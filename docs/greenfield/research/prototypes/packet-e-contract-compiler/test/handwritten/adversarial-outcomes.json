@@ -1,0 +1,162 @@
+{
+  "schemaVersion": "0.1.0",
+  "cue": [
+    {
+      "mutation": "deleted matrix cell",
+      "constraint": "#matrixCoordinatesComplete",
+      "property": "Every selected matrix has exactly one cell for every declared row-column coordinate."
+    },
+    {
+      "mutation": "duplicate matrix cell",
+      "constraint": "#matrixCoordinatesUnique",
+      "property": "A selected matrix cannot encode the same row-column coordinate twice."
+    },
+    {
+      "mutation": "wildcard matrix coordinate",
+      "constraint": "#matrixCoordinatesDeclared",
+      "property": "Matrix coordinates are concrete members of the declared axes; wildcard coordinates are not contract values."
+    },
+    {
+      "mutation": "undeclared matrix coordinate",
+      "constraint": "#matrixCoordinatesDeclared",
+      "property": "Every matrix cell references only a row and column declared by that matrix."
+    },
+    {
+      "mutation": "duplicate matrix axis",
+      "constraint": "#rowIdsUnique",
+      "property": "Each matrix axis is a duplicate-free closed set."
+    },
+    {
+      "mutation": "operation-inadmissible request error",
+      "constraint": "#requestErrorsAdmissible",
+      "property": "An operation exposes exactly the request-error set selected by the contract."
+    },
+    {
+      "mutation": "duplicate closed-sum wire tag",
+      "constraint": "#wireTagSelected",
+      "property": "Every closed variant retains its explicitly selected wire identity."
+    },
+    {
+      "mutation": "WaitOperation changed to mutation",
+      "constraint": "#waitOperationObservation",
+      "property": "WaitOperation remains observational and cannot be reclassified as a mutating call."
+    },
+    {
+      "mutation": "observation changed to an accepted branch",
+      "constraint": "#observationBranchShape",
+      "property": "An observation exposes exactly its selected result branches and cannot acquire a mutation-acceptance branch."
+    },
+    {
+      "mutation": "transition references an undeclared state",
+      "constraint": "#matrixTransitionsResolve",
+      "property": "A transition target resolves within the selected matrix state universe."
+    },
+    {
+      "mutation": "matrix cell has a valid but source-incorrect kind",
+      "constraint": "#matrixCellsSelected",
+      "property": "A cell retains the exact kind selected for its row-column coordinate."
+    },
+    {
+      "mutation": "transition has a valid but source-incorrect next state",
+      "constraint": "#matrixCellsSelected",
+      "property": "A transition retains its exact selected target, even when another target is structurally valid."
+    },
+    {
+      "mutation": "reject has a valid but source-incorrect request error",
+      "constraint": "#matrixCellsSelected",
+      "property": "A rejection cell retains its exact selected error, even when another error is admissible for that operation."
+    },
+    {
+      "mutation": "operation references an undeclared matrix",
+      "constraint": "#matrixReferencesResolve",
+      "property": "Every operation matrix reference resolves to its exact selected matrix set."
+    },
+    {
+      "mutation": "bundle identity changed",
+      "constraint": "bundleVersion",
+      "property": "The executable oracle accepts only the selected bundle format version."
+    },
+    {
+      "mutation": "model identity changed",
+      "constraint": "contractId",
+      "property": "The executable oracle is bound to the selected contract identity."
+    },
+    {
+      "mutation": "undeclared model field",
+      "constraint": "field not allowed",
+      "property": "The contract model is closed and rejects undeclared fields."
+    },
+    {
+      "mutation": "regenerated schema from an incomplete matrix",
+      "constraint": "#matrixCoordinatesComplete",
+      "property": "Matrix totality is an oracle relation over concrete data, not a fact copied from the generator input."
+    },
+    {
+      "mutation": "regenerated schema from duplicate matrix coordinates",
+      "constraint": "#matrixCoordinatesUnique",
+      "property": "Coordinate uniqueness remains enforced even when the schema is regenerated from the same invalid model."
+    },
+    {
+      "mutation": "regenerated schema from an extra undeclared matrix cell",
+      "constraint": "#matrixCoordinatesDeclared",
+      "property": "Declared-coordinate membership remains enforced even when the schema is regenerated from the same invalid model."
+    }
+  ],
+  "quint": [
+    {
+      "action": "mutantRejectedRequestCreatesEffects",
+      "invariant": "rejectedRequestHasNoHandleOrDispatch",
+      "property": "A rejected request creates neither a durable handle nor a dispatch."
+    },
+    {
+      "action": "mutantPersistsIntentAndDispatchesAtomically",
+      "invariant": "dispatchRequiresDurableIntent",
+      "property": "Dispatch requires intent that was already durable before the dispatch transition."
+    },
+    {
+      "action": "mutantEqualReplayReturnsDifferentHandle",
+      "invariant": "equalReplayReturnsSameHandle",
+      "property": "An equal replay returns the original durable handle."
+    },
+    {
+      "action": "mutantConflictingReplayMutatesResource",
+      "invariant": "conflictingReplayHasNoEffect",
+      "property": "A conflicting replay cannot dispatch or mutate resource/effect state."
+    },
+    {
+      "action": "mutantStaleEpochRetainsAuthority",
+      "invariant": "staleEpochHasNoAuthority",
+      "property": "An actor from a stale runtime epoch cannot retain current authority."
+    },
+    {
+      "action": "mutantSuccessWithoutExactPostcondition",
+      "invariant": "successRequiresExactPostcondition",
+      "property": "Success requires evidence of the exact requested postcondition."
+    },
+    {
+      "action": "mutantFailureWhilePossiblyActing",
+      "invariant": "failedOrCancelledHasNoPossiblyActingAuthority",
+      "property": "Failure or cancellation cannot be committed while an authority may still act."
+    },
+    {
+      "action": "mutantUnknownDispatchesBlindSuccessor",
+      "invariant": "terminalUnknownHasNoBlindSuccessor",
+      "property": "A terminal unknown Operation cannot dispatch a blind successor."
+    },
+    {
+      "action": "mutantRewritesTerminalOperation",
+      "invariant": "terminalOperationIsImmutable",
+      "property": "A terminal Operation result is immutable."
+    },
+    {
+      "action": "mutantWaitTimeoutMutatesResource",
+      "invariant": "waitTimeoutDoesNotMutateResource",
+      "property": "A wait timeout observes state without mutating the resource."
+    },
+    {
+      "action": "mutantProviderAcknowledgementEstablishesSuccess",
+      "invariant": "providerAcknowledgementDoesNotEstablishSuccess",
+      "property": "Provider acknowledgement alone is insufficient evidence of success."
+    }
+  ]
+}

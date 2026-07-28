@@ -1,0 +1,39 @@
+import "../prototype.pkl"
+
+local artifact = prototype.compile(new prototype.ArtifactInput {
+  environment = new prototype.Environment {
+    packages = List()
+    variables = Map()
+    activation = List("bash")
+  }
+  workspace = new prototype.WorkspaceInput {
+    destination = "/workspace"
+    allowedMaterializations = List("copy", "live")
+  }
+  network = new prototype.NetworkInput {
+    hardPolicy = new prototype.HardPolicy {
+      base = new prototype.PolicyDefinition {
+        allowedDestinations = List()
+        source = "fixture:base"
+      }
+    }
+  }
+  secrets = List()
+  resources = new prototype.Resources {
+    memory = new prototype.MemoryBounds {
+      minimumBytes = 536870912
+      maximumBytes = 4294967296
+    }
+  }
+  targets = List("bubblewrap", "firecracker")
+})
+
+result = prototype.create(artifact, new prototype.CreateInput {
+  runtimeProfile = "firecracker-copy"
+  workspace = new prototype.CreationWorkspace {
+    materialization = "live"
+  }
+  allocation = new prototype.CreationAllocation {
+    memoryBytes = 1073741824
+  }
+})

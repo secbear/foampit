@@ -1,0 +1,323 @@
+{
+  "registryVersion": 1,
+  "packet": "C",
+  "status": "reviewed",
+  "textAuthority": "Only closed identity, member-sharing, claim-authority, profile-coordinate, ownership, and research-pin fields are normative. Fields named *Explanation or *Explanations are non-normative. Exact field/profile support, rejection, phase, evidence, and delegation semantics live in the independently pinned Packet C case-contract catalog.",
+  "identityStatusExplanation": "Stable review coordinates; public target and profile names remain gated by the naming ADR.",
+  "productionIdentityContract": {
+    "reviewCoordinateIsProductionIdentity": false,
+    "binding": "complete-implementation-bundle-digest",
+    "registryClosureBeforeAdvertisement": "required",
+    "memberBoundConformanceBeforeAdvertisement": "required"
+  },
+  "productionIdentityExplanation": "These profile IDs are review coordinates, not production-advertisable identities. A production profile identity and digest must bind the exact versions or digests of every owned and external builder, driver, launcher, guest runtime, helper, protocol, conformance suite, kernel and host-capability envelope, and default-suppression contract. A profile cannot be advertised until that complete registry closure exists and its member-bound conformance evidence passes.",
+  "memberSharingContract": {
+    "distinctHardRequirementsRequireDistinctMembers": true,
+    "byteDeduplicationAcrossMembers": "allowed",
+    "multiProfileAdvertisement": "independent-member-bound-evidence-required"
+  },
+  "memberSharingExplanation": "A target member exists for each distinct tuple of built bytes, workload platform, boot or device requirements, and immutable hard requirements. One byte-identical member may advertise multiple runtime profiles only when builder-produced evidence independently proves every advertised profile compatible with that exact member.",
+  "claimAuthority": {
+    "artifactSource": "requirements-only",
+    "builder": "construction-and-support-claims",
+    "manifestLoader": "untrusted-claim-verifier",
+    "create": "advertised-profile-selector",
+    "operator": "implementation-and-placement-binder"
+  },
+  "claimAuthorityExplanations": {
+    "artifactSource": "Selects or requires target/profile identities and semantic constraints. It cannot author support, successful construction, or passing-conformance facts.",
+    "builder": "Constructs target members and emits content identities, compatible runtime-profile claims, applicable conformance-suite identities, results, and evidence.",
+    "manifestLoader": "Treats every builder claim as untrusted input and verifies identity, structure, evidence linkage, and required-profile satisfaction before creation.",
+    "create": "Selects one profile proven and advertised by one member; it cannot manufacture a missing profile.",
+    "operator": "Maps the selected profile to a pinned driver implementation, helpers, compatible hosts, and placement without weakening it."
+  },
+  "profiles": [
+    {
+      "id": "bubblewrap-linux-v1",
+      "targetFamily": "bubblewrap",
+      "workloadPlatform": {
+        "os": "linux",
+        "architecture": "artifact-selected-and-builder-proven"
+      },
+      "memberKind": "nix-closure-launch-bundle",
+      "artifactBuilder": {
+        "owner": "product",
+        "componentClass": "owned-direct-bubblewrap-artifact-builder",
+        "reusedDependency": "nix",
+        "forbiddenDependencyRoleExplanation": "jail.nix is prior art and cannot define the core lowering or manifest schema"
+      },
+      "runtime": {
+        "owner": "product",
+        "componentClass": "owned-bubblewrap-driver",
+        "externalImplementation": "bubblewrap",
+        "implementationPinOwner": "operator"
+      },
+      "implementationBundleExplanations": [
+        "owned direct target-member builder and typed mount-graph-to-argv compiler",
+        "owned non-shell pre-exec identity, capability, activation, and secret launcher",
+        "FD-safe host-path resolver retaining descriptors through mount setup",
+        "owned cgroup v2 supervisor and complete-process-tree lifetime controller",
+        "owned network-namespace, policy, DNS, ingress, and typed host-channel brokers",
+        "owned post-start evidence collector and versioned Bubblewrap conformance suite",
+        "pinned non-setuid Bubblewrap executable"
+      ],
+      "researchPins": [
+        {
+          "component": "bubblewrap",
+          "revision": "v0.11.2 / 1b80120ef26a28e065e67f89bfef873f13bdd317",
+          "source": "https://github.com/containers/bubblewrap/releases/tag/v0.11.2"
+        },
+        {
+          "component": "jail.nix-prior-art",
+          "revision": "404e7da9da5ab9aa643666682b2ba1312fa5fbe8",
+          "source": "https://git.sr.ht/~alexdavid/jail.nix/commit/404e7da9da5ab9aa643666682b2ba1312fa5fbe8"
+        }
+      ],
+      "requiredDefaultSuppressionExplanations": [
+        "ambient host filesystem",
+        "ambient host environment",
+        "ambient network namespace",
+        "ambient capabilities",
+        "shell command interpretation",
+        "setuid Bubblewrap mode",
+        "try or fallback namespace and mount operations",
+        "host current directory, HOME, PATH, supplementary groups, resolver files, devices, and open setup descriptors",
+        "unbounded root tmpfs or overlay behavior",
+        "backend PID1, signal, terminal, and file-mode defaults"
+      ],
+      "baselineUnsupportedExplanations": [
+        "non-Linux workload or unregistered foreign-architecture emulation",
+        "mandatory live mechanism outside registered FD-safe bind or copy semantics",
+        "separate workload-only memory bound",
+        "bounded private writable root without a registered quota-backed extension",
+        "path-scoped or shared-device I/O performance bounds",
+        "process, memory, device, or filesystem snapshot",
+        "identity or capability-set relations the owned launcher cannot install exactly",
+        "unregistered devices, host channels, kernel policies, and lifecycle operations"
+      ],
+      "advertisementPreconditionExplanations": [
+        "exact argument-vector construction succeeds",
+        "the executable pin, build features, non-setuid mode, and file mode are verified",
+        "all dynamic mount sources remain FD-pinned from validation through Bubblewrap setup",
+        "every required namespace operation is strict and no try or raw argument path exists",
+        "all required kernel and helper capabilities have registered checks",
+        "the applicable bubblewrap conformance suite passes for the built member and driver profile"
+      ]
+    },
+    {
+      "id": "microvm-firecracker-linux-v1",
+      "targetFamily": "microvm",
+      "workloadPlatform": {
+        "os": "linux",
+        "architecture": "artifact-selected-and-builder-proven"
+      },
+      "memberKind": "microvm-boot-bundle",
+      "artifactBuilder": {
+        "owner": "product",
+        "componentClass": "owned-versioned-microvm-build-adapter",
+        "reusedDependency": "pinned-microvm.nix-guest-builder",
+        "forbiddenDependencyRoleExplanation": "microvm.nix option trees and declaredRunner cannot define the product manifest or runtime contract"
+      },
+      "runtime": {
+        "owner": "product",
+        "componentClass": "owned-firecracker-driver",
+        "externalImplementation": "firecracker-plus-jailer-or-proven-stronger-process-sandbox",
+        "implementationPinOwner": "operator"
+      },
+      "implementationBundleExplanations": [
+        "owned versioned microVM target-member adapter using microvm.nix only for guest construction",
+        "owned guest runtime for process, identity, policy, secret, output, and lifecycle protocols",
+        "owned Firecracker API driver and exact device/configuration compiler",
+        "Firecracker jailer or separately evidenced stronger process sandbox",
+        "owned outer cgroup v2, namespace, TAP/network-policy, storage, vsock, and lifetime supervisors",
+        "owned snapshot orchestration and post-start evidence collector",
+        "pinned Firecracker and microvm.nix guest-construction revisions"
+      ],
+      "researchPins": [
+        {
+          "component": "microvm.nix",
+          "revision": "fa5340ac684cdce8a22b6d4a0bcebb0cc999275e",
+          "source": "https://github.com/microvm-nix/microvm.nix"
+        },
+        {
+          "component": "firecracker",
+          "revision": "c1490c7983644f68facfc267c20156546e81bd4f",
+          "source": "https://github.com/firecracker-microvm/firecracker"
+        }
+      ],
+      "requiredDefaultSuppressionExplanations": [
+        "microvm.nix generated runner",
+        "raw VMM arguments",
+        "implicit host shares or interfaces",
+        "implicit host paths and devices",
+        "VMM defaults that alter declared machine or security semantics",
+        "MMDS, pmem, passthrough, hotplug, and undeclared devices",
+        "unbounded serial output and implicit console behavior",
+        "VMM memory size presented as complete Sandbox or workload-only accounting",
+        "snapshot behavior outside the exact declared component and compatibility envelope"
+      ],
+      "baselineUnsupportedExplanations": [
+        "mandatory live host-directory workspace",
+        "process launch without jailer or evidenced stronger confinement",
+        "filesystem-inclusive or portable-host snapshot without owned orchestration",
+        "snapshot clone without identity, entropy, token, and network refresh",
+        "I/O bounds not attributable to a dedicated device or exact Firecracker limiter dimension",
+        "unregistered MMDS, pmem, passthrough, hotplug, serial, device, and host-channel semantics",
+        "raw microvm.nix runner, preStart, extraConfig, or extraArgs behavior"
+      ],
+      "advertisementPreconditionExplanations": [
+        "guest kernel, initrd, immutable filesystems, boot parameters, and guest runtime are built and identified",
+        "copy or prepared-block workspace requirements are satisfiable and live host filesystem sharing is not claimed",
+        "the exact Firecracker and jailer build, UID/GID and namespace setup, cgroup v2 parameters, rlimits, device baseline, and serial policy are proven",
+        "outer VMM accounting and guest workload accounting satisfy their distinct declared scopes",
+        "the applicable Firecracker, jailer, guest-runtime, and semantic conformance suites pass"
+      ]
+    },
+    {
+      "id": "microvm-cloud-hypervisor-linux-v1",
+      "targetFamily": "microvm",
+      "workloadPlatform": {
+        "os": "linux",
+        "architecture": "artifact-selected-and-builder-proven"
+      },
+      "memberKind": "microvm-boot-bundle",
+      "artifactBuilder": {
+        "owner": "product",
+        "componentClass": "owned-versioned-microvm-build-adapter",
+        "reusedDependency": "pinned-microvm.nix-guest-builder",
+        "forbiddenDependencyRoleExplanation": "microvm.nix option trees and declaredRunner cannot define the product manifest or runtime contract"
+      },
+      "runtime": {
+        "owner": "product",
+        "componentClass": "owned-cloud-hypervisor-driver",
+        "externalImplementation": "cloud-hypervisor-plus-product-required-process-sandbox",
+        "implementationPinOwner": "operator"
+      },
+      "implementationBundleExplanations": [
+        "owned versioned microVM target-member adapter using microvm.nix only for guest construction",
+        "owned guest runtime for process, identity, policy, secret, output, and lifecycle protocols",
+        "owned Cloud Hypervisor API driver and exact device/configuration compiler",
+        "owned outer namespace, cgroup v2, Landlock/seccomp admission, network, storage, vsock, and lifetime supervisors",
+        "owned qualified virtiofsd lifecycle, confinement, mapping, and accounting integration",
+        "owned snapshot orchestration and post-start evidence collector",
+        "pinned Cloud Hypervisor, virtiofsd, and microvm.nix guest-construction revisions"
+      ],
+      "researchPins": [
+        {
+          "component": "microvm.nix",
+          "revision": "fa5340ac684cdce8a22b6d4a0bcebb0cc999275e",
+          "source": "https://github.com/microvm-nix/microvm.nix"
+        },
+        {
+          "component": "cloud-hypervisor",
+          "revision": "aa19811139aeab74baf7065784b24fd66f6e32e2",
+          "source": "https://github.com/cloud-hypervisor/cloud-hypervisor"
+        },
+        {
+          "component": "virtiofsd",
+          "revision": "v1.14.0 / c2540f8db14caba81c1e37fba23fc7bf2cd7f0dd",
+          "source": "https://gitlab.com/virtio-fs/virtiofsd/-/releases/v1.14.0"
+        }
+      ],
+      "requiredDefaultSuppressionExplanations": [
+        "microvm.nix generated runner",
+        "raw VMM arguments",
+        "implicit virtiofs shares or interfaces",
+        "implicit host paths and devices",
+        "VMM defaults that alter declared machine or security semantics",
+        "nested virtualization, consoles, serial, debug endpoints, OEM strings, and passthrough",
+        "best-effort Landlock or seccomp confinement",
+        "virtiofsd outside the VMM jail and resource-accounting boundary",
+        "snapshot behavior outside the exact declared component and compatibility envelope"
+      ],
+      "baselineUnsupportedExplanations": [
+        "live virtiofs without shared memory, helper confinement/accounting, and exact ownership/access semantics",
+        "AF_UNIX isolation claimed from Landlock alone",
+        "filesystem-inclusive or cross-build snapshot without owned orchestration and proof",
+        "I/O bounds not attributable to a dedicated device or exact Cloud Hypervisor limiter dimension",
+        "unregistered nested virtualization, passthrough, vhost-user, OEM-string, device, and host-channel semantics",
+        "raw microvm.nix runner, preStart, extraArgs, platform OEM string, or helper behavior"
+      ],
+      "advertisementPreconditionExplanations": [
+        "guest kernel, initrd, immutable filesystems, boot parameters, and guest runtime are built and identified",
+        "every advertised live-workspace configuration identifies and confines its virtiofs helper",
+        "nested virtualization is disabled and the complete unavoidable plus requested device baseline is identified",
+        "Landlock and seccomp requirements fail closed and outer confinement closes boundaries they do not cover",
+        "outer VMM accounting and guest workload accounting satisfy their distinct declared scopes",
+        "the applicable Cloud Hypervisor, helper, guest-runtime, and semantic conformance suites pass"
+      ]
+    },
+    {
+      "id": "oci-linux-v1",
+      "targetFamily": "oci",
+      "workloadPlatform": {
+        "os": "linux",
+        "architecture": "artifact-selected-and-builder-proven"
+      },
+      "memberKind": "oci-image-plus-sandbox-manifest",
+      "artifactBuilder": {
+        "owner": "product",
+        "componentClass": "owned-oci-image-adapter",
+        "reusedDependency": "pinned-nix-oci-image-builder",
+        "forbiddenDependencyRoleExplanation": "OCI image configuration cannot substitute for the product runtime-policy manifest"
+      },
+      "runtime": {
+        "owner": "product",
+        "componentClass": "owned-oci-runtime-driver",
+        "externalImplementation": "registered-oci-runtime-implementation",
+        "implementationPinOwner": "operator"
+      },
+      "implementationBundleExplanations": [
+        "owned Nix-to-OCI image and product-manifest adapter",
+        "owned OCI runtime configuration generator",
+        "registered pinned OCI runtime implementation and host feature profile",
+        "owned cgroup, network, secret, mount, device, process, lifetime, and evidence integrations",
+        "owned product-manifest loader and OCI descriptor verifier",
+        "owned versioned OCI semantic conformance suite"
+      ],
+      "researchPins": [
+        {
+          "component": "oci-runtime-spec",
+          "revision": "v1.3.0",
+          "source": "https://specs.opencontainers.org/runtime-spec/runtime/?v=v1.3.0"
+        },
+        {
+          "component": "oci-image-spec",
+          "revision": "v1.1.1",
+          "source": "https://specs.opencontainers.org/image-spec/config/?v=v1.1.1"
+        },
+        {
+          "component": "oci-distribution-spec",
+          "revision": "v1.1.1",
+          "source": "https://github.com/opencontainers/distribution-spec/blob/v1.1.1/spec.md"
+        }
+      ],
+      "requiredDefaultSuppressionExplanations": [
+        "image entrypoint and command fallback",
+        "image environment, user, cwd, volume, port, and stop-signal fallback",
+        "runtime hooks",
+        "ambient host namespaces, mounts, devices, and annotations",
+        "runtime defaults that alter declared resource or security semantics",
+        "ambient cgroup placement, user/group mappings, resolver state, masked/read-only paths, and rootfs writability",
+        "provider hooks, injected commands, lifecycle mutation, and mutable tag selection",
+        "unregistered runtime-specific annotations and extensions"
+      ],
+      "baselineUnsupportedExplanations": [
+        "snapshot or restore semantics absent from the OCI Runtime v1 contract",
+        "bounded private writable root without a registered quota-backed runtime profile",
+        "runtime hooks or opaque provider mutation",
+        "I/O bounds on shared or unattributable backing devices",
+        "unregistered devices, kernel policies, annotations, host channels, and lifecycle operations",
+        "runtime implementation unable to suppress image or runtime defaults"
+      ],
+      "advertisementPreconditionExplanations": [
+        "the OCI image and product sandbox manifest are content-identified and linked",
+        "the runtime implementation and Linux configuration features required by the profile are registered and pinned",
+        "the generated runtime configuration neutralizes every image and runtime default outside the validated Artifact/Create/Operator contract",
+        "no Artifact-supplied or provider-supplied lifecycle hook is present",
+        "the runtime errors rather than weakens any unavailable namespace, resource, security, mount, device, or lifecycle requirement",
+        "the applicable OCI bundle, runtime-driver, and semantic conformance suites pass"
+      ]
+    }
+  ]
+}

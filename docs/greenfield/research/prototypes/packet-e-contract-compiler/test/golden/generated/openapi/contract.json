@@ -1,0 +1,1401 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "packet-e-vertical-slice",
+    "version": "0.1.0"
+  },
+  "paths": {},
+  "components": {
+    "schemas": {
+      "RegistryAmbiguityAmbiguityRuntimeUnknown": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId"
+        ],
+        "properties": {
+          "stableId": {
+            "const": "ambiguity.runtime.unknown"
+          }
+        },
+        "x-stable-id": "ambiguity.runtime.unknown",
+        "x-wire-tag": "1"
+      },
+      "RegistryAmbiguity": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/RegistryAmbiguityAmbiguityRuntimeUnknown"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "stableId",
+          "mapping": {
+            "ambiguity.runtime.unknown": "#/components/schemas/RegistryAmbiguityAmbiguityRuntimeUnknown"
+          }
+        },
+        "x-stable-id": "registry.ambiguity"
+      },
+      "RegistryCallerRecoveryCallerRecoveryRetry": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId"
+        ],
+        "properties": {
+          "stableId": {
+            "const": "caller.recovery.retry"
+          }
+        },
+        "x-stable-id": "caller.recovery.retry",
+        "x-wire-tag": "1"
+      },
+      "RegistryCallerRecovery": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/RegistryCallerRecoveryCallerRecoveryRetry"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "stableId",
+          "mapping": {
+            "caller.recovery.retry": "#/components/schemas/RegistryCallerRecoveryCallerRecoveryRetry"
+          }
+        },
+        "x-stable-id": "registry.caller.recovery"
+      },
+      "RegistryCoreResolutionCoreResolutionReconcile": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId"
+        ],
+        "properties": {
+          "stableId": {
+            "const": "core.resolution.reconcile"
+          }
+        },
+        "x-stable-id": "core.resolution.reconcile",
+        "x-wire-tag": "1"
+      },
+      "RegistryCoreResolution": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/RegistryCoreResolutionCoreResolutionReconcile"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "stableId",
+          "mapping": {
+            "core.resolution.reconcile": "#/components/schemas/RegistryCoreResolutionCoreResolutionReconcile"
+          }
+        },
+        "x-stable-id": "registry.core.resolution"
+      },
+      "RegistryKnownFailureFailureRuntimeProvisioning": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId"
+        ],
+        "properties": {
+          "stableId": {
+            "const": "failure.runtime.provisioning"
+          }
+        },
+        "x-stable-id": "failure.runtime.provisioning",
+        "x-wire-tag": "1"
+      },
+      "RegistryKnownFailure": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/RegistryKnownFailureFailureRuntimeProvisioning"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "stableId",
+          "mapping": {
+            "failure.runtime.provisioning": "#/components/schemas/RegistryKnownFailureFailureRuntimeProvisioning"
+          }
+        },
+        "x-stable-id": "registry.known.failure"
+      },
+      "RegistryOperationOutcomeOutcomeAccepted": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId"
+        ],
+        "properties": {
+          "stableId": {
+            "const": "outcome.accepted"
+          }
+        },
+        "x-stable-id": "outcome.accepted",
+        "x-wire-tag": "1"
+      },
+      "RegistryOperationOutcomeOutcomeRejected": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId"
+        ],
+        "properties": {
+          "stableId": {
+            "const": "outcome.rejected"
+          }
+        },
+        "x-stable-id": "outcome.rejected",
+        "x-wire-tag": "2"
+      },
+      "RegistryOperationOutcomeOutcomeRecovery": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId"
+        ],
+        "properties": {
+          "stableId": {
+            "const": "outcome.recovery"
+          }
+        },
+        "x-stable-id": "outcome.recovery",
+        "x-wire-tag": "3"
+      },
+      "RegistryOperationOutcomeOutcomeObserved": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId"
+        ],
+        "properties": {
+          "stableId": {
+            "const": "outcome.observed"
+          }
+        },
+        "x-stable-id": "outcome.observed",
+        "x-wire-tag": "4"
+      },
+      "RegistryOperationOutcome": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/RegistryOperationOutcomeOutcomeAccepted"
+          },
+          {
+            "$ref": "#/components/schemas/RegistryOperationOutcomeOutcomeRejected"
+          },
+          {
+            "$ref": "#/components/schemas/RegistryOperationOutcomeOutcomeRecovery"
+          },
+          {
+            "$ref": "#/components/schemas/RegistryOperationOutcomeOutcomeObserved"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "stableId",
+          "mapping": {
+            "outcome.accepted": "#/components/schemas/RegistryOperationOutcomeOutcomeAccepted",
+            "outcome.rejected": "#/components/schemas/RegistryOperationOutcomeOutcomeRejected",
+            "outcome.recovery": "#/components/schemas/RegistryOperationOutcomeOutcomeRecovery",
+            "outcome.observed": "#/components/schemas/RegistryOperationOutcomeOutcomeObserved"
+          }
+        },
+        "x-stable-id": "registry.operation.outcome"
+      },
+      "RegistryProcessControlOutcomeOutcomeProcessAccepted": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId"
+        ],
+        "properties": {
+          "stableId": {
+            "const": "outcome.process.accepted"
+          }
+        },
+        "x-stable-id": "outcome.process.accepted",
+        "x-wire-tag": "1"
+      },
+      "RegistryProcessControlOutcomeOutcomeProcessRejected": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId"
+        ],
+        "properties": {
+          "stableId": {
+            "const": "outcome.process.rejected"
+          }
+        },
+        "x-stable-id": "outcome.process.rejected",
+        "x-wire-tag": "2"
+      },
+      "RegistryProcessControlOutcomeOutcomeProcessRecovery": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId"
+        ],
+        "properties": {
+          "stableId": {
+            "const": "outcome.process.recovery"
+          }
+        },
+        "x-stable-id": "outcome.process.recovery",
+        "x-wire-tag": "3"
+      },
+      "RegistryProcessControlOutcome": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/RegistryProcessControlOutcomeOutcomeProcessAccepted"
+          },
+          {
+            "$ref": "#/components/schemas/RegistryProcessControlOutcomeOutcomeProcessRejected"
+          },
+          {
+            "$ref": "#/components/schemas/RegistryProcessControlOutcomeOutcomeProcessRecovery"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "stableId",
+          "mapping": {
+            "outcome.process.accepted": "#/components/schemas/RegistryProcessControlOutcomeOutcomeProcessAccepted",
+            "outcome.process.rejected": "#/components/schemas/RegistryProcessControlOutcomeOutcomeProcessRejected",
+            "outcome.process.recovery": "#/components/schemas/RegistryProcessControlOutcomeOutcomeProcessRecovery"
+          }
+        },
+        "x-stable-id": "registry.process.control.outcome"
+      },
+      "RegistryProcessTerminationProcessTerminationExited": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId"
+        ],
+        "properties": {
+          "stableId": {
+            "const": "process.termination.exited"
+          }
+        },
+        "x-stable-id": "process.termination.exited",
+        "x-wire-tag": "1"
+      },
+      "RegistryProcessTerminationProcessTerminationSignalled": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId"
+        ],
+        "properties": {
+          "stableId": {
+            "const": "process.termination.signalled"
+          }
+        },
+        "x-stable-id": "process.termination.signalled",
+        "x-wire-tag": "2"
+      },
+      "RegistryProcessTermination": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/RegistryProcessTerminationProcessTerminationExited"
+          },
+          {
+            "$ref": "#/components/schemas/RegistryProcessTerminationProcessTerminationSignalled"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "stableId",
+          "mapping": {
+            "process.termination.exited": "#/components/schemas/RegistryProcessTerminationProcessTerminationExited",
+            "process.termination.signalled": "#/components/schemas/RegistryProcessTerminationProcessTerminationSignalled"
+          }
+        },
+        "x-stable-id": "registry.process.termination"
+      },
+      "RegistryProviderEvidenceProviderEvidenceObserved": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId"
+        ],
+        "properties": {
+          "stableId": {
+            "const": "provider.evidence.observed"
+          }
+        },
+        "x-stable-id": "provider.evidence.observed",
+        "x-wire-tag": "1"
+      },
+      "RegistryProviderEvidence": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/RegistryProviderEvidenceProviderEvidenceObserved"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "stableId",
+          "mapping": {
+            "provider.evidence.observed": "#/components/schemas/RegistryProviderEvidenceProviderEvidenceObserved"
+          }
+        },
+        "x-stable-id": "registry.provider.evidence"
+      },
+      "RegistryRecoveryErrorRecoveryIdempotencyExpired": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId"
+        ],
+        "properties": {
+          "stableId": {
+            "const": "recovery.idempotency.expired"
+          }
+        },
+        "x-stable-id": "recovery.idempotency.expired",
+        "x-wire-tag": "1"
+      },
+      "RegistryRecoveryError": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/RegistryRecoveryErrorRecoveryIdempotencyExpired"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "stableId",
+          "mapping": {
+            "recovery.idempotency.expired": "#/components/schemas/RegistryRecoveryErrorRecoveryIdempotencyExpired"
+          }
+        },
+        "x-stable-id": "registry.recovery.error"
+      },
+      "RegistryRequestErrorRequestInvalidState": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId"
+        ],
+        "properties": {
+          "stableId": {
+            "const": "request.invalid.state"
+          }
+        },
+        "x-stable-id": "request.invalid.state",
+        "x-wire-tag": "1"
+      },
+      "RegistryRequestErrorRequestSequenceOutOfRange": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId"
+        ],
+        "properties": {
+          "stableId": {
+            "const": "request.sequence.out.of.range"
+          }
+        },
+        "x-stable-id": "request.sequence.out.of.range",
+        "x-wire-tag": "2"
+      },
+      "RegistryRequestError": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/RegistryRequestErrorRequestInvalidState"
+          },
+          {
+            "$ref": "#/components/schemas/RegistryRequestErrorRequestSequenceOutOfRange"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "stableId",
+          "mapping": {
+            "request.invalid.state": "#/components/schemas/RegistryRequestErrorRequestInvalidState",
+            "request.sequence.out.of.range": "#/components/schemas/RegistryRequestErrorRequestSequenceOutOfRange"
+          }
+        },
+        "x-stable-id": "registry.request.error"
+      },
+      "RegistryTransportErrorTransportErrorUnavailable": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId"
+        ],
+        "properties": {
+          "stableId": {
+            "const": "transport.error.unavailable"
+          }
+        },
+        "x-stable-id": "transport.error.unavailable",
+        "x-wire-tag": "1"
+      },
+      "RegistryTransportError": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/RegistryTransportErrorTransportErrorUnavailable"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "stableId",
+          "mapping": {
+            "transport.error.unavailable": "#/components/schemas/RegistryTransportErrorTransportErrorUnavailable"
+          }
+        },
+        "x-stable-id": "registry.transport.error"
+      },
+      "StateOperationStateOperationAccepted": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId"
+        ],
+        "properties": {
+          "stableId": {
+            "const": "state.operation.accepted"
+          }
+        },
+        "x-stable-id": "state.operation.accepted",
+        "x-wire-tag": "1"
+      },
+      "StateOperationStateOperationRunning": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId"
+        ],
+        "properties": {
+          "stableId": {
+            "const": "state.operation.running"
+          }
+        },
+        "x-stable-id": "state.operation.running",
+        "x-wire-tag": "2"
+      },
+      "StateOperationStateOperationCancelRequested": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId"
+        ],
+        "properties": {
+          "stableId": {
+            "const": "state.operation.cancel.requested"
+          }
+        },
+        "x-stable-id": "state.operation.cancel.requested",
+        "x-wire-tag": "3"
+      },
+      "StateOperationStateOperationSucceeded": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId"
+        ],
+        "properties": {
+          "stableId": {
+            "const": "state.operation.succeeded"
+          }
+        },
+        "x-stable-id": "state.operation.succeeded",
+        "x-wire-tag": "4"
+      },
+      "StateOperationStateOperationFailed": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId"
+        ],
+        "properties": {
+          "stableId": {
+            "const": "state.operation.failed"
+          }
+        },
+        "x-stable-id": "state.operation.failed",
+        "x-wire-tag": "5"
+      },
+      "StateOperationStateOperationCancelled": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId"
+        ],
+        "properties": {
+          "stableId": {
+            "const": "state.operation.cancelled"
+          }
+        },
+        "x-stable-id": "state.operation.cancelled",
+        "x-wire-tag": "6"
+      },
+      "StateOperationStateOperationUnknown": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId"
+        ],
+        "properties": {
+          "stableId": {
+            "const": "state.operation.unknown"
+          }
+        },
+        "x-stable-id": "state.operation.unknown",
+        "x-wire-tag": "7"
+      },
+      "StateOperation": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/StateOperationStateOperationAccepted"
+          },
+          {
+            "$ref": "#/components/schemas/StateOperationStateOperationRunning"
+          },
+          {
+            "$ref": "#/components/schemas/StateOperationStateOperationCancelRequested"
+          },
+          {
+            "$ref": "#/components/schemas/StateOperationStateOperationSucceeded"
+          },
+          {
+            "$ref": "#/components/schemas/StateOperationStateOperationFailed"
+          },
+          {
+            "$ref": "#/components/schemas/StateOperationStateOperationCancelled"
+          },
+          {
+            "$ref": "#/components/schemas/StateOperationStateOperationUnknown"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "stableId",
+          "mapping": {
+            "state.operation.accepted": "#/components/schemas/StateOperationStateOperationAccepted",
+            "state.operation.running": "#/components/schemas/StateOperationStateOperationRunning",
+            "state.operation.cancel.requested": "#/components/schemas/StateOperationStateOperationCancelRequested",
+            "state.operation.succeeded": "#/components/schemas/StateOperationStateOperationSucceeded",
+            "state.operation.failed": "#/components/schemas/StateOperationStateOperationFailed",
+            "state.operation.cancelled": "#/components/schemas/StateOperationStateOperationCancelled",
+            "state.operation.unknown": "#/components/schemas/StateOperationStateOperationUnknown"
+          }
+        },
+        "x-stable-id": "state.operation"
+      },
+      "StateProcessStateProcessAccepted": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId"
+        ],
+        "properties": {
+          "stableId": {
+            "const": "state.process.accepted"
+          }
+        },
+        "x-stable-id": "state.process.accepted",
+        "x-wire-tag": "1"
+      },
+      "StateProcessStateProcessStarting": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId"
+        ],
+        "properties": {
+          "stableId": {
+            "const": "state.process.starting"
+          }
+        },
+        "x-stable-id": "state.process.starting",
+        "x-wire-tag": "2"
+      },
+      "StateProcessStateProcessRunning": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId"
+        ],
+        "properties": {
+          "stableId": {
+            "const": "state.process.running"
+          }
+        },
+        "x-stable-id": "state.process.running",
+        "x-wire-tag": "3"
+      },
+      "StateProcessStateProcessUnknown": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId"
+        ],
+        "properties": {
+          "stableId": {
+            "const": "state.process.unknown"
+          }
+        },
+        "x-stable-id": "state.process.unknown",
+        "x-wire-tag": "4"
+      },
+      "StateProcessStateProcessTerminated": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId"
+        ],
+        "properties": {
+          "stableId": {
+            "const": "state.process.terminated"
+          }
+        },
+        "x-stable-id": "state.process.terminated",
+        "x-wire-tag": "5"
+      },
+      "StateProcess": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/StateProcessStateProcessAccepted"
+          },
+          {
+            "$ref": "#/components/schemas/StateProcessStateProcessStarting"
+          },
+          {
+            "$ref": "#/components/schemas/StateProcessStateProcessRunning"
+          },
+          {
+            "$ref": "#/components/schemas/StateProcessStateProcessUnknown"
+          },
+          {
+            "$ref": "#/components/schemas/StateProcessStateProcessTerminated"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "stableId",
+          "mapping": {
+            "state.process.accepted": "#/components/schemas/StateProcessStateProcessAccepted",
+            "state.process.starting": "#/components/schemas/StateProcessStateProcessStarting",
+            "state.process.running": "#/components/schemas/StateProcessStateProcessRunning",
+            "state.process.unknown": "#/components/schemas/StateProcessStateProcessUnknown",
+            "state.process.terminated": "#/components/schemas/StateProcessStateProcessTerminated"
+          }
+        },
+        "x-stable-id": "state.process"
+      },
+      "StateSandboxStateSandboxStopped": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId"
+        ],
+        "properties": {
+          "stableId": {
+            "const": "state.sandbox.stopped"
+          }
+        },
+        "x-stable-id": "state.sandbox.stopped",
+        "x-wire-tag": "1"
+      },
+      "StateSandboxStateSandboxProvisioning": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId"
+        ],
+        "properties": {
+          "stableId": {
+            "const": "state.sandbox.provisioning"
+          }
+        },
+        "x-stable-id": "state.sandbox.provisioning",
+        "x-wire-tag": "2"
+      },
+      "StateSandboxStateSandboxRunning": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId"
+        ],
+        "properties": {
+          "stableId": {
+            "const": "state.sandbox.running"
+          }
+        },
+        "x-stable-id": "state.sandbox.running",
+        "x-wire-tag": "3"
+      },
+      "StateSandboxStateSandboxUnknown": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "stableId"
+        ],
+        "properties": {
+          "stableId": {
+            "const": "state.sandbox.unknown"
+          }
+        },
+        "x-stable-id": "state.sandbox.unknown",
+        "x-wire-tag": "4"
+      },
+      "StateSandbox": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/StateSandboxStateSandboxStopped"
+          },
+          {
+            "$ref": "#/components/schemas/StateSandboxStateSandboxProvisioning"
+          },
+          {
+            "$ref": "#/components/schemas/StateSandboxStateSandboxRunning"
+          },
+          {
+            "$ref": "#/components/schemas/StateSandboxStateSandboxUnknown"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "stableId",
+          "mapping": {
+            "state.sandbox.stopped": "#/components/schemas/StateSandboxStateSandboxStopped",
+            "state.sandbox.provisioning": "#/components/schemas/StateSandboxStateSandboxProvisioning",
+            "state.sandbox.running": "#/components/schemas/StateSandboxStateSandboxRunning",
+            "state.sandbox.unknown": "#/components/schemas/StateSandboxStateSandboxUnknown"
+          }
+        },
+        "x-stable-id": "state.sandbox"
+      },
+      "CancelOperationRequestError": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/RegistryRequestErrorRequestInvalidState"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "stableId",
+          "mapping": {
+            "request.invalid.state": "#/components/schemas/RegistryRequestErrorRequestInvalidState"
+          }
+        }
+      },
+      "CancelOperationRecoveryError": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/RegistryRecoveryErrorRecoveryIdempotencyExpired"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "stableId",
+          "mapping": {
+            "recovery.idempotency.expired": "#/components/schemas/RegistryRecoveryErrorRecoveryIdempotencyExpired"
+          }
+        }
+      },
+      "CancelOperationKnownFailure": {
+        "not": {}
+      },
+      "CancelOperationAmbiguity": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/RegistryAmbiguityAmbiguityRuntimeUnknown"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "stableId",
+          "mapping": {
+            "ambiguity.runtime.unknown": "#/components/schemas/RegistryAmbiguityAmbiguityRuntimeUnknown"
+          }
+        }
+      },
+      "CancelOperationAccepted": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operationId",
+          "branch",
+          "carrierKind",
+          "schemaStableId"
+        ],
+        "properties": {
+          "operationId": {
+            "const": "operation.cancel.operation"
+          },
+          "branch": {
+            "const": "accepted"
+          },
+          "carrierKind": {
+            "const": "existingOperationObservation"
+          },
+          "schemaStableId": {
+            "const": "result.existing.operation.observation"
+          }
+        },
+        "x-stable-id": "outcome.accepted",
+        "x-wire-tag": "1"
+      },
+      "CancelOperationRecoveryRecoveryIdempotencyExpired": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operationId",
+          "branch",
+          "recoveryErrorId"
+        ],
+        "properties": {
+          "operationId": {
+            "const": "operation.cancel.operation"
+          },
+          "branch": {
+            "const": "recovery"
+          },
+          "recoveryErrorId": {
+            "const": "recovery.idempotency.expired"
+          }
+        },
+        "x-stable-id": "outcome.recovery",
+        "x-wire-tag": "3",
+        "x-error-stable-id": "recovery.idempotency.expired",
+        "x-error-wire-tag": "1"
+      },
+      "CancelOperationRecovery": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/CancelOperationRecoveryRecoveryIdempotencyExpired"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "recoveryErrorId",
+          "mapping": {
+            "recovery.idempotency.expired": "#/components/schemas/CancelOperationRecoveryRecoveryIdempotencyExpired"
+          }
+        }
+      },
+      "CancelOperationRejectedRequestInvalidState": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operationId",
+          "branch",
+          "requestErrorId"
+        ],
+        "properties": {
+          "operationId": {
+            "const": "operation.cancel.operation"
+          },
+          "branch": {
+            "const": "rejected"
+          },
+          "requestErrorId": {
+            "const": "request.invalid.state"
+          }
+        },
+        "x-stable-id": "outcome.rejected",
+        "x-wire-tag": "2",
+        "x-error-stable-id": "request.invalid.state",
+        "x-error-wire-tag": "1"
+      },
+      "CancelOperationRejected": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/CancelOperationRejectedRequestInvalidState"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "requestErrorId",
+          "mapping": {
+            "request.invalid.state": "#/components/schemas/CancelOperationRejectedRequestInvalidState"
+          }
+        }
+      },
+      "CancelOperationOutcome": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/CancelOperationAccepted"
+          },
+          {
+            "$ref": "#/components/schemas/CancelOperationRecovery"
+          },
+          {
+            "$ref": "#/components/schemas/CancelOperationRejected"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "branch",
+          "mapping": {
+            "accepted": "#/components/schemas/CancelOperationAccepted",
+            "recovery": "#/components/schemas/CancelOperationRecovery",
+            "rejected": "#/components/schemas/CancelOperationRejected"
+          }
+        },
+        "x-operation-id": "operation.cancel.operation"
+      },
+      "StartSandboxRequestError": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/RegistryRequestErrorRequestInvalidState"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "stableId",
+          "mapping": {
+            "request.invalid.state": "#/components/schemas/RegistryRequestErrorRequestInvalidState"
+          }
+        }
+      },
+      "StartSandboxRecoveryError": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/RegistryRecoveryErrorRecoveryIdempotencyExpired"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "stableId",
+          "mapping": {
+            "recovery.idempotency.expired": "#/components/schemas/RegistryRecoveryErrorRecoveryIdempotencyExpired"
+          }
+        }
+      },
+      "StartSandboxKnownFailure": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/RegistryKnownFailureFailureRuntimeProvisioning"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "stableId",
+          "mapping": {
+            "failure.runtime.provisioning": "#/components/schemas/RegistryKnownFailureFailureRuntimeProvisioning"
+          }
+        }
+      },
+      "StartSandboxAmbiguity": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/RegistryAmbiguityAmbiguityRuntimeUnknown"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "stableId",
+          "mapping": {
+            "ambiguity.runtime.unknown": "#/components/schemas/RegistryAmbiguityAmbiguityRuntimeUnknown"
+          }
+        }
+      },
+      "StartSandboxAccepted": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operationId",
+          "branch",
+          "carrierKind",
+          "schemaStableId"
+        ],
+        "properties": {
+          "operationId": {
+            "const": "operation.start.sandbox"
+          },
+          "branch": {
+            "const": "accepted"
+          },
+          "carrierKind": {
+            "const": "newDurableOperation"
+          },
+          "schemaStableId": {
+            "const": "result.operation.start.sandbox"
+          }
+        },
+        "x-stable-id": "outcome.accepted",
+        "x-wire-tag": "1"
+      },
+      "StartSandboxRecoveryRecoveryIdempotencyExpired": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operationId",
+          "branch",
+          "recoveryErrorId"
+        ],
+        "properties": {
+          "operationId": {
+            "const": "operation.start.sandbox"
+          },
+          "branch": {
+            "const": "recovery"
+          },
+          "recoveryErrorId": {
+            "const": "recovery.idempotency.expired"
+          }
+        },
+        "x-stable-id": "outcome.recovery",
+        "x-wire-tag": "3",
+        "x-error-stable-id": "recovery.idempotency.expired",
+        "x-error-wire-tag": "1"
+      },
+      "StartSandboxRecovery": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/StartSandboxRecoveryRecoveryIdempotencyExpired"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "recoveryErrorId",
+          "mapping": {
+            "recovery.idempotency.expired": "#/components/schemas/StartSandboxRecoveryRecoveryIdempotencyExpired"
+          }
+        }
+      },
+      "StartSandboxRejectedRequestInvalidState": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operationId",
+          "branch",
+          "requestErrorId"
+        ],
+        "properties": {
+          "operationId": {
+            "const": "operation.start.sandbox"
+          },
+          "branch": {
+            "const": "rejected"
+          },
+          "requestErrorId": {
+            "const": "request.invalid.state"
+          }
+        },
+        "x-stable-id": "outcome.rejected",
+        "x-wire-tag": "2",
+        "x-error-stable-id": "request.invalid.state",
+        "x-error-wire-tag": "1"
+      },
+      "StartSandboxRejected": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/StartSandboxRejectedRequestInvalidState"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "requestErrorId",
+          "mapping": {
+            "request.invalid.state": "#/components/schemas/StartSandboxRejectedRequestInvalidState"
+          }
+        }
+      },
+      "StartSandboxOutcome": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/StartSandboxAccepted"
+          },
+          {
+            "$ref": "#/components/schemas/StartSandboxRecovery"
+          },
+          {
+            "$ref": "#/components/schemas/StartSandboxRejected"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "branch",
+          "mapping": {
+            "accepted": "#/components/schemas/StartSandboxAccepted",
+            "recovery": "#/components/schemas/StartSandboxRecovery",
+            "rejected": "#/components/schemas/StartSandboxRejected"
+          }
+        },
+        "x-operation-id": "operation.start.sandbox"
+      },
+      "WaitOperationRequestError": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/RegistryRequestErrorRequestInvalidState"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "stableId",
+          "mapping": {
+            "request.invalid.state": "#/components/schemas/RegistryRequestErrorRequestInvalidState"
+          }
+        }
+      },
+      "WaitOperationRecoveryError": {
+        "not": {}
+      },
+      "WaitOperationKnownFailure": {
+        "not": {}
+      },
+      "WaitOperationAmbiguity": {
+        "not": {}
+      },
+      "WaitOperationObserved": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operationId",
+          "branch",
+          "carrierKind",
+          "schemaStableId"
+        ],
+        "properties": {
+          "operationId": {
+            "const": "operation.wait.operation"
+          },
+          "branch": {
+            "const": "observed"
+          },
+          "carrierKind": {
+            "const": "observation"
+          },
+          "schemaStableId": {
+            "const": "result.operation.wait.observation"
+          }
+        },
+        "x-stable-id": "outcome.observed",
+        "x-wire-tag": "4"
+      },
+      "WaitOperationRejectedRequestInvalidState": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operationId",
+          "branch",
+          "requestErrorId"
+        ],
+        "properties": {
+          "operationId": {
+            "const": "operation.wait.operation"
+          },
+          "branch": {
+            "const": "rejected"
+          },
+          "requestErrorId": {
+            "const": "request.invalid.state"
+          }
+        },
+        "x-stable-id": "outcome.rejected",
+        "x-wire-tag": "2",
+        "x-error-stable-id": "request.invalid.state",
+        "x-error-wire-tag": "1"
+      },
+      "WaitOperationRejected": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/WaitOperationRejectedRequestInvalidState"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "requestErrorId",
+          "mapping": {
+            "request.invalid.state": "#/components/schemas/WaitOperationRejectedRequestInvalidState"
+          }
+        }
+      },
+      "WaitOperationOutcome": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/WaitOperationObserved"
+          },
+          {
+            "$ref": "#/components/schemas/WaitOperationRejected"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "branch",
+          "mapping": {
+            "observed": "#/components/schemas/WaitOperationObserved",
+            "rejected": "#/components/schemas/WaitOperationRejected"
+          }
+        },
+        "x-operation-id": "operation.wait.operation"
+      },
+      "WriteProcessInputRequestError": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/RegistryRequestErrorRequestInvalidState"
+          },
+          {
+            "$ref": "#/components/schemas/RegistryRequestErrorRequestSequenceOutOfRange"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "stableId",
+          "mapping": {
+            "request.invalid.state": "#/components/schemas/RegistryRequestErrorRequestInvalidState",
+            "request.sequence.out.of.range": "#/components/schemas/RegistryRequestErrorRequestSequenceOutOfRange"
+          }
+        }
+      },
+      "WriteProcessInputRecoveryError": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/RegistryRecoveryErrorRecoveryIdempotencyExpired"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "stableId",
+          "mapping": {
+            "recovery.idempotency.expired": "#/components/schemas/RegistryRecoveryErrorRecoveryIdempotencyExpired"
+          }
+        }
+      },
+      "WriteProcessInputKnownFailure": {
+        "not": {}
+      },
+      "WriteProcessInputAmbiguity": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/RegistryAmbiguityAmbiguityRuntimeUnknown"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "stableId",
+          "mapping": {
+            "ambiguity.runtime.unknown": "#/components/schemas/RegistryAmbiguityAmbiguityRuntimeUnknown"
+          }
+        }
+      },
+      "WriteProcessInputAccepted": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operationId",
+          "branch",
+          "carrierKind",
+          "schemaStableId"
+        ],
+        "properties": {
+          "operationId": {
+            "const": "operation.write.process.input"
+          },
+          "branch": {
+            "const": "accepted"
+          },
+          "carrierKind": {
+            "const": "processControlReceipt"
+          },
+          "schemaStableId": {
+            "const": "result.process.control.receipt"
+          }
+        },
+        "x-stable-id": "outcome.process.accepted",
+        "x-wire-tag": "1"
+      },
+      "WriteProcessInputRecoveryRecoveryIdempotencyExpired": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operationId",
+          "branch",
+          "recoveryErrorId"
+        ],
+        "properties": {
+          "operationId": {
+            "const": "operation.write.process.input"
+          },
+          "branch": {
+            "const": "recovery"
+          },
+          "recoveryErrorId": {
+            "const": "recovery.idempotency.expired"
+          }
+        },
+        "x-stable-id": "outcome.process.recovery",
+        "x-wire-tag": "3",
+        "x-error-stable-id": "recovery.idempotency.expired",
+        "x-error-wire-tag": "1"
+      },
+      "WriteProcessInputRecovery": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/WriteProcessInputRecoveryRecoveryIdempotencyExpired"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "recoveryErrorId",
+          "mapping": {
+            "recovery.idempotency.expired": "#/components/schemas/WriteProcessInputRecoveryRecoveryIdempotencyExpired"
+          }
+        }
+      },
+      "WriteProcessInputRejectedRequestInvalidState": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operationId",
+          "branch",
+          "requestErrorId"
+        ],
+        "properties": {
+          "operationId": {
+            "const": "operation.write.process.input"
+          },
+          "branch": {
+            "const": "rejected"
+          },
+          "requestErrorId": {
+            "const": "request.invalid.state"
+          }
+        },
+        "x-stable-id": "outcome.process.rejected",
+        "x-wire-tag": "2",
+        "x-error-stable-id": "request.invalid.state",
+        "x-error-wire-tag": "1"
+      },
+      "WriteProcessInputRejectedRequestSequenceOutOfRange": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operationId",
+          "branch",
+          "requestErrorId"
+        ],
+        "properties": {
+          "operationId": {
+            "const": "operation.write.process.input"
+          },
+          "branch": {
+            "const": "rejected"
+          },
+          "requestErrorId": {
+            "const": "request.sequence.out.of.range"
+          }
+        },
+        "x-stable-id": "outcome.process.rejected",
+        "x-wire-tag": "2",
+        "x-error-stable-id": "request.sequence.out.of.range",
+        "x-error-wire-tag": "2"
+      },
+      "WriteProcessInputRejected": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/WriteProcessInputRejectedRequestInvalidState"
+          },
+          {
+            "$ref": "#/components/schemas/WriteProcessInputRejectedRequestSequenceOutOfRange"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "requestErrorId",
+          "mapping": {
+            "request.invalid.state": "#/components/schemas/WriteProcessInputRejectedRequestInvalidState",
+            "request.sequence.out.of.range": "#/components/schemas/WriteProcessInputRejectedRequestSequenceOutOfRange"
+          }
+        }
+      },
+      "WriteProcessInputOutcome": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/WriteProcessInputAccepted"
+          },
+          {
+            "$ref": "#/components/schemas/WriteProcessInputRecovery"
+          },
+          {
+            "$ref": "#/components/schemas/WriteProcessInputRejected"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "branch",
+          "mapping": {
+            "accepted": "#/components/schemas/WriteProcessInputAccepted",
+            "recovery": "#/components/schemas/WriteProcessInputRecovery",
+            "rejected": "#/components/schemas/WriteProcessInputRejected"
+          }
+        },
+        "x-operation-id": "operation.write.process.input"
+      }
+    }
+  }
+}

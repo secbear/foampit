@@ -1,0 +1,9 @@
+extends "amendable-base.pkl"
+
+input {
+  environment {
+    variables = Map("EXTENDED", "yes")
+  }
+}
+
+extensionMetadata = "admitted-by-extends"

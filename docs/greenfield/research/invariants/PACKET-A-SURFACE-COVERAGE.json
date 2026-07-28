@@ -1,0 +1,1507 @@
+{
+  "reviewVersion": 1,
+  "packet": "A",
+  "status": "reviewed",
+  "requiredResources": [
+    "artifact",
+    "manifest",
+    "operator",
+    "service",
+    "create",
+    "live",
+    "exec",
+    "framework",
+    "runtime"
+  ],
+  "surfaces": [
+    {
+      "id": "artifact.profile-selection",
+      "resource": "artifact",
+      "owner": "artifact",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "CMP-003",
+        "WIRE-002"
+      ],
+      "delegatedPacket": "B",
+      "rationale": "Visible selection, pinned profile identity, omission semantics, and complete expansion are Artifact fields that require the Packet B walk."
+    },
+    {
+      "id": "artifact.metadata",
+      "resource": "artifact",
+      "owner": "artifact",
+      "kind": "field-group",
+      "outcome": "no-new-rule",
+      "invariants": [],
+      "delegatedPacket": null,
+      "rationale": "Descriptive immutable metadata is Artifact-owned and creates no additional Packet A ownership conflict."
+    },
+    {
+      "id": "artifact.platform-architecture",
+      "resource": "artifact",
+      "owner": "artifact",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "STR-006",
+        "TGT-004"
+      ],
+      "delegatedPacket": "B",
+      "rationale": "Portable platform and architecture semantics require the Artifact field-family walk."
+    },
+    {
+      "id": "artifact.environment",
+      "resource": "artifact",
+      "owner": "artifact",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "STR-005",
+        "TGT-007"
+      ],
+      "delegatedPacket": "B",
+      "rationale": "Packages, devShell inputs, variables, activation, and ambient-environment exclusion are Artifact semantics."
+    },
+    {
+      "id": "artifact.immutable-content",
+      "resource": "artifact",
+      "owner": "artifact",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "SUM-005",
+        "XRS-004"
+      ],
+      "delegatedPacket": "B",
+      "rationale": "Immutable files, roots, images, and writable-resource separation require the Artifact field-family walk."
+    },
+    {
+      "id": "artifact.default-process",
+      "resource": "artifact",
+      "owner": "artifact",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "STR-005",
+        "CRT-006"
+      ],
+      "delegatedPacket": "B",
+      "rationale": "Artifact defaults and runtime Process requests remain separate but share a validated Process contract."
+    },
+    {
+      "id": "artifact.workspace-contract",
+      "resource": "artifact",
+      "owner": "artifact",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "SUM-001",
+        "XRS-003",
+        "XRS-005"
+      ],
+      "delegatedPacket": "B",
+      "rationale": "Artifact owns destination and bounds while Create owns the concrete source and binding."
+    },
+    {
+      "id": "artifact.protected-paths",
+      "resource": "artifact",
+      "owner": "artifact",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "LIVE-003"
+      ],
+      "delegatedPacket": "F",
+      "rationale": "Protected paths are immutable policy and need the complete disclosure and runtime-access walk."
+    },
+    {
+      "id": "artifact.binding-slots",
+      "resource": "artifact",
+      "owner": "artifact",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "STR-002",
+        "CMP-004",
+        "CRT-001",
+        "CRT-002",
+        "CRT-003"
+      ],
+      "delegatedPacket": "B",
+      "rationale": "Artifact declares typed slots and Create provides cardinality-checked concrete bindings."
+    },
+    {
+      "id": "artifact.secret-slots",
+      "resource": "artifact",
+      "owner": "artifact",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "STR-004",
+        "CMP-004",
+        "XRS-004"
+      ],
+      "delegatedPacket": "B",
+      "rationale": "Secret slots have delivery, destination, audience, lifetime, and snapshot semantics beyond generic binding cardinality."
+    },
+    {
+      "id": "artifact.scratch-storage",
+      "resource": "artifact",
+      "owner": "artifact",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "SUM-002",
+        "SUM-005"
+      ],
+      "delegatedPacket": "B",
+      "rationale": "Scratch, writable root, and persistent storage require distinct resource alternatives and bounds."
+    },
+    {
+      "id": "artifact.network-policy",
+      "resource": "artifact",
+      "owner": "artifact",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "SUM-004",
+        "XRS-002",
+        "TGT-005",
+        "CMP-002"
+      ],
+      "delegatedPacket": "B",
+      "rationale": "Artifact owns maximum authority and enforcement requirements, never provider mechanism defaults."
+    },
+    {
+      "id": "artifact.identity-security",
+      "resource": "artifact",
+      "owner": "artifact",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "EXE-004"
+      ],
+      "delegatedPacket": "B",
+      "rationale": "Workload identity and privilege bounds are Artifact policy; concrete mappings and per-Process narrowing are later resources."
+    },
+    {
+      "id": "artifact.device-requirements",
+      "resource": "artifact",
+      "owner": "artifact",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "TGT-004"
+      ],
+      "delegatedPacket": "B",
+      "rationale": "Artifact may require device classes but never concrete host device identities."
+    },
+    {
+      "id": "artifact.resource-bounds",
+      "resource": "artifact",
+      "owner": "artifact",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "XRS-001",
+        "OPS-002",
+        "TGT-006"
+      ],
+      "delegatedPacket": "B",
+      "rationale": "Artifact minimums and hard maximums constrain creation and operator placement."
+    },
+    {
+      "id": "artifact.lifetime-maximum",
+      "resource": "artifact",
+      "owner": "artifact",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "EXE-007"
+      ],
+      "delegatedPacket": "E",
+      "rationale": "Only a hard security maximum is Artifact-owned; runtime lifecycle choices require Packet E."
+    },
+    {
+      "id": "artifact.snapshot-persistence-contract",
+      "resource": "artifact",
+      "owner": "artifact",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "SUM-002",
+        "SUM-003",
+        "XRS-004"
+      ],
+      "delegatedPacket": "B",
+      "rationale": "Artifact requirements may describe capability and hard capture constraints, while concrete snapshot, retention, and restore operations remain runtime-owned."
+    },
+    {
+      "id": "artifact.declared-outputs",
+      "resource": "artifact",
+      "owner": "artifact",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "STR-002",
+        "LIVE-003"
+      ],
+      "delegatedPacket": "B",
+      "rationale": "Artifact output conventions are distinct from runtime selection, capture timing, export destination, and retention."
+    },
+    {
+      "id": "artifact.runtime-capabilities",
+      "resource": "artifact",
+      "owner": "artifact",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "STR-006",
+        "TGT-003",
+        "TGT-004"
+      ],
+      "delegatedPacket": "C",
+      "rationale": "Artifact requirements and target conformance identities require target realization review."
+    },
+    {
+      "id": "artifact.protocol-requirements",
+      "resource": "artifact",
+      "owner": "artifact",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "MAN-002"
+      ],
+      "delegatedPacket": "C",
+      "rationale": "Guest and runtime protocol compatibility crosses Artifact construction and runtime loading."
+    },
+    {
+      "id": "artifact.provenance",
+      "resource": "artifact",
+      "owner": "artifact",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "WIRE-002",
+        "MAN-001"
+      ],
+      "delegatedPacket": "F",
+      "rationale": "Build provenance is Artifact-owned while safe explanation and evidence disclosure require Packet F."
+    },
+    {
+      "id": "artifact.semantic-identity",
+      "resource": "artifact",
+      "owner": "artifact",
+      "kind": "trust-boundary",
+      "outcome": "delegated",
+      "invariants": [
+        "WIRE-002",
+        "MAN-001"
+      ],
+      "delegatedPacket": "B",
+      "rationale": "Portable semantic identity, target-member identity, and Artifact Set identity are distinct domains that require explicit field-level treatment."
+    },
+    {
+      "id": "artifact.supported-targets-profiles",
+      "resource": "artifact",
+      "owner": "artifact",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "STR-006",
+        "TGT-003",
+        "TGT-004",
+        "TGT-008"
+      ],
+      "delegatedPacket": "B",
+      "rationale": "Enabled target and runtime-profile identities are portable Artifact structure; target implementation and conformance remain Packet C concerns."
+    },
+    {
+      "id": "artifact.target-native-construction",
+      "resource": "artifact",
+      "owner": "artifact",
+      "kind": "extension-boundary",
+      "outcome": "delegated",
+      "invariants": [
+        "TGT-005",
+        "TGT-007",
+        "CMP-005",
+        "CMP-006",
+        "CMP-008"
+      ],
+      "delegatedPacket": "D",
+      "rationale": "Artifact-native configuration is construction-scoped and cannot bypass common policy."
+    },
+    {
+      "id": "manifest.identity-content",
+      "resource": "manifest",
+      "owner": "artifact",
+      "kind": "trust-boundary",
+      "outcome": "covered",
+      "invariants": [
+        "MAN-001"
+      ],
+      "delegatedPacket": null,
+      "rationale": "Runtime Artifact loading verifies member identity and content digests before creation."
+    },
+    {
+      "id": "manifest.profile-expansion",
+      "resource": "manifest",
+      "owner": "artifact",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "CMP-003",
+        "WIRE-002"
+      ],
+      "delegatedPacket": "D",
+      "rationale": "Expanded profile semantics and provenance require the composition review."
+    },
+    {
+      "id": "manifest.software-process-metadata",
+      "resource": "manifest",
+      "owner": "artifact",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "STR-005"
+      ],
+      "delegatedPacket": "B",
+      "rationale": "The manifest records complete Artifact defaults and cannot become a second authoring surface."
+    },
+    {
+      "id": "manifest.hard-bounds",
+      "resource": "manifest",
+      "owner": "artifact",
+      "kind": "field-group",
+      "outcome": "covered",
+      "invariants": [
+        "WIRE-003",
+        "XRS-001",
+        "XRS-002"
+      ],
+      "delegatedPacket": null,
+      "rationale": "Canonical and creation validators consume the immutable bounds defensively."
+    },
+    {
+      "id": "manifest.binding-contracts",
+      "resource": "manifest",
+      "owner": "artifact",
+      "kind": "field-group",
+      "outcome": "covered",
+      "invariants": [
+        "CRT-001",
+        "CRT-002",
+        "CRT-003"
+      ],
+      "delegatedPacket": null,
+      "rationale": "Manifest slot contracts are authoritative inputs to creation binding validation."
+    },
+    {
+      "id": "manifest.snapshot-persistence-requirements",
+      "resource": "manifest",
+      "owner": "artifact",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "SUM-002",
+        "SUM-003",
+        "MAN-002"
+      ],
+      "delegatedPacket": "B",
+      "rationale": "The manifest records typed capability requirements and hard capture constraints, never one run's snapshot, retention, or restore choice."
+    },
+    {
+      "id": "manifest.declared-outputs",
+      "resource": "manifest",
+      "owner": "artifact",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "STR-002",
+        "LIVE-003"
+      ],
+      "delegatedPacket": "B",
+      "rationale": "The manifest carries immutable output conventions so runtime operations can select and validate capture without inventing output policy."
+    },
+    {
+      "id": "manifest.secret-slots",
+      "resource": "manifest",
+      "owner": "artifact",
+      "kind": "trust-boundary",
+      "outcome": "covered",
+      "invariants": [
+        "MAN-003",
+        "STR-004"
+      ],
+      "delegatedPacket": null,
+      "rationale": "The built manifest carries contracts only and is rejected if secret/provider data appears."
+    },
+    {
+      "id": "manifest.capabilities-protocols",
+      "resource": "manifest",
+      "owner": "artifact",
+      "kind": "trust-boundary",
+      "outcome": "covered",
+      "invariants": [
+        "TGT-003",
+        "MAN-002"
+      ],
+      "delegatedPacket": null,
+      "rationale": "Required and advertised capabilities and protocols are versioned and checked at load."
+    },
+    {
+      "id": "manifest.provenance-claims",
+      "resource": "manifest",
+      "owner": "artifact",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "MAN-001",
+        "CMP-006"
+      ],
+      "delegatedPacket": "F",
+      "rationale": "Portable, target-specific, verified, and unverified claims need the evidence/disclosure review."
+    },
+    {
+      "id": "manifest.native-disclosure",
+      "resource": "manifest",
+      "owner": "artifact",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "MAN-003",
+        "CMP-006"
+      ],
+      "delegatedPacket": "F",
+      "rationale": "Only safe target-native information may be disclosed in the manifest."
+    },
+    {
+      "id": "operator.daemon-transport",
+      "resource": "operator",
+      "owner": "operator",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "XRS-008"
+      ],
+      "delegatedPacket": "F",
+      "rationale": "Daemon listeners, sockets, TLS, and caller boundaries require the authorization/disclosure review."
+    },
+    {
+      "id": "operator.authentication-tenancy",
+      "resource": "operator",
+      "owner": "operator",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "XRS-006"
+      ],
+      "delegatedPacket": "F",
+      "rationale": "Authorized callers and tenancy are operator policy, never Artifact or adapter data."
+    },
+    {
+      "id": "operator.driver-registration",
+      "resource": "operator",
+      "owner": "operator",
+      "kind": "field-group",
+      "outcome": "covered",
+      "invariants": [
+        "OPS-001",
+        "XRS-008"
+      ],
+      "delegatedPacket": null,
+      "rationale": "Operator Configuration registers named drivers and runtime profiles."
+    },
+    {
+      "id": "operator.provider-config",
+      "resource": "operator",
+      "owner": "operator",
+      "kind": "field-group",
+      "outcome": "covered",
+      "invariants": [
+        "XRS-006",
+        "XRS-008",
+        "HOST-003"
+      ],
+      "delegatedPacket": null,
+      "rationale": "Provider endpoints, accounts, regions, and credentials stay operator-owned."
+    },
+    {
+      "id": "operator.state-directories",
+      "resource": "operator",
+      "owner": "operator",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "XRS-008"
+      ],
+      "delegatedPacket": "C",
+      "rationale": "State, cache, image, volume, snapshot, and log storage are deployment mechanisms."
+    },
+    {
+      "id": "operator.nix-access",
+      "resource": "operator",
+      "owner": "operator",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "XRS-008"
+      ],
+      "delegatedPacket": "C",
+      "rationale": "Store, cache, and registry access is operator mechanism constrained by Artifact identity."
+    },
+    {
+      "id": "operator.host-setup",
+      "resource": "operator",
+      "owner": "operator",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "HOST-001"
+      ],
+      "delegatedPacket": "C",
+      "rationale": "KVM, namespaces, cgroups, LSM, devices, and host groups require target/host realization review."
+    },
+    {
+      "id": "operator.network-infrastructure",
+      "resource": "operator",
+      "owner": "operator",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "XRS-008",
+        "HOST-003"
+      ],
+      "delegatedPacket": "C",
+      "rationale": "Bridges, TAP, CNI, DNS, proxies, and gateways are operator mechanisms."
+    },
+    {
+      "id": "operator.storage-backends",
+      "resource": "operator",
+      "owner": "operator",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "HOST-003"
+      ],
+      "delegatedPacket": "C",
+      "rationale": "Volume and snapshot backend semantics require target/provider realization review."
+    },
+    {
+      "id": "operator.credential-providers",
+      "resource": "operator",
+      "owner": "operator",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "XRS-006",
+        "HOST-003"
+      ],
+      "delegatedPacket": "F",
+      "rationale": "Credential providers and safe failure/redaction are operator security concerns."
+    },
+    {
+      "id": "operator.quotas-admission-placement",
+      "resource": "operator",
+      "owner": "operator",
+      "kind": "field-group",
+      "outcome": "covered",
+      "invariants": [
+        "OPS-002",
+        "HOST-003"
+      ],
+      "delegatedPacket": null,
+      "rationale": "Operator ceilings, capacity, and placement intersect with Artifact and Create bounds."
+    },
+    {
+      "id": "operator.cleanup-reconciliation",
+      "resource": "operator",
+      "owner": "operator",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "DRV-001"
+      ],
+      "delegatedPacket": "E",
+      "rationale": "Global cleanup and orphan reconciliation require lifecycle failure-state review."
+    },
+    {
+      "id": "operator.observability",
+      "resource": "operator",
+      "owner": "operator",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "MAN-003"
+      ],
+      "delegatedPacket": "F",
+      "rationale": "Logging, metrics, tracing, audit, and evidence sinks require disclosure and retention rules."
+    },
+    {
+      "id": "operator.compatibility",
+      "resource": "operator",
+      "owner": "operator",
+      "kind": "field-group",
+      "outcome": "covered",
+      "invariants": [
+        "OPS-001",
+        "MAN-002"
+      ],
+      "delegatedPacket": null,
+      "rationale": "Operator admission checks driver and guest protocol compatibility without fallback."
+    },
+    {
+      "id": "operator.retry-health",
+      "resource": "operator",
+      "owner": "operator",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "HOST-003"
+      ],
+      "delegatedPacket": "E",
+      "rationale": "Driver retries, backoff, readiness, and transient classification require lifecycle review."
+    },
+    {
+      "id": "service.sandbox-request",
+      "resource": "service",
+      "owner": "service",
+      "kind": "field-group",
+      "outcome": "covered",
+      "invariants": [
+        "SVC-001",
+        "CRT-001",
+        "CRT-002",
+        "CRT-005"
+      ],
+      "delegatedPacket": null,
+      "rationale": "Managed services construct the same Artifact reference, target, bindings, and allocations as direct API callers."
+    },
+    {
+      "id": "service.identity",
+      "resource": "service",
+      "owner": "service",
+      "kind": "field-group",
+      "outcome": "no-new-rule",
+      "invariants": [],
+      "delegatedPacket": null,
+      "rationale": "Stable service naming and non-security labels are controller-owned identifiers."
+    },
+    {
+      "id": "service.lifecycle-policy",
+      "resource": "service",
+      "owner": "service",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "SVC-002"
+      ],
+      "delegatedPacket": "E",
+      "rationale": "Autostart, restart, recreate, stop, retention, cleanup, and update behavior require the lifecycle state machine."
+    },
+    {
+      "id": "service.dependencies-probes",
+      "resource": "service",
+      "owner": "service",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "SVC-002"
+      ],
+      "delegatedPacket": "E",
+      "rationale": "Unit dependencies and health/readiness reconciliation are controller lifecycle concerns."
+    },
+    {
+      "id": "service.evidence-retention",
+      "resource": "service",
+      "owner": "service",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "SVC-001"
+      ],
+      "delegatedPacket": "F",
+      "rationale": "Evidence/log retention is service/operator policy, not Artifact semantics."
+    },
+    {
+      "id": "service.systemd-hardening",
+      "resource": "service",
+      "owner": "service",
+      "kind": "field-group",
+      "outcome": "no-new-rule",
+      "invariants": [],
+      "delegatedPacket": null,
+      "rationale": "Hardening around the runtime client protects the controller and does not alter sandbox semantics."
+    },
+    {
+      "id": "service.core-api-only",
+      "resource": "service",
+      "owner": "service",
+      "kind": "trust-boundary",
+      "outcome": "covered",
+      "invariants": [
+        "SVC-002"
+      ],
+      "delegatedPacket": null,
+      "rationale": "Generated service units invoke only the Core API client and never a driver directly."
+    },
+    {
+      "id": "service.native-extension",
+      "resource": "service",
+      "owner": "service",
+      "kind": "extension-boundary",
+      "outcome": "covered",
+      "invariants": [
+        "SVC-001",
+        "SVC-002"
+      ],
+      "delegatedPacket": null,
+      "rationale": "Service-native extensions remain controller-scoped and cannot mint a second sandbox API."
+    },
+    {
+      "id": "create.artifact-target-profile",
+      "resource": "create",
+      "owner": "create",
+      "kind": "field-group",
+      "outcome": "covered",
+      "invariants": [
+        "CRT-005",
+        "TGT-002"
+      ],
+      "delegatedPacket": null,
+      "rationale": "Creation references one Artifact member and advertised runtime profile."
+    },
+    {
+      "id": "create.identity-labels",
+      "resource": "create",
+      "owner": "create",
+      "kind": "field-group",
+      "outcome": "no-new-rule",
+      "invariants": [],
+      "delegatedPacket": null,
+      "rationale": "Requested runtime identity and non-security labels are creation-local metadata subject to operator naming policy."
+    },
+    {
+      "id": "create.driver-selection",
+      "resource": "create",
+      "owner": "create",
+      "kind": "field-group",
+      "outcome": "covered",
+      "invariants": [
+        "OPS-001",
+        "CRT-005"
+      ],
+      "delegatedPacket": null,
+      "rationale": "Creation selects a named registered driver/profile without receiving provider credentials."
+    },
+    {
+      "id": "create.workspace-binding",
+      "resource": "create",
+      "owner": "create",
+      "kind": "field-group",
+      "outcome": "covered",
+      "invariants": [
+        "CRT-001",
+        "CRT-002",
+        "CRT-003",
+        "XRS-003",
+        "HOST-002"
+      ],
+      "delegatedPacket": null,
+      "rationale": "Concrete workspace source, materialization, and access must satisfy the Artifact slot."
+    },
+    {
+      "id": "create.mount-volume-snapshot-data",
+      "resource": "create",
+      "owner": "create",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "CRT-001",
+        "CRT-002",
+        "XRS-004"
+      ],
+      "delegatedPacket": "E",
+      "rationale": "Initial storage/snapshot inputs are creation bindings; snapshot compatibility needs lifecycle review."
+    },
+    {
+      "id": "create.secret-bindings",
+      "resource": "create",
+      "owner": "create",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "XRS-004",
+        "XRS-006",
+        "CRT-002"
+      ],
+      "delegatedPacket": "F",
+      "rationale": "Create binds declared secret slots through typed, redacted runtime channels."
+    },
+    {
+      "id": "create.resources-devices",
+      "resource": "create",
+      "owner": "create",
+      "kind": "field-group",
+      "outcome": "covered",
+      "invariants": [
+        "XRS-001",
+        "OPS-002",
+        "HOST-003"
+      ],
+      "delegatedPacket": null,
+      "rationale": "Actual allocations and devices must fit Artifact and operator bounds."
+    },
+    {
+      "id": "create.network-dns-ingress",
+      "resource": "create",
+      "owner": "create",
+      "kind": "field-group",
+      "outcome": "covered",
+      "invariants": [
+        "XRS-002",
+        "LIVE-004"
+      ],
+      "delegatedPacket": null,
+      "rationale": "Creation chooses mechanisms and authority no broader than the Artifact/network operator intersection."
+    },
+    {
+      "id": "create.identity-mapping",
+      "resource": "create",
+      "owner": "create",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "XRS-002"
+      ],
+      "delegatedPacket": "C",
+      "rationale": "Concrete mappings are host/driver mechanisms constrained by Artifact identity bounds."
+    },
+    {
+      "id": "create.placement",
+      "resource": "create",
+      "owner": "create",
+      "kind": "field-group",
+      "outcome": "covered",
+      "invariants": [
+        "XRS-006",
+        "OPS-001",
+        "HOST-003"
+      ],
+      "delegatedPacket": null,
+      "rationale": "Creation may give logical placement hints but operator owns endpoints, accounts, credentials, and final placement."
+    },
+    {
+      "id": "create.timeouts-lifetime-idle",
+      "resource": "create",
+      "owner": "create",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "EXE-007"
+      ],
+      "delegatedPacket": "E",
+      "rationale": "Creation-local timing choices must fit hard bounds and the lifecycle state machine."
+    },
+    {
+      "id": "create.restore-source",
+      "resource": "create",
+      "owner": "create",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "LIVE-002"
+      ],
+      "delegatedPacket": "E",
+      "rationale": "Restore is a creation input whose compatibility and state transitions require lifecycle review."
+    },
+    {
+      "id": "create.capture-evidence",
+      "resource": "create",
+      "owner": "create",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "MAN-003"
+      ],
+      "delegatedPacket": "F",
+      "rationale": "Per-run capture requests are runtime inputs; sinks, visibility, and redaction require Packet F."
+    },
+    {
+      "id": "create.native-extension",
+      "resource": "create",
+      "owner": "create",
+      "kind": "extension-boundary",
+      "outcome": "delegated",
+      "invariants": [
+        "CRT-002",
+        "DRV-001"
+      ],
+      "delegatedPacket": "D",
+      "rationale": "Create-native extensions may bind target creation mechanisms but cannot contradict common policy."
+    },
+    {
+      "id": "create.idempotency-correlation",
+      "resource": "create",
+      "owner": "create",
+      "kind": "field-group",
+      "outcome": "covered",
+      "invariants": [
+        "CRT-004"
+      ],
+      "delegatedPacket": null,
+      "rationale": "Caller-scoped idempotency is defined over the canonical request with secret-safe conflict diagnostics."
+    },
+    {
+      "id": "create.initial-process",
+      "resource": "create",
+      "owner": "create",
+      "kind": "field-group",
+      "outcome": "covered",
+      "invariants": [
+        "CRT-006",
+        "EXE-001",
+        "EXE-004"
+      ],
+      "delegatedPacket": null,
+      "rationale": "Initial Process input reuses the same bounded Process contract as Exec."
+    },
+    {
+      "id": "live.status-inspection",
+      "resource": "live",
+      "owner": "live",
+      "kind": "operation",
+      "outcome": "delegated",
+      "invariants": [
+        "LIVE-002"
+      ],
+      "delegatedPacket": "F",
+      "rationale": "Status and effective capability inspection require evidence and safe-disclosure rules."
+    },
+    {
+      "id": "live.start",
+      "resource": "live",
+      "owner": "live",
+      "kind": "operation",
+      "outcome": "delegated",
+      "invariants": [
+        "LIVE-002"
+      ],
+      "delegatedPacket": "E",
+      "rationale": "Separate create/start and legal state transitions require the lifecycle state machine."
+    },
+    {
+      "id": "live.stop-terminate-delete-signal",
+      "resource": "live",
+      "owner": "live",
+      "kind": "operation",
+      "outcome": "delegated",
+      "invariants": [
+        "LIVE-002"
+      ],
+      "delegatedPacket": "E",
+      "rationale": "Termination, signal, delete, idempotency, and partial failure require lifecycle review."
+    },
+    {
+      "id": "live.files",
+      "resource": "live",
+      "owner": "live",
+      "kind": "operation",
+      "outcome": "covered",
+      "invariants": [
+        "LIVE-003"
+      ],
+      "delegatedPacket": null,
+      "rationale": "File operations stay within declared mutable paths and never expose secret or host backing data."
+    },
+    {
+      "id": "live.ports",
+      "resource": "live",
+      "owner": "live",
+      "kind": "operation",
+      "outcome": "covered",
+      "invariants": [
+        "LIVE-004"
+      ],
+      "delegatedPacket": null,
+      "rationale": "Port operations use declared slots within immutable and operator network bounds."
+    },
+    {
+      "id": "live.logs-evidence",
+      "resource": "live",
+      "owner": "live",
+      "kind": "operation",
+      "outcome": "delegated",
+      "invariants": [
+        "MAN-003"
+      ],
+      "delegatedPacket": "F",
+      "rationale": "Streaming logs/evidence requires audience, redaction, retention, and model-visibility rules."
+    },
+    {
+      "id": "live.mutable-update",
+      "resource": "live",
+      "owner": "live",
+      "kind": "operation",
+      "outcome": "covered",
+      "invariants": [
+        "LIVE-001"
+      ],
+      "delegatedPacket": null,
+      "rationale": "Only explicitly mutable subsets may change and authority never widens."
+    },
+    {
+      "id": "live.pause-resume",
+      "resource": "live",
+      "owner": "live",
+      "kind": "operation",
+      "outcome": "delegated",
+      "invariants": [
+        "LIVE-002"
+      ],
+      "delegatedPacket": "E",
+      "rationale": "Capability and state transition semantics require Packet E."
+    },
+    {
+      "id": "live.snapshot-restore-fork",
+      "resource": "live",
+      "owner": "live",
+      "kind": "operation",
+      "outcome": "delegated",
+      "invariants": [
+        "LIVE-002",
+        "SUM-003"
+      ],
+      "delegatedPacket": "E",
+      "rationale": "Snapshot components, compatibility, fork identity, and restore-as-create require lifecycle review."
+    },
+    {
+      "id": "live.resize-ttl",
+      "resource": "live",
+      "owner": "live",
+      "kind": "operation",
+      "outcome": "delegated",
+      "invariants": [
+        "LIVE-001",
+        "LIVE-002",
+        "EXE-007"
+      ],
+      "delegatedPacket": "E",
+      "rationale": "Dynamic resize and TTL renewal must remain in immutable bounds and legal states."
+    },
+    {
+      "id": "live.attach-shell",
+      "resource": "live",
+      "owner": "live",
+      "kind": "operation",
+      "outcome": "delegated",
+      "invariants": [
+        "LIVE-002"
+      ],
+      "delegatedPacket": "E",
+      "rationale": "Attach/reconnect and stateful Shell handle semantics require lifecycle review."
+    },
+    {
+      "id": "live.exec",
+      "resource": "live",
+      "owner": "exec",
+      "kind": "operation",
+      "outcome": "covered",
+      "invariants": [
+        "EXE-001",
+        "EXE-004",
+        "EXE-007"
+      ],
+      "delegatedPacket": null,
+      "rationale": "Executing a Process delegates to the distinct Exec resource and never changes Sandbox policy."
+    },
+    {
+      "id": "live.native-extension",
+      "resource": "live",
+      "owner": "live",
+      "kind": "extension-boundary",
+      "outcome": "delegated",
+      "invariants": [
+        "LIVE-001",
+        "LIVE-002"
+      ],
+      "delegatedPacket": "D",
+      "rationale": "Live-native extensions remain operation-scoped and capability-gated."
+    },
+    {
+      "id": "exec.argv",
+      "resource": "exec",
+      "owner": "exec",
+      "kind": "field-group",
+      "outcome": "covered",
+      "invariants": [
+        "EXE-001"
+      ],
+      "delegatedPacket": null,
+      "rationale": "Every Process uses non-empty argv without an implicit shell."
+    },
+    {
+      "id": "exec.cwd",
+      "resource": "exec",
+      "owner": "exec",
+      "kind": "field-group",
+      "outcome": "covered",
+      "invariants": [
+        "EXE-002"
+      ],
+      "delegatedPacket": null,
+      "rationale": "Process cwd is an absolute permitted in-sandbox path."
+    },
+    {
+      "id": "exec.environment",
+      "resource": "exec",
+      "owner": "exec",
+      "kind": "field-group",
+      "outcome": "covered",
+      "invariants": [
+        "EXE-003"
+      ],
+      "delegatedPacket": null,
+      "rationale": "Ordinary environment values cannot use secret or reserved channels."
+    },
+    {
+      "id": "exec.secrets",
+      "resource": "exec",
+      "owner": "exec",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "EXE-003",
+        "XRS-004"
+      ],
+      "delegatedPacket": "F",
+      "rationale": "Per-Process secret bindings need typed delivery, lifetime, audience, and redaction review."
+    },
+    {
+      "id": "exec.stdio-mode",
+      "resource": "exec",
+      "owner": "exec",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "EXE-006"
+      ],
+      "delegatedPacket": "E",
+      "rationale": "Streaming, capture, background, detached, and stdin lifetime semantics require Process lifecycle review."
+    },
+    {
+      "id": "exec.timeout-deadline",
+      "resource": "exec",
+      "owner": "exec",
+      "kind": "field-group",
+      "outcome": "covered",
+      "invariants": [
+        "EXE-007"
+      ],
+      "delegatedPacket": null,
+      "rationale": "Process timing fits within the remaining Sandbox lifetime and controller bounds."
+    },
+    {
+      "id": "exec.pty",
+      "resource": "exec",
+      "owner": "exec",
+      "kind": "field-group",
+      "outcome": "covered",
+      "invariants": [
+        "EXE-006"
+      ],
+      "delegatedPacket": null,
+      "rationale": "PTY and resize require concrete conformed support and never silently degrade."
+    },
+    {
+      "id": "exec.identity-resources",
+      "resource": "exec",
+      "owner": "exec",
+      "kind": "field-group",
+      "outcome": "covered",
+      "invariants": [
+        "EXE-004"
+      ],
+      "delegatedPacket": null,
+      "rationale": "Process-local identity, privileges, rlimits, and scheduling may only narrow."
+    },
+    {
+      "id": "exec.signal-cancellation",
+      "resource": "exec",
+      "owner": "exec",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "EXE-007"
+      ],
+      "delegatedPacket": "E",
+      "rationale": "Signal, cancellation, exit, and retry outcomes require Process lifecycle review."
+    },
+    {
+      "id": "exec.output-capture",
+      "resource": "exec",
+      "owner": "exec",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "EXE-003"
+      ],
+      "delegatedPacket": "F",
+      "rationale": "Process output collection requires audience, redaction, and retention rules."
+    },
+    {
+      "id": "exec.correlation",
+      "resource": "exec",
+      "owner": "exec",
+      "kind": "field-group",
+      "outcome": "no-new-rule",
+      "invariants": [],
+      "delegatedPacket": null,
+      "rationale": "Correlation metadata is non-authoritative tracing context and never changes Process semantics."
+    },
+    {
+      "id": "exec.native-extension",
+      "resource": "exec",
+      "owner": "exec",
+      "kind": "extension-boundary",
+      "outcome": "covered",
+      "invariants": [
+        "EXE-005"
+      ],
+      "delegatedPacket": null,
+      "rationale": "Exec-native extensions remain process-local and cannot alter Sandbox isolation."
+    },
+    {
+      "id": "framework.association-defaults",
+      "resource": "framework",
+      "owner": "framework",
+      "kind": "field-group",
+      "outcome": "covered",
+      "invariants": [
+        "FWK-001",
+        "XRS-007"
+      ],
+      "delegatedPacket": null,
+      "rationale": "Adapters own agent association and defaults but submit only valid Core API operations."
+    },
+    {
+      "id": "framework.session-reuse",
+      "resource": "framework",
+      "owner": "framework",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "XRS-007"
+      ],
+      "delegatedPacket": "E",
+      "rationale": "Fresh versus reused Sandbox and cleanup responsibility require lifecycle review."
+    },
+    {
+      "id": "framework.conversation-state",
+      "resource": "framework",
+      "owner": "framework",
+      "kind": "field-group",
+      "outcome": "covered",
+      "invariants": [
+        "XRS-007"
+      ],
+      "delegatedPacket": null,
+      "rationale": "Conversation, run, retry, and trajectory state remain outside Artifact and Sandbox policy."
+    },
+    {
+      "id": "framework.workspace-translation",
+      "resource": "framework",
+      "owner": "framework",
+      "kind": "field-group",
+      "outcome": "covered",
+      "invariants": [
+        "FWK-001",
+        "CRT-002"
+      ],
+      "delegatedPacket": null,
+      "rationale": "Framework workspace manifests translate to declared Core API binding contracts."
+    },
+    {
+      "id": "framework.tool-registration",
+      "resource": "framework",
+      "owner": "framework",
+      "kind": "field-group",
+      "outcome": "covered",
+      "invariants": [
+        "FWK-002"
+      ],
+      "delegatedPacket": null,
+      "rationale": "Model-facing tools reflect concrete conformed Sandbox capabilities."
+    },
+    {
+      "id": "framework.prompt-output-approval",
+      "resource": "framework",
+      "owner": "framework",
+      "kind": "field-group",
+      "outcome": "no-new-rule",
+      "invariants": [],
+      "delegatedPacket": null,
+      "rationale": "Prompts, descriptions, model output limits, guardrails, and approvals are framework semantics."
+    },
+    {
+      "id": "framework.snapshot-reconnect",
+      "resource": "framework",
+      "owner": "framework",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "FWK-001",
+        "LIVE-002"
+      ],
+      "delegatedPacket": "E",
+      "rationale": "Adapter lifecycle choices translate to capability-gated Core API operations."
+    },
+    {
+      "id": "framework.tracing-diagnostics",
+      "resource": "framework",
+      "owner": "framework",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "FWK-001"
+      ],
+      "delegatedPacket": "F",
+      "rationale": "Safe diagnostic conversion and tracing audiences require disclosure review."
+    },
+    {
+      "id": "framework.cleanup",
+      "resource": "framework",
+      "owner": "framework",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "FWK-001"
+      ],
+      "delegatedPacket": "E",
+      "rationale": "Adapter-owned cleanup and failure recovery require lifecycle review."
+    },
+    {
+      "id": "framework.native-extension",
+      "resource": "framework",
+      "owner": "framework",
+      "kind": "extension-boundary",
+      "outcome": "covered",
+      "invariants": [
+        "FWK-001",
+        "FWK-002"
+      ],
+      "delegatedPacket": null,
+      "rationale": "Adapter-native extensions cannot bypass the typed Core API or invent capability."
+    },
+    {
+      "id": "runtime.lowering-bindings",
+      "resource": "runtime",
+      "owner": "runtime",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "DRV-001",
+        "XRS-003"
+      ],
+      "delegatedPacket": "C",
+      "rationale": "Drivers lower resolved slots and policy to target mechanisms after defensive validation."
+    },
+    {
+      "id": "runtime.target-launch",
+      "resource": "runtime",
+      "owner": "runtime",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "DRV-001",
+        "TGT-006"
+      ],
+      "delegatedPacket": "C",
+      "rationale": "Bubblewrap argv, OCI bundles, VMM launch, and provider calls require target realization review."
+    },
+    {
+      "id": "runtime.process-transport",
+      "resource": "runtime",
+      "owner": "runtime",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "EXE-005",
+        "EXE-006"
+      ],
+      "delegatedPacket": "C",
+      "rationale": "Guest/control transport and PTY mechanisms require target conformance."
+    },
+    {
+      "id": "runtime.host-plumbing",
+      "resource": "runtime",
+      "owner": "runtime",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "HOST-001",
+        "HOST-002",
+        "HOST-003"
+      ],
+      "delegatedPacket": "C",
+      "rationale": "Namespaces, cgroups, devices, networks, paths, and provider facts are preflight mechanisms."
+    },
+    {
+      "id": "runtime.preflight",
+      "resource": "runtime",
+      "owner": "runtime",
+      "kind": "trust-boundary",
+      "outcome": "delegated",
+      "invariants": [
+        "HOST-001",
+        "HOST-002",
+        "HOST-003",
+        "DRV-001"
+      ],
+      "delegatedPacket": "C",
+      "rationale": "Capability discovery and reservation must complete before mutation or untrusted work."
+    },
+    {
+      "id": "runtime.post-create-conformance",
+      "resource": "runtime",
+      "owner": "runtime",
+      "kind": "trust-boundary",
+      "outcome": "delegated",
+      "invariants": [
+        "TGT-003",
+        "TGT-006"
+      ],
+      "delegatedPacket": "C",
+      "rationale": "Effective mounts, identity, network, resources, and protocol behavior require trusted probes."
+    },
+    {
+      "id": "runtime.cleanup-errors",
+      "resource": "runtime",
+      "owner": "runtime",
+      "kind": "operation",
+      "outcome": "delegated",
+      "invariants": [
+        "DRV-001"
+      ],
+      "delegatedPacket": "E",
+      "rationale": "Cleanup, rollback, retry classification, and final evidence require lifecycle review."
+    },
+    {
+      "id": "runtime.native-lifecycle-scopes",
+      "resource": "runtime",
+      "owner": "runtime",
+      "kind": "extension-boundary",
+      "outcome": "delegated",
+      "invariants": [
+        "CMP-005",
+        "EXE-005",
+        "LIVE-001",
+        "SVC-002"
+      ],
+      "delegatedPacket": "D",
+      "rationale": "Native extensions remain split by Artifact, Create, Operator, Service, Live, Exec, and Adapter lifecycle."
+    }
+  ]
+}

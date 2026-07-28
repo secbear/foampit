@@ -1,0 +1,102 @@
+{
+  "registryVersion": 1,
+  "invariants": [
+    {
+      "id": "INV-001",
+      "title": "Example inventory invariant",
+      "statement": "A declared example must satisfy its portable constraint.",
+      "owner": "artifact",
+      "scope": "research",
+      "status": "specified",
+      "firstSoundPhase": "A0",
+      "rejectionDeadline": "A1",
+      "disposition": "reject-at-boundary",
+      "rationale": "The fully expanded Artifact is available at A0 and must be rejected by final Artifact validation.",
+      "invalidWitnesses": [
+        "INV-001"
+      ],
+      "validWitnesses": [
+        "VAL-001"
+      ],
+      "targets": [
+        "portable"
+      ],
+      "trustBoundaries": [
+        "canonical-wire"
+      ],
+      "compositionPaths": [
+        "ordinary-authoring"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "A1",
+          "component": "artifact-semantic-validator",
+          "path": "planned/artifact-validator",
+          "symbol": "validate_example",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/source-rejection",
+          "case": "BAD-001",
+          "status": "planned",
+          "covers": [
+            "ordinary-authoring"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/positive-boundary",
+          "case": "VAL-001",
+          "status": "planned",
+          "covers": [
+            "ordinary-authoring"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/wire-corruption",
+          "case": "BAD-001-corrupted",
+          "status": "planned",
+          "covers": [
+            "canonical-wire"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/diagnostic",
+          "case": "BAD-001",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "portable"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "INV-001",
+        "primaryPaths": [
+          "artifact.example"
+        ],
+        "relatedPaths": [],
+        "remediation": "Choose a value that satisfies the portable constraint.",
+        "secretSafe": true
+      },
+      "notes": "Minimal validator fixture, not a product invariant."
+    }
+  ]
+}

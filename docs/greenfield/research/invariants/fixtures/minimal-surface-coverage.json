@@ -1,0 +1,22 @@
+{
+  "reviewVersion": 1,
+  "packet": "A",
+  "status": "reviewed",
+  "requiredResources": [
+    "create"
+  ],
+  "surfaces": [
+    {
+      "id": "create.bindings",
+      "resource": "create",
+      "owner": "create",
+      "kind": "field-group",
+      "outcome": "covered",
+      "invariants": [
+        "INV-001"
+      ],
+      "delegatedPacket": null,
+      "rationale": "The fixture binding surface is covered by its registered invariant."
+    }
+  ]
+}

@@ -1,0 +1,234 @@
+typealias ProfileName = "workspace-edit-offline" | "workspace-live-development"
+typealias Materialization = "copy" | "live"
+typealias Access = "read-only" | "read-write"
+typealias NetworkMode = "none" | "egress"
+typealias Target = "bubblewrap" | "firecracker"
+
+class PackageReference {
+  input: String
+  attribute: String
+}
+
+class Environment {
+  packages: List<PackageReference>
+  variables: Map<String, String>
+  activation: List<String>
+}
+
+class WorkspaceInput {
+  destination: String
+  materialization: "inherit" | Materialization = "inherit"
+  allowedMaterializations: List<Materialization> = List("copy")
+  access: "inherit" | Access = "inherit"
+}
+
+class PolicyDefinition {
+  allowedDestinations: List<String>
+  source: String
+}
+
+class HardPolicy {
+  base: PolicyDefinition
+  refinements: List<PolicyDefinition> = List()
+}
+
+class NetworkInput {
+  mode: "inherit" | NetworkMode = "inherit"
+  egressAllow: List<String> = List()
+  hardPolicy: HardPolicy
+}
+
+class SecretSlot {
+  name: String
+  delivery: "environment" | "file"
+}
+
+class MemoryBounds {
+  minimumBytes: Int
+  maximumBytes: Int
+}
+
+class Resources {
+  memory: MemoryBounds
+}
+
+class ArtifactInput {
+  profile: ProfileName = "workspace-edit-offline"
+  environment: Environment
+  workspace: WorkspaceInput
+  network: NetworkInput
+  secrets: List<SecretSlot>
+  resources: Resources
+  targets: List<Target>
+}
+
+class CreationWorkspace {
+  materialization: Materialization
+}
+
+class CreationAllocation {
+  memoryBytes: Int
+}
+
+class CreateInput {
+  runtimeProfile: String
+  workspace: CreationWorkspace
+  allocation: CreationAllocation
+}
+
+local function profileMaterialization(profile: ProfileName): Materialization =
+  if (profile == "workspace-edit-offline") "copy" else "live"
+
+local function profileAccess(profile: ProfileName): Access = "read-write"
+
+local function profileNetworkMode(profile: ProfileName): NetworkMode =
+  if (profile == "workspace-edit-offline") "none" else "egress"
+
+local function resolvedMaterialization(input: ArtifactInput): Materialization =
+  if (input.workspace.materialization == "inherit")
+    profileMaterialization(input.profile)
+  else
+    input.workspace.materialization
+
+local function resolvedAccess(input: ArtifactInput): Access =
+  if (input.workspace.access == "inherit")
+    profileAccess(input.profile)
+  else
+    input.workspace.access
+
+local function resolvedNetworkMode(input: ArtifactInput): NetworkMode =
+  if (input.network.mode == "inherit")
+    profileNetworkMode(input.profile)
+  else
+    input.network.mode
+
+local function profileConsistent(input: ArtifactInput): Boolean =
+  (input.workspace.materialization == "inherit" ||
+    input.workspace.materialization == profileMaterialization(input.profile)) &&
+  (input.workspace.access == "inherit" ||
+    input.workspace.access == profileAccess(input.profile)) &&
+  (input.network.mode == "inherit" ||
+    input.network.mode == profileNetworkMode(input.profile))
+
+local function policyMonotonic(input: ArtifactInput): Boolean =
+  input.network.hardPolicy.refinements.every((refinement) ->
+    refinement.allowedDestinations.every((destination) ->
+      input.network.hardPolicy.base.allowedDestinations.contains(destination)
+    )
+  )
+
+local function targetSupports(input: ArtifactInput, target: Target): Boolean =
+  !(target == "firecracker" && resolvedMaterialization(input) == "live")
+
+local function everyTargetSupports(input: ArtifactInput): Boolean =
+  input.targets.every((target) -> targetSupports(input, target))
+
+local function requiredCapabilities(input: ArtifactInput): List<String> =
+  List(
+    "network.\(resolvedNetworkMode(input))",
+    "workspace.\(resolvedMaterialization(input))"
+  )
+
+local function manifest(input: ArtifactInput): Dynamic =
+  new Dynamic {
+    schemaVersion = 1
+    profile = new Dynamic {
+      selected = input.profile
+      selectionIsVisible = true
+    }
+    environment = new Dynamic {
+      packages = input.environment.packages
+      variables = input.environment.variables
+      activation = input.environment.activation
+    }
+    workspace = new Dynamic {
+      destination = input.workspace.destination
+      materialization = resolvedMaterialization(input)
+      allowedMaterializations = input.workspace.allowedMaterializations
+      access = resolvedAccess(input)
+    }
+    network = new Dynamic {
+      mode = resolvedNetworkMode(input)
+      egressAllow = input.network.egressAllow
+      hardPolicy = new Dynamic {
+        allowedDestinations = input.network.hardPolicy.base.allowedDestinations
+      }
+    }
+    secrets = input.secrets
+    resources = new Dynamic {
+      memory = new Dynamic {
+        minimumBytes = input.resources.memory.minimumBytes
+        maximumBytes = input.resources.memory.maximumBytes
+      }
+    }
+    targets = input.targets
+    requiredCapabilities = requiredCapabilities(input)
+    runtimeProfiles = new Mapping {
+      when (input.targets.contains("bubblewrap") &&
+        input.workspace.allowedMaterializations.contains("copy")) {
+        ["bubblewrap-copy"] = new Dynamic {
+          target = "bubblewrap"
+          materializations = List("copy")
+        }
+      }
+      when (input.targets.contains("bubblewrap") &&
+        input.workspace.allowedMaterializations.contains("live")) {
+        ["bubblewrap-live"] = new Dynamic {
+          target = "bubblewrap"
+          materializations = List("live")
+        }
+      }
+      when (input.targets.contains("firecracker") &&
+        input.workspace.allowedMaterializations.contains("copy")) {
+        ["firecracker-copy"] = new Dynamic {
+          target = "firecracker"
+          materializations = List("copy")
+        }
+      }
+    }
+  }
+
+function compile(input: ArtifactInput): Dynamic =
+  if (!profileConsistent(input))
+    throw("artifact.profile.explicit_conflict: explicit value contradicts selected profile")
+  else if (!input.workspace.destination.startsWith("/"))
+    throw("artifact.mount.destination_absolute: workspace destination must be absolute")
+  else if (input.environment.activation.length == 0)
+    throw("artifact.environment.activation_nonempty: activation argv must not be empty")
+  else if (resolvedNetworkMode(input) == "none" && input.network.egressAllow.length > 0)
+    throw("artifact.network.none_has_no_egress: disabled network cannot have egress destinations")
+  else if (!policyMonotonic(input))
+    throw("artifact.policy.monotonic_refinement: refinement widens hard policy")
+  else if (!everyTargetSupports(input))
+    throw("artifact.target.required_capability_supported: target lacks mandatory capability")
+  else if (input.targets.length == 0)
+    throw("artifact.target.at_least_one: at least one target is required")
+  else if (input.resources.memory.minimumBytes > input.resources.memory.maximumBytes)
+    throw("artifact.resources.bounds_nonempty: minimum memory exceeds maximum")
+  else
+    manifest(input)
+
+local function runtimeSupports(input: CreateInput): Boolean =
+  if (input.runtimeProfile == "firecracker-copy" || input.runtimeProfile == "bubblewrap-copy")
+    input.workspace.materialization == "copy"
+  else if (input.runtimeProfile == "bubblewrap-live")
+    input.workspace.materialization == "live"
+  else
+    false
+
+function create(artifact: Dynamic, input: CreateInput): Dynamic =
+  if (!runtimeSupports(input))
+    throw("create.runtime_profile_supports_binding: runtime profile does not support requested workspace materialization")
+  else if (input.allocation.memoryBytes < artifact.resources.memory.minimumBytes ||
+    input.allocation.memoryBytes > artifact.resources.memory.maximumBytes)
+    throw("create.allocation.within_artifact_bounds: requested memory outside Artifact bounds")
+  else
+    new Dynamic {
+      runtimeProfile = input.runtimeProfile
+      workspace = new Dynamic {
+        materialization = input.workspace.materialization
+      }
+      allocation = new Dynamic {
+        memoryBytes = input.allocation.memoryBytes
+      }
+    }

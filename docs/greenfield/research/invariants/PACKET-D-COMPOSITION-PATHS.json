@@ -1,0 +1,1891 @@
+{
+  "reviewVersion": 1,
+  "packet": "D",
+  "status": "candidate",
+  "reviewedPathCount": 54,
+  "definition": "A CompositionPath is a route by which a value or operation can contribute to, transform, transport, or attempt to bypass a product-owned resource contract.",
+  "textAuthority": "Only closed path IDs, ownership, effect, boundary, applicability, delegation, and frontend-mapping fields are normative. Explanatory mechanism text is non-normative and cannot grant authority.",
+  "frontendSyntaxContract": "Exact frontend syntax is evidence for a generic CompositionPath and never creates a second semantic contract.",
+  "reopenPolicy": "Adding any future composition or extension facility reopens Packet D and changes this locked path universe.",
+  "registryPathAliases": {
+    "adapter-native-extension": "adapter-native-extension",
+    "binding-resolution": "direct-api",
+    "built-artifact-load": "built-artifact-load",
+    "canonical-wire-corruption": "raw-wire-input",
+    "cli-adapter": "cli-adapter",
+    "core-api": "direct-api",
+    "corrupted-manifest": "corrupted-manifest",
+    "corrupted-resolved-input": "serialized-resolved-reentry",
+    "direct-api": "direct-api",
+    "direct-driver-invocation": "direct-driver-invocation",
+    "direct-native-nix-value": "direct-native-nix-value",
+    "driver-preparation": "resolved-driver-handoff",
+    "driver-selection": "operator-native-extension",
+    "exec-native-extension": "exec-native-extension",
+    "explicit-override": "artifact-explicit-override",
+    "framework-adapter": "framework-adapter",
+    "frontend-adaptation": "frontend-adaptation",
+    "frontend-output": "frontend-output",
+    "generated-unit-inspection": "managed-service",
+    "host-path-resolution": "resolved-driver-handoff",
+    "host-preflight": "provider-native-operation",
+    "idempotent-retry": "direct-api",
+    "import-order": "artifact-import-order",
+    "imports": "artifact-imports",
+    "initial-process": "direct-api",
+    "live-native-extension": "live-native-extension",
+    "live-operation": "live-native-extension",
+    "managed-service": "managed-service",
+    "managed-service-definition-imports": "managed-service-definition-imports",
+    "managed-service-definition-native-escape": "managed-service-definition-native-escape",
+    "managed-service-definition-precedence": "managed-service-definition-precedence",
+    "managed-service-reconciliation": "managed-service",
+    "member-deduplication": "built-artifact-load",
+    "namespaced-extension": "namespaced-extension",
+    "native-guest-module": "native-guest-module",
+    "native-language-escape": "artifact-native-language-escape",
+    "oci-descriptor-transfer": "oci-descriptor-transfer",
+    "operator-policy": "operator-native-extension",
+    "operator-configuration-imports": "operator-configuration-imports",
+    "operator-configuration-native-escape": "operator-configuration-native-escape",
+    "operator-configuration-precedence": "operator-configuration-precedence",
+    "operator-registration": "operator-native-extension",
+    "ordinary-authoring": "artifact-ordinary-authoring",
+    "placement": "direct-api",
+    "prebuilt-member-transfer": "prebuilt-member-transfer",
+    "profile-expansion": "artifact-profile-expansion",
+    "provider-build-cache": "provider-build-cache",
+    "provider-cache-hit": "provider-cache-hit",
+    "provider-native-adapter": "provider-native-adapter",
+    "provider-native-operation": "provider-native-operation",
+    "provider-selection": "direct-api",
+    "provider-side-construction": "provider-side-construction",
+    "raw-runtime-config-input": "raw-runtime-config-input",
+    "raw-wire-input": "raw-wire-input",
+    "resolved-driver-handoff": "resolved-driver-handoff",
+    "schema-migration": "schema-migration",
+    "secret-delivery": "direct-api",
+    "service-native-extension": "service-native-extension",
+    "snapshot-capture": "live-native-extension",
+    "snapshot-restore": "direct-api",
+    "serialized-resolved-reentry": "serialized-resolved-reentry",
+    "strongest-override": "artifact-strongest-override",
+    "target-lowering": "target-lowering",
+    "target-native-extension": "target-native-extension",
+    "target-selection": "direct-api",
+    "tool-registration": "framework-adapter",
+    "typed-nix-handle": "typed-nix-handle",
+    "unsafe-opaque-extension": "unsafe-opaque-extension"
+  },
+  "paths": [
+    {
+      "id": "artifact-ordinary-authoring",
+      "category": "authoring",
+      "sourceOwner": "artifact",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "allowedEffects": [
+        "may-contribute",
+        "no-authority"
+      ],
+      "firstBoundary": "source-semantics",
+      "finalBoundary": "canonical-wire",
+      "strongestBypassClass": "ordinary-composition",
+      "frontendMappings": [
+        {
+          "candidate": "nix",
+          "mechanism": "ordinary module definitions",
+          "researchPin": "NIX-MODULE-SYSTEM-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/ordinary-authoring/nix-module-definition"
+        },
+        {
+          "candidate": "cue",
+          "mechanism": "closed definitions and unification",
+          "researchPin": "CUE-SPEC-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/ordinary-authoring/cue-definition"
+        },
+        {
+          "candidate": "nickel",
+          "mechanism": "record contracts",
+          "researchPin": "NICKEL-MERGE-CONTRACTS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/ordinary-authoring/nickel-contract"
+        },
+        {
+          "candidate": "pkl",
+          "mechanism": "typed modules and classes",
+          "researchPin": "PKL-LANGUAGE-EXTERNAL-READERS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/ordinary-authoring/pkl-module"
+        },
+        {
+          "candidate": "dhall",
+          "mechanism": "typed record normalization",
+          "researchPin": "DHALL-STANDARD-2026-07-24",
+          "result": "research-control-only",
+          "witness": "planned/packet-d/ordinary-authoring/dhall-record"
+        }
+      ],
+      "targetApplicability": [
+        "portable"
+      ],
+      "delegatedPackets": [
+        "F"
+      ]
+    },
+    {
+      "id": "artifact-imports",
+      "category": "authoring",
+      "sourceOwner": "artifact",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "allowedEffects": [
+        "may-contribute",
+        "no-authority"
+      ],
+      "firstBoundary": "source-semantics",
+      "finalBoundary": "canonical-wire",
+      "strongestBypassClass": "import-composition",
+      "frontendMappings": [
+        {
+          "candidate": "nix",
+          "mechanism": "module imports",
+          "researchPin": "NIX-MODULE-SYSTEM-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/imports/nix-modules"
+        },
+        {
+          "candidate": "cue",
+          "mechanism": "module imports",
+          "researchPin": "CUE-SPEC-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/imports/cue-import"
+        },
+        {
+          "candidate": "nickel",
+          "mechanism": "file imports",
+          "researchPin": "NICKEL-MERGE-CONTRACTS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/imports/nickel-import"
+        },
+        {
+          "candidate": "pkl",
+          "mechanism": "module imports and amends",
+          "researchPin": "PKL-LANGUAGE-EXTERNAL-READERS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/imports/pkl-import"
+        },
+        {
+          "candidate": "dhall",
+          "mechanism": "hashed imports",
+          "researchPin": "DHALL-STANDARD-2026-07-24",
+          "result": "research-control-only",
+          "witness": "planned/packet-d/imports/dhall-import"
+        }
+      ],
+      "targetApplicability": [
+        "portable"
+      ],
+      "delegatedPackets": [
+        "F"
+      ]
+    },
+    {
+      "id": "artifact-import-order",
+      "category": "authoring",
+      "sourceOwner": "artifact",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "allowedEffects": [
+        "may-contribute",
+        "no-authority"
+      ],
+      "firstBoundary": "source-semantics",
+      "finalBoundary": "canonical-wire",
+      "strongestBypassClass": "composition-precedence",
+      "frontendMappings": [
+        {
+          "candidate": "nix",
+          "mechanism": "module definition order and mkOrder",
+          "researchPin": "NIX-MODULE-SYSTEM-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/import-order/nix-mkorder"
+        }
+      ],
+      "targetApplicability": [
+        "portable"
+      ],
+      "delegatedPackets": [
+        "F"
+      ]
+    },
+    {
+      "id": "artifact-profile-expansion",
+      "category": "authoring",
+      "sourceOwner": "artifact",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "allowedEffects": [
+        "may-select",
+        "no-authority"
+      ],
+      "firstBoundary": "artifact-normalization",
+      "finalBoundary": "canonical-wire",
+      "strongestBypassClass": "profile-expansion",
+      "frontendMappings": [
+        {
+          "candidate": "nix",
+          "mechanism": "named module/profile expansion",
+          "researchPin": "NIX-MODULE-SYSTEM-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/profile-expansion/nix-profile"
+        }
+      ],
+      "targetApplicability": [
+        "portable"
+      ],
+      "delegatedPackets": [
+        "F"
+      ]
+    },
+    {
+      "id": "artifact-explicit-override",
+      "category": "authoring",
+      "sourceOwner": "artifact",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "allowedEffects": [
+        "may-contribute",
+        "may-narrow",
+        "may-select",
+        "no-authority"
+      ],
+      "firstBoundary": "source-semantics",
+      "finalBoundary": "canonical-wire",
+      "strongestBypassClass": "composition-precedence",
+      "frontendMappings": [
+        {
+          "candidate": "nix",
+          "mechanism": "mkOverride priority",
+          "researchPin": "NIX-MODULE-SYSTEM-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/explicit-override/nix-mkoverride"
+        }
+      ],
+      "targetApplicability": [
+        "portable"
+      ],
+      "delegatedPackets": [
+        "F"
+      ]
+    },
+    {
+      "id": "artifact-semantic-refinement",
+      "category": "authoring",
+      "sourceOwner": "artifact",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "allowedEffects": [
+        "may-contribute",
+        "may-narrow",
+        "may-select",
+        "no-authority"
+      ],
+      "firstBoundary": "source-semantics",
+      "finalBoundary": "canonical-wire",
+      "strongestBypassClass": "semantic-widening",
+      "frontendMappings": [
+        {
+          "candidate": "cue",
+          "mechanism": "unification and closed refinement",
+          "researchPin": "CUE-SPEC-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/semantic-refinement/cue-unification"
+        },
+        {
+          "candidate": "nickel",
+          "mechanism": "contract-preserving merge",
+          "researchPin": "NICKEL-MERGE-CONTRACTS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/semantic-refinement/nickel-merge"
+        }
+      ],
+      "targetApplicability": [
+        "portable"
+      ],
+      "delegatedPackets": [
+        "F"
+      ]
+    },
+    {
+      "id": "artifact-strongest-override",
+      "category": "authoring",
+      "sourceOwner": "artifact",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "allowedEffects": [
+        "may-contribute",
+        "may-select",
+        "no-authority"
+      ],
+      "firstBoundary": "source-semantics",
+      "finalBoundary": "canonical-wire",
+      "strongestBypassClass": "composition-precedence",
+      "frontendMappings": [
+        {
+          "candidate": "nix",
+          "mechanism": "mkForce and stronger-priority definitions",
+          "researchPin": "NIX-MODULE-SYSTEM-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/strongest-override/nix-mkforce"
+        },
+        {
+          "candidate": "nickel",
+          "mechanism": "force priority",
+          "researchPin": "NICKEL-MERGE-CONTRACTS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/strongest-override/nickel-force"
+        },
+        {
+          "candidate": "pkl",
+          "mechanism": "amendment replacement",
+          "researchPin": "PKL-LANGUAGE-EXTERNAL-READERS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/strongest-override/pkl-amend"
+        }
+      ],
+      "targetApplicability": [
+        "portable"
+      ],
+      "delegatedPackets": [
+        "F"
+      ]
+    },
+    {
+      "id": "artifact-native-language-escape",
+      "category": "authoring",
+      "sourceOwner": "artifact",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "allowedEffects": [
+        "no-authority"
+      ],
+      "firstBoundary": "source-semantics",
+      "finalBoundary": "canonical-wire",
+      "strongestBypassClass": "native-language-escape",
+      "frontendMappings": [
+        {
+          "candidate": "nix",
+          "mechanism": "freeform modules, specialArgs, and _module.args",
+          "researchPin": "NIX-MODULE-SYSTEM-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/native-language-escape/nix-freeform"
+        },
+        {
+          "candidate": "cue",
+          "mechanism": "unknown fields outside closed definition",
+          "researchPin": "CUE-SPEC-2026-07-24",
+          "result": "unsupported",
+          "witness": "planned/packet-d/native-language-escape/cue-closed-definition"
+        },
+        {
+          "candidate": "nickel",
+          "mechanism": "foreign functions and dynamic fields",
+          "researchPin": "NICKEL-MERGE-CONTRACTS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/native-language-escape/nickel-foreign"
+        },
+        {
+          "candidate": "pkl",
+          "mechanism": "open and dynamic objects plus external readers",
+          "researchPin": "PKL-LANGUAGE-EXTERNAL-READERS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/native-language-escape/pkl-dynamic"
+        }
+      ],
+      "targetApplicability": [
+        "portable"
+      ],
+      "delegatedPackets": [
+        "F"
+      ]
+    },
+    {
+      "id": "operator-configuration-authoring",
+      "category": "authoring",
+      "sourceOwner": "operator",
+      "reachableOwners": [
+        "operator"
+      ],
+      "allowedEffects": [
+        "may-contribute",
+        "no-authority"
+      ],
+      "firstBoundary": "operator-configuration-source-completion",
+      "finalBoundary": "operator-configuration-validation",
+      "strongestBypassClass": "operator-configuration-composition",
+      "frontendMappings": [
+        {
+          "candidate": "nix",
+          "mechanism": "ordinary Operator Configuration module definitions",
+          "researchPin": "NIX-MODULE-SYSTEM-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/operator-configuration-authoring/nix-module-definition"
+        }
+      ],
+      "targetApplicability": [
+        "portable"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ]
+    },
+    {
+      "id": "operator-configuration-imports",
+      "category": "authoring",
+      "sourceOwner": "operator",
+      "reachableOwners": [
+        "operator"
+      ],
+      "allowedEffects": [
+        "may-contribute",
+        "no-authority"
+      ],
+      "firstBoundary": "operator-configuration-source-completion",
+      "finalBoundary": "operator-configuration-validation",
+      "strongestBypassClass": "operator-configuration-import-composition",
+      "frontendMappings": [
+        {
+          "candidate": "nix",
+          "mechanism": "Operator Configuration module imports",
+          "researchPin": "NIX-MODULE-SYSTEM-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/operator-configuration-imports/nix-module-imports"
+        }
+      ],
+      "targetApplicability": [
+        "portable"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ]
+    },
+    {
+      "id": "operator-configuration-precedence",
+      "category": "authoring",
+      "sourceOwner": "operator",
+      "reachableOwners": [
+        "operator"
+      ],
+      "allowedEffects": [
+        "may-contribute",
+        "may-select",
+        "may-narrow",
+        "no-authority"
+      ],
+      "firstBoundary": "operator-configuration-source-completion",
+      "finalBoundary": "operator-configuration-validation",
+      "strongestBypassClass": "operator-configuration-precedence",
+      "frontendMappings": [
+        {
+          "candidate": "nix",
+          "mechanism": "Operator Configuration definition order and override priority",
+          "researchPin": "NIX-MODULE-SYSTEM-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/operator-configuration-precedence/nix-definition-priority"
+        }
+      ],
+      "targetApplicability": [
+        "portable"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ]
+    },
+    {
+      "id": "operator-configuration-refinement",
+      "category": "authoring",
+      "sourceOwner": "operator",
+      "reachableOwners": [
+        "operator"
+      ],
+      "allowedEffects": [
+        "may-select",
+        "may-narrow",
+        "no-authority"
+      ],
+      "firstBoundary": "operator-configuration-source-completion",
+      "finalBoundary": "operator-configuration-validation",
+      "strongestBypassClass": "operator-configuration-refinement",
+      "frontendMappings": [
+        {
+          "candidate": "nix",
+          "mechanism": "typed Operator Configuration selection and narrowing",
+          "researchPin": "NIX-MODULE-SYSTEM-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/operator-configuration-refinement/nix-selection-narrowing"
+        }
+      ],
+      "targetApplicability": [
+        "portable"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ]
+    },
+    {
+      "id": "operator-configuration-native-escape",
+      "category": "authoring",
+      "sourceOwner": "operator",
+      "reachableOwners": [
+        "operator"
+      ],
+      "allowedEffects": [
+        "no-authority"
+      ],
+      "firstBoundary": "operator-configuration-source-completion",
+      "finalBoundary": "operator-configuration-validation",
+      "strongestBypassClass": "operator-configuration-native-escape",
+      "frontendMappings": [
+        {
+          "candidate": "nix",
+          "mechanism": "freeform Operator Configuration module escape",
+          "researchPin": "NIX-MODULE-SYSTEM-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/operator-configuration-native-escape/nix-freeform"
+        }
+      ],
+      "targetApplicability": [
+        "portable"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ]
+    },
+    {
+      "id": "managed-service-definition-authoring",
+      "category": "authoring",
+      "sourceOwner": "service",
+      "reachableOwners": [
+        "service"
+      ],
+      "allowedEffects": [
+        "may-contribute",
+        "no-authority"
+      ],
+      "firstBoundary": "managed-service-definition-source-completion",
+      "finalBoundary": "managed-service-definition-validation",
+      "strongestBypassClass": "managed-service-definition-composition",
+      "frontendMappings": [
+        {
+          "candidate": "nix",
+          "mechanism": "ordinary Managed-Service Definition module definitions",
+          "researchPin": "NIX-MODULE-SYSTEM-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/managed-service-definition-authoring/nix-module-definition"
+        }
+      ],
+      "targetApplicability": [
+        "portable"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ]
+    },
+    {
+      "id": "managed-service-definition-imports",
+      "category": "authoring",
+      "sourceOwner": "service",
+      "reachableOwners": [
+        "service"
+      ],
+      "allowedEffects": [
+        "may-contribute",
+        "no-authority"
+      ],
+      "firstBoundary": "managed-service-definition-source-completion",
+      "finalBoundary": "managed-service-definition-validation",
+      "strongestBypassClass": "managed-service-definition-import-composition",
+      "frontendMappings": [
+        {
+          "candidate": "nix",
+          "mechanism": "Managed-Service Definition module imports",
+          "researchPin": "NIX-MODULE-SYSTEM-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/managed-service-definition-imports/nix-module-imports"
+        }
+      ],
+      "targetApplicability": [
+        "portable"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ]
+    },
+    {
+      "id": "managed-service-definition-precedence",
+      "category": "authoring",
+      "sourceOwner": "service",
+      "reachableOwners": [
+        "service"
+      ],
+      "allowedEffects": [
+        "may-contribute",
+        "may-select",
+        "may-narrow",
+        "no-authority"
+      ],
+      "firstBoundary": "managed-service-definition-source-completion",
+      "finalBoundary": "managed-service-definition-validation",
+      "strongestBypassClass": "managed-service-definition-precedence",
+      "frontendMappings": [
+        {
+          "candidate": "nix",
+          "mechanism": "Managed-Service Definition order and override priority",
+          "researchPin": "NIX-MODULE-SYSTEM-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/managed-service-definition-precedence/nix-definition-priority"
+        }
+      ],
+      "targetApplicability": [
+        "portable"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ]
+    },
+    {
+      "id": "managed-service-definition-refinement",
+      "category": "authoring",
+      "sourceOwner": "service",
+      "reachableOwners": [
+        "service"
+      ],
+      "allowedEffects": [
+        "may-select",
+        "may-narrow",
+        "no-authority"
+      ],
+      "firstBoundary": "managed-service-definition-source-completion",
+      "finalBoundary": "managed-service-definition-validation",
+      "strongestBypassClass": "managed-service-definition-refinement",
+      "frontendMappings": [
+        {
+          "candidate": "nix",
+          "mechanism": "typed Managed-Service Definition selection and narrowing",
+          "researchPin": "NIX-MODULE-SYSTEM-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/managed-service-definition-refinement/nix-selection-narrowing"
+        }
+      ],
+      "targetApplicability": [
+        "portable"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ]
+    },
+    {
+      "id": "managed-service-definition-native-escape",
+      "category": "authoring",
+      "sourceOwner": "service",
+      "reachableOwners": [
+        "service"
+      ],
+      "allowedEffects": [
+        "no-authority"
+      ],
+      "firstBoundary": "managed-service-definition-source-completion",
+      "finalBoundary": "managed-service-definition-validation",
+      "strongestBypassClass": "managed-service-definition-native-escape",
+      "frontendMappings": [
+        {
+          "candidate": "nix",
+          "mechanism": "freeform Managed-Service Definition module escape",
+          "researchPin": "NIX-MODULE-SYSTEM-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/managed-service-definition-native-escape/nix-freeform"
+        }
+      ],
+      "targetApplicability": [
+        "portable"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ]
+    },
+    {
+      "id": "resolved-driver-handoff",
+      "category": "downstream-boundary",
+      "sourceOwner": "runtime",
+      "reachableOwners": [
+        "create",
+        "operator",
+        "runtime"
+      ],
+      "allowedEffects": [
+        "may-contribute",
+        "may-narrow",
+        "no-authority"
+      ],
+      "firstBoundary": "creation-resolution",
+      "finalBoundary": "driver-entry-validation",
+      "strongestBypassClass": "private-stage-identity",
+      "frontendMappings": [
+        {
+          "candidate": "shared-product-boundary",
+          "mechanism": "product-owned private resolved-stage handoff",
+          "researchPin": "PACKET-C-TARGET-CONTRACTS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/resolved-driver-handoff/private-stage"
+        }
+      ],
+      "targetApplicability": [
+        "all-packet-c-profiles"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ]
+    },
+    {
+      "id": "serialized-resolved-reentry",
+      "category": "downstream-boundary",
+      "sourceOwner": "runtime",
+      "reachableOwners": [
+        "create",
+        "operator",
+        "runtime"
+      ],
+      "allowedEffects": [
+        "boundary-input",
+        "no-authority"
+      ],
+      "firstBoundary": "resolved-reentry-wire-validation",
+      "finalBoundary": "driver-entry-validation",
+      "strongestBypassClass": "serialized-stage-forgery",
+      "frontendMappings": [
+        {
+          "candidate": "shared-product-boundary",
+          "mechanism": "closed bounded versioned resolved reentry envelope",
+          "researchPin": "PACKET-C-TARGET-CONTRACTS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/serialized-resolved-reentry/strict-replay"
+        }
+      ],
+      "targetApplicability": [
+        "all-packet-c-profiles"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ]
+    },
+    {
+      "id": "generated-runtime-configuration",
+      "category": "downstream-boundary",
+      "sourceOwner": "runtime",
+      "reachableOwners": [
+        "runtime"
+      ],
+      "allowedEffects": [
+        "boundary-input",
+        "no-authority"
+      ],
+      "firstBoundary": "driver-entry-validation",
+      "finalBoundary": "driver-entry-validation",
+      "strongestBypassClass": "generated-runtime-configuration",
+      "frontendMappings": [
+        {
+          "candidate": "shared-product-boundary",
+          "mechanism": "total backend-specific configuration generated from PreparedLaunch",
+          "researchPin": "PACKET-C-TARGET-CONTRACTS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/generated-runtime-configuration/closed-validation"
+        }
+      ],
+      "targetApplicability": [
+        "all-packet-c-profiles"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ]
+    },
+    {
+      "id": "direct-driver-invocation",
+      "category": "downstream-boundary",
+      "sourceOwner": "runtime",
+      "reachableOwners": [],
+      "allowedEffects": [
+        "no-authority"
+      ],
+      "firstBoundary": "driver-entry-validation",
+      "finalBoundary": "driver-entry-validation",
+      "strongestBypassClass": "direct-driver-invocation",
+      "frontendMappings": [],
+      "targetApplicability": [
+        "all-packet-c-profiles"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ]
+    },
+    {
+      "id": "raw-runtime-config-input",
+      "category": "downstream-boundary",
+      "sourceOwner": "runtime",
+      "reachableOwners": [],
+      "allowedEffects": [
+        "no-authority"
+      ],
+      "firstBoundary": "driver-entry-validation",
+      "finalBoundary": "driver-entry-validation",
+      "strongestBypassClass": "raw-runtime-config-input",
+      "frontendMappings": [],
+      "targetApplicability": [
+        "all-packet-c-profiles"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ]
+    },
+    {
+      "id": "frontend-output",
+      "category": "frontend-boundary",
+      "sourceOwner": "artifact",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "allowedEffects": [
+        "boundary-input",
+        "no-authority"
+      ],
+      "firstBoundary": "frontend-output-validation",
+      "finalBoundary": "canonical-wire",
+      "strongestBypassClass": "frontend-output-corruption",
+      "frontendMappings": [
+        {
+          "candidate": "nix",
+          "mechanism": "portable projection",
+          "researchPin": "NIX-MODULE-SYSTEM-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/frontend-output/nix-projection"
+        },
+        {
+          "candidate": "cue",
+          "mechanism": "JSON export",
+          "researchPin": "CUE-SPEC-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/frontend-output/cue-export"
+        },
+        {
+          "candidate": "nickel",
+          "mechanism": "JSON serialization",
+          "researchPin": "NICKEL-MERGE-CONTRACTS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/frontend-output/nickel-export"
+        },
+        {
+          "candidate": "pkl",
+          "mechanism": "output renderer",
+          "researchPin": "PKL-LANGUAGE-EXTERNAL-READERS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/frontend-output/pkl-render"
+        },
+        {
+          "candidate": "dhall",
+          "mechanism": "normalized JSON output",
+          "researchPin": "DHALL-STANDARD-2026-07-24",
+          "result": "research-control-only",
+          "witness": "planned/packet-d/frontend-output/dhall-json"
+        }
+      ],
+      "targetApplicability": [
+        "portable"
+      ],
+      "delegatedPackets": [
+        "F"
+      ]
+    },
+    {
+      "id": "raw-wire-input",
+      "category": "downstream-boundary",
+      "sourceOwner": "runtime",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "allowedEffects": [
+        "boundary-input",
+        "no-authority"
+      ],
+      "firstBoundary": "strict-wire-decode",
+      "finalBoundary": "canonical-wire",
+      "strongestBypassClass": "wire-corruption",
+      "frontendMappings": [
+        {
+          "candidate": "shared-product-boundary",
+          "mechanism": "raw canonical JSON input",
+          "researchPin": "JSON-RFC-IJSON-JCS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/raw-wire-input/json-decoder"
+        }
+      ],
+      "targetApplicability": [
+        "portable"
+      ],
+      "delegatedPackets": [
+        "F"
+      ]
+    },
+    {
+      "id": "schema-migration",
+      "category": "downstream-boundary",
+      "sourceOwner": "runtime",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "allowedEffects": [
+        "boundary-input",
+        "no-authority"
+      ],
+      "firstBoundary": "strict-wire-decode",
+      "finalBoundary": "canonical-wire",
+      "strongestBypassClass": "migration-corruption",
+      "frontendMappings": [
+        {
+          "candidate": "shared-product-boundary",
+          "mechanism": "versioned canonical schema migration",
+          "researchPin": "JSON-RFC-IJSON-JCS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/schema-migration/versioned-migration"
+        }
+      ],
+      "targetApplicability": [
+        "portable"
+      ],
+      "delegatedPackets": [
+        "F"
+      ]
+    },
+    {
+      "id": "namespaced-extension",
+      "category": "artifact-native",
+      "sourceOwner": "artifact",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "allowedEffects": [
+        "may-contribute",
+        "no-authority"
+      ],
+      "firstBoundary": "artifact-final-validation",
+      "finalBoundary": "canonical-wire",
+      "strongestBypassClass": "extension-namespace",
+      "frontendMappings": [
+        {
+          "candidate": "shared-product-boundary",
+          "mechanism": "registered namespaced portable extension",
+          "researchPin": "PACKET-C-TARGET-CONTRACTS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/namespaced-extension/registered-extension"
+        }
+      ],
+      "targetApplicability": [
+        "all-packet-c-profiles"
+      ],
+      "delegatedPackets": [
+        "F"
+      ]
+    },
+    {
+      "id": "typed-nix-handle",
+      "category": "artifact-native",
+      "sourceOwner": "artifact",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "allowedEffects": [
+        "may-contribute",
+        "no-authority"
+      ],
+      "firstBoundary": "artifact-final-validation",
+      "finalBoundary": "nix-handle-registry",
+      "strongestBypassClass": "native-handle-forgery",
+      "frontendMappings": [
+        {
+          "candidate": "nix",
+          "mechanism": "registry ID plus digest plus typed member ID",
+          "researchPin": "NIX-MODULE-SYSTEM-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/typed-nix-handle/registry-digest"
+        }
+      ],
+      "targetApplicability": [
+        "all-packet-c-profiles"
+      ],
+      "delegatedPackets": [
+        "F"
+      ]
+    },
+    {
+      "id": "native-guest-module",
+      "category": "artifact-native",
+      "sourceOwner": "artifact",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "allowedEffects": [
+        "may-contribute",
+        "no-authority"
+      ],
+      "firstBoundary": "artifact-final-validation",
+      "finalBoundary": "packet-c-realization",
+      "strongestBypassClass": "guest-host-ownership",
+      "frontendMappings": [
+        {
+          "candidate": "nix",
+          "mechanism": "scoped guest NixOS module",
+          "researchPin": "NIX-MODULE-SYSTEM-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/native-guest-module/guest-ownership"
+        }
+      ],
+      "targetApplicability": [
+        "microvm-firecracker-linux-v1",
+        "microvm-cloud-hypervisor-linux-v1"
+      ],
+      "delegatedPackets": [
+        "F"
+      ]
+    },
+    {
+      "id": "target-native-extension",
+      "category": "artifact-native",
+      "sourceOwner": "artifact",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "allowedEffects": [
+        "may-contribute",
+        "no-authority"
+      ],
+      "firstBoundary": "artifact-final-validation",
+      "finalBoundary": "packet-c-realization",
+      "strongestBypassClass": "target-native-widening",
+      "frontendMappings": [
+        {
+          "candidate": "nix",
+          "mechanism": "registered target-specific construction contract",
+          "researchPin": "PACKET-C-TARGET-CONTRACTS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/target-native-extension/packet-c-reentry"
+        }
+      ],
+      "targetApplicability": [
+        "all-packet-c-profiles"
+      ],
+      "delegatedPackets": [
+        "F"
+      ]
+    },
+    {
+      "id": "create-native-extension",
+      "category": "lifecycle-native",
+      "sourceOwner": "create",
+      "reachableOwners": [
+        "create"
+      ],
+      "allowedEffects": [
+        "may-narrow",
+        "no-authority"
+      ],
+      "firstBoundary": "creation-resolution",
+      "finalBoundary": "driver-preparation",
+      "strongestBypassClass": "lifecycle-ownership",
+      "frontendMappings": [
+        {
+          "candidate": "shared-product-boundary",
+          "mechanism": "typed CreateSandbox driver extension",
+          "researchPin": "PACKET-C-TARGET-CONTRACTS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/create-native-extension/create-owner"
+        }
+      ],
+      "targetApplicability": [
+        "all-packet-c-profiles"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ]
+    },
+    {
+      "id": "operator-native-extension",
+      "category": "lifecycle-native",
+      "sourceOwner": "operator",
+      "reachableOwners": [
+        "operator"
+      ],
+      "allowedEffects": [
+        "may-select",
+        "no-authority"
+      ],
+      "firstBoundary": "operator-admission",
+      "finalBoundary": "driver-preparation",
+      "strongestBypassClass": "lifecycle-ownership",
+      "frontendMappings": [
+        {
+          "candidate": "shared-product-boundary",
+          "mechanism": "typed operator driver configuration",
+          "researchPin": "PACKET-C-TARGET-CONTRACTS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/operator-native-extension/operator-owner"
+        }
+      ],
+      "targetApplicability": [
+        "all-packet-c-profiles"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ]
+    },
+    {
+      "id": "service-native-extension",
+      "category": "lifecycle-native",
+      "sourceOwner": "service",
+      "reachableOwners": [
+        "service"
+      ],
+      "allowedEffects": [
+        "may-select",
+        "no-authority"
+      ],
+      "firstBoundary": "service-reconciliation",
+      "finalBoundary": "core-api",
+      "strongestBypassClass": "lifecycle-ownership",
+      "frontendMappings": [
+        {
+          "candidate": "nix",
+          "mechanism": "managed-service driver configuration",
+          "researchPin": "NIX-MODULE-SYSTEM-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/service-native-extension/service-owner"
+        }
+      ],
+      "targetApplicability": [
+        "all-packet-c-profiles"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ]
+    },
+    {
+      "id": "live-native-extension",
+      "category": "lifecycle-native",
+      "sourceOwner": "live",
+      "reachableOwners": [
+        "live"
+      ],
+      "allowedEffects": [
+        "may-narrow",
+        "no-authority"
+      ],
+      "firstBoundary": "live-operation-validation",
+      "finalBoundary": "live-operation-validation",
+      "strongestBypassClass": "lifecycle-ownership",
+      "frontendMappings": [
+        {
+          "candidate": "shared-product-boundary",
+          "mechanism": "typed live-operation extension",
+          "researchPin": "PACKET-C-TARGET-CONTRACTS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/live-native-extension/live-owner"
+        }
+      ],
+      "targetApplicability": [
+        "all-packet-c-profiles"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ]
+    },
+    {
+      "id": "exec-native-extension",
+      "category": "lifecycle-native",
+      "sourceOwner": "exec",
+      "reachableOwners": [
+        "exec"
+      ],
+      "allowedEffects": [
+        "may-narrow",
+        "no-authority"
+      ],
+      "firstBoundary": "exec-validation",
+      "finalBoundary": "exec-validation",
+      "strongestBypassClass": "lifecycle-ownership",
+      "frontendMappings": [
+        {
+          "candidate": "shared-product-boundary",
+          "mechanism": "typed per-process extension",
+          "researchPin": "PACKET-C-TARGET-CONTRACTS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/exec-native-extension/exec-owner"
+        }
+      ],
+      "targetApplicability": [
+        "all-packet-c-profiles"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ]
+    },
+    {
+      "id": "adapter-native-extension",
+      "category": "lifecycle-native",
+      "sourceOwner": "framework",
+      "reachableOwners": [
+        "framework"
+      ],
+      "allowedEffects": [
+        "may-select",
+        "no-authority"
+      ],
+      "firstBoundary": "framework-translation",
+      "finalBoundary": "core-api",
+      "strongestBypassClass": "adapter-ownership",
+      "frontendMappings": [
+        {
+          "candidate": "shared-product-boundary",
+          "mechanism": "framework-owned adapter configuration",
+          "researchPin": "PACKET-C-TARGET-CONTRACTS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/adapter-native-extension/framework-owner"
+        }
+      ],
+      "targetApplicability": [
+        "portable"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ]
+    },
+    {
+      "id": "provider-native-adapter",
+      "category": "provider-native",
+      "sourceOwner": "operator",
+      "reachableOwners": [
+        "operator",
+        "runtime"
+      ],
+      "allowedEffects": [
+        "boundary-input",
+        "no-authority"
+      ],
+      "firstBoundary": "operator-admission",
+      "finalBoundary": "host-provider-preflight",
+      "strongestBypassClass": "provider-default",
+      "frontendMappings": [
+        {
+          "candidate": "shared-product-boundary",
+          "mechanism": "registered provider adapter",
+          "researchPin": "PACKET-C-TARGET-CONTRACTS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/provider-native-adapter/provider-admission"
+        }
+      ],
+      "targetApplicability": [
+        "remote-provider"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ]
+    },
+    {
+      "id": "provider-native-operation",
+      "category": "provider-native",
+      "sourceOwner": "runtime",
+      "reachableOwners": [
+        "runtime"
+      ],
+      "allowedEffects": [
+        "boundary-input",
+        "no-authority"
+      ],
+      "firstBoundary": "host-provider-preflight",
+      "finalBoundary": "driver-preparation",
+      "strongestBypassClass": "provider-operation",
+      "frontendMappings": [
+        {
+          "candidate": "shared-product-boundary",
+          "mechanism": "versioned provider operation",
+          "researchPin": "PACKET-C-TARGET-CONTRACTS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/provider-native-operation/provider-operation"
+        }
+      ],
+      "targetApplicability": [
+        "remote-provider"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ]
+    },
+    {
+      "id": "corrupted-manifest",
+      "category": "downstream-boundary",
+      "sourceOwner": "runtime",
+      "reachableOwners": [
+        "artifact",
+        "create"
+      ],
+      "allowedEffects": [
+        "boundary-input",
+        "no-authority"
+      ],
+      "firstBoundary": "manifest-load",
+      "finalBoundary": "creation-resolution",
+      "strongestBypassClass": "manifest-corruption",
+      "frontendMappings": [
+        {
+          "candidate": "shared-product-boundary",
+          "mechanism": "corrupted built manifest replay",
+          "researchPin": "PACKET-C-TARGET-CONTRACTS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/corrupted-manifest/manifest-loader"
+        }
+      ],
+      "targetApplicability": [
+        "all-packet-c-profiles"
+      ],
+      "delegatedPackets": [
+        "F"
+      ]
+    },
+    {
+      "id": "target-lowering",
+      "category": "downstream-boundary",
+      "sourceOwner": "runtime",
+      "reachableOwners": [
+        "artifact",
+        "runtime"
+      ],
+      "allowedEffects": [
+        "boundary-input",
+        "no-authority"
+      ],
+      "firstBoundary": "packet-c-contract-rederivation",
+      "finalBoundary": "manifest-load",
+      "strongestBypassClass": "target-lowering-corruption",
+      "frontendMappings": [
+        {
+          "candidate": "nix",
+          "mechanism": "target member lowering",
+          "researchPin": "PACKET-C-TARGET-CONTRACTS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/target-lowering/packet-c-realization"
+        }
+      ],
+      "targetApplicability": [
+        "all-packet-c-profiles"
+      ],
+      "delegatedPackets": [
+        "F"
+      ]
+    },
+    {
+      "id": "built-artifact-load",
+      "category": "downstream-boundary",
+      "sourceOwner": "runtime",
+      "reachableOwners": [
+        "artifact",
+        "create"
+      ],
+      "allowedEffects": [
+        "boundary-input",
+        "no-authority"
+      ],
+      "firstBoundary": "manifest-load",
+      "finalBoundary": "creation-resolution",
+      "strongestBypassClass": "built-artifact-corruption",
+      "frontendMappings": [
+        {
+          "candidate": "shared-product-boundary",
+          "mechanism": "built member and manifest verification",
+          "researchPin": "PACKET-C-TARGET-CONTRACTS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/built-artifact-load/member-verification"
+        }
+      ],
+      "targetApplicability": [
+        "all-packet-c-profiles"
+      ],
+      "delegatedPackets": [
+        "F"
+      ]
+    },
+    {
+      "id": "direct-api",
+      "category": "caller",
+      "sourceOwner": "create",
+      "reachableOwners": [
+        "create"
+      ],
+      "allowedEffects": [
+        "boundary-input",
+        "no-authority"
+      ],
+      "firstBoundary": "creation-resolution",
+      "finalBoundary": "core-api",
+      "strongestBypassClass": "caller-widening",
+      "frontendMappings": [
+        {
+          "candidate": "shared-product-boundary",
+          "mechanism": "typed Core Sandbox API request",
+          "researchPin": "PACKET-C-TARGET-CONTRACTS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/direct-api/create-request"
+        }
+      ],
+      "targetApplicability": [
+        "all-packet-c-profiles"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ]
+    },
+    {
+      "id": "framework-adapter",
+      "category": "caller",
+      "sourceOwner": "framework",
+      "reachableOwners": [
+        "framework"
+      ],
+      "allowedEffects": [
+        "boundary-input",
+        "no-authority"
+      ],
+      "firstBoundary": "framework-translation",
+      "finalBoundary": "core-api",
+      "strongestBypassClass": "adapter-widening",
+      "frontendMappings": [
+        {
+          "candidate": "shared-product-boundary",
+          "mechanism": "framework request translation",
+          "researchPin": "PACKET-C-TARGET-CONTRACTS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/framework-adapter/core-api-translation"
+        }
+      ],
+      "targetApplicability": [
+        "portable"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ]
+    },
+    {
+      "id": "cli-adapter",
+      "category": "caller",
+      "sourceOwner": "framework",
+      "reachableOwners": [
+        "framework"
+      ],
+      "allowedEffects": [
+        "boundary-input",
+        "no-authority"
+      ],
+      "firstBoundary": "framework-translation",
+      "finalBoundary": "core-api",
+      "strongestBypassClass": "adapter-widening",
+      "frontendMappings": [
+        {
+          "candidate": "shared-product-boundary",
+          "mechanism": "CLI request translation",
+          "researchPin": "PACKET-C-TARGET-CONTRACTS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/cli-adapter/core-api-translation"
+        }
+      ],
+      "targetApplicability": [
+        "portable"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ]
+    },
+    {
+      "id": "managed-service",
+      "category": "caller",
+      "sourceOwner": "service",
+      "reachableOwners": [
+        "service"
+      ],
+      "allowedEffects": [
+        "boundary-input",
+        "no-authority"
+      ],
+      "firstBoundary": "service-reconciliation",
+      "finalBoundary": "core-api",
+      "strongestBypassClass": "service-widening",
+      "frontendMappings": [
+        {
+          "candidate": "nix",
+          "mechanism": "managed-service reconciliation into Core API",
+          "researchPin": "NIX-MODULE-SYSTEM-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/managed-service/core-api-translation"
+        }
+      ],
+      "targetApplicability": [
+        "portable"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ]
+    },
+    {
+      "id": "direct-native-nix-value",
+      "category": "artifact-native",
+      "sourceOwner": "artifact",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "allowedEffects": [
+        "may-contribute",
+        "no-authority"
+      ],
+      "firstBoundary": "artifact-final-validation",
+      "finalBoundary": "nix-handle-registry",
+      "strongestBypassClass": "arbitrary-nix-value",
+      "frontendMappings": [
+        {
+          "candidate": "nix",
+          "mechanism": "same-evaluator typed native value projection",
+          "researchPin": "NIX-MODULE-SYSTEM-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/direct-native-nix-value/semantic-projection"
+        }
+      ],
+      "targetApplicability": [
+        "all-packet-c-profiles"
+      ],
+      "delegatedPackets": [
+        "F"
+      ]
+    },
+    {
+      "id": "frontend-adaptation",
+      "category": "frontend-boundary",
+      "sourceOwner": "artifact",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "allowedEffects": [
+        "boundary-input",
+        "no-authority"
+      ],
+      "firstBoundary": "frontend-output-validation",
+      "finalBoundary": "canonical-wire",
+      "strongestBypassClass": "frontend-claim",
+      "frontendMappings": [
+        {
+          "candidate": "cue",
+          "mechanism": "frontend output adapter",
+          "researchPin": "CUE-SPEC-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/frontend-adaptation/cue-adapter"
+        },
+        {
+          "candidate": "nickel",
+          "mechanism": "frontend output adapter",
+          "researchPin": "NICKEL-MERGE-CONTRACTS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/frontend-adaptation/nickel-adapter"
+        },
+        {
+          "candidate": "pkl",
+          "mechanism": "frontend output adapter",
+          "researchPin": "PKL-LANGUAGE-EXTERNAL-READERS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/frontend-adaptation/pkl-adapter"
+        },
+        {
+          "candidate": "dhall",
+          "mechanism": "research-control output adapter",
+          "researchPin": "DHALL-STANDARD-2026-07-24",
+          "result": "research-control-only",
+          "witness": "planned/packet-d/frontend-adaptation/dhall-adapter"
+        }
+      ],
+      "targetApplicability": [
+        "portable"
+      ],
+      "delegatedPackets": [
+        "F"
+      ]
+    },
+    {
+      "id": "unsafe-opaque-extension",
+      "category": "artifact-native",
+      "sourceOwner": "artifact",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "allowedEffects": [
+        "no-authority"
+      ],
+      "firstBoundary": "artifact-final-validation",
+      "finalBoundary": "artifact-final-validation",
+      "strongestBypassClass": "opaque-extension",
+      "frontendMappings": [
+        {
+          "candidate": "cue",
+          "mechanism": "unregistered opaque extension",
+          "researchPin": "CUE-SPEC-2026-07-24",
+          "result": "unsupported",
+          "witness": "planned/packet-d/unsafe-opaque-extension/cue-reject"
+        },
+        {
+          "candidate": "nix",
+          "mechanism": "arbitrary unprojected evaluator value",
+          "researchPin": "NIX-MODULE-SYSTEM-2026-07-24",
+          "result": "unsupported",
+          "witness": "planned/packet-d/unsafe-opaque-extension/nix-reject"
+        }
+      ],
+      "targetApplicability": [
+        "all-packet-c-profiles"
+      ],
+      "delegatedPackets": [
+        "F"
+      ]
+    },
+    {
+      "id": "provider-side-construction",
+      "category": "provider-native",
+      "sourceOwner": "runtime",
+      "reachableOwners": [
+        "artifact",
+        "runtime"
+      ],
+      "allowedEffects": [
+        "boundary-input",
+        "no-authority"
+      ],
+      "firstBoundary": "nix-construction",
+      "finalBoundary": "provider-build-result",
+      "strongestBypassClass": "provider-build",
+      "frontendMappings": [
+        {
+          "candidate": "shared-product-boundary",
+          "mechanism": "versioned remote construction protocol",
+          "researchPin": "PACKET-C-TARGET-CONTRACTS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/provider-side-construction/output-equivalence"
+        }
+      ],
+      "targetApplicability": [
+        "remote-provider"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ]
+    },
+    {
+      "id": "provider-build-cache",
+      "category": "provider-native",
+      "sourceOwner": "runtime",
+      "reachableOwners": [
+        "artifact",
+        "runtime"
+      ],
+      "allowedEffects": [
+        "boundary-input",
+        "no-authority"
+      ],
+      "firstBoundary": "provider-build-result",
+      "finalBoundary": "provider-build-result",
+      "strongestBypassClass": "provider-cache",
+      "frontendMappings": [
+        {
+          "candidate": "shared-product-boundary",
+          "mechanism": "untrusted provider build cache",
+          "researchPin": "PACKET-C-TARGET-CONTRACTS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/provider-build-cache/reverify-cache"
+        }
+      ],
+      "targetApplicability": [
+        "remote-provider"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ]
+    },
+    {
+      "id": "prebuilt-member-transfer",
+      "category": "provider-native",
+      "sourceOwner": "runtime",
+      "reachableOwners": [
+        "artifact",
+        "runtime"
+      ],
+      "allowedEffects": [
+        "boundary-input",
+        "no-authority"
+      ],
+      "firstBoundary": "operator-admission",
+      "finalBoundary": "host-provider-preflight",
+      "strongestBypassClass": "member-transfer",
+      "frontendMappings": [
+        {
+          "candidate": "shared-product-boundary",
+          "mechanism": "content-preserving member transfer",
+          "researchPin": "PACKET-C-TARGET-CONTRACTS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/prebuilt-member-transfer/member-digest"
+        }
+      ],
+      "targetApplicability": [
+        "remote-provider"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ]
+    },
+    {
+      "id": "oci-descriptor-transfer",
+      "category": "provider-native",
+      "sourceOwner": "runtime",
+      "reachableOwners": [
+        "artifact",
+        "runtime"
+      ],
+      "allowedEffects": [
+        "boundary-input",
+        "no-authority"
+      ],
+      "firstBoundary": "operator-admission",
+      "finalBoundary": "host-provider-preflight",
+      "strongestBypassClass": "descriptor-transfer",
+      "frontendMappings": [
+        {
+          "candidate": "shared-product-boundary",
+          "mechanism": "digest-addressed OCI descriptor transfer",
+          "researchPin": "PACKET-C-TARGET-CONTRACTS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/oci-descriptor-transfer/descriptor-graph"
+        }
+      ],
+      "targetApplicability": [
+        "oci-linux-v1",
+        "remote-provider"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ]
+    },
+    {
+      "id": "provider-cache-hit",
+      "category": "provider-native",
+      "sourceOwner": "runtime",
+      "reachableOwners": [
+        "artifact",
+        "runtime"
+      ],
+      "allowedEffects": [
+        "boundary-input",
+        "no-authority"
+      ],
+      "firstBoundary": "host-provider-preflight",
+      "finalBoundary": "driver-preparation",
+      "strongestBypassClass": "provider-cache",
+      "frontendMappings": [
+        {
+          "candidate": "shared-product-boundary",
+          "mechanism": "provider runtime cache hit",
+          "researchPin": "PACKET-C-TARGET-CONTRACTS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/provider-cache-hit/reverify-identity"
+        }
+      ],
+      "targetApplicability": [
+        "remote-provider"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ]
+    },
+    {
+      "id": "corrupted-provider-build-result",
+      "category": "downstream-boundary",
+      "sourceOwner": "runtime",
+      "reachableOwners": [
+        "artifact",
+        "runtime"
+      ],
+      "allowedEffects": [
+        "boundary-input",
+        "no-authority"
+      ],
+      "firstBoundary": "provider-build-result",
+      "finalBoundary": "provider-build-result",
+      "strongestBypassClass": "provider-result-corruption",
+      "frontendMappings": [
+        {
+          "candidate": "shared-product-boundary",
+          "mechanism": "corrupted provider construction result replay",
+          "researchPin": "PACKET-C-TARGET-CONTRACTS-2026-07-24",
+          "result": "supported",
+          "witness": "planned/packet-d/corrupted-provider-build-result/output-verifier"
+        }
+      ],
+      "targetApplicability": [
+        "remote-provider"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ]
+    }
+  ]
+}

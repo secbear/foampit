@@ -1,0 +1,3830 @@
+{
+  "reviewVersion": 1,
+  "packet": "D",
+  "status": "candidate",
+  "authority": "This candidate catalog is the normative semantic contract proposed for every locked composition path. Generated coverage may select current invariant IDs but may not redefine effects, boundaries, exclusions, identity authority, evidence, tests, or delegation.",
+  "structuralExclusionClasses": {
+    "active-path-contract": "The invariant is in this path's independently pinned active set and remains subject to the path's exact boundary contract.",
+    "foreign-owner": "This path cannot author a field or fact owned by an unreachable resource owner; the named path boundary rejects any forged foreign-owned value.",
+    "same-owner-stage-or-fact-class": "This path is inactive for this same-owner fact class: source, request, and native inputs cannot author builder/member/conformance/observed/runtime facts or other later-stage facts absent from the independently pinned active set.",
+    "immutable-artifact-fact": "A lifecycle, caller, provider, or downstream path cannot rewrite immutable Artifact facts or mint builder, member, support, provenance, semantic-identity, or conformance facts.",
+    "hard-contract-nonwidening": "The path may be relevant to this invariant but has no authority to weaken, replace, or mint the protected hard/common contract fact; the final shared validator rejects the attempted bypass."
+  },
+  "requiredProfileIds": [
+    "bubblewrap-linux-v1",
+    "microvm-firecracker-linux-v1",
+    "microvm-cloud-hypervisor-linux-v1",
+    "oci-linux-v1"
+  ],
+  "nativeHandleContract": {
+    "sourceGraphClosureDigest": "required-complete-pinned-transitive-closure",
+    "registryNamespace": "required",
+    "registryVersion": "required",
+    "registryDigest": "required",
+    "exportAttribute": "required",
+    "nativeInterfaceVersion": "required",
+    "targetSystem": "required",
+    "affectedMember": "required",
+    "expectedSemanticProjection": "required",
+    "semanticIdentityComparison": "required-before-construction"
+  },
+  "conditionalNativeHandleContract": {
+    "invariantIds": [
+      "NAT-002",
+      "NAT-003"
+    ],
+    "allowedEffects": [
+      "may-contribute",
+      "may-narrow",
+      "may-select",
+      "boundary-input"
+    ],
+    "condition": {
+      "kind": "when-native-handle-present"
+    },
+    "contract": {
+      "sourceGraphClosureDigest": "required-complete-pinned-transitive-closure",
+      "registryNamespace": "required",
+      "registryVersion": "required",
+      "registryDigest": "required",
+      "exportAttribute": "required",
+      "nativeInterfaceVersion": "required",
+      "targetSystem": "required",
+      "affectedMember": "required",
+      "expectedSemanticProjection": "required",
+      "semanticIdentityComparison": "required-before-construction"
+    }
+  },
+  "delegatedConcernTaxonomy": {
+    "E": [
+      "operation-transition",
+      "retry",
+      "cancellation",
+      "cleanup"
+    ],
+    "F": [
+      "disclosure",
+      "redaction",
+      "evidence-visibility"
+    ]
+  },
+  "crossPathHandoffs": [
+    {
+      "fromPathId": "prebuilt-member-transfer",
+      "afterBoundary": {
+        "id": "host-provider-preflight",
+        "phase": "H0",
+        "component": "remote-provider-adapter"
+      },
+      "toPathId": "built-artifact-load",
+      "resumeBoundary": {
+        "id": "manifest-load",
+        "phase": "C0",
+        "component": "artifact-manifest-loader"
+      },
+      "ordering": "separate-path-handoff"
+    },
+    {
+      "fromPathId": "oci-descriptor-transfer",
+      "afterBoundary": {
+        "id": "host-provider-preflight",
+        "phase": "H0",
+        "component": "remote-provider-adapter"
+      },
+      "toPathId": "built-artifact-load",
+      "resumeBoundary": {
+        "id": "manifest-load",
+        "phase": "C0",
+        "component": "artifact-manifest-loader"
+      },
+      "ordering": "separate-path-handoff"
+    },
+    {
+      "fromPathId": "provider-cache-hit",
+      "afterBoundary": {
+        "id": "driver-preparation",
+        "phase": "D0",
+        "component": "driver-preparation"
+      },
+      "toPathId": "built-artifact-load",
+      "resumeBoundary": {
+        "id": "manifest-load",
+        "phase": "C0",
+        "component": "artifact-manifest-loader"
+      },
+      "ordering": "separate-path-handoff"
+    },
+    {
+      "fromPathId": "provider-side-construction",
+      "afterBoundary": {
+        "id": "packet-c-realization",
+        "phase": "N1",
+        "component": "target-member-verifier"
+      },
+      "toPathId": "built-artifact-load",
+      "resumeBoundary": {
+        "id": "manifest-load",
+        "phase": "C0",
+        "component": "artifact-manifest-loader"
+      },
+      "ordering": "separate-path-handoff"
+    },
+    {
+      "fromPathId": "provider-build-cache",
+      "afterBoundary": {
+        "id": "packet-c-realization",
+        "phase": "N1",
+        "component": "target-member-verifier"
+      },
+      "toPathId": "built-artifact-load",
+      "resumeBoundary": {
+        "id": "manifest-load",
+        "phase": "C0",
+        "component": "artifact-manifest-loader"
+      },
+      "ordering": "separate-path-handoff"
+    },
+    {
+      "fromPathId": "corrupted-provider-build-result",
+      "afterBoundary": {
+        "id": "packet-c-realization",
+        "phase": "N1",
+        "component": "target-member-verifier"
+      },
+      "toPathId": "built-artifact-load",
+      "resumeBoundary": {
+        "id": "manifest-load",
+        "phase": "C0",
+        "component": "artifact-manifest-loader"
+      },
+      "ordering": "separate-path-handoff"
+    }
+  ],
+  "targetApplicabilityProjection": {
+    "artifact-ordinary-authoring": [],
+    "artifact-imports": [],
+    "artifact-import-order": [],
+    "artifact-profile-expansion": [],
+    "artifact-explicit-override": [],
+    "artifact-semantic-refinement": [],
+    "artifact-strongest-override": [],
+    "artifact-native-language-escape": [],
+    "operator-configuration-authoring": [],
+    "operator-configuration-imports": [],
+    "operator-configuration-precedence": [],
+    "operator-configuration-refinement": [],
+    "operator-configuration-native-escape": [],
+    "managed-service-definition-authoring": [],
+    "managed-service-definition-imports": [],
+    "managed-service-definition-precedence": [],
+    "managed-service-definition-refinement": [],
+    "managed-service-definition-native-escape": [],
+    "resolved-driver-handoff": [
+      "bubblewrap-linux-v1",
+      "microvm-firecracker-linux-v1",
+      "microvm-cloud-hypervisor-linux-v1",
+      "oci-linux-v1"
+    ],
+    "serialized-resolved-reentry": [
+      "bubblewrap-linux-v1",
+      "microvm-firecracker-linux-v1",
+      "microvm-cloud-hypervisor-linux-v1",
+      "oci-linux-v1"
+    ],
+    "generated-runtime-configuration": [
+      "bubblewrap-linux-v1",
+      "microvm-firecracker-linux-v1",
+      "microvm-cloud-hypervisor-linux-v1",
+      "oci-linux-v1"
+    ],
+    "direct-driver-invocation": [
+      "bubblewrap-linux-v1",
+      "microvm-firecracker-linux-v1",
+      "microvm-cloud-hypervisor-linux-v1",
+      "oci-linux-v1"
+    ],
+    "raw-runtime-config-input": [
+      "bubblewrap-linux-v1",
+      "microvm-firecracker-linux-v1",
+      "microvm-cloud-hypervisor-linux-v1",
+      "oci-linux-v1"
+    ],
+    "frontend-output": [],
+    "raw-wire-input": [],
+    "schema-migration": [],
+    "namespaced-extension": [
+      "bubblewrap-linux-v1",
+      "microvm-firecracker-linux-v1",
+      "microvm-cloud-hypervisor-linux-v1",
+      "oci-linux-v1"
+    ],
+    "typed-nix-handle": [
+      "bubblewrap-linux-v1",
+      "microvm-firecracker-linux-v1",
+      "microvm-cloud-hypervisor-linux-v1",
+      "oci-linux-v1"
+    ],
+    "native-guest-module": [
+      "microvm-firecracker-linux-v1",
+      "microvm-cloud-hypervisor-linux-v1"
+    ],
+    "target-native-extension": [
+      "bubblewrap-linux-v1",
+      "microvm-firecracker-linux-v1",
+      "microvm-cloud-hypervisor-linux-v1",
+      "oci-linux-v1"
+    ],
+    "create-native-extension": [
+      "bubblewrap-linux-v1",
+      "microvm-firecracker-linux-v1",
+      "microvm-cloud-hypervisor-linux-v1",
+      "oci-linux-v1"
+    ],
+    "operator-native-extension": [
+      "bubblewrap-linux-v1",
+      "microvm-firecracker-linux-v1",
+      "microvm-cloud-hypervisor-linux-v1",
+      "oci-linux-v1"
+    ],
+    "service-native-extension": [
+      "bubblewrap-linux-v1",
+      "microvm-firecracker-linux-v1",
+      "microvm-cloud-hypervisor-linux-v1",
+      "oci-linux-v1"
+    ],
+    "live-native-extension": [
+      "bubblewrap-linux-v1",
+      "microvm-firecracker-linux-v1",
+      "microvm-cloud-hypervisor-linux-v1",
+      "oci-linux-v1"
+    ],
+    "exec-native-extension": [
+      "bubblewrap-linux-v1",
+      "microvm-firecracker-linux-v1",
+      "microvm-cloud-hypervisor-linux-v1",
+      "oci-linux-v1"
+    ],
+    "adapter-native-extension": [],
+    "provider-native-adapter": [
+      "bubblewrap-linux-v1",
+      "microvm-firecracker-linux-v1",
+      "microvm-cloud-hypervisor-linux-v1",
+      "oci-linux-v1"
+    ],
+    "provider-native-operation": [
+      "bubblewrap-linux-v1",
+      "microvm-firecracker-linux-v1",
+      "microvm-cloud-hypervisor-linux-v1",
+      "oci-linux-v1"
+    ],
+    "corrupted-manifest": [
+      "bubblewrap-linux-v1",
+      "microvm-firecracker-linux-v1",
+      "microvm-cloud-hypervisor-linux-v1",
+      "oci-linux-v1"
+    ],
+    "target-lowering": [
+      "bubblewrap-linux-v1",
+      "microvm-firecracker-linux-v1",
+      "microvm-cloud-hypervisor-linux-v1",
+      "oci-linux-v1"
+    ],
+    "built-artifact-load": [
+      "bubblewrap-linux-v1",
+      "microvm-firecracker-linux-v1",
+      "microvm-cloud-hypervisor-linux-v1",
+      "oci-linux-v1"
+    ],
+    "direct-api": [
+      "bubblewrap-linux-v1",
+      "microvm-firecracker-linux-v1",
+      "microvm-cloud-hypervisor-linux-v1",
+      "oci-linux-v1"
+    ],
+    "framework-adapter": [],
+    "cli-adapter": [],
+    "managed-service": [],
+    "direct-native-nix-value": [
+      "bubblewrap-linux-v1",
+      "microvm-firecracker-linux-v1",
+      "microvm-cloud-hypervisor-linux-v1",
+      "oci-linux-v1"
+    ],
+    "frontend-adaptation": [],
+    "unsafe-opaque-extension": [
+      "bubblewrap-linux-v1",
+      "microvm-firecracker-linux-v1",
+      "microvm-cloud-hypervisor-linux-v1",
+      "oci-linux-v1"
+    ],
+    "provider-side-construction": [
+      "bubblewrap-linux-v1",
+      "microvm-firecracker-linux-v1",
+      "microvm-cloud-hypervisor-linux-v1",
+      "oci-linux-v1"
+    ],
+    "provider-build-cache": [
+      "bubblewrap-linux-v1",
+      "microvm-firecracker-linux-v1",
+      "microvm-cloud-hypervisor-linux-v1",
+      "oci-linux-v1"
+    ],
+    "prebuilt-member-transfer": [
+      "bubblewrap-linux-v1",
+      "microvm-firecracker-linux-v1",
+      "microvm-cloud-hypervisor-linux-v1",
+      "oci-linux-v1"
+    ],
+    "oci-descriptor-transfer": [
+      "oci-linux-v1"
+    ],
+    "provider-cache-hit": [
+      "bubblewrap-linux-v1",
+      "microvm-firecracker-linux-v1",
+      "microvm-cloud-hypervisor-linux-v1",
+      "oci-linux-v1"
+    ],
+    "corrupted-provider-build-result": [
+      "bubblewrap-linux-v1",
+      "microvm-firecracker-linux-v1",
+      "microvm-cloud-hypervisor-linux-v1",
+      "oci-linux-v1"
+    ]
+  },
+  "serializedResolvedReentryReplaySets": {
+    "builtMemberLoadInvariantIds": [
+      "CAP-001",
+      "CMP-002",
+      "CMP-003",
+      "CMP-004",
+      "CMP-005",
+      "CMP-006",
+      "CMP-007",
+      "CMP-008",
+      "CRT-001",
+      "CRT-003",
+      "DEV-001",
+      "DEV-002",
+      "DRV-001",
+      "EXE-007",
+      "HOST-004",
+      "HOST-005",
+      "IDN-001",
+      "IDT-001",
+      "IDT-002",
+      "LIF-001",
+      "LIVE-002",
+      "LIVE-003",
+      "LIVE-004",
+      "MAN-001",
+      "MAN-002",
+      "MAN-004",
+      "MAN-005",
+      "MAN-006",
+      "NAT-001",
+      "NAT-002",
+      "NET-001",
+      "NET-002",
+      "OUT-001",
+      "OUT-002",
+      "PLT-001",
+      "RES-001",
+      "RES-002",
+      "SCT-001",
+      "SCT-002",
+      "SCT-003",
+      "SEC-001",
+      "SEC-002",
+      "SNP-001",
+      "SNP-002",
+      "STR-001",
+      "STR-002",
+      "STR-003",
+      "STR-004",
+      "STR-005",
+      "STR-006",
+      "STR-008",
+      "STR-009",
+      "STR-010",
+      "STR-011",
+      "SUM-001",
+      "SUM-002",
+      "SUM-003",
+      "SUM-004",
+      "SUM-005",
+      "SUM-006",
+      "SUM-007",
+      "SUM-008",
+      "SUM-009",
+      "SUM-010",
+      "TGT-001",
+      "TGT-002",
+      "TGT-003",
+      "TGT-004",
+      "TGT-005",
+      "TGT-006",
+      "TGT-007",
+      "TGT-008",
+      "TGT-009",
+      "TGT-010",
+      "WIRE-002",
+      "XRS-003",
+      "XRS-004",
+      "XRS-009",
+      "XRS-010",
+      "XRS-011",
+      "XRS-012",
+      "XRS-013",
+      "XRS-014",
+      "XRS-015",
+      "XRS-016",
+      "XRS-017",
+      "XRS-018",
+      "XRS-019",
+      "XRS-020"
+    ],
+    "resolvedStageInvariantIds": [
+      "XRS-001",
+      "XRS-002",
+      "TGT-002",
+      "TGT-003",
+      "CRT-001",
+      "CRT-002",
+      "CRT-003",
+      "CRT-004",
+      "CRT-005",
+      "CRT-006",
+      "IDT-002",
+      "MAN-001",
+      "MAN-002",
+      "MAN-003",
+      "MAN-004",
+      "MAN-005",
+      "MAN-006",
+      "XRS-006",
+      "OPS-001",
+      "OPS-002",
+      "HOST-001",
+      "HOST-002",
+      "HOST-003",
+      "HOST-004",
+      "PRV-001",
+      "XRS-003",
+      "XRS-004",
+      "HOST-005",
+      "WIRE-004",
+      "DRV-001"
+    ]
+  },
+  "driverTrustStateContracts": {
+    "resolved-driver-handoff": {
+      "inputTrust": "private-product-owned",
+      "admittedValue": "PreparedLaunch",
+      "phaseSequence": [
+        "C0",
+        "O0",
+        "H0",
+        "D0"
+      ],
+      "fullReplay": false,
+      "totalGenerator": false,
+      "backendDefaultSuppression": false
+    },
+    "serialized-resolved-reentry": {
+      "inputTrust": "untrusted-serialized",
+      "admittedValue": "PreparedLaunch-after-full-replay",
+      "phaseSequence": [
+        "RW0",
+        "C0",
+        "O0",
+        "H0",
+        "D0"
+      ],
+      "fullReplay": true,
+      "totalGenerator": false,
+      "backendDefaultSuppression": false
+    },
+    "generated-runtime-configuration": {
+      "inputTrust": "product-generated",
+      "admittedValue": "GeneratedRuntimeConfiguration",
+      "phaseSequence": [
+        "D0",
+        "D0"
+      ],
+      "fullReplay": true,
+      "totalGenerator": true,
+      "backendDefaultSuppression": true
+    },
+    "direct-driver-invocation": {
+      "inputTrust": "forbidden-external",
+      "admittedValue": null,
+      "phaseSequence": [
+        "D0"
+      ],
+      "fullReplay": false,
+      "totalGenerator": false,
+      "backendDefaultSuppression": false
+    },
+    "raw-runtime-config-input": {
+      "inputTrust": "forbidden-external",
+      "admittedValue": null,
+      "phaseSequence": [
+        "D0"
+      ],
+      "fullReplay": false,
+      "totalGenerator": false,
+      "backendDefaultSuppression": false
+    }
+  },
+  "classificationCodeContract": {
+    "C": "may-contribute",
+    "N": "may-narrow",
+    "S": "may-select",
+    "B": "boundary-input",
+    "F": "no-authority:foreign-owner",
+    "L": "no-authority:same-owner-stage-or-fact-class",
+    "I": "no-authority:immutable-artifact-fact",
+    "H": "no-authority:hard-contract-nonwidening"
+  },
+  "phaseAuthorityPolicy": {
+    "activeContributionSelectionRefinement": "registry-exact",
+    "boundaryInput": "shift only invariants complete before ingress to the pinned ingress-complete authority; otherwise preserve the invariant first-sound phase, deadline, and authoritative hook while retaining the ingress continuation chain",
+    "hardContractNoAuthority": "registry-exact",
+    "otherNoAuthority": "use the exact phase and component of the contract template rejectedForeignOwnerAt boundary; this is the path-relative complete structural exclusion authority"
+  },
+  "boundaryIngressCompleteAuthoritiesByTemplate": {
+    "authoring": {
+      "phase": "A1",
+      "component": "artifact-final-validator"
+    },
+    "frontend-boundary": {
+      "phase": "W0",
+      "component": "canonical-wire-validator"
+    },
+    "raw-wire": {
+      "phase": "W0",
+      "component": "canonical-wire-validator"
+    },
+    "schema-migration": {
+      "phase": "W0",
+      "component": "canonical-wire-validator"
+    },
+    "create": {
+      "phase": "C0",
+      "component": "creation-resolver"
+    },
+    "service": {
+      "phase": "S0",
+      "component": "managed-service-compiler"
+    },
+    "framework": {
+      "phase": "F0",
+      "component": "framework-adapter-validator"
+    },
+    "provider-admission": {
+      "phase": "H0",
+      "component": "remote-provider-adapter"
+    },
+    "provider-operation": {
+      "phase": "D0",
+      "component": "driver-preparation"
+    },
+    "manifest-load": {
+      "phase": "C0",
+      "component": "artifact-manifest-loader"
+    },
+    "target-lowering": {
+      "phase": "N0",
+      "component": "nix-construction-validator"
+    },
+    "provider-build": {
+      "phase": "N0",
+      "component": "nix-construction-validator"
+    },
+    "provider-result": {
+      "phase": "N1",
+      "component": "target-member-verifier"
+    },
+    "operator-source": {
+      "phase": "OC0",
+      "component": "operator-configuration-validator"
+    },
+    "managed-service-source": {
+      "phase": "MS0",
+      "component": "managed-service-definition-validator"
+    },
+    "resolved-driver-handoff": {
+      "phase": "C0",
+      "component": "creation-resolver"
+    },
+    "serialized-resolved-reentry": {
+      "phase": "RW0",
+      "component": "resolved-reentry-wire-validator"
+    },
+    "generated-runtime-configuration": {
+      "phase": "D0",
+      "component": "runtime-config-validator"
+    },
+    "direct-driver-invocation": {
+      "phase": "D0",
+      "component": "driver-entry-validator"
+    },
+    "raw-runtime-config-input": {
+      "phase": "D0",
+      "component": "driver-entry-validator"
+    }
+  },
+  "reviewedInvariantIds": [
+    "STR-001",
+    "STR-002",
+    "STR-003",
+    "STR-004",
+    "STR-005",
+    "STR-006",
+    "STR-007",
+    "STR-008",
+    "SUM-001",
+    "SUM-002",
+    "SUM-003",
+    "SUM-004",
+    "SUM-005",
+    "XRS-001",
+    "XRS-002",
+    "XRS-003",
+    "XRS-004",
+    "XRS-005",
+    "XRS-006",
+    "XRS-007",
+    "XRS-008",
+    "TGT-001",
+    "TGT-002",
+    "TGT-003",
+    "TGT-004",
+    "TGT-005",
+    "TGT-006",
+    "TGT-007",
+    "TGT-008",
+    "CMP-001",
+    "CMP-002",
+    "CMP-003",
+    "CMP-004",
+    "CMP-005",
+    "CMP-006",
+    "CMP-007",
+    "CMP-008",
+    "WIRE-001",
+    "WIRE-002",
+    "WIRE-003",
+    "WIRE-004",
+    "OPS-001",
+    "OPS-002",
+    "HOST-001",
+    "HOST-002",
+    "HOST-003",
+    "DRV-001",
+    "MAN-001",
+    "MAN-002",
+    "MAN-003",
+    "CRT-001",
+    "CRT-002",
+    "CRT-003",
+    "CRT-004",
+    "CRT-005",
+    "CRT-006",
+    "SVC-001",
+    "SVC-002",
+    "LIVE-001",
+    "LIVE-002",
+    "LIVE-003",
+    "LIVE-004",
+    "EXE-001",
+    "EXE-002",
+    "EXE-003",
+    "EXE-004",
+    "EXE-005",
+    "EXE-006",
+    "EXE-007",
+    "FWK-001",
+    "FWK-002",
+    "PLT-001",
+    "STR-009",
+    "XRS-009",
+    "XRS-010",
+    "STR-010",
+    "XRS-011",
+    "XRS-012",
+    "STR-011",
+    "XRS-013",
+    "XRS-014",
+    "MAN-004",
+    "XRS-015",
+    "XRS-016",
+    "XRS-017",
+    "XRS-018",
+    "XRS-019",
+    "SUM-006",
+    "SUM-007",
+    "SUM-008",
+    "SUM-009",
+    "XRS-020",
+    "NET-001",
+    "NET-002",
+    "RES-001",
+    "RES-002",
+    "IDN-001",
+    "SEC-001",
+    "SEC-002",
+    "DEV-001",
+    "DEV-002",
+    "SCT-001",
+    "SCT-002",
+    "SCT-003",
+    "CAP-001",
+    "SNP-001",
+    "SUM-010",
+    "OUT-001",
+    "OUT-002",
+    "IDT-001",
+    "IDT-002",
+    "TGT-009",
+    "TGT-010",
+    "NAT-001",
+    "NAT-002",
+    "LIF-001",
+    "MAN-005",
+    "MAN-006",
+    "HOST-004",
+    "HOST-005",
+    "SNP-002",
+    "PRV-001",
+    "PRV-002",
+    "CMP-009",
+    "CMP-010",
+    "CMP-011",
+    "WIRE-005",
+    "WIRE-006",
+    "MIG-001",
+    "NAT-003",
+    "OPS-003",
+    "OPS-004",
+    "OPS-005",
+    "SVC-003",
+    "SVC-004",
+    "SVC-005",
+    "WIRE-007",
+    "DRV-002",
+    "DRV-003",
+    "DRV-004"
+  ],
+  "portableArtifactInvariantIds": [
+    "STR-001",
+    "STR-002",
+    "STR-003",
+    "STR-004",
+    "STR-005",
+    "STR-006",
+    "STR-007",
+    "STR-008",
+    "SUM-001",
+    "SUM-002",
+    "SUM-003",
+    "SUM-004",
+    "SUM-005",
+    "XRS-005",
+    "TGT-001",
+    "TGT-004",
+    "TGT-005",
+    "TGT-006",
+    "TGT-007",
+    "TGT-008",
+    "CMP-001",
+    "CMP-002",
+    "CMP-003",
+    "CMP-004",
+    "CMP-005",
+    "CMP-006",
+    "CMP-007",
+    "CMP-008",
+    "WIRE-001",
+    "WIRE-002",
+    "WIRE-003",
+    "WIRE-004",
+    "PLT-001",
+    "STR-009",
+    "XRS-009",
+    "XRS-010",
+    "STR-010",
+    "XRS-012",
+    "STR-011",
+    "XRS-013",
+    "XRS-014",
+    "XRS-015",
+    "XRS-016",
+    "XRS-017",
+    "XRS-018",
+    "XRS-019",
+    "SUM-006",
+    "SUM-007",
+    "SUM-008",
+    "SUM-009",
+    "XRS-020",
+    "NET-001",
+    "NET-002",
+    "RES-001",
+    "RES-002",
+    "IDN-001",
+    "SEC-001",
+    "SEC-002",
+    "DEV-001",
+    "DEV-002",
+    "SCT-001",
+    "SCT-002",
+    "SCT-003",
+    "CAP-001",
+    "SNP-001",
+    "SUM-010",
+    "OUT-001",
+    "OUT-002",
+    "IDT-001",
+    "TGT-009",
+    "TGT-010",
+    "NAT-001",
+    "LIF-001",
+    "CMP-009",
+    "CMP-010",
+    "CMP-011",
+    "WIRE-005",
+    "WIRE-006",
+    "MIG-001"
+  ],
+  "packetCTargetRealizationInvariantIds": [
+    "CAP-001",
+    "CMP-002",
+    "CMP-003",
+    "CMP-004",
+    "CMP-005",
+    "CMP-006",
+    "CMP-007",
+    "CMP-008",
+    "CRT-001",
+    "CRT-003",
+    "DEV-001",
+    "DEV-002",
+    "DRV-001",
+    "EXE-007",
+    "HOST-004",
+    "HOST-005",
+    "IDN-001",
+    "IDT-001",
+    "IDT-002",
+    "LIF-001",
+    "LIVE-002",
+    "LIVE-003",
+    "LIVE-004",
+    "MAN-001",
+    "MAN-002",
+    "MAN-004",
+    "MAN-005",
+    "MAN-006",
+    "NAT-001",
+    "NAT-002",
+    "NET-001",
+    "NET-002",
+    "OUT-001",
+    "OUT-002",
+    "PLT-001",
+    "RES-001",
+    "RES-002",
+    "SCT-001",
+    "SCT-002",
+    "SCT-003",
+    "SEC-001",
+    "SEC-002",
+    "SNP-001",
+    "SNP-002",
+    "STR-001",
+    "STR-002",
+    "STR-003",
+    "STR-004",
+    "STR-005",
+    "STR-006",
+    "STR-008",
+    "STR-009",
+    "STR-010",
+    "STR-011",
+    "SUM-001",
+    "SUM-002",
+    "SUM-003",
+    "SUM-004",
+    "SUM-005",
+    "SUM-006",
+    "SUM-007",
+    "SUM-008",
+    "SUM-009",
+    "SUM-010",
+    "TGT-001",
+    "TGT-002",
+    "TGT-003",
+    "TGT-004",
+    "TGT-005",
+    "TGT-006",
+    "TGT-007",
+    "TGT-008",
+    "TGT-009",
+    "TGT-010",
+    "WIRE-002",
+    "XRS-003",
+    "XRS-004",
+    "XRS-009",
+    "XRS-010",
+    "XRS-011",
+    "XRS-012",
+    "XRS-013",
+    "XRS-014",
+    "XRS-015",
+    "XRS-016",
+    "XRS-017",
+    "XRS-018",
+    "XRS-019",
+    "XRS-020"
+  ],
+  "classificationVectorsByPath": {
+    "artifact-ordinary-authoring": "CLCCCCCCCCCCCFFFFCFFFLFLLLLLLLLLLLLLLLLLLFFFFFFLLLFFFFFFFFFFFFFFFFFFFFFCCCCCCCCCCLCLCCLCCCCLCCCLCCCCLCLLLCCCLLLCLLLCLLFFFFLLLLLLLLFFFFFFFFFF",
+    "artifact-imports": "CCLCCLLLLLLLLFFFFCFFFLFLLLLLLCCLCLLCLLLLLFFFFFFLLLFFFFFFFFFFFFFFFFFFFFFCCCLCCCCCLLLCLLCCCLCCCLCCCCLCLCCCCCCCCLLCCCLCLLFFFFLCCLLLLLFFFFFFFFFF",
+    "artifact-import-order": "LLLLLLLLLLLLLFFFFLFFFLFLLLLLLCLLCLLCLLLLLFFFFFFLLLFFFFFFFFFFFFFFFFFFFFFLLLLLLLLLLLLLLLCLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLFFFFLLCLLLLLFFFFFFFFFF",
+    "artifact-profile-expansion": "SSLLSLLLSLSSLFFFFLFFFSFLSLLLSLLSLLLLLLLLLFFFFFFLLLFFFFFFFFFFFFFFFFFFFFFSSSLLSSSSSLLSLLSLLSLSSSSSSSLLSSSSSSSSSSLSSLLSLLFFFFLLSLLLLLFFFFFFFFFF",
+    "artifact-explicit-override": "LLLLLLLLLLLLLFFFFLFFFLFLLLLLLLLSLLLLLLLLLFFFFFFLLLFFFFFFFFFFFFFFFFFFFFFLLLLLLLLLLLLLLLLLLLLLLLLNLLLLLLLLLLLLLLLLLLLNLLFFFFLLCLLLLLFFFFFFFFFF",
+    "artifact-semantic-refinement": "LLLLLLLLLLLLLFFFFLFFFLFLLLLLLLHSLLLLHLLLLFFFFFFLLLFFFFFFFFFFFFFFFFFFFFFLLLLLLLLLLLLLLLHLLLLHLLLNLLLLLLLLLLLLLLLLLLLNLLFFFFLLCLLLLLFFFFFFFFFF",
+    "artifact-strongest-override": "LLLLLLLLLLLLLFFFFLFFFLFLLLLLLLHSLLLLHLLLLFFFFFFLLLFFFFFFFFFFFFFFFFFFFFFLLLLLLLLLLLLLLLHLLLLHLLLHLLLLLLLLLLLLLLLLLLLHLLFFFFLLCLLLLLFFFFFFFFFF",
+    "artifact-native-language-escape": "LLLLLLLLLLLLLFFFFLFFFLFLLLLLLLLLLLLLHLLLLFFFFFFLLLFFFFFFFFFFFFFFFFFFFFFLLLLHLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLFFFFLHLLLLLLFFFFFFFFFF",
+    "operator-configuration-authoring": "IIIIIIIIIIIIIFFFFICFCIFIIIIIIIIIIIIIIIIIILLLFLFIIIFFFFFFFFFFFFFFFFFFFFFIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIILFFLIIIIIIIILLLFFFFFFF",
+    "operator-configuration-imports": "IIIIIIIIIIIIIFFFFICFCIFIIIIIIIIIIIIIIIIIILLLFLFIIIFFFFFFFFFFFFFFFFFFFFFIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIILFFLIIIIIIIICLLFFFFFFF",
+    "operator-configuration-precedence": "IIIIIIIIIIIIIFFFFILFLIFIIIIIIIIIIIIIIIIIISNLFLFIIIFFFFFFFFFFFFFFFFFFFFFIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIISFFLIIIIIIIILCLFFFFFFF",
+    "operator-configuration-refinement": "IIIIIIIIIIIIIFFFFILFLIFIIIIIIIIIIIIIIIIIISNLFLFIIIFFFFFFFFFFFFFFFFFFFFFIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIISFFLIIIIIIIILLLFFFFFFF",
+    "operator-configuration-native-escape": "IIIIIIIIIIIIIFFFFILFLIFIIIIIIIIIIIIIIIIIILLLFLFIIIFFFFFFFFFFFFFFFFFFFFFIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIILFFLIIIIIIIILLLFFFFFFF",
+    "managed-service-definition-authoring": "IIIIIIIIIIIIIFFFFIFFFIFIIIIIIIIIIIIIIIIIIFFFFFFIIIFFFFFFCLFFFFFFFFFFFFFIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIFFFFIIIIIIIIFFFLLLFFFF",
+    "managed-service-definition-imports": "IIIIIIIIIIIIIFFFFIFFFIFIIIIIIIIIIIIIIIIIIFFFFFFIIIFFFFFFCLFFFFFFFFFFFFFIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIFFFFIIIIIIIIFFFCLLFFFF",
+    "managed-service-definition-precedence": "IIIIIIIIIIIIIFFFFIFFFIFIIIIIIIIIIIIIIIIIIFFFFFFIIIFFFFFFNLFFFFFFFFFFFFFIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIFFFFIIIIIIIIFFFLCLFFFF",
+    "managed-service-definition-refinement": "IIIIIIIIIIIIIFFFFIFFFIFIIIIIIIIIIIIIIIIIIFFFFFFIIIFFFFFFNLFFFFFFFFFFFFFIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIFFFFIIIIIIIIFFFLLLFFFF",
+    "managed-service-definition-native-escape": "IIIIIIIIIIIIIFFFFIFFFIFIIIIIIIIIIIIIIIIIIFFFFFFIIIFFFFFFLLFFFFFFFFFFFFFIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIFFFFIIIIIIIIFFFLLLFFFF",
+    "resolved-driver-handoff": "IIIIIIIIIIIIICCCCINFLICIIIIIIIIIIIIIIIIIINNNCNCIIICCCCCCFFFFFFFFFFFFFFFIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIINCFNIIIIIIIILLLFFFLLCL",
+    "serialized-resolved-reentry": "BBBBBBIBBBBBBBBBBIBFLBBBBBBBBIBBBBBBBIBIBBBBBBBBBBBBBBBBFFFBBBFFFFFFBFFBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBIIIIIIIILLLFFFBBBL",
+    "generated-runtime-configuration": "IIIIIIIIIIIIIFFFFIFFFIFIIIIIIIIIIIIIIIIIIFFFFFBIIIFFFFFFFFFFFFFFFFFFFFFIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIFFFFIIIIIIIIFFFFFFLLBL",
+    "direct-driver-invocation": "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+    "raw-runtime-config-input": "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+    "frontend-output": "BBBBBBBBBBBBBFFFFBFFFBFLBBBBBBBBBBBBBBBBBFFFFFFLLLFFFFFFFFFFFFFFFFFFFFFBBBBBLBBBBLBBBBBBBBBBBBBBBBBBBBBBBBBBBBLBBBBBLLFFFFLBBBBBBBFFFFFFFFFF",
+    "raw-wire-input": "BBBBBBBBBBBBBFFFFBFFFBFIBBBBBBBBBBBBBBBBBFFFFFFIIIFFFFFFFFFFFFFFFFFFFFFBBBBBIBBBBIBBBBBBBBBBBBBBBBBBBBBBBBBBBBIBBBBBIIFFFFIBBBBBBBFFFFFFFFFF",
+    "schema-migration": "BBBBBBBBBBBBBFFFFBFFFBFIBBBBBBBBBBBBBBBBBFFFFFFIIIFFFFFFFFFFFFFFFFFFFFFBBBBBIBBBBIBBBBBBBBBBBBBBBBBBBBBBBBBBBBIBBBBBIIFFFFIBBBBBBBFFFFFFFFFF",
+    "namespaced-extension": "LLLLLCLCLLLLLFFFFLFFFLFLLLLLLLLLLLCLLLLLLFFFFFFLLLFFFFFFFFFFFFFFFFFFFFFLLLCLLLLLLLCLCCLLLLLLLLLLLLCLCLLLCLCLLLLLLCLLLLFFFFLLLCLLLLFFFFFFFFFF",
+    "typed-nix-handle": "LLLLLLLLLLLLLFFFFLFFFLFLLLLLLLLLLLLLLLLLLFFFFFFLLLFFFFFFFFFFFFFFFFFFFFFLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLCLLLFFFFLLLLLLLCFFFFFFFFFF",
+    "native-guest-module": "LLLLLLLLLLLLLFFFFLFFFLFLLHLHLLLLLHLLLLLLLFFFFFFLLLFFFFFFFFFFFFFFFFFFFFFLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLCLLLFFFFLLLCLLLCFFFFFFFFFF",
+    "target-native-extension": "LLLLLLLLLLLLLFFFFLFFHLFLLHHHLLLLLLHLLLLLLFFFFFFLLLFFFFFFFFFFFFFFFFFFFFFLLLLLLLLLLHHLLHLLHLHHHHHHHHHHHHHHLLLLHLLLHCCLLLFFFFLLLCLLLCFFFFFFFFFF",
+    "create-native-extension": "IIIIIIIIIIIIINNNNIFFFINIIIIIIIIIIIIIIIIIIFFFNFFIIINNNNNNFFFFFFFFFFFFFFFIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIFNFFIIIIIIIIFFFFFFFFFF",
+    "operator-native-extension": "IIIIIIIIIIIIIFFFFILFLIFIIIIIIIIIIIIIIIIIISSLFLFIIIFFFFFFFFFFFFFFFFFFFFFIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIISFFLIIIIIIIILLLFFFFFFF",
+    "service-native-extension": "IIIIIIIIIIIIIFFFFIFFFIFIIIIIIIIIIIIIIIIIIFFFFFFIIIFFFFFFSLFFFFFFFFFFFFFIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIFFFFIIIIIIIIFFFLLLFFFF",
+    "live-native-extension": "IIIIIIIIIIIIIFFFFIFFFIFIIIIIIIIIIIIIIIIIIFFFFFFIIIFFFFFFFFNLLLFFFFFFFFFIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIFFNFIIIIIIIIFFFFFFFFFF",
+    "exec-native-extension": "IIIIIIIIIIIIIFFFFIFFFIFIIIIIIIIIIIIIIIIIIFFFFFFIIIFFFFFFFFFFFFLLLNNLLFFIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIFFFFIIIIIIIIFFFFFFFFFF",
+    "adapter-native-extension": "IIIIIIIIIIIIIFFFFIFLFIFIIIIIIIIIIIIIIIIIIFFFFFFIIIFFFFFFFFFFFFFFFFFFFSLIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIFFFFIIIIIIIIFFFFFFFFFF",
+    "provider-native-adapter": "IIIIIIIIIIIIIFFFFILFLIFIIIIIIIIIIIIIIIIIILLLFLLIIIFFFFFFFFFFFFFFFFFFFFFIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIILFFLBIIIIIIILLLFFFLLLL",
+    "provider-native-operation": "IIIIIIIIIIIIIFFFFIFFFIFIIIIIIIIIIIIIIIIIIFFBBBLIIIFFFFFFFFFBBBFFFFFFFFFIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIFFFFIIIIIIIIFFFFFFLLLL",
+    "corrupted-manifest": "BBBBBBBBBBBBBLLLLBFFFBLBBBBBBBBBBBBBBBBBBFFFLFFBBBLLLLLLFFFFFFFFFFFFFFFBBBBBIBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBFLFFIBBBBBBBFFFFFFFFFF",
+    "target-lowering": "BBBBBBIBBBBBBFFBBIFFFBBBBBBBBIBBBBBBBIBIIFFFFFBBBIBFBFFFFFFBBBFFFFFFBFFBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBFIIIIIIIIFFFFFFLLLL",
+    "built-artifact-load": "BBBBBBBBBBBBBLLLLBFFFBLBBBBBBBBBBBBBBBBBBFFFLFFBBBLLLLLLFFFFFFFFFFFFFFFBBBBBIBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBFLFFIBBBBBBBFFFFFFFFFF",
+    "direct-api": "IIIIIIIIIIIIIBBBBIBFFBBIBIIIBIIIIIIIIIIIIBBFBBFIIIBBBBBBFFBBBBBBBBBBBFFIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIBBBFIIIIIIIIFFFFFFFFFF",
+    "framework-adapter": "IIIIIIIIIIIIIFFFFIFBFIFIIIIIIIIIIIIIIIIIIFFFFFFIIIBBBBBBFFBBBBBBBBBBBBBIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIFFFFIIIIIIIIFFFFFFFFFF",
+    "cli-adapter": "IIIIIIIIIIIIIFFFFIFLFIFIIIIIIIIIIIIIIIIIIFFFFFFIIIBBBBBBFFBBBBBBBBBBBBBIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIFFFFIIIIIIIIFFFFFFFFFF",
+    "managed-service": "IIIIIIIIIIIIIFFFFIFFFIFIIIIIIIIIIIIIIIIIIFFFFFFIIIBBBBBBBBBBBBBBBBBBBFFIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIFFFFIIIIIIIIFFFLLLFFFF",
+    "direct-native-nix-value": "LLLLLLLLLLLLLFFFFLFFFLFLLLLLLLLLLLLLLLLLLFFFFFFLLLFFFFFFFFFFFFFFFFFFFFFLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLCLLLFFFFLCLCLLLCFFFFFFFFFF",
+    "frontend-adaptation": "BBBBBBBBBBBBBFFFFBFFFBFLBBBBBBBBBBBBBBBBBFFFFFFLLLFFFFFFFFFFFFFFFFFFFFFBBBBBLBBBBLBBBBBBBBBBBBBBBBBBBBBBBBBBBBLBBBBBLLFFFFLBBBBBBBFFFFFFFFFF",
+    "unsafe-opaque-extension": "LLLLLLLLLLLLLFFFFLFFFLFLLLLLLLLLLLLLLLLLLFFFFFFLLLFFFFFFFFFFFFFFFFFFFFFLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLFFFFLLLHLLLLFFFFFFFFFF",
+    "provider-side-construction": "IIIIIIIIIIIIIFFFFIFFFIFBIIIIIIIIIIIIIIIIIFFFFFLBBBFFFFFFFFFFFFFFFFFFFFFIIIIIIIIIIBIIIIIIIIIIIIIIIIIIIIIIIIIIIIBIIIIIBBFFFFBIIIIIIIFFFFFFLLLL",
+    "provider-build-cache": "IIIIIIIIIIIIIFFFFIFFFIFBIIIIIIIIIIIIIIIIIFFFFFLBBBFFFFFFFFFFFFFFFFFFFFFIIIIIIIIIIBIIIIIIIIIIIIIIIIIIIIIIIIIIIIBIIIIIBBFFFFBIIIIIIIFFFFFFLLLL",
+    "prebuilt-member-transfer": "IIIIIIIIIIIIIFFFFIFFFIFIIIIIIIIIIIIIIIIIIFFFFFLIIIFFFFFFFFFFFFFFFFFFFFFIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIFFFBIIIIIIIIFFFFFFLLLL",
+    "oci-descriptor-transfer": "IIIIIIIIIIIIIFFFFIFFFIFIIIIIIIIIIIIIIIIIIFFFFFLIIIFFFFFFFFFFFFFFFFFFFFFIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIFFFBIIIIIIIIFFFFFFLLLL",
+    "provider-cache-hit": "IIIIIIIIIIIIIFFFFIFFFIFIIIIIIIIIIIIIIIIIIFFFFFLIIIFFFFFFFFFFFFFFFFFFFFFIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIFFFBIIIIIIIIFFFFFFLLLL",
+    "corrupted-provider-build-result": "IIIIIIIIIIIIIFFFFIFFFIFBIIIIIIIIIIIIIIIIIFFFFFLBBBFFFFFFFFFFFFFFFFFFFFFIIIIIIIIIIBIIIIIIIIIIIIIIIIIIIIIIIIIIIIBIIIIIBBFFFFBIIIIIIIFFFFFFLLLL"
+  },
+  "contractTemplates": {
+    "authoring": {
+      "firstSoundPhase": "P1",
+      "rejectionDeadline": "W0",
+      "authority": {
+        "phase": "W0",
+        "component": "canonical-wire-validator"
+      },
+      "boundaryChain": [
+        {
+          "id": "source-semantics",
+          "phase": "P1",
+          "component": "frontend-semantics"
+        },
+        {
+          "id": "artifact-normalization",
+          "phase": "A0",
+          "component": "artifact-normalizer"
+        },
+        {
+          "id": "artifact-final-validation",
+          "phase": "A1",
+          "component": "artifact-final-validator"
+        },
+        {
+          "id": "canonical-wire",
+          "phase": "W0",
+          "component": "canonical-wire-validator"
+        },
+        {
+          "id": "nix-construction",
+          "phase": "N0",
+          "component": "nix-construction-validator"
+        }
+      ],
+      "structuralExclusion": "Foreign-owned resource fields are absent from the Artifact authoring contract.",
+      "rejectedForeignOwnerAt": "artifact-final-validation",
+      "fullRevalidation": false,
+      "identityAuthority": "preserve-only",
+      "ownershipExclusions": [
+        "foreign-owned-fields",
+        "artifact-identity-minting",
+        "conformance-identity-minting"
+      ]
+    },
+    "artifact-normalization": {
+      "firstSoundPhase": "A0",
+      "rejectionDeadline": "W0",
+      "authority": {
+        "phase": "W0",
+        "component": "canonical-wire-validator"
+      },
+      "boundaryChain": [
+        {
+          "id": "artifact-normalization",
+          "phase": "A0",
+          "component": "artifact-normalizer"
+        },
+        {
+          "id": "artifact-final-validation",
+          "phase": "A1",
+          "component": "artifact-final-validator"
+        },
+        {
+          "id": "canonical-wire",
+          "phase": "W0",
+          "component": "canonical-wire-validator"
+        },
+        {
+          "id": "nix-construction",
+          "phase": "N0",
+          "component": "nix-construction-validator"
+        }
+      ],
+      "structuralExclusion": "Profile expansion cannot author a foreign-owned resource.",
+      "rejectedForeignOwnerAt": "artifact-final-validation",
+      "fullRevalidation": false,
+      "identityAuthority": "preserve-only",
+      "ownershipExclusions": [
+        "foreign-owned-fields",
+        "support-claim-minting",
+        "conformance-identity-minting"
+      ]
+    },
+    "frontend-boundary": {
+      "firstSoundPhase": "W0",
+      "rejectionDeadline": "W0",
+      "authority": {
+        "phase": "W0",
+        "component": "canonical-wire-validator"
+      },
+      "boundaryChain": [
+        {
+          "id": "frontend-output-validation",
+          "phase": "W0",
+          "component": "frontend-wire-adapter"
+        },
+        {
+          "id": "strict-wire-decode",
+          "phase": "W0",
+          "component": "canonical-wire-decoder"
+        },
+        {
+          "id": "artifact-semantic-replay",
+          "phase": "W0",
+          "component": "artifact-semantic-validator"
+        },
+        {
+          "id": "semantic-identity-comparison",
+          "phase": "W0",
+          "component": "artifact-identity-validator"
+        },
+        {
+          "id": "canonical-wire",
+          "phase": "W0",
+          "component": "canonical-wire-validator"
+        },
+        {
+          "id": "nix-handle-validation",
+          "phase": "N0",
+          "component": "nix-construction-validator"
+        }
+      ],
+      "structuralExclusion": "Frontend claims are untrusted and cannot bypass strict decoding, complete Artifact semantic replay, identity comparison, or Nix-handle validation.",
+      "rejectedForeignOwnerAt": "strict-wire-decode",
+      "fullRevalidation": true,
+      "identityAuthority": "preserve-only",
+      "ownershipExclusions": [
+        "frontend-claim-authority",
+        "artifact-identity-minting",
+        "conformance-identity-minting"
+      ]
+    },
+    "raw-wire": {
+      "firstSoundPhase": "W0",
+      "rejectionDeadline": "W0",
+      "authority": {
+        "phase": "W0",
+        "component": "canonical-wire-validator"
+      },
+      "boundaryChain": [
+        {
+          "id": "strict-wire-decode",
+          "phase": "W0",
+          "component": "canonical-wire-decoder"
+        },
+        {
+          "id": "artifact-semantic-replay",
+          "phase": "W0",
+          "component": "artifact-semantic-validator"
+        },
+        {
+          "id": "semantic-identity-comparison",
+          "phase": "W0",
+          "component": "artifact-identity-validator"
+        },
+        {
+          "id": "canonical-wire",
+          "phase": "W0",
+          "component": "canonical-wire-validator"
+        },
+        {
+          "id": "nix-handle-validation",
+          "phase": "N0",
+          "component": "nix-construction-validator"
+        }
+      ],
+      "structuralExclusion": "Raw wire values have no source-level authority and are accepted only after strict decoding, complete Artifact semantic replay, identity comparison, and Nix-handle validation.",
+      "rejectedForeignOwnerAt": "strict-wire-decode",
+      "fullRevalidation": true,
+      "identityAuthority": "preserve-only",
+      "ownershipExclusions": [
+        "source-claim-trust",
+        "artifact-identity-minting",
+        "conformance-identity-minting"
+      ]
+    },
+    "schema-migration": {
+      "firstSoundPhase": "W0",
+      "rejectionDeadline": "W0",
+      "authority": {
+        "phase": "W0",
+        "component": "schema-migration-validator"
+      },
+      "boundaryChain": [
+        {
+          "id": "strict-wire-decode",
+          "phase": "W0",
+          "component": "canonical-wire-decoder"
+        },
+        {
+          "id": "schema-migration",
+          "phase": "W0",
+          "component": "schema-migration-validator"
+        },
+        {
+          "id": "artifact-semantic-replay",
+          "phase": "W0",
+          "component": "artifact-semantic-validator"
+        },
+        {
+          "id": "semantic-identity-comparison",
+          "phase": "W0",
+          "component": "artifact-identity-validator"
+        },
+        {
+          "id": "canonical-wire",
+          "phase": "W0",
+          "component": "canonical-wire-validator"
+        },
+        {
+          "id": "nix-handle-validation",
+          "phase": "N0",
+          "component": "nix-construction-validator"
+        }
+      ],
+      "structuralExclusion": "Migration cannot invent fields or authority absent from the source schema and must replay the complete Artifact semantic validator before construction.",
+      "rejectedForeignOwnerAt": "strict-wire-decode",
+      "fullRevalidation": true,
+      "identityAuthority": "preserve-only",
+      "ownershipExclusions": [
+        "unknown-schema-authority",
+        "artifact-identity-minting",
+        "conformance-identity-minting"
+      ]
+    },
+    "artifact-native": {
+      "firstSoundPhase": "A1",
+      "rejectionDeadline": "N0",
+      "authority": {
+        "phase": "N0",
+        "component": "nix-construction-validator"
+      },
+      "boundaryChain": [
+        {
+          "id": "artifact-final-validation",
+          "phase": "A1",
+          "component": "artifact-final-validator"
+        },
+        {
+          "id": "canonical-wire",
+          "phase": "W0",
+          "component": "canonical-wire-validator"
+        },
+        {
+          "id": "nix-construction",
+          "phase": "N0",
+          "component": "nix-construction-validator"
+        }
+      ],
+      "structuralExclusion": "A scoped Artifact-native extension cannot author lifecycle, host, provider, support, or conformance state.",
+      "rejectedForeignOwnerAt": "artifact-final-validation",
+      "fullRevalidation": false,
+      "identityAuthority": "preserve-only",
+      "ownershipExclusions": [
+        "host-bindings",
+        "runtime-allocations",
+        "secrets",
+        "provider-objects",
+        "runtime-profile-selection",
+        "support-claims",
+        "conformance-claims"
+      ]
+    },
+    "typed-handle": {
+      "firstSoundPhase": "A1",
+      "rejectionDeadline": "N0",
+      "authority": {
+        "phase": "N0",
+        "component": "nix-handle-registry-resolver"
+      },
+      "boundaryChain": [
+        {
+          "id": "artifact-final-validation",
+          "phase": "A1",
+          "component": "artifact-final-validator"
+        },
+        {
+          "id": "canonical-wire",
+          "phase": "W0",
+          "component": "canonical-wire-validator"
+        },
+        {
+          "id": "nix-handle-registry",
+          "phase": "N0",
+          "component": "nix-handle-registry-resolver"
+        }
+      ],
+      "structuralExclusion": "Only a typed registry reference crosses the portable boundary; arbitrary evaluator values do not.",
+      "rejectedForeignOwnerAt": "artifact-final-validation",
+      "fullRevalidation": false,
+      "identityAuthority": "preserve-only",
+      "ownershipExclusions": [
+        "arbitrary-evaluator-values",
+        "store-path-as-portable-identity",
+        "artifact-identity-minting",
+        "conformance-identity-minting"
+      ]
+    },
+    "target-native": {
+      "firstSoundPhase": "A1",
+      "rejectionDeadline": "N1",
+      "authority": {
+        "phase": "N1",
+        "component": "target-member-builder"
+      },
+      "boundaryChain": [
+        {
+          "id": "artifact-final-validation",
+          "phase": "A1",
+          "component": "artifact-final-validator"
+        },
+        {
+          "id": "canonical-wire",
+          "phase": "W0",
+          "component": "canonical-wire-validator"
+        },
+        {
+          "id": "packet-c-profile-contract",
+          "phase": "N0",
+          "component": "nix-construction-validator"
+        },
+        {
+          "id": "packet-c-realization",
+          "phase": "N1",
+          "component": "target-member-builder"
+        }
+      ],
+      "structuralExclusion": "Target-native content is confined to a registered construction contract and re-enters every Packet C profile, identity, manifest, and realization check.",
+      "rejectedForeignOwnerAt": "artifact-final-validation",
+      "fullRevalidation": false,
+      "identityAuthority": "preserve-only",
+      "ownershipExclusions": [
+        "host-bindings",
+        "runtime-allocations",
+        "secrets",
+        "provider-objects",
+        "runtime-profile-selection",
+        "support-claims",
+        "conformance-claims"
+      ]
+    },
+    "unsafe-opaque": {
+      "firstSoundPhase": "A1",
+      "rejectionDeadline": "A1",
+      "authority": {
+        "phase": "A1",
+        "component": "artifact-final-validator"
+      },
+      "boundaryChain": [
+        {
+          "id": "artifact-final-validation",
+          "phase": "A1",
+          "component": "artifact-final-validator"
+        }
+      ],
+      "structuralExclusion": "Unregistered or semantically opaque extensions are rejected rather than weakening conformance.",
+      "rejectedForeignOwnerAt": "artifact-final-validation",
+      "fullRevalidation": true,
+      "identityAuthority": "preserve-only",
+      "ownershipExclusions": [
+        "opaque-authority",
+        "artifact-identity-minting",
+        "support-claim-minting",
+        "conformance-identity-minting"
+      ]
+    },
+    "create": {
+      "firstSoundPhase": "C0",
+      "rejectionDeadline": "D0",
+      "authority": {
+        "phase": "C0",
+        "component": "creation-resolver"
+      },
+      "boundaryChain": [
+        {
+          "id": "creation-resolution",
+          "phase": "C0",
+          "component": "creation-resolver"
+        },
+        {
+          "id": "core-api",
+          "phase": "C0",
+          "component": "core-api-request-validator"
+        },
+        {
+          "id": "operator-admission",
+          "phase": "O0",
+          "component": "operator-admission"
+        },
+        {
+          "id": "host-provider-preflight",
+          "phase": "H0",
+          "component": "host-provider-preflight"
+        },
+        {
+          "id": "driver-preparation",
+          "phase": "D0",
+          "component": "driver-preparation"
+        }
+      ],
+      "structuralExclusion": "Create-owned values may select or narrow only within the immutable Artifact contract.",
+      "rejectedForeignOwnerAt": "creation-resolution",
+      "fullRevalidation": false,
+      "identityAuthority": "preserve-only",
+      "ownershipExclusions": [
+        "artifact-widening",
+        "built-content-identity",
+        "support-claim-minting",
+        "conformance-identity-minting"
+      ]
+    },
+    "operator": {
+      "firstSoundPhase": "O0",
+      "rejectionDeadline": "D0",
+      "authority": {
+        "phase": "O0",
+        "component": "operator-admission"
+      },
+      "boundaryChain": [
+        {
+          "id": "operator-admission",
+          "phase": "O0",
+          "component": "operator-admission"
+        },
+        {
+          "id": "host-provider-preflight",
+          "phase": "H0",
+          "component": "host-provider-preflight"
+        },
+        {
+          "id": "driver-preparation",
+          "phase": "D0",
+          "component": "driver-preparation"
+        }
+      ],
+      "structuralExclusion": "Operator configuration binds implementation and placement without reinterpreting Artifact policy.",
+      "rejectedForeignOwnerAt": "operator-admission",
+      "fullRevalidation": false,
+      "identityAuthority": "preserve-only",
+      "ownershipExclusions": [
+        "artifact-widening",
+        "built-content-identity",
+        "artifact-identity-minting",
+        "conformance-identity-minting"
+      ]
+    },
+    "service": {
+      "firstSoundPhase": "S0",
+      "rejectionDeadline": "S0",
+      "authority": {
+        "phase": "S0",
+        "component": "managed-service-compiler"
+      },
+      "boundaryChain": [
+        {
+          "id": "service-reconciliation",
+          "phase": "S0",
+          "component": "managed-service-compiler"
+        },
+        {
+          "id": "core-api",
+          "phase": "S0",
+          "component": "core-api-request-builder"
+        }
+      ],
+      "structuralExclusion": "Managed-service configuration compiles to the Core API and never creates second lifecycle or Artifact semantics.",
+      "rejectedForeignOwnerAt": "service-reconciliation",
+      "fullRevalidation": false,
+      "identityAuthority": "preserve-only",
+      "ownershipExclusions": [
+        "artifact-widening",
+        "core-api-bypass",
+        "artifact-identity-minting",
+        "conformance-identity-minting"
+      ]
+    },
+    "live": {
+      "firstSoundPhase": "L0",
+      "rejectionDeadline": "L0",
+      "authority": {
+        "phase": "L0",
+        "component": "live-operation-validator"
+      },
+      "boundaryChain": [
+        {
+          "id": "live-operation-validation",
+          "phase": "L0",
+          "component": "live-operation-validator"
+        }
+      ],
+      "structuralExclusion": "A live operation acts only on an existing Sandbox within immutable bounds.",
+      "rejectedForeignOwnerAt": "live-operation-validation",
+      "fullRevalidation": false,
+      "identityAuthority": "preserve-only",
+      "ownershipExclusions": [
+        "artifact-widening",
+        "creation-state-authority",
+        "artifact-identity-minting",
+        "conformance-identity-minting"
+      ]
+    },
+    "exec": {
+      "firstSoundPhase": "E0",
+      "rejectionDeadline": "E0",
+      "authority": {
+        "phase": "E0",
+        "component": "exec-validator"
+      },
+      "boundaryChain": [
+        {
+          "id": "exec-validation",
+          "phase": "E0",
+          "component": "exec-validator"
+        }
+      ],
+      "structuralExclusion": "Exec input owns one Process and can only narrow the existing Sandbox boundary.",
+      "rejectedForeignOwnerAt": "exec-validation",
+      "fullRevalidation": false,
+      "identityAuthority": "preserve-only",
+      "ownershipExclusions": [
+        "artifact-widening",
+        "sandbox-boundary-widening",
+        "artifact-identity-minting",
+        "conformance-identity-minting"
+      ]
+    },
+    "framework": {
+      "firstSoundPhase": "F0",
+      "rejectionDeadline": "F0",
+      "authority": {
+        "phase": "F0",
+        "component": "framework-adapter-validator"
+      },
+      "boundaryChain": [
+        {
+          "id": "framework-translation",
+          "phase": "F0",
+          "component": "framework-adapter-validator"
+        },
+        {
+          "id": "core-api",
+          "phase": "F0",
+          "component": "core-api-request-builder"
+        }
+      ],
+      "structuralExclusion": "Framework and CLI adapters translate lifecycle requests and cannot author Artifact or runtime policy.",
+      "rejectedForeignOwnerAt": "framework-translation",
+      "fullRevalidation": false,
+      "identityAuthority": "preserve-only",
+      "ownershipExclusions": [
+        "artifact-widening",
+        "runtime-policy-authority",
+        "artifact-identity-minting",
+        "conformance-identity-minting"
+      ]
+    },
+    "provider-admission": {
+      "firstSoundPhase": "O0",
+      "rejectionDeadline": "H0",
+      "authority": {
+        "phase": "H0",
+        "component": "remote-provider-adapter"
+      },
+      "boundaryChain": [
+        {
+          "id": "operator-admission",
+          "phase": "O0",
+          "component": "operator-admission"
+        },
+        {
+          "id": "host-provider-preflight",
+          "phase": "H0",
+          "component": "remote-provider-adapter"
+        }
+      ],
+      "structuralExclusion": "Provider inputs are untrusted transport or construction data and cannot redefine portable semantics.",
+      "rejectedForeignOwnerAt": "operator-admission",
+      "fullRevalidation": true,
+      "identityAuthority": "preserve-only",
+      "ownershipExclusions": [
+        "provider-default-authority",
+        "provider-reference-as-identity",
+        "artifact-identity-minting",
+        "conformance-identity-minting"
+      ]
+    },
+    "provider-operation": {
+      "firstSoundPhase": "H0",
+      "rejectionDeadline": "D0",
+      "authority": {
+        "phase": "D0",
+        "component": "driver-preparation"
+      },
+      "boundaryChain": [
+        {
+          "id": "host-provider-preflight",
+          "phase": "H0",
+          "component": "remote-provider-adapter"
+        },
+        {
+          "id": "driver-preparation",
+          "phase": "D0",
+          "component": "driver-preparation"
+        }
+      ],
+      "structuralExclusion": "Provider operations and cache results are untrusted and revalidated before driver mutation.",
+      "rejectedForeignOwnerAt": "host-provider-preflight",
+      "fullRevalidation": true,
+      "identityAuthority": "preserve-only",
+      "ownershipExclusions": [
+        "provider-claim-trust",
+        "backend-default-authority",
+        "artifact-identity-minting",
+        "conformance-identity-minting"
+      ]
+    },
+    "manifest-load": {
+      "firstSoundPhase": "C0",
+      "rejectionDeadline": "C0",
+      "authority": {
+        "phase": "C0",
+        "component": "artifact-manifest-loader"
+      },
+      "boundaryChain": [
+        {
+          "id": "manifest-load",
+          "phase": "C0",
+          "component": "artifact-manifest-loader"
+        },
+        {
+          "id": "creation-resolution",
+          "phase": "C0",
+          "component": "creation-resolver"
+        }
+      ],
+      "structuralExclusion": "Built manifests and members are untrusted until identity, profile, and construction evidence are verified.",
+      "rejectedForeignOwnerAt": "manifest-load",
+      "fullRevalidation": true,
+      "identityAuthority": "preserve-only",
+      "ownershipExclusions": [
+        "manifest-claim-trust",
+        "provider-reference-as-identity",
+        "artifact-identity-minting",
+        "conformance-identity-minting"
+      ]
+    },
+    "target-lowering": {
+      "firstSoundPhase": "N0",
+      "rejectionDeadline": "N1",
+      "authority": {
+        "phase": "N0",
+        "component": "nix-construction-validator"
+      },
+      "boundaryChain": [
+        {
+          "id": "packet-c-contract-rederivation",
+          "phase": "N0",
+          "component": "nix-construction-validator"
+        },
+        {
+          "id": "packet-c-target-build",
+          "phase": "N1",
+          "component": "target-member-builder"
+        },
+        {
+          "id": "packet-c-member-manifest-verification",
+          "phase": "N1",
+          "component": "target-member-verifier"
+        },
+        {
+          "id": "manifest-load",
+          "phase": "C0",
+          "component": "artifact-manifest-loader"
+        }
+      ],
+      "structuralExclusion": "Target lowering re-derives Packet C from the validated Artifact, builds the member, independently verifies member and manifest identity, then revalidates at load.",
+      "rejectedForeignOwnerAt": "packet-c-contract-rederivation",
+      "fullRevalidation": true,
+      "identityAuthority": "preserve-only",
+      "ownershipExclusions": [
+        "target-default-authority",
+        "semantic-weakening",
+        "artifact-identity-minting",
+        "conformance-identity-minting"
+      ]
+    },
+    "provider-build": {
+      "firstSoundPhase": "N0",
+      "rejectionDeadline": "N1",
+      "authority": {
+        "phase": "N1",
+        "component": "target-member-verifier"
+      },
+      "boundaryChain": [
+        {
+          "id": "nix-construction",
+          "phase": "N0",
+          "component": "nix-construction-validator"
+        },
+        {
+          "id": "provider-build-result",
+          "phase": "N1",
+          "component": "provider-build-adapter"
+        },
+        {
+          "id": "packet-c-realization",
+          "phase": "N1",
+          "component": "target-member-verifier"
+        }
+      ],
+      "structuralExclusion": "Provider construction and caches are untrusted optimizations whose output identity and equivalence evidence are independently verified by the product.",
+      "rejectedForeignOwnerAt": "provider-build-result",
+      "fullRevalidation": true,
+      "identityAuthority": "preserve-only",
+      "ownershipExclusions": [
+        "provider-default-authority",
+        "provider-reference-as-identity",
+        "artifact-identity-minting",
+        "conformance-identity-minting"
+      ]
+    },
+    "provider-result": {
+      "firstSoundPhase": "N1",
+      "rejectionDeadline": "N1",
+      "authority": {
+        "phase": "N1",
+        "component": "target-member-verifier"
+      },
+      "boundaryChain": [
+        {
+          "id": "provider-build-result",
+          "phase": "N1",
+          "component": "provider-build-adapter"
+        },
+        {
+          "id": "packet-c-realization",
+          "phase": "N1",
+          "component": "target-member-verifier"
+        }
+      ],
+      "structuralExclusion": "A provider result has no authority until the product verifier independently checks output identity, provenance, and equivalence evidence.",
+      "rejectedForeignOwnerAt": "provider-build-result",
+      "fullRevalidation": true,
+      "identityAuthority": "preserve-only",
+      "ownershipExclusions": [
+        "provider-claim-trust",
+        "provider-reference-as-identity",
+        "artifact-identity-minting",
+        "conformance-identity-minting"
+      ]
+    },
+    "operator-source": {
+      "firstSoundPhase": "P1",
+      "rejectionDeadline": "OC0",
+      "authority": {
+        "phase": "OC0",
+        "component": "operator-configuration-validator"
+      },
+      "boundaryChain": [
+        {
+          "id": "operator-source-semantics",
+          "phase": "P1",
+          "component": "nix-source-semantics"
+        },
+        {
+          "id": "operator-dependency-closure",
+          "phase": "OC0",
+          "component": "operator-configuration-dependency-resolver"
+        },
+        {
+          "id": "operator-precedence-and-provenance",
+          "phase": "OC0",
+          "component": "operator-configuration-composer"
+        },
+        {
+          "id": "operator-configuration-validation",
+          "phase": "OC0",
+          "component": "operator-configuration-validator"
+        }
+      ],
+      "structuralExclusion": "Operator Configuration source semantics can author only operator-owned configuration and cannot author Artifact, Create, Service, live, Exec, framework, or runtime facts.",
+      "rejectedForeignOwnerAt": "operator-configuration-validation",
+      "fullRevalidation": false,
+      "identityAuthority": "preserve-only",
+      "ownershipExclusions": [
+        "artifact-facts",
+        "create-facts",
+        "service-facts",
+        "live-facts",
+        "exec-facts",
+        "framework-facts",
+        "runtime-facts",
+        "artifact-identity-minting",
+        "conformance-identity-minting"
+      ]
+    },
+    "managed-service-source": {
+      "firstSoundPhase": "P1",
+      "rejectionDeadline": "MS0",
+      "authority": {
+        "phase": "MS0",
+        "component": "managed-service-definition-validator"
+      },
+      "boundaryChain": [
+        {
+          "id": "managed-service-source-semantics",
+          "phase": "P1",
+          "component": "nix-source-semantics"
+        },
+        {
+          "id": "managed-service-dependency-closure",
+          "phase": "MS0",
+          "component": "managed-service-definition-dependency-resolver"
+        },
+        {
+          "id": "managed-service-precedence-and-provenance",
+          "phase": "MS0",
+          "component": "managed-service-definition-composer"
+        },
+        {
+          "id": "managed-service-definition-validation",
+          "phase": "MS0",
+          "component": "managed-service-definition-validator"
+        }
+      ],
+      "structuralExclusion": "Managed-Service Definition source semantics can author only service-owned desired state and cannot author Artifact, Create, Operator, live, Exec, framework, or runtime facts.",
+      "rejectedForeignOwnerAt": "managed-service-definition-validation",
+      "fullRevalidation": false,
+      "identityAuthority": "preserve-only",
+      "ownershipExclusions": [
+        "artifact-facts",
+        "create-facts",
+        "operator-facts",
+        "live-facts",
+        "exec-facts",
+        "framework-facts",
+        "runtime-facts",
+        "artifact-identity-minting",
+        "conformance-identity-minting"
+      ]
+    },
+    "resolved-driver-handoff": {
+      "firstSoundPhase": "C0",
+      "rejectionDeadline": "D0",
+      "authority": {
+        "phase": "D0",
+        "component": "driver-entry-validator"
+      },
+      "boundaryChain": [
+        {
+          "id": "private-resolved-creation",
+          "phase": "C0",
+          "component": "creation-resolver"
+        },
+        {
+          "id": "private-operator-admission",
+          "phase": "O0",
+          "component": "operator-admission"
+        },
+        {
+          "id": "private-host-provider-preflight",
+          "phase": "H0",
+          "component": "host-provider-preflight"
+        },
+        {
+          "id": "driver-entry-validation",
+          "phase": "D0",
+          "component": "driver-entry-validator"
+        }
+      ],
+      "structuralExclusion": "Only product-owned private resolved stages advance to PreparedLaunch; copied or foreign record shapes cannot enter the chain.",
+      "rejectedForeignOwnerAt": "private-resolved-creation",
+      "fullRevalidation": false,
+      "identityAuthority": "extend-private-identity",
+      "ownershipExclusions": [
+        "forgeable-validated-record",
+        "earlier-identity-rewrite",
+        "backend-default-authority",
+        "conformance-identity-minting"
+      ]
+    },
+    "serialized-resolved-reentry": {
+      "firstSoundPhase": "RW0",
+      "rejectionDeadline": "D0",
+      "authority": {
+        "phase": "D0",
+        "component": "driver-entry-validator"
+      },
+      "boundaryChain": [
+        {
+          "id": "resolved-reentry-wire-validation",
+          "phase": "RW0",
+          "component": "resolved-reentry-wire-validator"
+        },
+        {
+          "id": "fresh-private-stage-construction",
+          "phase": "C0",
+          "component": "resolved-reentry-stage-constructor"
+        },
+        {
+          "id": "current-operator-admission",
+          "phase": "O0",
+          "component": "operator-admission"
+        },
+        {
+          "id": "current-host-provider-reacquisition",
+          "phase": "H0",
+          "component": "host-provider-preflight"
+        },
+        {
+          "id": "driver-entry-validation",
+          "phase": "D0",
+          "component": "driver-entry-validator"
+        }
+      ],
+      "structuralExclusion": "Serialized resolved state is wholly untrusted and cannot mint a private stage without strict decoding, exact replay, and current H0 reacquisition.",
+      "rejectedForeignOwnerAt": "resolved-reentry-wire-validation",
+      "fullRevalidation": true,
+      "identityAuthority": "rederive-private-identity",
+      "ownershipExclusions": [
+        "authenticated-bytes-as-semantic-authority",
+        "serialized-handle-authority",
+        "private-stage-minting",
+        "backend-default-authority"
+      ]
+    },
+    "generated-runtime-configuration": {
+      "firstSoundPhase": "D0",
+      "rejectionDeadline": "D0",
+      "authority": {
+        "phase": "D0",
+        "component": "runtime-config-validator"
+      },
+      "boundaryChain": [
+        {
+          "id": "total-runtime-configuration-generation",
+          "phase": "D0",
+          "component": "runtime-config-generator"
+        },
+        {
+          "id": "generated-runtime-configuration-validation",
+          "phase": "D0",
+          "component": "runtime-config-validator"
+        }
+      ],
+      "structuralExclusion": "Backend configuration is total D0 output from PreparedLaunch, suppresses undeclared defaults, and is validated as a closed generated value.",
+      "rejectedForeignOwnerAt": "generated-runtime-configuration-validation",
+      "fullRevalidation": true,
+      "identityAuthority": "preserve-only",
+      "ownershipExclusions": [
+        "external-runtime-config-input",
+        "backend-default-authority",
+        "unchecked-raw-arguments",
+        "conformance-identity-minting"
+      ]
+    },
+    "direct-driver-invocation": {
+      "firstSoundPhase": "D0",
+      "rejectionDeadline": "D0",
+      "authority": {
+        "phase": "D0",
+        "component": "driver-entry-validator"
+      },
+      "boundaryChain": [
+        {
+          "id": "driver-entry-rejection",
+          "phase": "D0",
+          "component": "driver-entry-validator"
+        }
+      ],
+      "structuralExclusion": "Direct driver invocation has no admitted value and is rejected before external mutation.",
+      "rejectedForeignOwnerAt": "driver-entry-rejection",
+      "fullRevalidation": false,
+      "identityAuthority": "no-admitted-value",
+      "ownershipExclusions": [
+        "all-caller-values",
+        "forgeable-prepared-launch",
+        "external-mutation",
+        "backend-default-authority"
+      ]
+    },
+    "raw-runtime-config-input": {
+      "firstSoundPhase": "D0",
+      "rejectionDeadline": "D0",
+      "authority": {
+        "phase": "D0",
+        "component": "driver-entry-validator"
+      },
+      "boundaryChain": [
+        {
+          "id": "driver-entry-rejection",
+          "phase": "D0",
+          "component": "driver-entry-validator"
+        }
+      ],
+      "structuralExclusion": "Raw runtime configuration has no admitted value and is rejected before external mutation.",
+      "rejectedForeignOwnerAt": "driver-entry-rejection",
+      "fullRevalidation": false,
+      "identityAuthority": "no-admitted-value",
+      "ownershipExclusions": [
+        "all-raw-values",
+        "forgeable-generated-configuration",
+        "external-mutation",
+        "backend-default-authority"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "pathId": "artifact-ordinary-authoring",
+      "contractTemplate": "authoring",
+      "sourceOwner": "artifact",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "targetProfileIds": [],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "final-artifact-validation",
+        "canonical-wire-replay"
+      ],
+      "testObligationIds": [
+        "ordinary-authoring-valid",
+        "ordinary-authoring-invalid"
+      ],
+      "delegatedPackets": [
+        "F"
+      ],
+      "delegatedConcerns": [
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "artifact-imports",
+      "contractTemplate": "authoring",
+      "sourceOwner": "artifact",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "targetProfileIds": [],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "import-provenance",
+        "final-artifact-validation",
+        "canonical-wire-replay"
+      ],
+      "testObligationIds": [
+        "import-valid",
+        "import-bypass-invalid"
+      ],
+      "delegatedPackets": [
+        "F"
+      ],
+      "delegatedConcerns": [
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "artifact-import-order",
+      "contractTemplate": "authoring",
+      "sourceOwner": "artifact",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "targetProfileIds": [],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "ordered-definition-provenance",
+        "final-artifact-validation"
+      ],
+      "testObligationIds": [
+        "import-order-valid",
+        "import-order-bypass-invalid"
+      ],
+      "delegatedPackets": [
+        "F"
+      ],
+      "delegatedConcerns": [
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "artifact-profile-expansion",
+      "contractTemplate": "artifact-normalization",
+      "sourceOwner": "artifact",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "targetProfileIds": [],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "expanded-profile-provenance",
+        "final-artifact-validation"
+      ],
+      "testObligationIds": [
+        "profile-expansion-valid",
+        "profile-expansion-invalid"
+      ],
+      "delegatedPackets": [
+        "F"
+      ],
+      "delegatedConcerns": [
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "artifact-explicit-override",
+      "contractTemplate": "authoring",
+      "sourceOwner": "artifact",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "targetProfileIds": [],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "override-provenance",
+        "monotonic-refinement",
+        "final-artifact-validation"
+      ],
+      "testObligationIds": [
+        "explicit-override-valid",
+        "explicit-override-widening-invalid"
+      ],
+      "delegatedPackets": [
+        "F"
+      ],
+      "delegatedConcerns": [
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "artifact-semantic-refinement",
+      "contractTemplate": "authoring",
+      "sourceOwner": "artifact",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "targetProfileIds": [],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "refinement-provenance",
+        "monotonic-refinement",
+        "final-artifact-validation"
+      ],
+      "testObligationIds": [
+        "semantic-refinement-valid",
+        "semantic-widening-invalid"
+      ],
+      "delegatedPackets": [
+        "F"
+      ],
+      "delegatedConcerns": [
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "artifact-strongest-override",
+      "contractTemplate": "authoring",
+      "sourceOwner": "artifact",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "targetProfileIds": [],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "strongest-override-provenance",
+        "monotonic-refinement",
+        "final-artifact-validation"
+      ],
+      "testObligationIds": [
+        "strongest-override-valid",
+        "strongest-override-bypass-invalid"
+      ],
+      "delegatedPackets": [
+        "F"
+      ],
+      "delegatedConcerns": [
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "artifact-native-language-escape",
+      "contractTemplate": "authoring",
+      "sourceOwner": "artifact",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "targetProfileIds": [],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "native-source-provenance",
+        "final-artifact-validation",
+        "canonical-wire-replay"
+      ],
+      "testObligationIds": [
+        "native-language-valid",
+        "native-language-bypass-invalid"
+      ],
+      "delegatedPackets": [
+        "F"
+      ],
+      "delegatedConcerns": [
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "operator-configuration-authoring",
+      "contractTemplate": "operator-source",
+      "sourceOwner": "operator",
+      "reachableOwners": [
+        "operator"
+      ],
+      "targetProfileIds": [],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "operator-configuration-dependency-closure",
+        "operator-configuration-contributor-provenance",
+        "operator-configuration-final-validation"
+      ],
+      "testObligationIds": [
+        "operator-configuration-authoring-valid",
+        "operator-configuration-authoring-invalid"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ],
+      "delegatedConcerns": [
+        "operation-transition",
+        "retry",
+        "cancellation",
+        "cleanup",
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "operator-configuration-imports",
+      "contractTemplate": "operator-source",
+      "sourceOwner": "operator",
+      "reachableOwners": [
+        "operator"
+      ],
+      "targetProfileIds": [],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "operator-configuration-dependency-closure",
+        "operator-configuration-contributor-provenance",
+        "operator-configuration-final-validation"
+      ],
+      "testObligationIds": [
+        "operator-configuration-imports-valid",
+        "operator-configuration-imports-invalid"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ],
+      "delegatedConcerns": [
+        "operation-transition",
+        "retry",
+        "cancellation",
+        "cleanup",
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "operator-configuration-precedence",
+      "contractTemplate": "operator-source",
+      "sourceOwner": "operator",
+      "reachableOwners": [
+        "operator"
+      ],
+      "targetProfileIds": [],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "operator-configuration-dependency-closure",
+        "operator-configuration-contributor-provenance",
+        "operator-configuration-final-validation"
+      ],
+      "testObligationIds": [
+        "operator-configuration-precedence-valid",
+        "operator-configuration-precedence-invalid"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ],
+      "delegatedConcerns": [
+        "operation-transition",
+        "retry",
+        "cancellation",
+        "cleanup",
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "operator-configuration-refinement",
+      "contractTemplate": "operator-source",
+      "sourceOwner": "operator",
+      "reachableOwners": [
+        "operator"
+      ],
+      "targetProfileIds": [],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "operator-configuration-dependency-closure",
+        "operator-configuration-contributor-provenance",
+        "operator-configuration-final-validation"
+      ],
+      "testObligationIds": [
+        "operator-configuration-refinement-valid",
+        "operator-configuration-refinement-invalid"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ],
+      "delegatedConcerns": [
+        "operation-transition",
+        "retry",
+        "cancellation",
+        "cleanup",
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "operator-configuration-native-escape",
+      "contractTemplate": "operator-source",
+      "sourceOwner": "operator",
+      "reachableOwners": [
+        "operator"
+      ],
+      "targetProfileIds": [],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "operator-configuration-dependency-closure",
+        "operator-configuration-contributor-provenance",
+        "operator-configuration-final-validation"
+      ],
+      "testObligationIds": [
+        "operator-configuration-native-escape-valid",
+        "operator-configuration-native-escape-invalid"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ],
+      "delegatedConcerns": [
+        "operation-transition",
+        "retry",
+        "cancellation",
+        "cleanup",
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "managed-service-definition-authoring",
+      "contractTemplate": "managed-service-source",
+      "sourceOwner": "service",
+      "reachableOwners": [
+        "service"
+      ],
+      "targetProfileIds": [],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "managed-service-definition-dependency-closure",
+        "managed-service-definition-contributor-provenance",
+        "managed-service-definition-final-validation"
+      ],
+      "testObligationIds": [
+        "managed-service-definition-authoring-valid",
+        "managed-service-definition-authoring-invalid"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ],
+      "delegatedConcerns": [
+        "operation-transition",
+        "retry",
+        "cancellation",
+        "cleanup",
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "managed-service-definition-imports",
+      "contractTemplate": "managed-service-source",
+      "sourceOwner": "service",
+      "reachableOwners": [
+        "service"
+      ],
+      "targetProfileIds": [],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "managed-service-definition-dependency-closure",
+        "managed-service-definition-contributor-provenance",
+        "managed-service-definition-final-validation"
+      ],
+      "testObligationIds": [
+        "managed-service-definition-imports-valid",
+        "managed-service-definition-imports-invalid"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ],
+      "delegatedConcerns": [
+        "operation-transition",
+        "retry",
+        "cancellation",
+        "cleanup",
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "managed-service-definition-precedence",
+      "contractTemplate": "managed-service-source",
+      "sourceOwner": "service",
+      "reachableOwners": [
+        "service"
+      ],
+      "targetProfileIds": [],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "managed-service-definition-dependency-closure",
+        "managed-service-definition-contributor-provenance",
+        "managed-service-definition-final-validation"
+      ],
+      "testObligationIds": [
+        "managed-service-definition-precedence-valid",
+        "managed-service-definition-precedence-invalid"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ],
+      "delegatedConcerns": [
+        "operation-transition",
+        "retry",
+        "cancellation",
+        "cleanup",
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "managed-service-definition-refinement",
+      "contractTemplate": "managed-service-source",
+      "sourceOwner": "service",
+      "reachableOwners": [
+        "service"
+      ],
+      "targetProfileIds": [],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "managed-service-definition-dependency-closure",
+        "managed-service-definition-contributor-provenance",
+        "managed-service-definition-final-validation"
+      ],
+      "testObligationIds": [
+        "managed-service-definition-refinement-valid",
+        "managed-service-definition-refinement-invalid"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ],
+      "delegatedConcerns": [
+        "operation-transition",
+        "retry",
+        "cancellation",
+        "cleanup",
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "managed-service-definition-native-escape",
+      "contractTemplate": "managed-service-source",
+      "sourceOwner": "service",
+      "reachableOwners": [
+        "service"
+      ],
+      "targetProfileIds": [],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "managed-service-definition-dependency-closure",
+        "managed-service-definition-contributor-provenance",
+        "managed-service-definition-final-validation"
+      ],
+      "testObligationIds": [
+        "managed-service-definition-native-escape-valid",
+        "managed-service-definition-native-escape-invalid"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ],
+      "delegatedConcerns": [
+        "operation-transition",
+        "retry",
+        "cancellation",
+        "cleanup",
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "resolved-driver-handoff",
+      "contractTemplate": "resolved-driver-handoff",
+      "sourceOwner": "runtime",
+      "reachableOwners": [
+        "create",
+        "operator",
+        "runtime"
+      ],
+      "targetProfileIds": [
+        "bubblewrap-linux-v1",
+        "microvm-firecracker-linux-v1",
+        "microvm-cloud-hypervisor-linux-v1",
+        "oci-linux-v1"
+      ],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "private-stage-construction",
+        "prepared-launch-identity",
+        "driver-entry-validation"
+      ],
+      "testObligationIds": [
+        "resolved-driver-handoff-valid",
+        "forged-private-stage-invalid"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ],
+      "delegatedConcerns": [
+        "operation-transition",
+        "retry",
+        "cancellation",
+        "cleanup",
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "serialized-resolved-reentry",
+      "contractTemplate": "serialized-resolved-reentry",
+      "sourceOwner": "runtime",
+      "reachableOwners": [
+        "create",
+        "operator",
+        "runtime"
+      ],
+      "targetProfileIds": [
+        "bubblewrap-linux-v1",
+        "microvm-firecracker-linux-v1",
+        "microvm-cloud-hypervisor-linux-v1",
+        "oci-linux-v1"
+      ],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "strict-rw0-decoding",
+        "exact-built-member-load-replay",
+        "exact-resolved-stage-replay",
+        "fresh-prepared-launch"
+      ],
+      "testObligationIds": [
+        "serialized-reentry-valid",
+        "serialized-reentry-incomplete-replay-invalid",
+        "serialized-reentry-forged-stage-invalid"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ],
+      "delegatedConcerns": [
+        "operation-transition",
+        "retry",
+        "cancellation",
+        "cleanup",
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "generated-runtime-configuration",
+      "contractTemplate": "generated-runtime-configuration",
+      "sourceOwner": "runtime",
+      "reachableOwners": [
+        "runtime"
+      ],
+      "targetProfileIds": [
+        "bubblewrap-linux-v1",
+        "microvm-firecracker-linux-v1",
+        "microvm-cloud-hypervisor-linux-v1",
+        "oci-linux-v1"
+      ],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "total-runtime-configuration-generation",
+        "backend-default-suppression",
+        "generated-configuration-validation"
+      ],
+      "testObligationIds": [
+        "generated-runtime-configuration-valid",
+        "generated-runtime-configuration-corruption-invalid"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ],
+      "delegatedConcerns": [
+        "operation-transition",
+        "retry",
+        "cancellation",
+        "cleanup",
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "direct-driver-invocation",
+      "contractTemplate": "direct-driver-invocation",
+      "sourceOwner": "runtime",
+      "reachableOwners": [],
+      "targetProfileIds": [
+        "bubblewrap-linux-v1",
+        "microvm-firecracker-linux-v1",
+        "microvm-cloud-hypervisor-linux-v1",
+        "oci-linux-v1"
+      ],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "no-admitted-value",
+        "driver-entry-rejection-before-mutation"
+      ],
+      "testObligationIds": [
+        "direct-driver-invocation-invalid"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ],
+      "delegatedConcerns": [
+        "operation-transition",
+        "retry",
+        "cancellation",
+        "cleanup",
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "raw-runtime-config-input",
+      "contractTemplate": "raw-runtime-config-input",
+      "sourceOwner": "runtime",
+      "reachableOwners": [],
+      "targetProfileIds": [
+        "bubblewrap-linux-v1",
+        "microvm-firecracker-linux-v1",
+        "microvm-cloud-hypervisor-linux-v1",
+        "oci-linux-v1"
+      ],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "no-admitted-value",
+        "raw-runtime-input-rejection-before-mutation"
+      ],
+      "testObligationIds": [
+        "raw-runtime-config-input-invalid"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ],
+      "delegatedConcerns": [
+        "operation-transition",
+        "retry",
+        "cancellation",
+        "cleanup",
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "frontend-output",
+      "contractTemplate": "frontend-boundary",
+      "sourceOwner": "artifact",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "targetProfileIds": [],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "frontend-source-digest",
+        "full-canonical-revalidation"
+      ],
+      "testObligationIds": [
+        "frontend-output-valid",
+        "frontend-output-corruption-invalid"
+      ],
+      "delegatedPackets": [
+        "F"
+      ],
+      "delegatedConcerns": [
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "raw-wire-input",
+      "contractTemplate": "raw-wire",
+      "sourceOwner": "runtime",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "targetProfileIds": [],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "canonical-byte-validation",
+        "semantic-validation"
+      ],
+      "testObligationIds": [
+        "raw-wire-valid",
+        "raw-wire-corruption-invalid"
+      ],
+      "delegatedPackets": [
+        "F"
+      ],
+      "delegatedConcerns": [
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "schema-migration",
+      "contractTemplate": "schema-migration",
+      "sourceOwner": "runtime",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "targetProfileIds": [],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "source-schema-version",
+        "migration-identity",
+        "post-migration-validation"
+      ],
+      "testObligationIds": [
+        "schema-migration-valid",
+        "schema-migration-invalid",
+        "downstream-boundaries-migration-group"
+      ],
+      "delegatedPackets": [
+        "F"
+      ],
+      "delegatedConcerns": [
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "namespaced-extension",
+      "contractTemplate": "artifact-native",
+      "sourceOwner": "artifact",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "targetProfileIds": [
+        "bubblewrap-linux-v1",
+        "microvm-firecracker-linux-v1",
+        "microvm-cloud-hypervisor-linux-v1",
+        "oci-linux-v1"
+      ],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "registered-extension-contract",
+        "portable-projection",
+        "packet-c-reentry"
+      ],
+      "testObligationIds": [
+        "namespaced-extension-valid",
+        "unregistered-extension-invalid"
+      ],
+      "delegatedPackets": [
+        "F"
+      ],
+      "delegatedConcerns": [
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "typed-nix-handle",
+      "contractTemplate": "typed-handle",
+      "sourceOwner": "artifact",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "targetProfileIds": [
+        "bubblewrap-linux-v1",
+        "microvm-firecracker-linux-v1",
+        "microvm-cloud-hypervisor-linux-v1",
+        "oci-linux-v1"
+      ],
+      "nativeHandleContract": {
+        "sourceGraphClosureDigest": "required-complete-pinned-transitive-closure",
+        "registryNamespace": "required",
+        "registryVersion": "required",
+        "registryDigest": "required",
+        "exportAttribute": "required",
+        "nativeInterfaceVersion": "required",
+        "targetSystem": "required",
+        "affectedMember": "required",
+        "expectedSemanticProjection": "required",
+        "semanticIdentityComparison": "required-before-construction"
+      },
+      "evidenceObligationIds": [
+        "transitive-source-closure-identity",
+        "versioned-handle-registry-identity",
+        "native-export-coordinate",
+        "expected-semantic-projection",
+        "semantic-identity-comparison"
+      ],
+      "testObligationIds": [
+        "typed-handle-valid",
+        "typed-handle-incomplete-coordinate-invalid",
+        "typed-handle-digest-invalid"
+      ],
+      "delegatedPackets": [
+        "F"
+      ],
+      "delegatedConcerns": [
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "native-guest-module",
+      "contractTemplate": "target-native",
+      "sourceOwner": "artifact",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "targetProfileIds": [
+        "microvm-firecracker-linux-v1",
+        "microvm-cloud-hypervisor-linux-v1"
+      ],
+      "nativeHandleContract": {
+        "sourceGraphClosureDigest": "required-complete-pinned-transitive-closure",
+        "registryNamespace": "required",
+        "registryVersion": "required",
+        "registryDigest": "required",
+        "exportAttribute": "required",
+        "nativeInterfaceVersion": "required",
+        "targetSystem": "required",
+        "affectedMember": "required",
+        "expectedSemanticProjection": "required",
+        "semanticIdentityComparison": "required-before-construction"
+      },
+      "evidenceObligationIds": [
+        "guest-module-provenance",
+        "guest-owner-exclusion",
+        "packet-c-reentry",
+        "complete-native-handle-identity",
+        "total-native-effect-projection"
+      ],
+      "testObligationIds": [
+        "guest-module-valid",
+        "guest-module-host-state-invalid",
+        "native-handle-completeness-invalid",
+        "native-effect-projection-incomplete-invalid"
+      ],
+      "delegatedPackets": [
+        "F"
+      ],
+      "delegatedConcerns": [
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "target-native-extension",
+      "contractTemplate": "target-native",
+      "sourceOwner": "artifact",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "targetProfileIds": [
+        "bubblewrap-linux-v1",
+        "microvm-firecracker-linux-v1",
+        "microvm-cloud-hypervisor-linux-v1",
+        "oci-linux-v1"
+      ],
+      "nativeHandleContract": {
+        "sourceGraphClosureDigest": "required-complete-pinned-transitive-closure",
+        "registryNamespace": "required",
+        "registryVersion": "required",
+        "registryDigest": "required",
+        "exportAttribute": "required",
+        "nativeInterfaceVersion": "required",
+        "targetSystem": "required",
+        "affectedMember": "required",
+        "expectedSemanticProjection": "required",
+        "semanticIdentityComparison": "required-before-construction"
+      },
+      "evidenceObligationIds": [
+        "registered-target-contract",
+        "packet-c-profile-identity",
+        "packet-c-realization",
+        "complete-native-handle-identity",
+        "total-native-effect-projection"
+      ],
+      "testObligationIds": [
+        "target-native-valid",
+        "target-native-widening-invalid",
+        "native-handle-completeness-invalid",
+        "native-effect-projection-incomplete-invalid"
+      ],
+      "delegatedPackets": [
+        "F"
+      ],
+      "delegatedConcerns": [
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "create-native-extension",
+      "contractTemplate": "create",
+      "sourceOwner": "create",
+      "reachableOwners": [
+        "create"
+      ],
+      "targetProfileIds": [
+        "bubblewrap-linux-v1",
+        "microvm-firecracker-linux-v1",
+        "microvm-cloud-hypervisor-linux-v1",
+        "oci-linux-v1"
+      ],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "create-owner-proof",
+        "artifact-bound-check",
+        "resolved-input-validation"
+      ],
+      "testObligationIds": [
+        "create-native-valid",
+        "create-native-foreign-owner-invalid"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ],
+      "delegatedConcerns": [
+        "operation-transition",
+        "retry",
+        "cancellation",
+        "cleanup",
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "operator-native-extension",
+      "contractTemplate": "operator",
+      "sourceOwner": "operator",
+      "reachableOwners": [
+        "operator"
+      ],
+      "targetProfileIds": [
+        "bubblewrap-linux-v1",
+        "microvm-firecracker-linux-v1",
+        "microvm-cloud-hypervisor-linux-v1",
+        "oci-linux-v1"
+      ],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "operator-owner-proof",
+        "artifact-bound-check",
+        "driver-selection-evidence"
+      ],
+      "testObligationIds": [
+        "operator-native-valid",
+        "operator-native-foreign-owner-invalid"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ],
+      "delegatedConcerns": [
+        "operation-transition",
+        "retry",
+        "cancellation",
+        "cleanup",
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "service-native-extension",
+      "contractTemplate": "service",
+      "sourceOwner": "service",
+      "reachableOwners": [
+        "service"
+      ],
+      "targetProfileIds": [
+        "bubblewrap-linux-v1",
+        "microvm-firecracker-linux-v1",
+        "microvm-cloud-hypervisor-linux-v1",
+        "oci-linux-v1"
+      ],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "service-owner-proof",
+        "core-api-equivalence"
+      ],
+      "testObligationIds": [
+        "service-native-valid",
+        "service-native-foreign-owner-invalid"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ],
+      "delegatedConcerns": [
+        "operation-transition",
+        "retry",
+        "cancellation",
+        "cleanup",
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "live-native-extension",
+      "contractTemplate": "live",
+      "sourceOwner": "live",
+      "reachableOwners": [
+        "live"
+      ],
+      "targetProfileIds": [
+        "bubblewrap-linux-v1",
+        "microvm-firecracker-linux-v1",
+        "microvm-cloud-hypervisor-linux-v1",
+        "oci-linux-v1"
+      ],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "live-owner-proof",
+        "immutable-bound-check"
+      ],
+      "testObligationIds": [
+        "live-native-valid",
+        "live-native-widening-invalid"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ],
+      "delegatedConcerns": [
+        "operation-transition",
+        "retry",
+        "cancellation",
+        "cleanup",
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "exec-native-extension",
+      "contractTemplate": "exec",
+      "sourceOwner": "exec",
+      "reachableOwners": [
+        "exec"
+      ],
+      "targetProfileIds": [
+        "bubblewrap-linux-v1",
+        "microvm-firecracker-linux-v1",
+        "microvm-cloud-hypervisor-linux-v1",
+        "oci-linux-v1"
+      ],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "exec-owner-proof",
+        "sandbox-bound-check"
+      ],
+      "testObligationIds": [
+        "exec-native-valid",
+        "exec-native-widening-invalid"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ],
+      "delegatedConcerns": [
+        "operation-transition",
+        "retry",
+        "cancellation",
+        "cleanup",
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "adapter-native-extension",
+      "contractTemplate": "framework",
+      "sourceOwner": "framework",
+      "reachableOwners": [
+        "framework"
+      ],
+      "targetProfileIds": [],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "adapter-owner-proof",
+        "core-api-equivalence"
+      ],
+      "testObligationIds": [
+        "adapter-native-valid",
+        "adapter-native-artifact-invalid"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ],
+      "delegatedConcerns": [
+        "operation-transition",
+        "retry",
+        "cancellation",
+        "cleanup",
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "provider-native-adapter",
+      "contractTemplate": "provider-admission",
+      "sourceOwner": "operator",
+      "reachableOwners": [
+        "operator",
+        "runtime"
+      ],
+      "targetProfileIds": [
+        "bubblewrap-linux-v1",
+        "microvm-firecracker-linux-v1",
+        "microvm-cloud-hypervisor-linux-v1",
+        "oci-linux-v1"
+      ],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "provider-registration",
+        "provider-default-suppression",
+        "admission-verification"
+      ],
+      "testObligationIds": [
+        "provider-adapter-valid",
+        "provider-adapter-default-invalid"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ],
+      "delegatedConcerns": [
+        "operation-transition",
+        "retry",
+        "cancellation",
+        "cleanup",
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "provider-native-operation",
+      "contractTemplate": "provider-operation",
+      "sourceOwner": "runtime",
+      "reachableOwners": [
+        "runtime"
+      ],
+      "targetProfileIds": [
+        "bubblewrap-linux-v1",
+        "microvm-firecracker-linux-v1",
+        "microvm-cloud-hypervisor-linux-v1",
+        "oci-linux-v1"
+      ],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "versioned-provider-operation",
+        "resolved-input-validation"
+      ],
+      "testObligationIds": [
+        "provider-operation-valid",
+        "provider-operation-corruption-invalid"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ],
+      "delegatedConcerns": [
+        "operation-transition",
+        "retry",
+        "cancellation",
+        "cleanup",
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "corrupted-manifest",
+      "contractTemplate": "manifest-load",
+      "sourceOwner": "runtime",
+      "reachableOwners": [
+        "artifact",
+        "create"
+      ],
+      "targetProfileIds": [
+        "bubblewrap-linux-v1",
+        "microvm-firecracker-linux-v1",
+        "microvm-cloud-hypervisor-linux-v1",
+        "oci-linux-v1"
+      ],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "manifest-identity-verification",
+        "packet-c-profile-verification",
+        "construction-evidence-verification"
+      ],
+      "testObligationIds": [
+        "manifest-load-valid",
+        "manifest-corruption-invalid",
+        "downstream-boundaries-manifest-group"
+      ],
+      "delegatedPackets": [
+        "F"
+      ],
+      "delegatedConcerns": [
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "target-lowering",
+      "contractTemplate": "target-lowering",
+      "sourceOwner": "runtime",
+      "reachableOwners": [
+        "artifact",
+        "runtime"
+      ],
+      "targetProfileIds": [
+        "bubblewrap-linux-v1",
+        "microvm-firecracker-linux-v1",
+        "microvm-cloud-hypervisor-linux-v1",
+        "oci-linux-v1"
+      ],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "packet-c-profile-identity",
+        "packet-c-member-identity",
+        "packet-c-realization"
+      ],
+      "testObligationIds": [
+        "target-lowering-valid",
+        "target-lowering-corruption-invalid"
+      ],
+      "delegatedPackets": [
+        "F"
+      ],
+      "delegatedConcerns": [
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "built-artifact-load",
+      "contractTemplate": "manifest-load",
+      "sourceOwner": "runtime",
+      "reachableOwners": [
+        "artifact",
+        "create"
+      ],
+      "targetProfileIds": [
+        "bubblewrap-linux-v1",
+        "microvm-firecracker-linux-v1",
+        "microvm-cloud-hypervisor-linux-v1",
+        "oci-linux-v1"
+      ],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "member-content-identity",
+        "manifest-identity-verification",
+        "packet-c-profile-verification"
+      ],
+      "testObligationIds": [
+        "built-load-valid",
+        "built-load-corruption-invalid",
+        "downstream-boundaries-manifest-group"
+      ],
+      "delegatedPackets": [
+        "F"
+      ],
+      "delegatedConcerns": [
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "direct-api",
+      "contractTemplate": "create",
+      "sourceOwner": "create",
+      "reachableOwners": [
+        "create"
+      ],
+      "targetProfileIds": [
+        "bubblewrap-linux-v1",
+        "microvm-firecracker-linux-v1",
+        "microvm-cloud-hypervisor-linux-v1",
+        "oci-linux-v1"
+      ],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "typed-api-request",
+        "artifact-bound-check",
+        "owner-bound-check"
+      ],
+      "testObligationIds": [
+        "direct-api-valid",
+        "direct-api-widening-invalid"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ],
+      "delegatedConcerns": [
+        "operation-transition",
+        "retry",
+        "cancellation",
+        "cleanup",
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "framework-adapter",
+      "contractTemplate": "framework",
+      "sourceOwner": "framework",
+      "reachableOwners": [
+        "framework"
+      ],
+      "targetProfileIds": [],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "framework-request-provenance",
+        "core-api-equivalence"
+      ],
+      "testObligationIds": [
+        "framework-adapter-valid",
+        "framework-adapter-artifact-invalid"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ],
+      "delegatedConcerns": [
+        "operation-transition",
+        "retry",
+        "cancellation",
+        "cleanup",
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "cli-adapter",
+      "contractTemplate": "framework",
+      "sourceOwner": "framework",
+      "reachableOwners": [
+        "framework"
+      ],
+      "targetProfileIds": [],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "cli-request-provenance",
+        "core-api-equivalence"
+      ],
+      "testObligationIds": [
+        "cli-adapter-valid",
+        "cli-adapter-artifact-invalid"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ],
+      "delegatedConcerns": [
+        "operation-transition",
+        "retry",
+        "cancellation",
+        "cleanup",
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "managed-service",
+      "contractTemplate": "service",
+      "sourceOwner": "service",
+      "reachableOwners": [
+        "service"
+      ],
+      "targetProfileIds": [],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "service-reconciliation-evidence",
+        "core-api-equivalence"
+      ],
+      "testObligationIds": [
+        "managed-service-valid",
+        "managed-service-artifact-invalid"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ],
+      "delegatedConcerns": [
+        "operation-transition",
+        "retry",
+        "cancellation",
+        "cleanup",
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "direct-native-nix-value",
+      "contractTemplate": "typed-handle",
+      "sourceOwner": "artifact",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "targetProfileIds": [
+        "bubblewrap-linux-v1",
+        "microvm-firecracker-linux-v1",
+        "microvm-cloud-hypervisor-linux-v1",
+        "oci-linux-v1"
+      ],
+      "nativeHandleContract": {
+        "sourceGraphClosureDigest": "required-complete-pinned-transitive-closure",
+        "registryNamespace": "required",
+        "registryVersion": "required",
+        "registryDigest": "required",
+        "exportAttribute": "required",
+        "nativeInterfaceVersion": "required",
+        "targetSystem": "required",
+        "affectedMember": "required",
+        "expectedSemanticProjection": "required",
+        "semanticIdentityComparison": "required-before-construction"
+      },
+      "evidenceObligationIds": [
+        "transitive-source-closure-identity",
+        "versioned-handle-registry-identity",
+        "native-export-coordinate",
+        "expected-semantic-projection",
+        "semantic-identity-comparison"
+      ],
+      "testObligationIds": [
+        "direct-native-nix-valid",
+        "direct-native-nix-incomplete-coordinate-invalid",
+        "direct-native-nix-unprojected-invalid"
+      ],
+      "delegatedPackets": [
+        "F"
+      ],
+      "delegatedConcerns": [
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "frontend-adaptation",
+      "contractTemplate": "frontend-boundary",
+      "sourceOwner": "artifact",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "targetProfileIds": [],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "frontend-adapter-identity",
+        "frontend-source-digest",
+        "full-canonical-revalidation"
+      ],
+      "testObligationIds": [
+        "frontend-adaptation-valid",
+        "frontend-adaptation-claim-invalid"
+      ],
+      "delegatedPackets": [
+        "F"
+      ],
+      "delegatedConcerns": [
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "unsafe-opaque-extension",
+      "contractTemplate": "unsafe-opaque",
+      "sourceOwner": "artifact",
+      "reachableOwners": [
+        "artifact"
+      ],
+      "targetProfileIds": [
+        "bubblewrap-linux-v1",
+        "microvm-firecracker-linux-v1",
+        "microvm-cloud-hypervisor-linux-v1",
+        "oci-linux-v1"
+      ],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "explicit-unsupported-diagnostic",
+        "opaque-extension-rejection"
+      ],
+      "testObligationIds": [
+        "registered-extension-nearby-valid",
+        "unsafe-opaque-extension-invalid"
+      ],
+      "delegatedPackets": [
+        "F"
+      ],
+      "delegatedConcerns": [
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "provider-side-construction",
+      "contractTemplate": "provider-build",
+      "sourceOwner": "runtime",
+      "reachableOwners": [
+        "artifact",
+        "runtime"
+      ],
+      "targetProfileIds": [
+        "bubblewrap-linux-v1",
+        "microvm-firecracker-linux-v1",
+        "microvm-cloud-hypervisor-linux-v1",
+        "oci-linux-v1"
+      ],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "pinned-construction-inputs",
+        "provider-default-suppression",
+        "output-equivalence-evidence"
+      ],
+      "testObligationIds": [
+        "provider-construction-valid",
+        "provider-construction-invalid"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ],
+      "delegatedConcerns": [
+        "operation-transition",
+        "retry",
+        "cancellation",
+        "cleanup",
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "provider-build-cache",
+      "contractTemplate": "provider-result",
+      "sourceOwner": "runtime",
+      "reachableOwners": [
+        "artifact",
+        "runtime"
+      ],
+      "targetProfileIds": [
+        "bubblewrap-linux-v1",
+        "microvm-firecracker-linux-v1",
+        "microvm-cloud-hypervisor-linux-v1",
+        "oci-linux-v1"
+      ],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "cache-result-reverification",
+        "member-content-identity",
+        "construction-evidence-verification"
+      ],
+      "testObligationIds": [
+        "provider-build-cache-valid",
+        "provider-build-cache-invalid"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ],
+      "delegatedConcerns": [
+        "operation-transition",
+        "retry",
+        "cancellation",
+        "cleanup",
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "prebuilt-member-transfer",
+      "contractTemplate": "provider-admission",
+      "sourceOwner": "runtime",
+      "reachableOwners": [
+        "artifact",
+        "runtime"
+      ],
+      "targetProfileIds": [
+        "bubblewrap-linux-v1",
+        "microvm-firecracker-linux-v1",
+        "microvm-cloud-hypervisor-linux-v1",
+        "oci-linux-v1"
+      ],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "source-artifact-set-identity",
+        "transferred-member-content-identity",
+        "post-start-profile-conformance"
+      ],
+      "testObligationIds": [
+        "prebuilt-transfer-valid",
+        "prebuilt-transfer-invalid"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ],
+      "delegatedConcerns": [
+        "operation-transition",
+        "retry",
+        "cancellation",
+        "cleanup",
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "oci-descriptor-transfer",
+      "contractTemplate": "provider-admission",
+      "sourceOwner": "runtime",
+      "reachableOwners": [
+        "artifact",
+        "runtime"
+      ],
+      "targetProfileIds": [
+        "oci-linux-v1"
+      ],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "oci-descriptor-digest",
+        "oci-graph-verification",
+        "product-manifest-link"
+      ],
+      "testObligationIds": [
+        "oci-transfer-valid",
+        "oci-transfer-invalid"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ],
+      "delegatedConcerns": [
+        "operation-transition",
+        "retry",
+        "cancellation",
+        "cleanup",
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "provider-cache-hit",
+      "contractTemplate": "provider-operation",
+      "sourceOwner": "runtime",
+      "reachableOwners": [
+        "artifact",
+        "runtime"
+      ],
+      "targetProfileIds": [
+        "bubblewrap-linux-v1",
+        "microvm-firecracker-linux-v1",
+        "microvm-cloud-hypervisor-linux-v1",
+        "oci-linux-v1"
+      ],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "provider-cache-reference-resolution",
+        "member-identity-reverification",
+        "runtime-profile-reverification"
+      ],
+      "testObligationIds": [
+        "provider-cache-hit-valid",
+        "provider-cache-hit-invalid"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ],
+      "delegatedConcerns": [
+        "operation-transition",
+        "retry",
+        "cancellation",
+        "cleanup",
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    },
+    {
+      "pathId": "corrupted-provider-build-result",
+      "contractTemplate": "provider-result",
+      "sourceOwner": "runtime",
+      "reachableOwners": [
+        "artifact",
+        "runtime"
+      ],
+      "targetProfileIds": [
+        "bubblewrap-linux-v1",
+        "microvm-firecracker-linux-v1",
+        "microvm-cloud-hypervisor-linux-v1",
+        "oci-linux-v1"
+      ],
+      "nativeHandleContract": null,
+      "evidenceObligationIds": [
+        "provider-output-identity",
+        "provider-output-provenance",
+        "semantic-equivalence-proof"
+      ],
+      "testObligationIds": [
+        "provider-result-valid",
+        "provider-result-corruption-invalid"
+      ],
+      "delegatedPackets": [
+        "E",
+        "F"
+      ],
+      "delegatedConcerns": [
+        "operation-transition",
+        "retry",
+        "cancellation",
+        "cleanup",
+        "disclosure",
+        "redaction",
+        "evidence-visibility"
+      ]
+    }
+  ]
+}

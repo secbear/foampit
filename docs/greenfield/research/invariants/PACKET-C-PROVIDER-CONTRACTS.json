@@ -1,0 +1,509 @@
+{
+  "reviewVersion": 1,
+  "packet": "C",
+  "status": "reviewed",
+  "textAuthority": "Only closed structured control fields and stable obligation identifiers are normative. Human-readable explanations and examples are non-normative and cannot change failure, default, warning, verification, cache, secret, retention, phase, authority, identity, input, evidence, unsupported, or admission semantics.",
+  "transportIsNotTarget": true,
+  "introducedInvariants": [
+    "PRV-001",
+    "PRV-002"
+  ],
+  "identityContract": {
+    "transportChangesPortableIdentity": false,
+    "providerReferences": "runtime-metadata-only",
+    "mutableReferencesAsIdentity": "forbidden"
+  },
+  "unsupportedContract": {
+    "disposition": "explicit-error",
+    "implicitRebuild": "forbidden",
+    "substitution": "forbidden",
+    "semanticWeakening": "forbidden"
+  },
+  "identityExplanation": "Transport selection never changes portable semantic identity. A provider object, alias, mutable tag, cache key, source path, or deployment name is not a target-member identity.",
+  "unsupportedExplanation": "If a provider cannot preserve and verify the selected member and its required runtime profile, the adapter returns an explicit unsupported or admission error. It never rebuilds, substitutes, or weakens the member implicitly.",
+  "contracts": [
+    {
+      "id": "prebuilt-member-transfer",
+      "invariants": [
+        "PRV-001"
+      ],
+      "conformanceClass": "content-preserving-transfer",
+      "safetyPolicy": {
+        "failure": "fail-closed",
+        "defaults": "explicit-only",
+        "warnings": "never-sufficient",
+        "verification": "mandatory",
+        "cache": {
+          "trust": "untrusted-optimization",
+          "verification": "mandatory"
+        },
+        "secrets": {
+          "providerCredentials": "operator-configuration",
+          "workloadValues": "create-binding",
+          "artifactInclusion": "forbidden"
+        },
+        "retention": {
+          "source": "explicit-operator-configuration",
+          "artifactIdentityEffect": "none"
+        }
+      },
+      "input": {
+        "required": [
+          {
+            "id": "artifact-set-identity",
+            "explanation": "Artifact Set identity"
+          },
+          {
+            "id": "target-member-content-identity",
+            "explanation": "target-member content identity"
+          },
+          {
+            "id": "target-member-manifest",
+            "explanation": "target-member manifest"
+          },
+          {
+            "id": "member-content-source",
+            "explanation": "member bytes or content-addressed fetch descriptors"
+          },
+          {
+            "id": "builder-conformance-evidence",
+            "explanation": "builder conformance evidence"
+          }
+        ],
+        "forbidden": [
+          {
+            "id": "mutable-provider-alias-as-identity",
+            "explanation": "mutable provider alias as identity"
+          },
+          {
+            "id": "secret-value",
+            "explanation": "secret value"
+          },
+          {
+            "id": "provider-credential",
+            "explanation": "provider credential"
+          },
+          {
+            "id": "live-placement",
+            "explanation": "live placement"
+          },
+          {
+            "id": "implicit-member-kind-conversion",
+            "explanation": "implicit conversion to another member kind"
+          }
+        ]
+      },
+      "admission": {
+        "firstSoundPhase": "O0",
+        "deadline": "H0",
+        "authority": {
+          "phase": "H0",
+          "component": "remote-provider-adapter"
+        },
+        "requirements": [
+          {
+            "id": "accept-exact-member-kind-and-platform",
+            "explanation": "provider explicitly accepts the exact member kind and workload platform"
+          },
+          {
+            "id": "report-enforceable-runtime-profile",
+            "explanation": "provider reports the runtime profile and required capability versions it can enforce"
+          },
+          {
+            "id": "preserve-member-bytes",
+            "explanation": "provider storage and runtime do not rewrite member bytes"
+          },
+          {
+            "id": "require-explicit-retention",
+            "explanation": "provider retention and deletion behavior are explicit operator inputs"
+          }
+        ]
+      },
+      "identityVerification": [
+        {
+          "id": "verify-source-artifact-set",
+          "phase": "O0",
+          "component": "remote-provider-adapter",
+          "explanation": "Verify Artifact Set and member manifests before upload."
+        },
+        {
+          "id": "verify-transferred-content",
+          "phase": "H0",
+          "component": "remote-provider-adapter",
+          "explanation": "Verify the provider-accepted byte and content digests after transfer."
+        },
+        {
+          "id": "bind-provider-reference-as-metadata",
+          "phase": "H0",
+          "component": "remote-provider-adapter",
+          "explanation": "Link the provider object reference to the verified member identity as non-semantic runtime metadata."
+        }
+      ],
+      "cacheExplanation": "A cache hit is accepted only after the cached object is re-associated with and verified against the requested member content identity.",
+      "secretExplanation": "Provider credentials are Operator Configuration; secret-slot values are bound at Create and never enter the transferred Artifact member.",
+      "retentionExplanation": "Provider object retention and deletion are explicit Operator Configuration. The adapter records the effective policy and never imports a provider default into Artifact semantics or identity.",
+      "runtimeEvidence": [
+        {
+          "id": "effective-member-identity",
+          "explanation": "provider-reported effective member identity"
+        },
+        {
+          "id": "runtime-profile-and-implementation-identity",
+          "explanation": "selected runtime profile and implementation identity"
+        },
+        {
+          "id": "admission-capability-results",
+          "explanation": "admission/preflight capability results"
+        },
+        {
+          "id": "post-start-profile-conformance",
+          "explanation": "post-start conformance required by the selected profile"
+        }
+      ],
+      "unsupportedWhen": [
+        {
+          "id": "member-kind-unavailable",
+          "explanation": "provider cannot accept the member kind"
+        },
+        {
+          "id": "unverifiable-byte-transformation",
+          "explanation": "provider transforms member bytes without a verifiable output identity"
+        },
+        {
+          "id": "runtime-capability-or-evidence-unavailable",
+          "explanation": "required runtime capabilities or evidence are unavailable"
+        },
+        {
+          "id": "retention-policy-unsatisfied",
+          "explanation": "retention or deletion policy cannot satisfy operator requirements"
+        }
+      ],
+      "providerExampleExplanations": [
+        "a product-operated remote runtime accepting a microVM boot bundle",
+        "a provider API explicitly accepting a content-addressed native member"
+      ]
+    },
+    {
+      "id": "oci-descriptor-transfer",
+      "invariants": [
+        "PRV-001"
+      ],
+      "conformanceClass": "content-preserving-transfer",
+      "safetyPolicy": {
+        "failure": "fail-closed",
+        "defaults": "explicit-only",
+        "warnings": "never-sufficient",
+        "verification": "mandatory",
+        "cache": {
+          "trust": "untrusted-optimization",
+          "verification": "mandatory"
+        },
+        "secrets": {
+          "providerCredentials": "operator-configuration",
+          "workloadValues": "create-binding",
+          "artifactInclusion": "forbidden"
+        },
+        "retention": {
+          "source": "explicit-operator-configuration",
+          "artifactIdentityEffect": "none"
+        }
+      },
+      "input": {
+        "required": [
+          {
+            "id": "digest-addressed-oci-descriptor",
+            "explanation": "digest-addressed OCI image manifest or index descriptor"
+          },
+          {
+            "id": "linked-product-artifact-manifest",
+            "explanation": "product Sandbox Artifact manifest linked to the image digest"
+          },
+          {
+            "id": "target-member-and-artifact-set-identities",
+            "explanation": "target-member and Artifact Set identities"
+          },
+          {
+            "id": "builder-conformance-evidence",
+            "explanation": "builder conformance evidence"
+          }
+        ],
+        "forbidden": [
+          {
+            "id": "tag-only-selection",
+            "explanation": "tag-only image selection"
+          },
+          {
+            "id": "provider-image-id-as-member-identity",
+            "explanation": "provider image ID as member identity"
+          },
+          {
+            "id": "unverified-registry-response",
+            "explanation": "unverified registry response"
+          },
+          {
+            "id": "provider-image-defaults-as-artifact-semantics",
+            "explanation": "provider image defaults as Artifact semantics"
+          },
+          {
+            "id": "secret-in-image-or-metadata",
+            "explanation": "secret value in image layers, image config, annotations, or referrers"
+          }
+        ]
+      },
+      "admission": {
+        "firstSoundPhase": "O0",
+        "deadline": "H0",
+        "authority": {
+          "phase": "H0",
+          "component": "oci-provider-adapter"
+        },
+        "requirements": [
+          {
+            "id": "accept-exact-digest-and-platform",
+            "explanation": "registry/provider accepts the exact digest and workload platform"
+          },
+          {
+            "id": "verify-descriptor-graph",
+            "explanation": "fetched manifest and blobs verify against their descriptors"
+          },
+          {
+            "id": "preserve-product-manifest-link",
+            "explanation": "product manifest remains linked to the selected image digest"
+          },
+          {
+            "id": "enforce-oci-profile",
+            "explanation": "provider exposes enough creation controls to enforce the selected oci-linux-v1 profile"
+          }
+        ]
+      },
+      "identityVerification": [
+        {
+          "id": "verify-oci-root-descriptor",
+          "phase": "O0",
+          "component": "oci-provider-adapter",
+          "explanation": "Fetch and verify the OCI root descriptor by digest."
+        },
+        {
+          "id": "verify-oci-graph-and-product-manifest",
+          "phase": "H0",
+          "component": "oci-provider-adapter",
+          "explanation": "Verify every referenced blob and linked product manifest or referrer."
+        },
+        {
+          "id": "classify-provider-identifiers-as-metadata",
+          "phase": "H0",
+          "component": "oci-provider-adapter",
+          "explanation": "Treat registry repository and provider object identifiers as transport metadata only."
+        }
+      ],
+      "cacheExplanation": "Registry or provider caches are transparent only when the returned descriptor and every required blob still verify by digest.",
+      "secretExplanation": "Registry/provider credentials are Operator Configuration; runtime secret values are Create bindings outside the OCI image and product manifest.",
+      "retentionExplanation": "Registry blobs, manifests, referrers, and provider objects use explicit retention and deletion policies. Garbage collection changes availability, never portable identity.",
+      "runtimeEvidence": [
+        {
+          "id": "verified-oci-descriptor-graph",
+          "explanation": "verified OCI descriptor graph"
+        },
+        {
+          "id": "runtime-implementation-and-features",
+          "explanation": "provider/runtime implementation and feature identity"
+        },
+        {
+          "id": "effective-runtime-configuration",
+          "explanation": "effective generated runtime configuration with sensitive host data redacted"
+        },
+        {
+          "id": "post-start-profile-conformance",
+          "explanation": "post-start profile conformance probes"
+        }
+      ],
+      "unsupportedWhen": [
+        {
+          "id": "mutable-reference-only",
+          "explanation": "only mutable tag or alias selection is available"
+        },
+        {
+          "id": "runtime-defaults-not-neutralizable",
+          "explanation": "provider cannot neutralize image/runtime defaults"
+        },
+        {
+          "id": "runtime-semantics-not-provable",
+          "explanation": "provider cannot expose or prove required security, resource, network, device, or lifecycle semantics"
+        },
+        {
+          "id": "opaque-runtime-mutation",
+          "explanation": "provider injects opaque hooks or runtime mutation"
+        }
+      ],
+      "providerExampleExplanations": [
+        "Modal Image.from_registry with a digest-pinned OCI image, subject to adapter capability checks",
+        "another provider accepting an OCI image descriptor by digest"
+      ]
+    },
+    {
+      "id": "provider-side-construction",
+      "invariants": [
+        "PRV-002"
+      ],
+      "conformanceClass": "rebuild-requires-equivalence-proof",
+      "safetyPolicy": {
+        "failure": "fail-closed",
+        "defaults": "explicit-only",
+        "warnings": "never-sufficient",
+        "verification": "mandatory",
+        "cache": {
+          "trust": "untrusted-optimization",
+          "verification": "mandatory"
+        },
+        "secrets": {
+          "providerCredentials": "operator-configuration",
+          "workloadValues": "create-binding",
+          "artifactInclusion": "forbidden"
+        },
+        "retention": {
+          "source": "explicit-operator-configuration",
+          "artifactIdentityEffect": "none"
+        }
+      },
+      "input": {
+        "required": [
+          {
+            "id": "artifact-semantic-identity",
+            "explanation": "canonical Artifact semantic identity"
+          },
+          {
+            "id": "pinned-construction-inputs",
+            "explanation": "pinned construction inputs and dependency identities"
+          },
+          {
+            "id": "requested-target-profile",
+            "explanation": "requested target/profile identity"
+          },
+          {
+            "id": "versioned-construction-protocol",
+            "explanation": "versioned product construction protocol"
+          },
+          {
+            "id": "expected-output-evidence-schema",
+            "explanation": "expected output and evidence schema"
+          }
+        ],
+        "forbidden": [
+          {
+            "id": "unlocked-source",
+            "explanation": "unlocked source checkout"
+          },
+          {
+            "id": "ambient-provider-base",
+            "explanation": "ambient provider base image or package index"
+          },
+          {
+            "id": "opaque-imperative-setup",
+            "explanation": "opaque shell setup as the portable contract"
+          },
+          {
+            "id": "secret-in-build-input-or-cache-key",
+            "explanation": "secret value in build input or cache key"
+          },
+          {
+            "id": "unverified-reproducibility-claim",
+            "explanation": "claim of bit-for-bit identity without output comparison"
+          }
+        ]
+      },
+      "admission": {
+        "firstSoundPhase": "N0",
+        "deadline": "N1",
+        "authority": {
+          "phase": "N1",
+          "component": "provider-build-adapter"
+        },
+        "requirements": [
+          {
+            "id": "support-construction-protocol",
+            "explanation": "provider supports the exact versioned construction protocol"
+          },
+          {
+            "id": "verify-all-construction-inputs",
+            "explanation": "all source and dependency inputs are pinned and transferred or fetched by verified identity"
+          },
+          {
+            "id": "replace-provider-defaults",
+            "explanation": "provider defaults are replaced by explicit construction and runtime values"
+          },
+          {
+            "id": "return-product-output-and-evidence",
+            "explanation": "provider returns output identities, logs, provenance, and conformance evidence in the product schema"
+          }
+        ]
+      },
+      "identityVerification": [
+        {
+          "id": "verify-provider-output-member",
+          "phase": "N1",
+          "component": "provider-build-adapter",
+          "explanation": "Verify the provider output as a new target member."
+        },
+        {
+          "id": "verify-claimed-bit-reproducibility",
+          "phase": "N1",
+          "component": "provider-build-adapter",
+          "explanation": "Compare output identity with the expected identity when bit-for-bit reproducibility is claimed."
+        },
+        {
+          "id": "verify-semantic-equivalence-for-distinct-member",
+          "phase": "N1",
+          "component": "provider-build-adapter",
+          "explanation": "For a distinct member identity, bind it to the same portable semantic identity only after semantic and conformance equivalence succeeds."
+        }
+      ],
+      "cacheExplanation": "Provider build caches are untrusted optimization inputs. Every returned output is verified as if newly built.",
+      "secretExplanation": "Build credentials are Operator Configuration and may authorize fetches without becoming Artifact inputs; workload secret values remain Create bindings.",
+      "retentionExplanation": "Provider build outputs and caches use explicit retention and deletion policies. Deleting a provider object changes availability only; it never invalidates the portable semantic identity.",
+      "runtimeEvidence": [
+        {
+          "id": "builder-and-protocol-versions",
+          "explanation": "provider builder and protocol versions"
+        },
+        {
+          "id": "pinned-input-identity-set",
+          "explanation": "complete pinned input identity set"
+        },
+        {
+          "id": "output-member-identity",
+          "explanation": "output content/member identity"
+        },
+        {
+          "id": "build-provenance-and-conformance",
+          "explanation": "build provenance and conformance results"
+        },
+        {
+          "id": "runtime-implementation-and-post-start",
+          "explanation": "selected runtime implementation and post-start evidence"
+        }
+      ],
+      "unsupportedWhen": [
+        {
+          "id": "imperative-recipe-only",
+          "explanation": "provider accepts only an imperative environment recipe without pinned input or output identity"
+        },
+        {
+          "id": "output-identity-or-evidence-unavailable",
+          "explanation": "provider does not expose the result identity or required evidence"
+        },
+        {
+          "id": "provider-defaults-not-suppressible",
+          "explanation": "provider base image, resources, network, entrypoint, or retention defaults cannot be suppressed"
+        },
+        {
+          "id": "runtime-profile-unsatisfied",
+          "explanation": "provider-native capabilities cannot satisfy the requested product runtime profile"
+        }
+      ],
+      "providerExampleExplanations": [
+        "an E2B template adapter only after a versioned product construction protocol and equivalence evidence exist",
+        "a product-operated remote Nix builder returning a verified Artifact Set member"
+      ]
+    }
+  ]
+}

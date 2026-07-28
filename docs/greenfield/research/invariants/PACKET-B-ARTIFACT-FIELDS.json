@@ -1,0 +1,2230 @@
+{
+  "reviewVersion": 1,
+  "packet": "B",
+  "status": "reviewed",
+  "fieldIdentityStatus": "semantic review identifiers; public option names remain gated by the configuration-language and naming ADRs",
+  "requiredFamilies": [
+    "profile",
+    "metadata",
+    "platform",
+    "environment",
+    "process",
+    "workspace",
+    "filesystem",
+    "network",
+    "resources",
+    "identity",
+    "security",
+    "secretSlots",
+    "requirements",
+    "lifecycleRequirements",
+    "outputs",
+    "provenance",
+    "targets"
+  ],
+  "introducedInvariants": [
+    "PLT-001",
+    "STR-009",
+    "XRS-009",
+    "XRS-010",
+    "STR-010",
+    "XRS-011",
+    "XRS-012",
+    "STR-011",
+    "XRS-013",
+    "XRS-014",
+    "MAN-004",
+    "XRS-015",
+    "XRS-016",
+    "XRS-017",
+    "XRS-018",
+    "XRS-019",
+    "SUM-006",
+    "SUM-007",
+    "SUM-008",
+    "SUM-009",
+    "XRS-020",
+    "NET-001",
+    "NET-002",
+    "RES-001",
+    "RES-002",
+    "IDN-001",
+    "SEC-001",
+    "SEC-002",
+    "DEV-001",
+    "DEV-002",
+    "SCT-001",
+    "SCT-002",
+    "SCT-003",
+    "CAP-001",
+    "SNP-001",
+    "SUM-010",
+    "OUT-001",
+    "OUT-002",
+    "IDT-001",
+    "IDT-002",
+    "TGT-009",
+    "TGT-010",
+    "NAT-001",
+    "NAT-002",
+    "LIF-001"
+  ],
+  "fields": [
+    {
+      "id": "artifact.profile.selection",
+      "family": "profile",
+      "kind": "scalar",
+      "outcome": "covered",
+      "invariants": [
+        "STR-009",
+        "XRS-009",
+        "CMP-003"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.profile-selection",
+        "manifest.profile-expansion"
+      ],
+      "portableMeaning": "Selects exactly one descriptively named pinned profile and records explicit or implicit selection as non-semantic explanation metadata.",
+      "valueShape": "Profile name plus normalized selection-origin enum.",
+      "omissionSemantics": "Select workspace-edit-offline and materialize that choice visibly.",
+      "forbiddenInputs": [
+        "A profile named default.",
+        "Ambient or target-dependent selection."
+      ],
+      "manifestProjection": "Name, pinned source identity, version, and digest in the semantic domain; non-hashed selection origin in the explanation domain.",
+      "rationale": "Profile selection changes normalized semantics and must never be delegated to a target or backend default.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.profile.expansion",
+      "family": "profile",
+      "kind": "derived",
+      "outcome": "covered",
+      "invariants": [
+        "XRS-009",
+        "CMP-003",
+        "WIRE-002"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.profile-selection",
+        "manifest.profile-expansion"
+      ],
+      "portableMeaning": "Materializes the complete profile contribution before explicit-field composition and final validation.",
+      "valueShape": "Fully expanded portable Artifact fragment with field-level origins.",
+      "omissionSemantics": "No field may remain unresolved or fall through to a target default.",
+      "forbiddenInputs": [
+        "Backend defaults.",
+        "Unpinned profile libraries."
+      ],
+      "manifestProjection": "Complete expansion and non-hashed explanation provenance.",
+      "rationale": "Target construction consumes only expanded semantics; Packet D later proves every composition path reaches this state.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.profile.compositionPaths",
+      "family": "profile",
+      "kind": "derived",
+      "outcome": "delegated",
+      "invariants": [
+        "CMP-003",
+        "CMP-007",
+        "CMP-008"
+      ],
+      "delegatedPackets": [
+        "D"
+      ],
+      "refinesPacketASurfaces": [
+        "artifact.profile-selection",
+        "manifest.profile-expansion"
+      ],
+      "portableMeaning": "Requires imports, profile expansion, explicit fields, overrides, native handles, and raw canonical input to converge on the same final Artifact validator.",
+      "valueShape": "Cross-cutting construction-path coverage relation over the fully expanded Artifact.",
+      "omissionSemantics": "No supported composition or escape path is exempt from final validation.",
+      "forbiddenInputs": [
+        "Frontend-only validation.",
+        "Override or native path that bypasses the canonical Artifact boundary."
+      ],
+      "manifestProjection": "Final expanded semantics plus non-hashed contributing-source provenance.",
+      "rationale": "Packet B defines the final field semantics; Packet D proves every ordinary and strongest construction path reaches them.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.metadata.descriptive",
+      "family": "metadata",
+      "kind": "object",
+      "outcome": "covered",
+      "invariants": [
+        "XRS-010",
+        "STR-008"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.metadata"
+      ],
+      "portableMeaning": "Carries immutable descriptive name, description, and string labels with no control semantics.",
+      "valueShape": "Optional name and description plus a closed string map.",
+      "omissionSemantics": "No author-supplied descriptive metadata.",
+      "forbiddenInputs": [
+        "Runtime IDs or timestamps.",
+        "Placement, credential, lifecycle, or policy selectors."
+      ],
+      "manifestProjection": "Canonical descriptive metadata map.",
+      "rationale": "Metadata remains safely extensible only while consumers are forbidden from interpreting it as another resource.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.platform.workload",
+      "family": "platform",
+      "kind": "object",
+      "outcome": "covered",
+      "invariants": [
+        "PLT-001",
+        "STR-006",
+        "TGT-004"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.platform-architecture"
+      ],
+      "portableMeaning": "Declares workload OS, architecture, and Nix target-system contract.",
+      "valueShape": "Closed OS, architecture, and target-system tuple with namespaced extension support.",
+      "omissionSemantics": "Invalid; the platform must be explicit before construction.",
+      "forbiddenInputs": [
+        "Evaluator or runtime host inference.",
+        "Current-host feature probes."
+      ],
+      "manifestProjection": "Resolved workload platform tuple.",
+      "rationale": "Workload platform affects package resolution and every target member, while current host capability belongs to preflight.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.environment.packages",
+      "family": "environment",
+      "kind": "list",
+      "outcome": "covered",
+      "invariants": [
+        "STR-010",
+        "TGT-004",
+        "TGT-007"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.environment"
+      ],
+      "portableMeaning": "Declares ordered typed pinned package references and their closures for the workload platform.",
+      "valueShape": "List of typed Nix input, attribute, output, and target-system references.",
+      "omissionSemantics": "No packages beyond other explicit environment components.",
+      "forbiddenInputs": [
+        "Raw Nix values or source.",
+        "Current-machine store paths.",
+        "Host paths."
+      ],
+      "manifestProjection": "Resolved package and closure identities in canonical order.",
+      "rationale": "Package intent is immutable Artifact content; actual realization and target closure checks continue in Packet C.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.environment.devShell",
+      "family": "environment",
+      "kind": "reference",
+      "outcome": "covered",
+      "invariants": [
+        "STR-010",
+        "XRS-011"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.environment"
+      ],
+      "portableMeaning": "Imports one typed pinned devShell through a closed lossless projection.",
+      "valueShape": "Typed Nix input, devShell attribute, output system, and importer-version reference.",
+      "omissionSemantics": "No devShell contribution.",
+      "forbiddenInputs": [
+        "Arbitrary Nix evaluator values.",
+        "Silent dropping of unsupported shell state."
+      ],
+      "manifestProjection": "Importer version, source identity, retained categories, and resolved content identities.",
+      "rationale": "A devShell is a development/build environment importer, not a root filesystem or opaque activation mechanism.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.environment.variables",
+      "family": "environment",
+      "kind": "map",
+      "outcome": "covered",
+      "invariants": [
+        "STR-004",
+        "XRS-012",
+        "TGT-007"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.environment"
+      ],
+      "portableMeaning": "Declares explicit non-secret process environment defaults.",
+      "valueShape": "Closed string-keyed map of non-secret values with reserved-name validation.",
+      "omissionSemantics": "No variable is inherited or synthesized.",
+      "forbiddenInputs": [
+        "Secret values or references.",
+        "Ambient caller, daemon, builder, or host variables."
+      ],
+      "manifestProjection": "Canonical non-secret environment map with redaction classification.",
+      "rationale": "Environment defaults affect deterministic behavior and cannot inherit mutable ambient state.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.environment.searchPath",
+      "family": "environment",
+      "kind": "list",
+      "outcome": "covered",
+      "invariants": [
+        "XRS-012",
+        "TGT-007"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.environment"
+      ],
+      "portableMeaning": "Declares the complete ordered executable search path derived from Artifact content.",
+      "valueShape": "Ordered list of in-Artifact executable directories.",
+      "omissionSemantics": "No host PATH or backend image PATH is inherited.",
+      "forbiddenInputs": [
+        "Host PATH entries.",
+        "Unresolved host directories."
+      ],
+      "manifestProjection": "Canonical ordered search path.",
+      "rationale": "Path order is observable process semantics and therefore explicit and target-invariant.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.environment.activation",
+      "family": "environment",
+      "kind": "list",
+      "outcome": "covered",
+      "invariants": [
+        "STR-005",
+        "XRS-011"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.environment"
+      ],
+      "portableMeaning": "Declares an ordered sequence of trusted argv-form activation commands.",
+      "valueShape": "List of non-empty argv arrays with explicit order.",
+      "omissionSemantics": "No activation runs.",
+      "forbiddenInputs": [
+        "Shell strings.",
+        "Implicit interactive shellHook.",
+        "Host-mutating hooks."
+      ],
+      "manifestProjection": "Ordered activation argv metadata and executable identities.",
+      "rationale": "Explicit argv preserves portable execution semantics without shell interpolation.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.environment.ambientExclusion",
+      "family": "environment",
+      "kind": "derived",
+      "outcome": "delegated",
+      "invariants": [
+        "XRS-012"
+      ],
+      "delegatedPackets": [
+        "F"
+      ],
+      "refinesPacketASurfaces": [
+        "artifact.environment"
+      ],
+      "portableMeaning": "Requires omission to remain absence and forbids ambient environment inheritance.",
+      "valueShape": "Derived closed-environment requirement.",
+      "omissionSemantics": "The requirement is always active.",
+      "forbiddenInputs": [
+        "Backend-specific inheritance allowlists in Artifact source."
+      ],
+      "manifestProjection": "Closed-environment requirement and reserved-name policy version.",
+      "rationale": "Packet B fixes static semantics; Packet F verifies runtime descriptors, environment, logs, and disclosure cannot bypass them.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.process.argv",
+      "family": "process",
+      "kind": "list",
+      "outcome": "covered",
+      "invariants": [
+        "STR-005",
+        "XRS-013",
+        "XRS-014"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.default-process",
+        "manifest.software-process-metadata"
+      ],
+      "portableMeaning": "Optionally declares the default Process executable and arguments in argv form.",
+      "valueShape": "Absent or one non-empty argv array.",
+      "omissionSemantics": "No Artifact-default Process command and no image/backend entrypoint inheritance.",
+      "forbiddenInputs": [
+        "Shell strings.",
+        "Backend default entrypoints."
+      ],
+      "manifestProjection": "Explicit argv or explicit absence.",
+      "rationale": "Artifact defaults and runtime Process requests share semantics without making an omitted default auto-start anything.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.process.cwd",
+      "family": "process",
+      "kind": "scalar",
+      "outcome": "covered",
+      "invariants": [
+        "STR-011",
+        "XRS-013"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.default-process",
+        "manifest.software-process-metadata"
+      ],
+      "portableMeaning": "Optionally declares a default absolute working directory inside the permitted Sandbox filesystem.",
+      "valueShape": "Absent or normalized absolute in-sandbox path.",
+      "omissionSemantics": "No Artifact cwd default; a complete runtime Process must choose one.",
+      "forbiddenInputs": [
+        "Current-host, provider, builder, or driver paths."
+      ],
+      "manifestProjection": "Explicit cwd or explicit absence.",
+      "rationale": "The default Process cannot escape or reinterpret the Artifact filesystem namespace.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.process.environment",
+      "family": "process",
+      "kind": "map",
+      "outcome": "covered",
+      "invariants": [
+        "STR-004",
+        "XRS-013"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.default-process",
+        "manifest.software-process-metadata"
+      ],
+      "portableMeaning": "Optionally narrows or supplements ordinary non-secret Process environment within the Artifact environment contract.",
+      "valueShape": "Closed non-secret string map with reserved-name validation.",
+      "omissionSemantics": "Use only the Artifact environment map.",
+      "forbiddenInputs": [
+        "Secret values or references.",
+        "Reserved runtime channels."
+      ],
+      "manifestProjection": "Canonical default Process environment delta.",
+      "rationale": "Process defaults may specialize ordinary environment but cannot create a secret side channel.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.process.identity",
+      "family": "process",
+      "kind": "object",
+      "outcome": "covered",
+      "invariants": [
+        "XRS-013",
+        "IDN-001"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.default-process",
+        "manifest.software-process-metadata"
+      ],
+      "portableMeaning": "Optionally selects one workload-visible identity already permitted by the Artifact identity contract.",
+      "valueShape": "Absent or typed workload user/group reference.",
+      "omissionSemantics": "Use the Artifact's selected workload identity.",
+      "forbiddenInputs": [
+        "Host UID/GID mappings.",
+        "Launcher or provider identity."
+      ],
+      "manifestProjection": "Resolved workload identity reference.",
+      "rationale": "The default Process can preserve or narrow identity but never select host privilege.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.process.omission",
+      "family": "process",
+      "kind": "derived",
+      "outcome": "delegated",
+      "invariants": [
+        "XRS-014",
+        "MAN-004"
+      ],
+      "delegatedPackets": [
+        "C"
+      ],
+      "refinesPacketASurfaces": [
+        "artifact.default-process",
+        "manifest.software-process-metadata"
+      ],
+      "portableMeaning": "Makes absence of every default Process member an explicit portable semantic.",
+      "valueShape": "Presence bitmap over the default Process record.",
+      "omissionSemantics": "Absent remains absent on every target.",
+      "forbiddenInputs": [
+        "OCI image or provider fallback defaults.",
+        "Any sentinel or value requesting backend-default inheritance."
+      ],
+      "manifestProjection": "Explicit presence/absence for all default Process members.",
+      "rationale": "XRS-014 rejects inheritance requests in the normalized Artifact; MAN-004 and Packet C prove every lowerer suppresses target-native defaults when fields are absent.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.workspace.slot",
+      "family": "workspace",
+      "kind": "object",
+      "outcome": "covered",
+      "invariants": [
+        "STR-002",
+        "XRS-015",
+        "XRS-016",
+        "CMP-004"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.workspace-contract",
+        "artifact.binding-slots",
+        "manifest.binding-contracts"
+      ],
+      "portableMeaning": "Declares the logical workspace binding interface without a concrete source.",
+      "valueShape": "One typed slot with identity, cardinality, source-kind constraints, and workspace contract digest.",
+      "omissionSemantics": "No workspace binding interface unless supplied by the selected visible profile.",
+      "forbiddenInputs": [
+        "Checkout payload.",
+        "Host/provider/snapshot identity.",
+        "Binding mechanism."
+      ],
+      "manifestProjection": "Complete workspace slot contract.",
+      "rationale": "Artifact declares the interface; Create supplies the concrete source and compatible materialization.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.workspace.destination",
+      "family": "workspace",
+      "kind": "scalar",
+      "outcome": "covered",
+      "invariants": [
+        "STR-001",
+        "XRS-019"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.workspace-contract"
+      ],
+      "portableMeaning": "Names the absolute project root visible inside the Sandbox.",
+      "valueShape": "Normalized absolute in-sandbox path.",
+      "omissionSemantics": "Selected profile supplies /workspace; otherwise a declared workspace requires an explicit destination.",
+      "forbiddenInputs": [
+        "Host source paths.",
+        "Relative destinations."
+      ],
+      "manifestProjection": "Normalized workspace destination.",
+      "rationale": "The destination is portable observable behavior independent of target mount mechanism.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.workspace.access",
+      "family": "workspace",
+      "kind": "sum-type",
+      "outcome": "covered",
+      "invariants": [
+        "SUM-001",
+        "XRS-003",
+        "XRS-017"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.workspace-contract"
+      ],
+      "portableMeaning": "Sets the workspace read-only or read-write authority ceiling.",
+      "valueShape": "Closed access enum.",
+      "omissionSemantics": "Selected profile supplies read-write; otherwise a workspace declaration must be explicit.",
+      "forbiddenInputs": [
+        "Persistence, writeback, or synchronization modes."
+      ],
+      "manifestProjection": "Workspace access ceiling.",
+      "rationale": "Access is immutable policy; retention and result transfer remain separate runtime choices.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.workspace.materializations",
+      "family": "workspace",
+      "kind": "sum-type",
+      "outcome": "covered",
+      "invariants": [
+        "SUM-001",
+        "TGT-001",
+        "TGT-002"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.workspace-contract"
+      ],
+      "portableMeaning": "Requires one materialization or permits a non-empty set from which Create selects.",
+      "valueShape": "Mandatory alternative or non-empty set of permitted typed alternatives.",
+      "omissionSemantics": "Selected profile declares its permitted materializations; no target chooses implicitly.",
+      "forbiddenInputs": [
+        "Concrete source fields.",
+        "One-run selection."
+      ],
+      "manifestProjection": "Mandatory or permitted materialization contracts per runtime profile.",
+      "rationale": "Artifact expresses reusable bounds while Create chooses a supported concrete binding.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.workspace.ownership",
+      "family": "workspace",
+      "kind": "object",
+      "outcome": "covered",
+      "invariants": [
+        "XRS-018",
+        "IDN-001"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.workspace-contract"
+      ],
+      "portableMeaning": "Declares workload-visible ownership expectations for the workspace tree.",
+      "valueShape": "Workload UID/GID or named identity reference plus ownership behavior enum.",
+      "omissionSemantics": "Use the selected workload identity without importing a host mapping.",
+      "forbiddenInputs": [
+        "Host ID maps.",
+        "Concrete chown mechanism.",
+        "Provider identity."
+      ],
+      "manifestProjection": "Workload ownership expectations.",
+      "rationale": "Observable in-sandbox ownership is portable; host/guest mapping and materialization strategy are realization details.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.workspace.required",
+      "family": "workspace",
+      "kind": "scalar",
+      "outcome": "covered",
+      "invariants": [
+        "XRS-016",
+        "CRT-001",
+        "CRT-003"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.workspace-contract",
+        "artifact.binding-slots",
+        "manifest.binding-contracts"
+      ],
+      "portableMeaning": "Determines whether a compatible workspace binding is required at creation.",
+      "valueShape": "Required or optional cardinality.",
+      "omissionSemantics": "Selected profile makes the workspace required.",
+      "forbiddenInputs": [
+        "Concrete binding count or value."
+      ],
+      "manifestProjection": "Workspace binding cardinality.",
+      "rationale": "The Artifact owns the interface cardinality; Create proves it supplies the required binding.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.workspace.protectedPaths",
+      "family": "workspace",
+      "kind": "list",
+      "outcome": "covered",
+      "invariants": [
+        "XRS-020",
+        "LIVE-003"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.protected-paths"
+      ],
+      "portableMeaning": "Narrows selected workspace subpaths to immutable read-only or masked protection modes.",
+      "valueShape": "List of root-relative normalized paths with closed protection mode.",
+      "omissionSemantics": "Selected profile protects .git, .agents, and .codex; otherwise no additional protected subpaths.",
+      "forbiddenInputs": [
+        "Paths outside their root.",
+        "Conflicting modes.",
+        "Writable shadow resources."
+      ],
+      "manifestProjection": "Canonical protected-path contracts.",
+      "rationale": "Static path policy is Artifact-owned; Packet F later covers symlink, hardlink, traversal, and disclosure enforcement.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.workspace.runtimeTransferExclusion",
+      "family": "workspace",
+      "kind": "derived",
+      "outcome": "delegated",
+      "invariants": [
+        "XRS-017",
+        "SUM-010"
+      ],
+      "delegatedPackets": [
+        "E"
+      ],
+      "refinesPacketASurfaces": [
+        "artifact.workspace-contract",
+        "artifact.snapshot-persistence-contract"
+      ],
+      "portableMeaning": "Forbids synchronization, writeback, retention, capture, export, and snapshot timing from becoming workspace fields.",
+      "valueShape": "Closed workspace record with no lifecycle members.",
+      "omissionSemantics": "Runtime caller chooses among supported operations without changing Artifact identity.",
+      "forbiddenInputs": [
+        "workspace.changes.",
+        "workspace.writeback.",
+        "workspace.persistent."
+      ],
+      "manifestProjection": "Workspace contract only; no runtime operation choices.",
+      "rationale": "Packet E owns live retention and result-transfer operations and must preserve the Artifact workspace bounds.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.filesystem.immutableInputs",
+      "family": "filesystem",
+      "kind": "list",
+      "outcome": "covered",
+      "invariants": [
+        "STR-001",
+        "STR-010",
+        "SUM-005",
+        "SUM-006"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.immutable-content"
+      ],
+      "portableMeaning": "Adds typed pinned read-only content at explicit in-sandbox destinations.",
+      "valueShape": "List of immutable-input identities, destinations, and content modes.",
+      "omissionSemantics": "No extra immutable inputs beyond the environment and target base.",
+      "forbiddenInputs": [
+        "Writable access.",
+        "Runtime binding.",
+        "Host/provider identity.",
+        "Lifecycle fields."
+      ],
+      "manifestProjection": "Resolved content identities, digests, destinations, and read-only contract.",
+      "rationale": "Immutable content participates in construction and identity and remains distinct from runtime-writable resources.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.filesystem.mountSlots",
+      "family": "filesystem",
+      "kind": "list",
+      "outcome": "covered",
+      "invariants": [
+        "STR-001",
+        "STR-002",
+        "SUM-007",
+        "CMP-004"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.binding-slots",
+        "manifest.binding-contracts"
+      ],
+      "portableMeaning": "Declares logical mount interfaces and their maximum access without concrete sources.",
+      "valueShape": "List of typed slot identities, source-kind constraints, cardinality, destination, and access ceiling.",
+      "omissionSemantics": "No additional mount interfaces.",
+      "forbiddenInputs": [
+        "Host/provider source.",
+        "Bind, share, overlay, block, or volume implementation choice."
+      ],
+      "manifestProjection": "Complete mount-slot contracts.",
+      "rationale": "Slots preserve one portable binding API while Packet C owns target-specific mount realization.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.filesystem.scratch",
+      "family": "filesystem",
+      "kind": "list",
+      "outcome": "covered",
+      "invariants": [
+        "STR-001",
+        "STR-003",
+        "SUM-002",
+        "SUM-008"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.scratch-storage"
+      ],
+      "portableMeaning": "Declares private writable one-Sandbox scratch roots and references their mandatory hard capacity bounds.",
+      "valueShape": "List of destinations, medium classes, and capacity-bound identities under artifact.resources.",
+      "omissionSemantics": "Selected profile supplies private home and temporary roots; otherwise no scratch.",
+      "forbiddenInputs": [
+        "External identity.",
+        "Actual allocation.",
+        "Restore, retention, writeback, or export."
+      ],
+      "manifestProjection": "Scratch destinations, medium requirements, and hard maxima.",
+      "rationale": "Scratch is ephemeral private state, not a generic persistence or volume abstraction.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.filesystem.volumeSlots",
+      "family": "filesystem",
+      "kind": "list",
+      "outcome": "covered",
+      "invariants": [
+        "STR-001",
+        "STR-002",
+        "SUM-002",
+        "SUM-009"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.binding-slots",
+        "artifact.scratch-storage",
+        "manifest.binding-contracts"
+      ],
+      "portableMeaning": "Declares logical independent-lifecycle volume binding interfaces.",
+      "valueShape": "List of slot identities, destinations, access, cardinality, and capacity bounds.",
+      "omissionSemantics": "No persistent-volume binding interface.",
+      "forbiddenInputs": [
+        "Concrete volume or snapshot identity.",
+        "Provider, attachment, filesystem-driver, or retention choice."
+      ],
+      "manifestProjection": "Complete volume-slot contracts and bounds.",
+      "rationale": "Persistent storage is a runtime-bound resource whose reusable constraints belong to the Artifact.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.filesystem.writableRoot",
+      "family": "filesystem",
+      "kind": "sum-type",
+      "outcome": "covered",
+      "invariants": [
+        "SUM-005",
+        "RES-001",
+        "RES-002"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.immutable-content",
+        "artifact.scratch-storage"
+      ],
+      "portableMeaning": "Explicitly requires immutable root or a private writable root that references a mandatory capacity bound.",
+      "valueShape": "Closed immutable alternative or private writable alternative with a capacity-bound identity under artifact.resources.",
+      "omissionSemantics": "Selected profile uses an immutable base plus declared writable roots; no backend writable layer is inferred.",
+      "forbiddenInputs": [
+        "Unbounded backend writable layer.",
+        "Persistent volume identity."
+      ],
+      "manifestProjection": "Root mutability alternative, scope, and bounds.",
+      "rationale": "Root writability is observable security and storage policy, not an incidental image/runtime default.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.filesystem.topology",
+      "family": "filesystem",
+      "kind": "derived",
+      "outcome": "delegated",
+      "invariants": [
+        "XRS-019",
+        "XRS-020",
+        "OUT-002",
+        "SCT-002"
+      ],
+      "delegatedPackets": [
+        "C",
+        "F"
+      ],
+      "refinesPacketASurfaces": [
+        "artifact.immutable-content",
+        "artifact.protected-paths",
+        "manifest.binding-contracts"
+      ],
+      "portableMeaning": "Normalizes one conflict-free destination graph across workspace, immutable content, writable roots, secrets, and outputs.",
+      "valueShape": "Validated path graph with explicit permitted nested compositions.",
+      "omissionSemantics": "No undeclared target mount or shadowing relationship is permitted.",
+      "forbiddenInputs": [
+        "Duplicate destinations.",
+        "Implicit precedence.",
+        "Protected or immutable shadowing."
+      ],
+      "manifestProjection": "Canonical resource roots, nesting relations, and protection constraints.",
+      "rationale": "Packets C and F must realize and probe the exact graph without target-specific shadowing or traversal bypass.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.network.access",
+      "family": "network",
+      "kind": "sum-type",
+      "outcome": "covered",
+      "invariants": [
+        "SUM-004",
+        "NET-001",
+        "CMP-002"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.network-policy"
+      ],
+      "portableMeaning": "Selects no IP connectivity, unrestricted egress, or controlled egress as a closed authority alternative.",
+      "valueShape": "Closed access-mode enum.",
+      "omissionSemantics": "Selected profile supplies no IP network access; no target network default applies.",
+      "forbiddenInputs": [
+        "Host-network mode as a portable value.",
+        "Mode-dependent hidden target defaults."
+      ],
+      "manifestProjection": "Resolved access mode and hard authority ceiling.",
+      "rationale": "Network authority is observable hard policy even though targets enforce it through different mechanisms.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.network.egress",
+      "family": "network",
+      "kind": "list",
+      "outcome": "covered",
+      "invariants": [
+        "SUM-004",
+        "NET-001",
+        "TGT-005",
+        "CMP-002"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.network-policy"
+      ],
+      "portableMeaning": "Declares typed egress rules and the versioned enforcement capability required to implement them.",
+      "valueShape": "Normalized domain, CIDR, protocol, port, or broker rules with capability requirement.",
+      "omissionSemantics": "No egress rules; controlled mode without rules is invalid unless its closed semantics explicitly deny all.",
+      "forbiddenInputs": [
+        "Provider firewall IDs.",
+        "Unversioned best-effort allowlists."
+      ],
+      "manifestProjection": "Canonical egress rules and enforcement requirement.",
+      "rationale": "Destination policy is portable intent only when the Artifact requires a conforming enforcement implementation.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.network.dns",
+      "family": "network",
+      "kind": "sum-type",
+      "outcome": "covered",
+      "invariants": [
+        "SUM-004",
+        "NET-001"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.network-policy"
+      ],
+      "portableMeaning": "Declares denied, policy-coupled, or explicitly permitted DNS behavior.",
+      "valueShape": "Closed DNS alternative with resolver and enforcement semantics when applicable.",
+      "omissionSemantics": "When IP access is none, omission normalizes to denied. Under unrestricted or controlled IP access, omission is invalid: DNS must explicitly be denied or declare a compatible resolver/enforcement contract. The normalized alternative is always recorded.",
+      "forbiddenInputs": [
+        "Host resolver inheritance.",
+        "DNS enabled under disabled network."
+      ],
+      "manifestProjection": "Resolved DNS alternative and required enforcement capability.",
+      "rationale": "DNS can bypass destination policy and therefore cannot be an implicit consequence of target networking.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.network.ingressPorts",
+      "family": "network",
+      "kind": "list",
+      "outcome": "covered",
+      "invariants": [
+        "STR-002",
+        "NET-001",
+        "LIVE-004"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.network-policy",
+        "artifact.binding-slots",
+        "manifest.binding-contracts"
+      ],
+      "portableMeaning": "Declares logical inbound port interfaces and their protocol/guest-port bounds.",
+      "valueShape": "List of unique port-slot identities, protocol, guest port/range, and exposure ceiling.",
+      "omissionSemantics": "No inbound port interface.",
+      "forbiddenInputs": [
+        "Concrete host port.",
+        "Public URL, domain, or provider endpoint."
+      ],
+      "manifestProjection": "Port-slot contracts and network-policy ceiling.",
+      "rationale": "Artifact declares reusable port interfaces; Create/live operations and operator infrastructure choose concrete exposure.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.network.credentialSlots",
+      "family": "network",
+      "kind": "list",
+      "outcome": "covered",
+      "invariants": [
+        "NET-001",
+        "SCT-001",
+        "STR-004"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.network-policy",
+        "artifact.secret-slots",
+        "manifest.secret-slots"
+      ],
+      "portableMeaning": "References declared secret slots needed by a network policy without embedding credential values or providers.",
+      "valueShape": "List of secret-slot identities and required audience.",
+      "omissionSemantics": "Network policy has no credential dependency.",
+      "forbiddenInputs": [
+        "Credential value or provider reference.",
+        "Undeclared secret slot."
+      ],
+      "manifestProjection": "Secret-slot identities and audience contracts only.",
+      "rationale": "Credential interfaces are declarative, while values and providers remain Create/operator-owned.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.network.hostChannels",
+      "family": "network",
+      "kind": "list",
+      "outcome": "covered",
+      "invariants": [
+        "NET-002",
+        "STR-002",
+        "CMP-004"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.network-policy",
+        "artifact.binding-slots",
+        "manifest.binding-contracts"
+      ],
+      "portableMeaning": "Declares each non-IP host communication interface independently.",
+      "valueShape": "List of typed socket, vsock, bus, display/audio, broker, or descriptor-slot contracts.",
+      "omissionSemantics": "No host communication channel; network mode does not imply one.",
+      "forbiddenInputs": [
+        "Concrete host socket path.",
+        "Provider endpoint.",
+        "Implicit inherited descriptors."
+      ],
+      "manifestProjection": "Typed host-channel contracts and required capabilities.",
+      "rationale": "No IP connectivity does not prove host isolation, so every other channel is explicit and separately bounded.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.resources.cpuConcurrency",
+      "family": "resources",
+      "kind": "object",
+      "outcome": "covered",
+      "invariants": [
+        "STR-003",
+        "RES-001",
+        "RES-002"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.resource-bounds",
+        "manifest.hard-bounds"
+      ],
+      "portableMeaning": "Bounds simultaneously runnable workload CPU concurrency.",
+      "valueShape": "Positive integral minimum and optional hard maximum with workload/sandbox scope.",
+      "omissionSemantics": "No Artifact concurrency bound.",
+      "forbiddenInputs": [
+        "CPU quota or relative weight encoded as concurrency."
+      ],
+      "manifestProjection": "Normalized concurrency range and enforcement scope.",
+      "rationale": "Concurrency is not interchangeable with rate or priority and must be named precisely.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.resources.cpuRate",
+      "family": "resources",
+      "kind": "object",
+      "outcome": "covered",
+      "invariants": [
+        "STR-003",
+        "RES-001",
+        "RES-002"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.resource-bounds",
+        "manifest.hard-bounds"
+      ],
+      "portableMeaning": "Bounds absolute CPU quota separately from optional relative scheduling weight.",
+      "valueShape": "Unit-explicit quota/period range and a separately typed relative-weight constraint.",
+      "omissionSemantics": "No Artifact CPU rate or weight bound.",
+      "forbiddenInputs": [
+        "Treating weight as a ceiling.",
+        "Unscoped generic CPU number."
+      ],
+      "manifestProjection": "Normalized quota and relative-weight constraints with scopes.",
+      "rationale": "Kernel and provider controls distinguish absolute limits from relative weights.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.resources.memoryTotal",
+      "family": "resources",
+      "kind": "object",
+      "outcome": "covered",
+      "invariants": [
+        "STR-003",
+        "RES-001",
+        "RES-002"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.resource-bounds",
+        "manifest.hard-bounds"
+      ],
+      "portableMeaning": "Bounds total Sandbox or VMM memory including runtime/guest overhead.",
+      "valueShape": "Unit-explicit minimum and optional hard maximum with total-sandbox scope.",
+      "omissionSemantics": "No Artifact total-memory bound.",
+      "forbiddenInputs": [
+        "Workload-only memory mislabeled as total.",
+        "Implicit units."
+      ],
+      "manifestProjection": "Normalized total-memory range and scope.",
+      "rationale": "A VM's assigned RAM and a process/container workload ceiling have different observable scopes.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.resources.memoryWorkload",
+      "family": "resources",
+      "kind": "object",
+      "outcome": "covered",
+      "invariants": [
+        "STR-003",
+        "RES-001",
+        "RES-002"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.resource-bounds",
+        "manifest.hard-bounds"
+      ],
+      "portableMeaning": "Optionally bounds workload memory independently from total Sandbox overhead.",
+      "valueShape": "Unit-explicit minimum and optional hard maximum with workload scope.",
+      "omissionSemantics": "No separate workload-memory bound.",
+      "forbiddenInputs": [
+        "Assuming a total VM allocation proves workload enforcement."
+      ],
+      "manifestProjection": "Normalized workload-memory range and enforcement requirement.",
+      "rationale": "Separate scope prevents a host cgroup or guest allocation from being misrepresented as a workload limit.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.resources.swap",
+      "family": "resources",
+      "kind": "sum-type",
+      "outcome": "covered",
+      "invariants": [
+        "STR-003",
+        "RES-001",
+        "RES-002"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.resource-bounds",
+        "manifest.hard-bounds"
+      ],
+      "portableMeaning": "Explicitly denies swap or bounds swap in a named enforcement scope.",
+      "valueShape": "Closed denied alternative or unit-explicit bounded alternative.",
+      "omissionSemantics": "No Artifact swap claim; a target cannot advertise swap semantics unless otherwise required.",
+      "forbiddenInputs": [
+        "Inferring swap from memory.",
+        "Unscoped provider defaults."
+      ],
+      "manifestProjection": "Resolved swap alternative and enforcement scope.",
+      "rationale": "Swap changes memory behavior and must not be silently folded into a memory number.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.resources.tasks",
+      "family": "resources",
+      "kind": "object",
+      "outcome": "covered",
+      "invariants": [
+        "RES-001",
+        "RES-002"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.resource-bounds",
+        "manifest.hard-bounds"
+      ],
+      "portableMeaning": "Bounds workload tasks/threads using an explicitly named counting model.",
+      "valueShape": "Positive integral minimum and optional hard maximum plus task-count semantic version.",
+      "omissionSemantics": "No Artifact task ceiling.",
+      "forbiddenInputs": [
+        "Ambiguous process count when the mechanism counts threads."
+      ],
+      "manifestProjection": "Normalized task bound and counting semantics.",
+      "rationale": "Linux pids controllers count tasks/TIDs, which is not necessarily an application's process count.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.resources.writableRootCapacity",
+      "family": "resources",
+      "kind": "object",
+      "outcome": "covered",
+      "invariants": [
+        "STR-003",
+        "RES-001",
+        "RES-002"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.resource-bounds",
+        "artifact.scratch-storage",
+        "manifest.hard-bounds"
+      ],
+      "portableMeaning": "Bounds the private writable root layer separately from volumes and tmpfs.",
+      "valueShape": "Unit-explicit capacity minimum and optional hard maximum.",
+      "omissionSemantics": "No writable root when filesystem policy is immutable; invalid if a private writable root exists without this bound.",
+      "forbiddenInputs": [
+        "Generic disk size.",
+        "Persistent volume capacity."
+      ],
+      "manifestProjection": "Writable-root capacity range and scope.",
+      "rationale": "Writable root, independent volume, and memory-backed tmpfs consume different resources.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.resources.volumeCapacity",
+      "family": "resources",
+      "kind": "map",
+      "outcome": "covered",
+      "invariants": [
+        "STR-003",
+        "RES-001",
+        "RES-002",
+        "SUM-009"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.resource-bounds",
+        "artifact.binding-slots",
+        "manifest.hard-bounds",
+        "manifest.binding-contracts"
+      ],
+      "portableMeaning": "Sets capacity ranges per logical persistent-volume slot.",
+      "valueShape": "Map from volume-slot identity to unit-explicit range.",
+      "omissionSemantics": "The slot has no Artifact capacity requirement.",
+      "forbiddenInputs": [
+        "Concrete volume size allocation.",
+        "Cross-slot generic disk pool."
+      ],
+      "manifestProjection": "Per-slot normalized capacity bounds.",
+      "rationale": "Artifact constraints attach to logical slots; actual storage allocation is selected at Create/operator admission.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.resources.tmpfsCapacity",
+      "family": "resources",
+      "kind": "map",
+      "outcome": "covered",
+      "invariants": [
+        "STR-003",
+        "RES-001",
+        "RES-002",
+        "SUM-008"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.resource-bounds",
+        "artifact.scratch-storage",
+        "manifest.hard-bounds"
+      ],
+      "portableMeaning": "Sets capacity ranges per memory-backed scratch/tmpfs root.",
+      "valueShape": "Map from scratch identity to unit-explicit range.",
+      "omissionSemantics": "No tmpfs bound when no tmpfs scratch exists; invalid if a tmpfs scratch root exists without its bound.",
+      "forbiddenInputs": [
+        "Treating tmpfs capacity as independent disk."
+      ],
+      "manifestProjection": "Per-scratch normalized tmpfs bounds.",
+      "rationale": "Memory-backed storage participates in both filesystem and memory planning and therefore needs explicit scope.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.resources.io",
+      "family": "resources",
+      "kind": "list",
+      "outcome": "covered",
+      "invariants": [
+        "STR-003",
+        "RES-001",
+        "RES-002"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.resource-bounds",
+        "manifest.hard-bounds"
+      ],
+      "portableMeaning": "Optionally bounds directional byte rate or operation rate for a named storage resource.",
+      "valueShape": "List of resource identity, read/write direction, bytes-per-second or IOPS dimension, minimum, and hard maximum.",
+      "omissionSemantics": "No Artifact I/O performance bound.",
+      "forbiddenInputs": [
+        "Generic I/O number.",
+        "Concrete host device identity."
+      ],
+      "manifestProjection": "Normalized per-resource directional I/O constraints.",
+      "rationale": "Bandwidth and IOPS are different dimensions and target support is capability-gated.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.identity.user",
+      "family": "identity",
+      "kind": "object",
+      "outcome": "covered",
+      "invariants": [
+        "IDN-001",
+        "TGT-007"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.identity-security",
+        "manifest.software-process-metadata"
+      ],
+      "portableMeaning": "Declares the workload-visible user by numeric identity or a name resolved from constructed content.",
+      "valueShape": "Canonical UID/GID or typed name reference with resolution source.",
+      "omissionSemantics": "Selected profile supplies an unprivileged sandbox user.",
+      "forbiddenInputs": [
+        "Host account lookup.",
+        "Provider identity.",
+        "Launcher user."
+      ],
+      "manifestProjection": "Resolved workload UID/GID and optional canonical name.",
+      "rationale": "Workload identity must be deterministic without equating guest/container root to host root.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.identity.groups",
+      "family": "identity",
+      "kind": "list",
+      "outcome": "covered",
+      "invariants": [
+        "IDN-001"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.identity-security",
+        "manifest.software-process-metadata"
+      ],
+      "portableMeaning": "Declares the complete explicit workload supplementary-group set.",
+      "valueShape": "Canonical unique GIDs or typed names resolved from constructed content.",
+      "omissionSemantics": "No supplementary groups.",
+      "forbiddenInputs": [
+        "Ambient host groups.",
+        "Device-injected groups not projected through policy."
+      ],
+      "manifestProjection": "Resolved complete supplementary-group set.",
+      "rationale": "Ambient groups can grant filesystem or device authority and cannot be inherited implicitly.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.identity.hostMappingExclusion",
+      "family": "identity",
+      "kind": "derived",
+      "outcome": "delegated",
+      "invariants": [
+        "IDN-001",
+        "XRS-018"
+      ],
+      "delegatedPackets": [
+        "C"
+      ],
+      "refinesPacketASurfaces": [
+        "artifact.identity-security",
+        "artifact.workspace-contract"
+      ],
+      "portableMeaning": "Separates workload-visible identity from concrete host/guest mappings and launcher privilege.",
+      "valueShape": "Derived prohibition with target mapping requirements.",
+      "omissionSemantics": "Concrete mapping remains a validated realization decision.",
+      "forbiddenInputs": [
+        "Host UID/GID map.",
+        "Outer launcher privilege.",
+        "Provider account."
+      ],
+      "manifestProjection": "Workload identity plus required mapping capability, never a live mapping.",
+      "rationale": "Packet C lowers portable identity into target-specific mappings without changing what the workload observes.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.security.noNewPrivileges",
+      "family": "security",
+      "kind": "scalar",
+      "outcome": "covered",
+      "invariants": [
+        "SEC-001",
+        "TGT-004"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.identity-security"
+      ],
+      "portableMeaning": "Requires or explicitly permits privilege transitions under a closed privilege contract.",
+      "valueShape": "Closed required/compatible enum rather than a backend boolean.",
+      "omissionSemantics": "Selected profile requires no-new-privileges.",
+      "forbiddenInputs": [
+        "Target default.",
+        "Contradictory setuid/file-capability transitions."
+      ],
+      "manifestProjection": "Privilege-transition requirement and conformance identity.",
+      "rationale": "No-new-privileges interacts with executable/file capabilities and must be validated as part of one ceiling.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.security.capabilities",
+      "family": "security",
+      "kind": "object",
+      "outcome": "covered",
+      "invariants": [
+        "STR-006",
+        "SEC-001",
+        "TGT-004"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.identity-security"
+      ],
+      "portableMeaning": "Declares the complete permitted Linux capability ceiling and relationships among capability sets.",
+      "valueShape": "Canonical unique bounding, permitted, effective, inheritable, and ambient set constraints.",
+      "omissionSemantics": "Selected profile permits no Linux capabilities.",
+      "forbiddenInputs": [
+        "Unknown names.",
+        "Ambient/inheritable widening.",
+        "Backend-added defaults."
+      ],
+      "manifestProjection": "Canonical capability ceiling and semantic version.",
+      "rationale": "A single capability list loses important privilege relationships; the Artifact owns the full ceiling.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.security.kernelPolicies",
+      "family": "security",
+      "kind": "list",
+      "outcome": "covered",
+      "invariants": [
+        "STR-006",
+        "SEC-002",
+        "CAP-001"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.identity-security",
+        "artifact.runtime-capabilities",
+        "manifest.capabilities-protocols"
+      ],
+      "portableMeaning": "Requires versioned semantic syscall, filesystem, namespace, or other kernel-surface restrictions without conflating mechanisms.",
+      "valueShape": "List of registered/namespaced policy contract identities, versions, architecture applicability, and strength.",
+      "omissionSemantics": "Only the selected profile's explicit security requirements apply; no mechanism default is claimed.",
+      "forbiddenInputs": [
+        "Opaque unversioned blobs as complete policy.",
+        "Claim that seccomp alone is a sandbox."
+      ],
+      "manifestProjection": "Policy requirement identities, versions, scope, and required conformance.",
+      "rationale": "Seccomp, LSM/Landlock, syd, namespaces, and VM isolation cover different security dimensions.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.security.devices",
+      "family": "security",
+      "kind": "list",
+      "outcome": "covered",
+      "invariants": [
+        "DEV-001",
+        "DEV-002",
+        "TGT-004"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.device-requirements"
+      ],
+      "portableMeaning": "Declares logical device classes and explicitly projects every induced authority change.",
+      "valueShape": "List of class, count, access, isolation, capability, and projected edit contracts.",
+      "omissionSemantics": "Selected profile receives only the documented minimal virtual/pseudo device set.",
+      "forbiddenInputs": [
+        "Live device identity or host path.",
+        "IOMMU group.",
+        "Provider allocation.",
+        "Opaque CDI edits."
+      ],
+      "manifestProjection": "Logical device requirements and projected policy edits.",
+      "rationale": "Concrete allocation is dynamic, while required device semantics and authority ceiling are immutable.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.security.rootFilesystem",
+      "family": "security",
+      "kind": "sum-type",
+      "outcome": "covered",
+      "invariants": [
+        "SUM-005",
+        "TGT-004",
+        "TGT-006"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.identity-security",
+        "artifact.immutable-content",
+        "artifact.scratch-storage"
+      ],
+      "portableMeaning": "Declares the required root-filesystem writability and bound resource relationship.",
+      "valueShape": "Immutable alternative or bounded private writable-root reference.",
+      "omissionSemantics": "Selected profile's complete expansion is explicit; no target image/runtime default.",
+      "forbiddenInputs": [
+        "Unbounded target writable layer.",
+        "Persistent volume alias."
+      ],
+      "manifestProjection": "Resolved root alternative and bound resource identity.",
+      "rationale": "Root writability is a security property as well as a storage resource.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.secretSlots.identity",
+      "family": "secretSlots",
+      "kind": "list",
+      "outcome": "covered",
+      "invariants": [
+        "STR-002",
+        "STR-004",
+        "CMP-004"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.secret-slots",
+        "artifact.binding-slots",
+        "manifest.secret-slots",
+        "manifest.binding-contracts"
+      ],
+      "portableMeaning": "Declares unique logical secret interfaces without values, providers, or lookup expressions.",
+      "valueShape": "List of unique slot identities, required/optional cardinality, and typed delivery alternatives.",
+      "omissionSemantics": "Artifact accepts no secret binding.",
+      "forbiddenInputs": [
+        "Secret/provider reference.",
+        "Provider/account identity.",
+        "Lookup expression.",
+        "Value-derived hash."
+      ],
+      "manifestProjection": "Value-free secret-slot identity and cardinality.",
+      "rationale": "The Artifact owns its secret interface while concrete references and values remain outside immutable inputs.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.secretSlots.delivery",
+      "family": "secretSlots",
+      "kind": "sum-type",
+      "outcome": "covered",
+      "invariants": [
+        "SCT-001",
+        "XRS-004"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.secret-slots",
+        "manifest.secret-slots"
+      ],
+      "portableMeaning": "Permits a non-empty set of explicit file, credential, or environment delivery alternatives.",
+      "valueShape": "Closed alternative set with kind-specific required and forbidden members.",
+      "omissionSemantics": "Invalid for a declared secret slot.",
+      "forbiddenInputs": [
+        "argv delivery.",
+        "Immutable image/store delivery.",
+        "Implicit environment delivery."
+      ],
+      "manifestProjection": "Permitted ephemeral delivery alternatives and their constraints.",
+      "rationale": "Delivery forms have different leakage and ownership semantics and cannot be one generic value.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.secretSlots.destination",
+      "family": "secretSlots",
+      "kind": "object",
+      "outcome": "covered",
+      "invariants": [
+        "STR-001",
+        "SCT-001",
+        "SCT-002"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.secret-slots",
+        "manifest.secret-slots"
+      ],
+      "portableMeaning": "Names the typed ephemeral secret destination and prevents conflicts with ordinary resources.",
+      "valueShape": "File path, credential identity, or reserved environment name according to delivery kind.",
+      "omissionSemantics": "Invalid when the chosen delivery kind requires a destination.",
+      "forbiddenInputs": [
+        "Ordinary environment name.",
+        "Immutable/protected/output path.",
+        "Concrete provider location."
+      ],
+      "manifestProjection": "Destination contract without any bound secret reference.",
+      "rationale": "Static destination conflicts can and must fail before any secret is bound.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.secretSlots.audienceLifetime",
+      "family": "secretSlots",
+      "kind": "object",
+      "outcome": "covered",
+      "invariants": [
+        "STR-003",
+        "SCT-001"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.secret-slots",
+        "manifest.secret-slots"
+      ],
+      "portableMeaning": "Bounds secret audience, file ownership/mode, and maximum delivery lifetime per alternative.",
+      "valueShape": "Audience identifiers, kind-specific ownership/mode, and a required positive finite maximum delivery lifetime.",
+      "omissionSemantics": "A delivery alternative without a maximum delivery lifetime is invalid; only kind-inapplicable ownership or mode members may be absent.",
+      "forbiddenInputs": [
+        "Secret value.",
+        "Provider lifetime/rotation operation.",
+        "Model-visible audience data when classified."
+      ],
+      "manifestProjection": "Secret-safe audience and delivery constraint metadata.",
+      "rationale": "The reusable contract limits delivery, while Create chooses a concrete secret and lifetime inside it.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.secretSlots.snapshotTreatment",
+      "family": "secretSlots",
+      "kind": "sum-type",
+      "outcome": "covered",
+      "invariants": [
+        "SCT-003",
+        "SNP-001"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.secret-slots",
+        "artifact.snapshot-persistence-contract",
+        "manifest.secret-slots",
+        "manifest.snapshot-persistence-requirements"
+      ],
+      "portableMeaning": "Explicitly forbids or permits inclusion for every snapshot class capable of capturing the delivery surface.",
+      "valueShape": "Map from compatible snapshot class to forbidden/permitted treatment.",
+      "omissionSemantics": "Invalid when any required snapshot class can capture the secret surface.",
+      "forbiddenInputs": [
+        "Runtime snapshot timing.",
+        "Provider snapshot ID."
+      ],
+      "manifestProjection": "Secret-safe compatibility matrix between slot and snapshot classes.",
+      "rationale": "Secret and snapshot contracts must agree before runtime; Packet F later verifies no disclosure.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.requirements.capabilities",
+      "family": "requirements",
+      "kind": "list",
+      "outcome": "covered",
+      "invariants": [
+        "STR-006",
+        "CAP-001",
+        "TGT-004"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.runtime-capabilities",
+        "manifest.capabilities-protocols"
+      ],
+      "portableMeaning": "Declares mandatory or optional versioned capability requirements and their dependency closure.",
+      "valueShape": "List of registered/namespaced identities, version constraints, strength, and dependency edges.",
+      "omissionSemantics": "No capability beyond explicit field semantics and selected profile requirements.",
+      "forbiddenInputs": [
+        "Target-name inference.",
+        "Unregistered capability identity or unsatisfiable version constraint.",
+        "Unsatisfied dependency."
+      ],
+      "manifestProjection": "Normalized capability requirements; builder-produced support and conformance facts are separate manifest claims.",
+      "rationale": "Capabilities communicate optional/common-shaped semantics without pretending every target implements them.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.requirements.protocols",
+      "family": "requirements",
+      "kind": "list",
+      "outcome": "delegated",
+      "invariants": [
+        "STR-006",
+        "MAN-002"
+      ],
+      "delegatedPackets": [
+        "C"
+      ],
+      "refinesPacketASurfaces": [
+        "artifact.protocol-requirements",
+        "manifest.capabilities-protocols"
+      ],
+      "portableMeaning": "Declares compatible target, driver, guest-runtime, evidence, and control protocol version requirements.",
+      "valueShape": "List of protocol identity and accepted version range.",
+      "omissionSemantics": "Only mandatory product baseline protocols apply and are materialized in the manifest.",
+      "forbiddenInputs": [
+        "Current driver endpoint or socket.",
+        "Provider API credential."
+      ],
+      "manifestProjection": "Resolved supported protocol identities and versions.",
+      "rationale": "Packet C defines target/guest protocol lowering and loader compatibility without exposing operator endpoints.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.requirements.workspace",
+      "family": "requirements",
+      "kind": "object",
+      "outcome": "covered",
+      "invariants": [
+        "SUM-001",
+        "TGT-001",
+        "TGT-004"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.workspace-contract",
+        "artifact.runtime-capabilities"
+      ],
+      "portableMeaning": "States hard workspace access/materialization capabilities every usable target/profile combination must satisfy.",
+      "valueShape": "Mandatory semantics plus permitted selection matrix.",
+      "omissionSemantics": "Derived completely from the workspace contract.",
+      "forbiddenInputs": [
+        "Concrete binding source.",
+        "Host share mechanism."
+      ],
+      "manifestProjection": "Workspace capability requirements per supported runtime profile.",
+      "rationale": "Requirement projection lets target validation reject unsupported semantics before Create.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.requirements.enforcement",
+      "family": "requirements",
+      "kind": "list",
+      "outcome": "delegated",
+      "invariants": [
+        "TGT-004",
+        "TGT-006",
+        "DRV-001"
+      ],
+      "delegatedPackets": [
+        "C",
+        "F"
+      ],
+      "refinesPacketASurfaces": [
+        "artifact.runtime-capabilities",
+        "artifact.resource-bounds",
+        "manifest.capabilities-protocols",
+        "manifest.hard-bounds"
+      ],
+      "portableMeaning": "Requires each target to enforce every hard network, filesystem, resource, identity, security, and device semantic or reject the Artifact.",
+      "valueShape": "Derived list of semantic requirement identities and evidence classes.",
+      "omissionSemantics": "No hard field is treated as advisory.",
+      "forbiddenInputs": [
+        "Best-effort downgrade.",
+        "Target-name-only capability inference."
+      ],
+      "manifestProjection": "Required enforcement and evidence contracts per target member/profile.",
+      "rationale": "Packet C proves target support and Packet F proves observed enforcement/disclosure at runtime.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.lifecycleRequirements.maximumLifetime",
+      "family": "lifecycleRequirements",
+      "kind": "scalar",
+      "outcome": "covered",
+      "invariants": [
+        "STR-003",
+        "LIF-001"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.lifetime-maximum",
+        "manifest.hard-bounds"
+      ],
+      "portableMeaning": "Optionally sets a positive finite hard maximum lifetime for any Sandbox created from the Artifact.",
+      "valueShape": "Absent or unit-explicit positive finite duration.",
+      "omissionSemantics": "No Artifact-imposed lifetime ceiling; operator policy may still impose a narrower maximum.",
+      "forbiddenInputs": [
+        "Actual Create TTL.",
+        "Idle action.",
+        "Renewal policy.",
+        "Target default."
+      ],
+      "manifestProjection": "Optional immutable lifetime ceiling and explicit absence.",
+      "rationale": "Packet B locks the hard security ceiling; Packet E owns Create selection, renewal, idle behavior, deadlines, and teardown.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.lifecycleRequirements.maximumLifetimeEnforcement",
+      "family": "lifecycleRequirements",
+      "kind": "derived",
+      "outcome": "delegated",
+      "invariants": [
+        "LIF-001",
+        "EXE-007"
+      ],
+      "delegatedPackets": [
+        "E"
+      ],
+      "refinesPacketASurfaces": [
+        "artifact.lifetime-maximum",
+        "manifest.hard-bounds"
+      ],
+      "portableMeaning": "Requires Create resolution, live lifecycle, and Process deadlines to preserve and enforce the immutable Artifact maximum-lifetime ceiling.",
+      "valueShape": "Cross-boundary relation from the optional Artifact ceiling to resolved expiration and remaining-lifetime checks.",
+      "omissionSemantics": "When the Artifact ceiling is absent, this relation introduces no Artifact-derived deadline; operator or Create limits remain independently valid.",
+      "forbiddenInputs": [
+        "Runtime extension beyond the Artifact ceiling.",
+        "Treating an absent Artifact ceiling as a target default."
+      ],
+      "manifestProjection": "Immutable ceiling or explicit absence for Packet E resolution and enforcement.",
+      "rationale": "Packet B validates the static ceiling at A1; Packet E proves that creation, renewal, idle handling, Process deadlines, and teardown preserve it at runtime.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.lifecycleRequirements.snapshot",
+      "family": "lifecycleRequirements",
+      "kind": "object",
+      "outcome": "delegated",
+      "invariants": [
+        "SUM-003",
+        "SNP-001",
+        "SCT-003",
+        "CAP-001"
+      ],
+      "delegatedPackets": [
+        "E"
+      ],
+      "refinesPacketASurfaces": [
+        "artifact.snapshot-persistence-contract",
+        "manifest.snapshot-persistence-requirements"
+      ],
+      "portableMeaning": "Requires a structured snapshot capability class and hard capture compatibility, not one runtime snapshot operation.",
+      "valueShape": "Component set, external-storage/secret/device-state treatment, compatibility domain, and quiescing requirement.",
+      "omissionSemantics": "Artifact does not require snapshot support.",
+      "forbiddenInputs": [
+        "snapshot=true.",
+        "Snapshot timing, destination, retention, or provider ID."
+      ],
+      "manifestProjection": "Complete snapshot capability requirement and compatible runtime profiles.",
+      "rationale": "Packet E defines request/restore lifecycle while the Artifact constrains which implementations are usable.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.lifecycleRequirements.optionalOperations",
+      "family": "lifecycleRequirements",
+      "kind": "list",
+      "outcome": "delegated",
+      "invariants": [
+        "CAP-001",
+        "LIVE-002"
+      ],
+      "delegatedPackets": [
+        "E"
+      ],
+      "refinesPacketASurfaces": [
+        "artifact.runtime-capabilities",
+        "artifact.snapshot-persistence-contract",
+        "manifest.capabilities-protocols"
+      ],
+      "portableMeaning": "Requires versioned support for optional pause/resume, fork, resize, checkpoint, PTY, or other lifecycle capabilities.",
+      "valueShape": "List of capability requirements without operation timing or parameters.",
+      "omissionSemantics": "No optional lifecycle capability is required by the Artifact.",
+      "forbiddenInputs": [
+        "One run's pause, fork, resize, or checkpoint request.",
+        "Provider retention policy."
+      ],
+      "manifestProjection": "Required optional-operation capabilities and conformance versions.",
+      "rationale": "Artifact requirements preserve portability; Packet E owns actual operations and state-dependent validation.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.outputs.declarations",
+      "family": "outputs",
+      "kind": "list",
+      "outcome": "covered",
+      "invariants": [
+        "STR-001",
+        "STR-002",
+        "OUT-001"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.declared-outputs",
+        "manifest.declared-outputs"
+      ],
+      "portableMeaning": "Publishes exact file or directory result conventions eligible for later runtime collection.",
+      "valueShape": "List of unique identity, exact normalized path, and file/directory kind.",
+      "omissionSemantics": "No declared output convention beyond standard Process termination data.",
+      "forbiddenInputs": [
+        "Glob/pattern in v1.",
+        "Export destination.",
+        "Capture timing, selection, retention, or required-existence policy."
+      ],
+      "manifestProjection": "Canonical output identity, path, and kind.",
+      "rationale": "Exact typed paths permit static compatibility checks while runtime caller retains collection choices.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.outputs.filesystemCompatibility",
+      "family": "outputs",
+      "kind": "derived",
+      "outcome": "covered",
+      "invariants": [
+        "OUT-002",
+        "SCT-002",
+        "XRS-020"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.declared-outputs",
+        "manifest.declared-outputs"
+      ],
+      "portableMeaning": "Proves each output is reachable through a writable permitted path without crossing a secret/protected/immutable boundary.",
+      "valueShape": "Validated relation between output and filesystem path graph.",
+      "omissionSemantics": "No output compatibility relation when no outputs exist.",
+      "forbiddenInputs": [
+        "Symlink-based escape promise.",
+        "Secret or protected overlap."
+      ],
+      "manifestProjection": "Output-to-filesystem resource relationship and protection constraints.",
+      "rationale": "Static path compatibility is known at Artifact validation; runtime traversal enforcement remains Packet F.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.outputs.runtimeCollection",
+      "family": "outputs",
+      "kind": "derived",
+      "outcome": "delegated",
+      "invariants": [
+        "OUT-001",
+        "SUM-010"
+      ],
+      "delegatedPackets": [
+        "E"
+      ],
+      "refinesPacketASurfaces": [
+        "artifact.declared-outputs",
+        "manifest.declared-outputs",
+        "artifact.snapshot-persistence-contract"
+      ],
+      "portableMeaning": "Separates eligibility from one operation's selection, strict capture, archive/patch format, export destination, timing, and retention.",
+      "valueShape": "Closed Artifact declarations consumed by typed runtime collection requests.",
+      "omissionSemantics": "Declaring an output neither selects it nor requires it to exist for every run.",
+      "forbiddenInputs": [
+        "Per-run selection.",
+        "Host/provider destination.",
+        "Capture timing or retention."
+      ],
+      "manifestProjection": "Eligible output conventions only.",
+      "rationale": "Packet E owns collection operations; a selected strict collection succeeds completely or fails.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.provenance.requirements",
+      "family": "provenance",
+      "kind": "list",
+      "outcome": "delegated",
+      "invariants": [
+        "STR-006",
+        "CMP-006",
+        "MAN-001"
+      ],
+      "delegatedPackets": [
+        "F"
+      ],
+      "refinesPacketASurfaces": [
+        "artifact.provenance",
+        "manifest.provenance-claims"
+      ],
+      "portableMeaning": "Requests versioned build-provenance schemes and minimum claim classes without authoring verified facts.",
+      "valueShape": "List of registered/namespaced scheme identities, versions, and required claim classes.",
+      "omissionSemantics": "Mandatory identity/content facts remain; no additional provenance scheme is required.",
+      "forbiddenInputs": [
+        "Author-asserted verified claim.",
+        "Runtime execution evidence or retention policy."
+      ],
+      "manifestProjection": "Requested scheme plus builder-emitted facts with verification classification.",
+      "rationale": "Packet F separates author requirements, builder facts, verified claims, explanation data, and safe disclosure.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.provenance.profile",
+      "family": "provenance",
+      "kind": "derived",
+      "outcome": "covered",
+      "invariants": [
+        "XRS-009",
+        "IDT-001",
+        "WIRE-002"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.profile-selection",
+        "artifact.provenance",
+        "manifest.profile-expansion"
+      ],
+      "portableMeaning": "Records pinned profile semantic identity separately from non-hashed selection/explanation origins.",
+      "valueShape": "Pinned source, version, digest, expansion digest, and explanation-origin records.",
+      "omissionSemantics": "Profile provenance is always present because one profile is always selected.",
+      "forbiddenInputs": [
+        "Checkout path or source span in semantic digest.",
+        "Unpinned profile source."
+      ],
+      "manifestProjection": "Hashed semantic profile identity plus non-hashed explanation provenance.",
+      "rationale": "Profile content changes identity, while author spelling and source locations must not.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.provenance.native",
+      "family": "provenance",
+      "kind": "derived",
+      "outcome": "delegated",
+      "invariants": [
+        "NAT-002",
+        "CMP-006",
+        "MAN-001"
+      ],
+      "delegatedPackets": [
+        "D",
+        "F"
+      ],
+      "refinesPacketASurfaces": [
+        "artifact.provenance",
+        "artifact.target-native-construction",
+        "manifest.provenance-claims",
+        "manifest.native-disclosure"
+      ],
+      "portableMeaning": "Associates each byte-changing native handle with its target member without minting unearned conformance claims.",
+      "valueShape": "Typed native-handle identity, affected member relation, and claim classification.",
+      "omissionSemantics": "No native provenance when no native input affects the member.",
+      "forbiddenInputs": [
+        "Raw native secret/provider data.",
+        "Unvalidated built-in conformance claim."
+      ],
+      "manifestProjection": "Safe native identities, affected member, and granular conformance loss/verification.",
+      "rationale": "Packet D proves composition cannot bypass identity; Packet F defines safe claim and disclosure semantics.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.provenance.semanticIdentity",
+      "family": "provenance",
+      "kind": "derived",
+      "outcome": "covered",
+      "invariants": [
+        "WIRE-002",
+        "IDT-001"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.semantic-identity",
+        "manifest.identity-content"
+      ],
+      "portableMeaning": "Identifies one fully expanded validated portable Artifact semantic value.",
+      "valueShape": "Typed canonical semantic digest.",
+      "omissionSemantics": "Always generated after normalization and wire validation.",
+      "forbiddenInputs": [
+        "Formatting, source spans, checkout path, timestamp, selection explicitness, or explanation provenance."
+      ],
+      "manifestProjection": "Typed portable semantic digest.",
+      "rationale": "Semantic identity is content-addressed portable meaning, not a deployment, runtime, or target-member identity.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.provenance.builtIdentities",
+      "family": "provenance",
+      "kind": "derived",
+      "outcome": "delegated",
+      "invariants": [
+        "MAN-001",
+        "IDT-002",
+        "TGT-003"
+      ],
+      "delegatedPackets": [
+        "C",
+        "F"
+      ],
+      "refinesPacketASurfaces": [
+        "artifact.semantic-identity",
+        "manifest.identity-content",
+        "manifest.provenance-claims"
+      ],
+      "portableMeaning": "Separates target-member content identities and Artifact Set identity from the portable semantic digest.",
+      "valueShape": "Typed member digests, member identities, and set identity with verified relations.",
+      "omissionSemantics": "Always generated for every constructed member and Artifact Set.",
+      "forbiddenInputs": [
+        "Interchangeable untyped digest strings.",
+        "Author-minted verified content fact."
+      ],
+      "manifestProjection": "Typed identity domains and verified relationship graph.",
+      "rationale": "Packet C constructs members; Packet F governs verification evidence and safe disclosure.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.targets.enabled",
+      "family": "targets",
+      "kind": "list",
+      "outcome": "covered",
+      "invariants": [
+        "TGT-008",
+        "TGT-009",
+        "TGT-010"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.supported-targets-profiles"
+      ],
+      "portableMeaning": "Names a non-empty unique set of registered/namespaced target families that will produce Artifact Set members.",
+      "valueShape": "Non-empty set of target identities and target-construction contract versions.",
+      "omissionSemantics": "Invalid; no backend target is selected heuristically.",
+      "forbiddenInputs": [
+        "Current host/provider availability.",
+        "Divergent common semantics inside one Artifact."
+      ],
+      "manifestProjection": "Enabled target identities and construction contract versions.",
+      "rationale": "Target families are explicit construction outputs; operator availability is evaluated only when a Sandbox is created.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.targets.runtimeProfiles",
+      "family": "targets",
+      "kind": "map",
+      "outcome": "covered",
+      "invariants": [
+        "STR-006",
+        "CAP-001",
+        "TGT-009"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.supported-targets-profiles",
+        "artifact.runtime-capabilities",
+        "manifest.capabilities-protocols"
+      ],
+      "portableMeaning": "Selects or requires explicit compatible runtime-profile identities for each enabled target without authoring a support or conformance claim.",
+      "valueShape": "Map from target to a non-empty set of registered profile identities and required capability/conformance-version constraints.",
+      "omissionSemantics": "Invalid for an enabled target that has no usable runtime profile.",
+      "forbiddenInputs": [
+        "Current registered driver or host.",
+        "Profile attached to incompatible target."
+      ],
+      "manifestProjection": "Requested target/profile matrix and constraints; builders separately emit support facts and conformance evidence.",
+      "rationale": "Artifact declares which profiles its members must satisfy; member construction proves support, Create selects an advertised proven profile, and Operator maps it to infrastructure.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.targets.commonContract",
+      "family": "targets",
+      "kind": "derived",
+      "outcome": "covered",
+      "invariants": [
+        "TGT-004",
+        "TGT-007",
+        "TGT-010"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.supported-targets-profiles"
+      ],
+      "portableMeaning": "Requires every member of one Artifact Set to preserve identical common environment, workspace, policy, bounds, and requirements.",
+      "valueShape": "Common semantic digest shared by all member construction inputs.",
+      "omissionSemantics": "Always active; intentional divergence requires a separate named Artifact Definition.",
+      "forbiddenInputs": [
+        "Target-specific common-field replacement.",
+        "Intra-Artifact behavioral variants."
+      ],
+      "manifestProjection": "Shared semantic identity and per-member conformance relationship.",
+      "rationale": "Separate named Artifacts are clearer and safer than pretending divergent members are equivalent.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.targets.nativeConstruction",
+      "family": "targets",
+      "kind": "map",
+      "outcome": "delegated",
+      "invariants": [
+        "NAT-001",
+        "NAT-002",
+        "TGT-005",
+        "TGT-007",
+        "CMP-005",
+        "CMP-008"
+      ],
+      "delegatedPackets": [
+        "D"
+      ],
+      "refinesPacketASurfaces": [
+        "artifact.target-native-construction",
+        "manifest.native-disclosure"
+      ],
+      "portableMeaning": "Provides registered versioned Artifact-construction-only native configuration under an enabled target.",
+      "valueShape": "Map from enabled target and native namespace/version to typed pinned handles or target-local construction values.",
+      "omissionSemantics": "Target uses only product-owned construction from common semantics.",
+      "forbiddenInputs": [
+        "Disabled-target data.",
+        "Create/operator/live/Exec/framework fields.",
+        "Unpinned byte-changing native inputs."
+      ],
+      "manifestProjection": "Safe namespace/version, resolved handle identities, affected member, and conformance classification.",
+      "rationale": "Packet D proves native composition and escape hatches cannot bypass common policy or identity.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.targets.memberConstruction",
+      "family": "targets",
+      "kind": "derived",
+      "outcome": "delegated",
+      "invariants": [
+        "MAN-001",
+        "MAN-002",
+        "MAN-004",
+        "TGT-003",
+        "TGT-004",
+        "TGT-006"
+      ],
+      "delegatedPackets": [
+        "C"
+      ],
+      "refinesPacketASurfaces": [
+        "artifact.supported-targets-profiles",
+        "artifact.protocol-requirements",
+        "manifest.identity-content",
+        "manifest.software-process-metadata",
+        "manifest.hard-bounds",
+        "manifest.capabilities-protocols"
+      ],
+      "portableMeaning": "Constructs one target member per distinct target-specific bytes and hard-requirements shape from identical common semantics; byte-identical compatible runtime profiles may share that member.",
+      "valueShape": "Generated typed target-construction input, built member relation, and one-or-more compatible runtime-profile associations.",
+      "omissionSemantics": "No enabled target/profile may silently disappear or downgrade; unsupported construction fails.",
+      "forbiddenInputs": [
+        "Driver generic maps.",
+        "Best-effort policy approximation.",
+        "Backend environment/process defaults."
+      ],
+      "manifestProjection": "Target member identity, content digests, protocols, requirements, and exact common projection.",
+      "rationale": "Packet C owns lowerers and adapters while Packet B fixes every field they must preserve.",
+      "owner": "artifact"
+    },
+    {
+      "id": "artifact.targets.artifactSet",
+      "family": "targets",
+      "kind": "derived",
+      "outcome": "covered",
+      "invariants": [
+        "MAN-001",
+        "IDT-002",
+        "TGT-010"
+      ],
+      "delegatedPackets": [],
+      "refinesPacketASurfaces": [
+        "artifact.semantic-identity",
+        "manifest.identity-content"
+      ],
+      "portableMeaning": "Groups the target members constructed from one common portable semantic Artifact identity.",
+      "valueShape": "Typed Artifact Set identity plus non-empty member map and shared semantic identity.",
+      "omissionSemantics": "Always generated after all requested target members build successfully.",
+      "forbiddenInputs": [
+        "Members with divergent common semantics.",
+        "Untyped digest substitution."
+      ],
+      "manifestProjection": "Artifact Set identity, shared semantic identity, and complete member identity graph.",
+      "rationale": "The flake deterministically produces an Artifact Set; live Sandbox creation consumes one advertised member/profile.",
+      "owner": "artifact"
+    }
+  ]
+}

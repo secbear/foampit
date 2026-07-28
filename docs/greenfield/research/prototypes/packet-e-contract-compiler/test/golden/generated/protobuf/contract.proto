@@ -1,0 +1,528 @@
+syntax = "proto3";
+
+package packet_e.contract.v1;
+
+import "google/protobuf/descriptor.proto";
+
+extend google.protobuf.MessageOptions {
+  string stable_id = 50001;
+  string operation_id = 50002;
+  string carrier_kind = 50003;
+  string schema_stable_id = 50004;
+}
+
+extend google.protobuf.FieldOptions {
+  string variant_stable_id = 50001;
+  string variant_wire_tag = 50002;
+}
+
+message AmbiguityRuntimeUnknown {
+  option (stable_id) = "ambiguity.runtime.unknown";
+}
+
+message CallerRecoveryRetry {
+  option (stable_id) = "caller.recovery.retry";
+}
+
+message CoreResolutionReconcile {
+  option (stable_id) = "core.resolution.reconcile";
+}
+
+message FailureRuntimeProvisioning {
+  option (stable_id) = "failure.runtime.provisioning";
+}
+
+message OutcomeAccepted {
+  option (stable_id) = "outcome.accepted";
+}
+
+message OutcomeObserved {
+  option (stable_id) = "outcome.observed";
+}
+
+message OutcomeProcessAccepted {
+  option (stable_id) = "outcome.process.accepted";
+}
+
+message OutcomeProcessRecovery {
+  option (stable_id) = "outcome.process.recovery";
+}
+
+message OutcomeProcessRejected {
+  option (stable_id) = "outcome.process.rejected";
+}
+
+message OutcomeRecovery {
+  option (stable_id) = "outcome.recovery";
+}
+
+message OutcomeRejected {
+  option (stable_id) = "outcome.rejected";
+}
+
+message ProcessTerminationExited {
+  option (stable_id) = "process.termination.exited";
+}
+
+message ProcessTerminationSignalled {
+  option (stable_id) = "process.termination.signalled";
+}
+
+message ProviderEvidenceObserved {
+  option (stable_id) = "provider.evidence.observed";
+}
+
+message RecoveryIdempotencyExpired {
+  option (stable_id) = "recovery.idempotency.expired";
+}
+
+message RequestInvalidState {
+  option (stable_id) = "request.invalid.state";
+}
+
+message RequestSequenceOutOfRange {
+  option (stable_id) = "request.sequence.out.of.range";
+}
+
+message StateOperationAccepted {
+  option (stable_id) = "state.operation.accepted";
+}
+
+message StateOperationCancelRequested {
+  option (stable_id) = "state.operation.cancel.requested";
+}
+
+message StateOperationCancelled {
+  option (stable_id) = "state.operation.cancelled";
+}
+
+message StateOperationFailed {
+  option (stable_id) = "state.operation.failed";
+}
+
+message StateOperationRunning {
+  option (stable_id) = "state.operation.running";
+}
+
+message StateOperationSucceeded {
+  option (stable_id) = "state.operation.succeeded";
+}
+
+message StateOperationUnknown {
+  option (stable_id) = "state.operation.unknown";
+}
+
+message StateProcessAccepted {
+  option (stable_id) = "state.process.accepted";
+}
+
+message StateProcessRunning {
+  option (stable_id) = "state.process.running";
+}
+
+message StateProcessStarting {
+  option (stable_id) = "state.process.starting";
+}
+
+message StateProcessTerminated {
+  option (stable_id) = "state.process.terminated";
+}
+
+message StateProcessUnknown {
+  option (stable_id) = "state.process.unknown";
+}
+
+message StateSandboxProvisioning {
+  option (stable_id) = "state.sandbox.provisioning";
+}
+
+message StateSandboxRunning {
+  option (stable_id) = "state.sandbox.running";
+}
+
+message StateSandboxStopped {
+  option (stable_id) = "state.sandbox.stopped";
+}
+
+message StateSandboxUnknown {
+  option (stable_id) = "state.sandbox.unknown";
+}
+
+message TransportErrorUnavailable {
+  option (stable_id) = "transport.error.unavailable";
+}
+
+message RegistryAmbiguity {
+  option (stable_id) = "registry.ambiguity";
+
+  oneof variant {
+    AmbiguityRuntimeUnknown ambiguity_runtime_unknown = 1 [(variant_stable_id) = "ambiguity.runtime.unknown", (variant_wire_tag) = "1"];
+  }
+}
+
+message RegistryCallerRecovery {
+  option (stable_id) = "registry.caller.recovery";
+
+  oneof variant {
+    CallerRecoveryRetry caller_recovery_retry = 1 [(variant_stable_id) = "caller.recovery.retry", (variant_wire_tag) = "1"];
+  }
+}
+
+message RegistryCoreResolution {
+  option (stable_id) = "registry.core.resolution";
+
+  oneof variant {
+    CoreResolutionReconcile core_resolution_reconcile = 1 [(variant_stable_id) = "core.resolution.reconcile", (variant_wire_tag) = "1"];
+  }
+}
+
+message RegistryKnownFailure {
+  option (stable_id) = "registry.known.failure";
+
+  oneof variant {
+    FailureRuntimeProvisioning failure_runtime_provisioning = 1 [(variant_stable_id) = "failure.runtime.provisioning", (variant_wire_tag) = "1"];
+  }
+}
+
+message RegistryOperationOutcome {
+  option (stable_id) = "registry.operation.outcome";
+
+  oneof variant {
+    OutcomeAccepted outcome_accepted = 1 [(variant_stable_id) = "outcome.accepted", (variant_wire_tag) = "1"];
+    OutcomeRejected outcome_rejected = 2 [(variant_stable_id) = "outcome.rejected", (variant_wire_tag) = "2"];
+    OutcomeRecovery outcome_recovery = 3 [(variant_stable_id) = "outcome.recovery", (variant_wire_tag) = "3"];
+    OutcomeObserved outcome_observed = 4 [(variant_stable_id) = "outcome.observed", (variant_wire_tag) = "4"];
+  }
+}
+
+message RegistryProcessControlOutcome {
+  option (stable_id) = "registry.process.control.outcome";
+
+  oneof variant {
+    OutcomeProcessAccepted outcome_process_accepted = 1 [(variant_stable_id) = "outcome.process.accepted", (variant_wire_tag) = "1"];
+    OutcomeProcessRejected outcome_process_rejected = 2 [(variant_stable_id) = "outcome.process.rejected", (variant_wire_tag) = "2"];
+    OutcomeProcessRecovery outcome_process_recovery = 3 [(variant_stable_id) = "outcome.process.recovery", (variant_wire_tag) = "3"];
+  }
+}
+
+message RegistryProcessTermination {
+  option (stable_id) = "registry.process.termination";
+
+  oneof variant {
+    ProcessTerminationExited process_termination_exited = 1 [(variant_stable_id) = "process.termination.exited", (variant_wire_tag) = "1"];
+    ProcessTerminationSignalled process_termination_signalled = 2 [(variant_stable_id) = "process.termination.signalled", (variant_wire_tag) = "2"];
+  }
+}
+
+message RegistryProviderEvidence {
+  option (stable_id) = "registry.provider.evidence";
+
+  oneof variant {
+    ProviderEvidenceObserved provider_evidence_observed = 1 [(variant_stable_id) = "provider.evidence.observed", (variant_wire_tag) = "1"];
+  }
+}
+
+message RegistryRecoveryError {
+  option (stable_id) = "registry.recovery.error";
+
+  oneof variant {
+    RecoveryIdempotencyExpired recovery_idempotency_expired = 1 [(variant_stable_id) = "recovery.idempotency.expired", (variant_wire_tag) = "1"];
+  }
+}
+
+message RegistryRequestError {
+  option (stable_id) = "registry.request.error";
+
+  oneof variant {
+    RequestInvalidState request_invalid_state = 1 [(variant_stable_id) = "request.invalid.state", (variant_wire_tag) = "1"];
+    RequestSequenceOutOfRange request_sequence_out_of_range = 2 [(variant_stable_id) = "request.sequence.out.of.range", (variant_wire_tag) = "2"];
+  }
+}
+
+message RegistryTransportError {
+  option (stable_id) = "registry.transport.error";
+
+  oneof variant {
+    TransportErrorUnavailable transport_error_unavailable = 1 [(variant_stable_id) = "transport.error.unavailable", (variant_wire_tag) = "1"];
+  }
+}
+
+message StateOperation {
+  option (stable_id) = "state.operation";
+
+  oneof variant {
+    StateOperationAccepted state_operation_accepted = 1 [(variant_stable_id) = "state.operation.accepted", (variant_wire_tag) = "1"];
+    StateOperationRunning state_operation_running = 2 [(variant_stable_id) = "state.operation.running", (variant_wire_tag) = "2"];
+    StateOperationCancelRequested state_operation_cancel_requested = 3 [(variant_stable_id) = "state.operation.cancel.requested", (variant_wire_tag) = "3"];
+    StateOperationSucceeded state_operation_succeeded = 4 [(variant_stable_id) = "state.operation.succeeded", (variant_wire_tag) = "4"];
+    StateOperationFailed state_operation_failed = 5 [(variant_stable_id) = "state.operation.failed", (variant_wire_tag) = "5"];
+    StateOperationCancelled state_operation_cancelled = 6 [(variant_stable_id) = "state.operation.cancelled", (variant_wire_tag) = "6"];
+    StateOperationUnknown state_operation_unknown = 7 [(variant_stable_id) = "state.operation.unknown", (variant_wire_tag) = "7"];
+  }
+}
+
+message StateProcess {
+  option (stable_id) = "state.process";
+
+  oneof variant {
+    StateProcessAccepted state_process_accepted = 1 [(variant_stable_id) = "state.process.accepted", (variant_wire_tag) = "1"];
+    StateProcessStarting state_process_starting = 2 [(variant_stable_id) = "state.process.starting", (variant_wire_tag) = "2"];
+    StateProcessRunning state_process_running = 3 [(variant_stable_id) = "state.process.running", (variant_wire_tag) = "3"];
+    StateProcessUnknown state_process_unknown = 4 [(variant_stable_id) = "state.process.unknown", (variant_wire_tag) = "4"];
+    StateProcessTerminated state_process_terminated = 5 [(variant_stable_id) = "state.process.terminated", (variant_wire_tag) = "5"];
+  }
+}
+
+message StateSandbox {
+  option (stable_id) = "state.sandbox";
+
+  oneof variant {
+    StateSandboxStopped state_sandbox_stopped = 1 [(variant_stable_id) = "state.sandbox.stopped", (variant_wire_tag) = "1"];
+    StateSandboxProvisioning state_sandbox_provisioning = 2 [(variant_stable_id) = "state.sandbox.provisioning", (variant_wire_tag) = "2"];
+    StateSandboxRunning state_sandbox_running = 3 [(variant_stable_id) = "state.sandbox.running", (variant_wire_tag) = "3"];
+    StateSandboxUnknown state_sandbox_unknown = 4 [(variant_stable_id) = "state.sandbox.unknown", (variant_wire_tag) = "4"];
+  }
+}
+
+message CancelOperationRequestError {
+  option (operation_id) = "operation.cancel.operation";
+  // Current-contract exclusions only; reservations do not prove historical removal.
+
+  oneof variant {
+    RequestInvalidState request_invalid_state = 1 [(variant_stable_id) = "request.invalid.state", (variant_wire_tag) = "1"];
+  }
+  reserved 2;
+  reserved "request_sequence_out_of_range";
+
+}
+
+message CancelOperationRecoveryError {
+  option (operation_id) = "operation.cancel.operation";
+  // Current-contract exclusions only; reservations do not prove historical removal.
+
+  oneof variant {
+    RecoveryIdempotencyExpired recovery_idempotency_expired = 1 [(variant_stable_id) = "recovery.idempotency.expired", (variant_wire_tag) = "1"];
+  }
+
+}
+
+message CancelOperationKnownFailure {
+  option (operation_id) = "operation.cancel.operation";
+  // Current-contract exclusions only; reservations do not prove historical removal.
+  reserved 1;
+  reserved "failure_runtime_provisioning";
+
+}
+
+message CancelOperationAmbiguity {
+  option (operation_id) = "operation.cancel.operation";
+  // Current-contract exclusions only; reservations do not prove historical removal.
+
+  oneof variant {
+    AmbiguityRuntimeUnknown ambiguity_runtime_unknown = 1 [(variant_stable_id) = "ambiguity.runtime.unknown", (variant_wire_tag) = "1"];
+  }
+
+}
+
+message CancelOperationCarrier {
+  option (operation_id) = "operation.cancel.operation";
+  option (stable_id) = "result.existing.operation.observation";
+  option (carrier_kind) = "existingOperationObservation";
+  option (schema_stable_id) = "result.existing.operation.observation";
+}
+
+message CancelOperationOutcome {
+  option (operation_id) = "operation.cancel.operation";
+  // Current-contract exclusions only; reservations do not prove historical removal.
+
+  oneof variant {
+    CancelOperationCarrier accepted = 1 [(variant_stable_id) = "outcome.accepted", (variant_wire_tag) = "1"];
+    CancelOperationRequestError rejected = 2 [(variant_stable_id) = "outcome.rejected", (variant_wire_tag) = "2"];
+    CancelOperationRecoveryError recovery = 3 [(variant_stable_id) = "outcome.recovery", (variant_wire_tag) = "3"];
+  }
+  reserved 4;
+  reserved "observed";
+
+}
+
+
+message StartSandboxRequestError {
+  option (operation_id) = "operation.start.sandbox";
+  // Current-contract exclusions only; reservations do not prove historical removal.
+
+  oneof variant {
+    RequestInvalidState request_invalid_state = 1 [(variant_stable_id) = "request.invalid.state", (variant_wire_tag) = "1"];
+  }
+  reserved 2;
+  reserved "request_sequence_out_of_range";
+
+}
+
+message StartSandboxRecoveryError {
+  option (operation_id) = "operation.start.sandbox";
+  // Current-contract exclusions only; reservations do not prove historical removal.
+
+  oneof variant {
+    RecoveryIdempotencyExpired recovery_idempotency_expired = 1 [(variant_stable_id) = "recovery.idempotency.expired", (variant_wire_tag) = "1"];
+  }
+
+}
+
+message StartSandboxKnownFailure {
+  option (operation_id) = "operation.start.sandbox";
+  // Current-contract exclusions only; reservations do not prove historical removal.
+
+  oneof variant {
+    FailureRuntimeProvisioning failure_runtime_provisioning = 1 [(variant_stable_id) = "failure.runtime.provisioning", (variant_wire_tag) = "1"];
+  }
+
+}
+
+message StartSandboxAmbiguity {
+  option (operation_id) = "operation.start.sandbox";
+  // Current-contract exclusions only; reservations do not prove historical removal.
+
+  oneof variant {
+    AmbiguityRuntimeUnknown ambiguity_runtime_unknown = 1 [(variant_stable_id) = "ambiguity.runtime.unknown", (variant_wire_tag) = "1"];
+  }
+
+}
+
+message StartSandboxCarrier {
+  option (operation_id) = "operation.start.sandbox";
+  option (stable_id) = "result.operation.start.sandbox";
+  option (carrier_kind) = "newDurableOperation";
+  option (schema_stable_id) = "result.operation.start.sandbox";
+}
+
+message StartSandboxOutcome {
+  option (operation_id) = "operation.start.sandbox";
+  // Current-contract exclusions only; reservations do not prove historical removal.
+
+  oneof variant {
+    StartSandboxCarrier accepted = 1 [(variant_stable_id) = "outcome.accepted", (variant_wire_tag) = "1"];
+    StartSandboxRequestError rejected = 2 [(variant_stable_id) = "outcome.rejected", (variant_wire_tag) = "2"];
+    StartSandboxRecoveryError recovery = 3 [(variant_stable_id) = "outcome.recovery", (variant_wire_tag) = "3"];
+  }
+  reserved 4;
+  reserved "observed";
+
+}
+
+
+message WaitOperationRequestError {
+  option (operation_id) = "operation.wait.operation";
+  // Current-contract exclusions only; reservations do not prove historical removal.
+
+  oneof variant {
+    RequestInvalidState request_invalid_state = 1 [(variant_stable_id) = "request.invalid.state", (variant_wire_tag) = "1"];
+  }
+  reserved 2;
+  reserved "request_sequence_out_of_range";
+
+}
+
+message WaitOperationRecoveryError {
+  option (operation_id) = "operation.wait.operation";
+  // Current-contract exclusions only; reservations do not prove historical removal.
+  reserved 1;
+  reserved "recovery_idempotency_expired";
+
+}
+
+message WaitOperationKnownFailure {
+  option (operation_id) = "operation.wait.operation";
+  // Current-contract exclusions only; reservations do not prove historical removal.
+  reserved 1;
+  reserved "failure_runtime_provisioning";
+
+}
+
+message WaitOperationAmbiguity {
+  option (operation_id) = "operation.wait.operation";
+  // Current-contract exclusions only; reservations do not prove historical removal.
+  reserved 1;
+  reserved "ambiguity_runtime_unknown";
+
+}
+
+message WaitOperationCarrier {
+  option (operation_id) = "operation.wait.operation";
+  option (stable_id) = "result.operation.wait.observation";
+  option (carrier_kind) = "observation";
+  option (schema_stable_id) = "result.operation.wait.observation";
+}
+
+message WaitOperationOutcome {
+  option (operation_id) = "operation.wait.operation";
+  // Current-contract exclusions only; reservations do not prove historical removal.
+
+  oneof variant {
+    WaitOperationRequestError rejected = 2 [(variant_stable_id) = "outcome.rejected", (variant_wire_tag) = "2"];
+    WaitOperationCarrier observed = 4 [(variant_stable_id) = "outcome.observed", (variant_wire_tag) = "4"];
+  }
+  reserved 1, 3;
+  reserved "accepted", "recovery";
+
+}
+
+
+message WriteProcessInputRequestError {
+  option (operation_id) = "operation.write.process.input";
+  // Current-contract exclusions only; reservations do not prove historical removal.
+
+  oneof variant {
+    RequestInvalidState request_invalid_state = 1 [(variant_stable_id) = "request.invalid.state", (variant_wire_tag) = "1"];
+    RequestSequenceOutOfRange request_sequence_out_of_range = 2 [(variant_stable_id) = "request.sequence.out.of.range", (variant_wire_tag) = "2"];
+  }
+
+}
+
+message WriteProcessInputRecoveryError {
+  option (operation_id) = "operation.write.process.input";
+  // Current-contract exclusions only; reservations do not prove historical removal.
+
+  oneof variant {
+    RecoveryIdempotencyExpired recovery_idempotency_expired = 1 [(variant_stable_id) = "recovery.idempotency.expired", (variant_wire_tag) = "1"];
+  }
+
+}
+
+message WriteProcessInputKnownFailure {
+  option (operation_id) = "operation.write.process.input";
+  // Current-contract exclusions only; reservations do not prove historical removal.
+  reserved 1;
+  reserved "failure_runtime_provisioning";
+
+}
+
+message WriteProcessInputAmbiguity {
+  option (operation_id) = "operation.write.process.input";
+  // Current-contract exclusions only; reservations do not prove historical removal.
+
+  oneof variant {
+    AmbiguityRuntimeUnknown ambiguity_runtime_unknown = 1 [(variant_stable_id) = "ambiguity.runtime.unknown", (variant_wire_tag) = "1"];
+  }
+
+}
+
+message WriteProcessInputCarrier {
+  option (operation_id) = "operation.write.process.input";
+  option (stable_id) = "result.process.control.receipt";
+  option (carrier_kind) = "processControlReceipt";
+  option (schema_stable_id) = "result.process.control.receipt";
+}
+
+message WriteProcessInputOutcome {
+  option (operation_id) = "operation.write.process.input";
+  // Current-contract exclusions only; reservations do not prove historical removal.
+
+  oneof variant {
+    WriteProcessInputCarrier accepted = 1 [(variant_stable_id) = "outcome.process.accepted", (variant_wire_tag) = "1"];
+    WriteProcessInputRequestError rejected = 2 [(variant_stable_id) = "outcome.process.rejected", (variant_wire_tag) = "2"];
+    WriteProcessInputRecoveryError recovery = 3 [(variant_stable_id) = "outcome.process.recovery", (variant_wire_tag) = "3"];
+  }
+
+}
+
+

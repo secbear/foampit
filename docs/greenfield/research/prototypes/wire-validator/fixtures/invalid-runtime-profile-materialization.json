@@ -1,0 +1,19 @@
+{
+  "schemaVersion": {"major": 0, "minor": 1},
+  "profile": {"selected": "workspace-edit-offline", "selectionIsVisible": true},
+  "environment": {
+    "packages": [{"source": {"kind": "nixInput", "input": "nixpkgs", "attribute": "hello"}}],
+    "variables": {"EDITOR": "vi"},
+    "activation": [["bash"]]
+  },
+  "workspace": {"destination": "/workspace", "materialization": "copy", "allowedMaterializations": ["copy"], "access": "readWrite"},
+  "network": {"mode": "disabled", "egressAllow": [], "hardPolicy": {"allowedDestinations": []}},
+  "secrets": [{"name": "agent-api-token", "delivery": ["environment"]}],
+  "resources": {"memory": {"minimumBytes": 536870912, "maximumBytes": 4294967296}},
+  "targets": ["bubblewrap"],
+  "requiredCapabilities": ["network.disabled", "workspace.copy"],
+  "runtimeProfiles": {
+    "bubblewrap-live": {"target": "bubblewrap", "materializations": ["live"]}
+  },
+  "extensions": {}
+}

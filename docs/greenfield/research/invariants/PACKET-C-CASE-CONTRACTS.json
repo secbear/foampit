@@ -1,0 +1,3020 @@
+{
+  "reviewVersion": 1,
+  "packet": "C",
+  "status": "reviewed",
+  "authority": "Generator-owned exact condition, outcome, phase, authority, step, evidence, and delegation contracts keyed by target realization rule/case identity.",
+  "entries": [
+    {
+      "identity": "TRL-001-COMMON-IDENTITY/all-values",
+      "condition": {
+        "kind": "all-values"
+      },
+      "outcome": "conforming-lowering",
+      "firstSoundPhase": "N0",
+      "deadline": "N1",
+      "authority": {
+        "phase": "N1",
+        "component": "target-member-builder"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "built-content",
+          "component": "target-member-builder"
+        }
+      ],
+      "evidenceClasses": [
+        "canonical-artifact-wire",
+        "target-member-content-digests",
+        "artifact-set-graph-validation",
+        "builder-conformance-evidence-linkage"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-045-CONDITIONAL-CONSTRUCTION-CLAIMS/registered-and-constructible",
+      "condition": {
+        "kind": "constraint-satisfied",
+        "requirement": "Every requested runtime profile, provenance claim, native-construction contract, and member-construction contract is registered, exactly pinned, mutually compatible, and constructible with member-bound support evidence.",
+        "predicateId": "TRL-045-CONDITIONAL-CONSTRUCTION-CLAIMS/registered-and-constructible"
+      },
+      "outcome": "conforming-lowering",
+      "firstSoundPhase": "N0",
+      "deadline": "N1",
+      "authority": {
+        "phase": "N1",
+        "component": "target-member-builder"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "built-content",
+          "component": "target-member-builder"
+        }
+      ],
+      "evidenceClasses": [
+        "registered-construction-closure",
+        "exact-component-and-protocol-pins",
+        "member-bound-builder-support-facts",
+        "construction-conformance-evidence"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-045-CONDITIONAL-CONSTRUCTION-CLAIMS/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "N1",
+      "deadline": "N1",
+      "authority": {
+        "phase": "N1",
+        "component": "target-member-builder"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "build-rejection",
+          "component": "target-member-builder"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-002-SOFTWARE-CONTENT/constructible-platform-content",
+      "condition": {
+        "kind": "constraint-satisfied",
+        "requirement": "Every referenced input resolves reproducibly for the declared Linux workload platform and architecture, and the selected member builder can represent it.",
+        "predicateId": "TRL-002-SOFTWARE-CONTENT/constructible-platform-content"
+      },
+      "outcome": "conforming-lowering",
+      "firstSoundPhase": "N0",
+      "deadline": "N1",
+      "authority": {
+        "phase": "N1",
+        "component": "target-member-builder"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "built-content",
+          "component": "target-member-builder"
+        }
+      ],
+      "evidenceClasses": [
+        "pinned-nix-input-resolution",
+        "cross-platform-closure-build",
+        "member-content-digest"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-002-SOFTWARE-CONTENT/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "N1",
+      "deadline": "N1",
+      "authority": {
+        "phase": "N1",
+        "component": "target-member-builder"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "build-rejection",
+          "component": "target-member-builder"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-003-CLOSED-ENVIRONMENT/all-values",
+      "condition": {
+        "kind": "all-values"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "N0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "manifest-only",
+          "component": "target-member-builder"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "manifest-environment-projection",
+        "effective-process-environment",
+        "ambient-environment-negative-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-004-ACTIVATION/registered-activation-semantics",
+      "condition": {
+        "kind": "constraint-satisfied",
+        "requirement": "Every activation executable is present in built content, has an exact identity, and the selected launcher or guest runtime implements the ordered direct-argv, final-isolation, fail-closed activation protocol.",
+        "predicateId": "TRL-004-ACTIVATION/registered-activation-semantics"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "N0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "manifest-only",
+          "component": "target-member-builder"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "activation-executable-identities",
+        "activation-order-probe",
+        "activation-failure-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-004-ACTIVATION/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "N1",
+      "deadline": "N1",
+      "authority": {
+        "phase": "N1",
+        "component": "target-member-builder"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "build-rejection",
+          "component": "target-member-builder"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-005-DEFAULT-PROCESS/all-values",
+      "condition": {
+        "kind": "all-values"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "N0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "manifest-only",
+          "component": "target-member-builder"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "manifest-default-process-projection",
+        "effective-argv-and-cwd",
+        "backend-default-negative-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-006-BUBBLEWRAP-IDENTITY/representable-user-namespace-identity",
+      "condition": {
+        "kind": "constraint-satisfied",
+        "requirement": "The workload identity resolves from built content and the exact UID, GID, supplementary groups, and host mapping can be installed by the registered user-namespace launcher.",
+        "predicateId": "TRL-006-BUBBLEWRAP-IDENTITY/representable-user-namespace-identity"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "N0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "manifest-only",
+          "component": "target-member-builder"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "built-identity-resolution",
+        "user-namespace-map-evidence",
+        "effective-identity-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-006-BUBBLEWRAP-IDENTITY/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "N1",
+      "deadline": "N1",
+      "authority": {
+        "phase": "N1",
+        "component": "target-member-builder"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "build-rejection",
+          "component": "target-member-builder"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-007-GUEST-AND-OCI-IDENTITY/representable-runtime-identity",
+      "condition": {
+        "kind": "constraint-satisfied",
+        "requirement": "Names resolve from constructed content and the guest runtime or OCI runtime can install the exact UID, GID, and supplementary-group set.",
+        "predicateId": "TRL-007-GUEST-AND-OCI-IDENTITY/representable-runtime-identity"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "N0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "manifest-only",
+          "component": "target-member-builder"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "built-identity-resolution",
+        "runtime-identity-configuration",
+        "effective-identity-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-007-GUEST-AND-OCI-IDENTITY/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "N1",
+      "deadline": "N1",
+      "authority": {
+        "phase": "N1",
+        "component": "target-member-builder"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "build-rejection",
+          "component": "target-member-builder"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-008-BUBBLEWRAP-WORKSPACE/supported-workspace-materialization",
+      "condition": {
+        "kind": "constraint-satisfied",
+        "requirement": "The workspace contract permits an owned copy-in tree, an FD-pinned bind, or another registered Bubblewrap materialization with exact access and ownership semantics.",
+        "predicateId": "TRL-008-BUBBLEWRAP-WORKSPACE/supported-workspace-materialization"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "C0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "C0",
+          "mode": "create-binding",
+          "component": "creation-resolver"
+        },
+        {
+          "phase": "O0",
+          "mode": "operator-binding",
+          "component": "operator-resolver"
+        },
+        {
+          "phase": "H0",
+          "mode": "host-preflight",
+          "component": "operator-preflight"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "workspace-binding-cardinality",
+        "fd-safe-source-resolution",
+        "effective-workspace-mount",
+        "workspace-access-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-008-BUBBLEWRAP-WORKSPACE/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "A1",
+      "deadline": "A1",
+      "authority": {
+        "phase": "A1",
+        "component": "artifact-final-validator"
+      },
+      "steps": [
+        {
+          "phase": "A1",
+          "mode": "build-rejection",
+          "component": "artifact-final-validator"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-009-FIRECRACKER-WORKSPACE/copy-or-prepared-block-workspace",
+      "condition": {
+        "kind": "constraint-satisfied",
+        "requirement": "The required workspace can use copy-in or a prepared block image with exact ownership and access; live host-directory sharing is not mandatory.",
+        "predicateId": "TRL-009-FIRECRACKER-WORKSPACE/copy-or-prepared-block-workspace"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "C0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "C0",
+          "mode": "create-binding",
+          "component": "creation-resolver"
+        },
+        {
+          "phase": "O0",
+          "mode": "operator-binding",
+          "component": "operator-resolver"
+        },
+        {
+          "phase": "H0",
+          "mode": "host-preflight",
+          "component": "operator-preflight"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "workspace-materialization-intersection",
+        "prepared-block-identity",
+        "guest-workspace-mount-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-009-FIRECRACKER-WORKSPACE/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "A1",
+      "deadline": "A1",
+      "authority": {
+        "phase": "A1",
+        "component": "artifact-final-validator"
+      },
+      "steps": [
+        {
+          "phase": "A1",
+          "mode": "build-rejection",
+          "component": "artifact-final-validator"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-010-CLOUD-HYPERVISOR-WORKSPACE/supported-cloud-hypervisor-workspace",
+      "condition": {
+        "kind": "constraint-satisfied",
+        "requirement": "The workspace uses copy-in, prepared block, or qualified virtiofs with shared memory, confined helper, exact ownership translation, and proven read-only/read-write semantics.",
+        "predicateId": "TRL-010-CLOUD-HYPERVISOR-WORKSPACE/supported-cloud-hypervisor-workspace"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "C0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "C0",
+          "mode": "create-binding",
+          "component": "creation-resolver"
+        },
+        {
+          "phase": "O0",
+          "mode": "operator-binding",
+          "component": "operator-resolver"
+        },
+        {
+          "phase": "H0",
+          "mode": "host-preflight",
+          "component": "operator-preflight"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "workspace-materialization-intersection",
+        "virtiofs-helper-confinement",
+        "guest-workspace-access-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-010-CLOUD-HYPERVISOR-WORKSPACE/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "A1",
+      "deadline": "A1",
+      "authority": {
+        "phase": "A1",
+        "component": "artifact-final-validator"
+      },
+      "steps": [
+        {
+          "phase": "A1",
+          "mode": "build-rejection",
+          "component": "artifact-final-validator"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-011-OCI-WORKSPACE/supported-oci-workspace",
+      "condition": {
+        "kind": "constraint-satisfied",
+        "requirement": "The registered OCI driver can realize one permitted copy, bind, or independent-volume materialization with exact access, ownership, propagation, and path-safety semantics.",
+        "predicateId": "TRL-011-OCI-WORKSPACE/supported-oci-workspace"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "C0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "C0",
+          "mode": "create-binding",
+          "component": "creation-resolver"
+        },
+        {
+          "phase": "O0",
+          "mode": "operator-binding",
+          "component": "operator-resolver"
+        },
+        {
+          "phase": "H0",
+          "mode": "host-preflight",
+          "component": "operator-preflight"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "workspace-binding-cardinality",
+        "oci-mount-generation",
+        "effective-workspace-access-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-011-OCI-WORKSPACE/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "A1",
+      "deadline": "A1",
+      "authority": {
+        "phase": "A1",
+        "component": "artifact-final-validator"
+      },
+      "steps": [
+        {
+          "phase": "A1",
+          "mode": "build-rejection",
+          "component": "artifact-final-validator"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-012-BUBBLEWRAP-BINDING-FILESYSTEM/supported-binding-class",
+      "condition": {
+        "kind": "constraint-satisfied",
+        "requirement": "Every required mount or volume source kind, capacity range, access mode, cardinality, ownership relation, and destination is implemented by the selected profile.",
+        "predicateId": "TRL-012-BUBBLEWRAP-BINDING-FILESYSTEM/supported-binding-class"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "C0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "C0",
+          "mode": "create-binding",
+          "component": "creation-resolver"
+        },
+        {
+          "phase": "O0",
+          "mode": "operator-binding",
+          "component": "operator-resolver"
+        },
+        {
+          "phase": "H0",
+          "mode": "host-preflight",
+          "component": "operator-preflight"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "slot-binding-cardinality",
+        "source-identity-and-capacity-preflight",
+        "effective-mount-and-access-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-012-BUBBLEWRAP-BINDING-FILESYSTEM/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "A1",
+      "deadline": "A1",
+      "authority": {
+        "phase": "A1",
+        "component": "artifact-final-validator"
+      },
+      "steps": [
+        {
+          "phase": "A1",
+          "mode": "build-rejection",
+          "component": "artifact-final-validator"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-013-MICROVM-BINDING-FILESYSTEM/supported-binding-class",
+      "condition": {
+        "kind": "constraint-satisfied",
+        "requirement": "Every required mount or volume source kind, capacity range, access mode, cardinality, ownership relation, and destination is implemented by the selected profile.",
+        "predicateId": "TRL-013-MICROVM-BINDING-FILESYSTEM/supported-binding-class"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "C0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "C0",
+          "mode": "create-binding",
+          "component": "creation-resolver"
+        },
+        {
+          "phase": "O0",
+          "mode": "operator-binding",
+          "component": "operator-resolver"
+        },
+        {
+          "phase": "H0",
+          "mode": "host-preflight",
+          "component": "operator-preflight"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "slot-binding-cardinality",
+        "source-identity-and-capacity-preflight",
+        "effective-mount-and-access-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-013-MICROVM-BINDING-FILESYSTEM/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "A1",
+      "deadline": "A1",
+      "authority": {
+        "phase": "A1",
+        "component": "artifact-final-validator"
+      },
+      "steps": [
+        {
+          "phase": "A1",
+          "mode": "build-rejection",
+          "component": "artifact-final-validator"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-014-OCI-BINDING-FILESYSTEM/supported-binding-class",
+      "condition": {
+        "kind": "constraint-satisfied",
+        "requirement": "Every required mount or volume source kind, capacity range, access mode, cardinality, ownership relation, and destination is implemented by the selected profile.",
+        "predicateId": "TRL-014-OCI-BINDING-FILESYSTEM/supported-binding-class"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "C0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "C0",
+          "mode": "create-binding",
+          "component": "creation-resolver"
+        },
+        {
+          "phase": "O0",
+          "mode": "operator-binding",
+          "component": "operator-resolver"
+        },
+        {
+          "phase": "H0",
+          "mode": "host-preflight",
+          "component": "operator-preflight"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "slot-binding-cardinality",
+        "source-identity-and-capacity-preflight",
+        "effective-mount-and-access-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-014-OCI-BINDING-FILESYSTEM/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "A1",
+      "deadline": "A1",
+      "authority": {
+        "phase": "A1",
+        "component": "artifact-final-validator"
+      },
+      "steps": [
+        {
+          "phase": "A1",
+          "mode": "build-rejection",
+          "component": "artifact-final-validator"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-015-FILESYSTEM-TOPOLOGY/all-values",
+      "condition": {
+        "kind": "all-values"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "N0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "manifest-only",
+          "component": "target-member-builder"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "filesystem-topology-digest",
+        "effective-mount-graph",
+        "protected-path-negative-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-016-BUBBLEWRAP-SCRATCH/all-values",
+      "condition": {
+        "kind": "all-values"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "N0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "manifest-only",
+          "component": "target-member-builder"
+        },
+        {
+          "phase": "C0",
+          "mode": "create-binding",
+          "component": "creation-resolver"
+        },
+        {
+          "phase": "O0",
+          "mode": "operator-binding",
+          "component": "operator-resolver"
+        },
+        {
+          "phase": "H0",
+          "mode": "host-preflight",
+          "component": "operator-preflight"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "scratch-manifest-projection",
+        "effective-scratch-mount",
+        "capacity-and-disposal-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-017-MICROVM-SCRATCH/all-values",
+      "condition": {
+        "kind": "all-values"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "N0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "manifest-only",
+          "component": "target-member-builder"
+        },
+        {
+          "phase": "C0",
+          "mode": "create-binding",
+          "component": "creation-resolver"
+        },
+        {
+          "phase": "O0",
+          "mode": "operator-binding",
+          "component": "operator-resolver"
+        },
+        {
+          "phase": "H0",
+          "mode": "host-preflight",
+          "component": "operator-preflight"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "scratch-manifest-projection",
+        "effective-scratch-mount",
+        "capacity-and-disposal-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-018-OCI-SCRATCH/all-values",
+      "condition": {
+        "kind": "all-values"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "N0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "manifest-only",
+          "component": "target-member-builder"
+        },
+        {
+          "phase": "C0",
+          "mode": "create-binding",
+          "component": "creation-resolver"
+        },
+        {
+          "phase": "O0",
+          "mode": "operator-binding",
+          "component": "operator-resolver"
+        },
+        {
+          "phase": "H0",
+          "mode": "host-preflight",
+          "component": "operator-preflight"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "scratch-manifest-projection",
+        "effective-scratch-mount",
+        "capacity-and-disposal-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-019-BUBBLEWRAP-AND-OCI-ROOT/immutable-root",
+      "condition": {
+        "kind": "alternative",
+        "path": "artifact.filesystem.writableRoot",
+        "values": [
+          "immutable"
+        ]
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "N0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "manifest-only",
+          "component": "target-member-builder"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "root-content-identity",
+        "effective-root-mount",
+        "root-write-negative-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-019-BUBBLEWRAP-AND-OCI-ROOT/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "A1",
+      "deadline": "A1",
+      "authority": {
+        "phase": "A1",
+        "component": "artifact-final-validator"
+      },
+      "steps": [
+        {
+          "phase": "A1",
+          "mode": "build-rejection",
+          "component": "artifact-final-validator"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-020-MICROVM-ROOT/representable-root-alternative",
+      "condition": {
+        "kind": "constraint-satisfied",
+        "requirement": "The root is immutable or its private writable layer is backed by an explicitly sized image/device with guest mount semantics and complete outer accounting.",
+        "predicateId": "TRL-020-MICROVM-ROOT/representable-root-alternative"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "N0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "manifest-only",
+          "component": "target-member-builder"
+        },
+        {
+          "phase": "C0",
+          "mode": "create-binding",
+          "component": "creation-resolver"
+        },
+        {
+          "phase": "O0",
+          "mode": "operator-binding",
+          "component": "operator-resolver"
+        },
+        {
+          "phase": "H0",
+          "mode": "host-preflight",
+          "component": "operator-preflight"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "microvm-root-content-and-device-identity",
+        "guest-root-mount-probe",
+        "root-capacity-and-cleanup-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-020-MICROVM-ROOT/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "A1",
+      "deadline": "A1",
+      "authority": {
+        "phase": "A1",
+        "component": "artifact-final-validator"
+      },
+      "steps": [
+        {
+          "phase": "A1",
+          "mode": "build-rejection",
+          "component": "artifact-final-validator"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-021-BUBBLEWRAP-NETWORK/supported-network-contract",
+      "condition": {
+        "kind": "constraint-satisfied",
+        "requirement": "Every requested access mode, egress rule, DNS alternative, ingress slot, credential dependency, and host-channel class has an exact registered enforcement mechanism.",
+        "predicateId": "TRL-021-BUBBLEWRAP-NETWORK/supported-network-contract"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "N0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "manifest-only",
+          "component": "target-member-builder"
+        },
+        {
+          "phase": "C0",
+          "mode": "create-binding",
+          "component": "creation-resolver"
+        },
+        {
+          "phase": "O0",
+          "mode": "operator-binding",
+          "component": "operator-resolver"
+        },
+        {
+          "phase": "H0",
+          "mode": "host-preflight",
+          "component": "operator-preflight"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "effective-network-configuration",
+        "network-positive-and-negative-probes",
+        "undeclared-host-channel-negative-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-021-BUBBLEWRAP-NETWORK/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "A1",
+      "deadline": "A1",
+      "authority": {
+        "phase": "A1",
+        "component": "artifact-final-validator"
+      },
+      "steps": [
+        {
+          "phase": "A1",
+          "mode": "build-rejection",
+          "component": "artifact-final-validator"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-022-MICROVM-NETWORK/supported-network-contract",
+      "condition": {
+        "kind": "constraint-satisfied",
+        "requirement": "Every requested access mode, egress rule, DNS alternative, ingress slot, credential dependency, and host-channel class has an exact registered enforcement mechanism.",
+        "predicateId": "TRL-022-MICROVM-NETWORK/supported-network-contract"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "N0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "manifest-only",
+          "component": "target-member-builder"
+        },
+        {
+          "phase": "C0",
+          "mode": "create-binding",
+          "component": "creation-resolver"
+        },
+        {
+          "phase": "O0",
+          "mode": "operator-binding",
+          "component": "operator-resolver"
+        },
+        {
+          "phase": "H0",
+          "mode": "host-preflight",
+          "component": "operator-preflight"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "effective-network-configuration",
+        "network-positive-and-negative-probes",
+        "undeclared-host-channel-negative-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-022-MICROVM-NETWORK/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "A1",
+      "deadline": "A1",
+      "authority": {
+        "phase": "A1",
+        "component": "artifact-final-validator"
+      },
+      "steps": [
+        {
+          "phase": "A1",
+          "mode": "build-rejection",
+          "component": "artifact-final-validator"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-023-OCI-NETWORK/supported-network-contract",
+      "condition": {
+        "kind": "constraint-satisfied",
+        "requirement": "Every requested access mode, egress rule, DNS alternative, ingress slot, credential dependency, and host-channel class has an exact registered enforcement mechanism.",
+        "predicateId": "TRL-023-OCI-NETWORK/supported-network-contract"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "N0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "manifest-only",
+          "component": "target-member-builder"
+        },
+        {
+          "phase": "C0",
+          "mode": "create-binding",
+          "component": "creation-resolver"
+        },
+        {
+          "phase": "O0",
+          "mode": "operator-binding",
+          "component": "operator-resolver"
+        },
+        {
+          "phase": "H0",
+          "mode": "host-preflight",
+          "component": "operator-preflight"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "effective-network-configuration",
+        "network-positive-and-negative-probes",
+        "undeclared-host-channel-negative-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-023-OCI-NETWORK/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "A1",
+      "deadline": "A1",
+      "authority": {
+        "phase": "A1",
+        "component": "artifact-final-validator"
+      },
+      "steps": [
+        {
+          "phase": "A1",
+          "mode": "build-rejection",
+          "component": "artifact-final-validator"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-024-COMMON-RESOURCE-BOUNDS/representable-resource-bounds",
+      "condition": {
+        "kind": "constraint-satisfied",
+        "requirement": "Every declared minimum and hard maximum maps to an exact target and operator mechanism with the declared sandbox/workload scope.",
+        "predicateId": "TRL-024-COMMON-RESOURCE-BOUNDS/representable-resource-bounds"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "N0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "manifest-only",
+          "component": "target-member-builder"
+        },
+        {
+          "phase": "C0",
+          "mode": "create-binding",
+          "component": "creation-resolver"
+        },
+        {
+          "phase": "O0",
+          "mode": "operator-binding",
+          "component": "operator-resolver"
+        },
+        {
+          "phase": "H0",
+          "mode": "host-preflight",
+          "component": "operator-preflight"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "resource-bound-manifest-projection",
+        "effective-controller-and-vmm-readback",
+        "resource-exhaustion-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-024-COMMON-RESOURCE-BOUNDS/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "A1",
+      "deadline": "A1",
+      "authority": {
+        "phase": "A1",
+        "component": "artifact-final-validator"
+      },
+      "steps": [
+        {
+          "phase": "A1",
+          "mode": "build-rejection",
+          "component": "artifact-final-validator"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-025-BUBBLEWRAP-WORKLOAD-MEMORY/omitted",
+      "condition": {
+        "kind": "field-omitted",
+        "path": "artifact.resources.memoryWorkload"
+      },
+      "outcome": "conforming-lowering",
+      "firstSoundPhase": "N0",
+      "deadline": "N1",
+      "authority": {
+        "phase": "N1",
+        "component": "target-member-builder"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "preserved-no-emission",
+          "component": "target-member-builder"
+        }
+      ],
+      "evidenceClasses": [
+        "manifest-absence",
+        "no-workload-memory-support-claim"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-025-BUBBLEWRAP-WORKLOAD-MEMORY/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "A1",
+      "deadline": "A1",
+      "authority": {
+        "phase": "A1",
+        "component": "artifact-final-validator"
+      },
+      "steps": [
+        {
+          "phase": "A1",
+          "mode": "build-rejection",
+          "component": "artifact-final-validator"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-026-MICROVM-AND-OCI-WORKLOAD-MEMORY/omitted",
+      "condition": {
+        "kind": "field-omitted",
+        "path": "artifact.resources.memoryWorkload"
+      },
+      "outcome": "conforming-lowering",
+      "firstSoundPhase": "N0",
+      "deadline": "N1",
+      "authority": {
+        "phase": "N1",
+        "component": "target-member-builder"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "preserved-no-emission",
+          "component": "target-member-builder"
+        }
+      ],
+      "evidenceClasses": [
+        "manifest-absence",
+        "no-workload-memory-support-claim"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-026-MICROVM-AND-OCI-WORKLOAD-MEMORY/present-and-representable",
+      "condition": {
+        "kind": "constraint-satisfied",
+        "requiresFieldPresence": true,
+        "requirement": "The selected guest runtime or OCI runtime can place only workload processes in a distinct cgroup, keep VMM, launcher, driver, and supervisor overhead outside it, and enforce and prove the exact memory and swap bounds.",
+        "predicateId": "TRL-026-MICROVM-AND-OCI-WORKLOAD-MEMORY/present-and-representable"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "N0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "manifest-only",
+          "component": "target-member-builder"
+        },
+        {
+          "phase": "C0",
+          "mode": "create-binding",
+          "component": "creation-resolver"
+        },
+        {
+          "phase": "O0",
+          "mode": "operator-binding",
+          "component": "operator-resolver"
+        },
+        {
+          "phase": "H0",
+          "mode": "host-preflight",
+          "component": "operator-preflight"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "workload-cgroup-membership",
+        "effective-workload-memory-readback",
+        "workload-memory-exhaustion-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-026-MICROVM-AND-OCI-WORKLOAD-MEMORY/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "A1",
+      "deadline": "A1",
+      "authority": {
+        "phase": "A1",
+        "component": "artifact-final-validator"
+      },
+      "steps": [
+        {
+          "phase": "A1",
+          "mode": "build-rejection",
+          "component": "artifact-final-validator"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-027-BUBBLEWRAP-IO/omitted",
+      "condition": {
+        "kind": "field-omitted",
+        "path": "artifact.resources.io"
+      },
+      "outcome": "conforming-lowering",
+      "firstSoundPhase": "N0",
+      "deadline": "N1",
+      "authority": {
+        "phase": "N1",
+        "component": "target-member-builder"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "preserved-no-emission",
+          "component": "target-member-builder"
+        }
+      ],
+      "evidenceClasses": [
+        "manifest-absence",
+        "no-io-support-claim"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-027-BUBBLEWRAP-IO/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "A1",
+      "deadline": "A1",
+      "authority": {
+        "phase": "A1",
+        "component": "artifact-final-validator"
+      },
+      "steps": [
+        {
+          "phase": "A1",
+          "mode": "build-rejection",
+          "component": "artifact-final-validator"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-028-MICROVM-AND-OCI-IO/omitted",
+      "condition": {
+        "kind": "field-omitted",
+        "path": "artifact.resources.io"
+      },
+      "outcome": "conforming-lowering",
+      "firstSoundPhase": "N0",
+      "deadline": "N1",
+      "authority": {
+        "phase": "N1",
+        "component": "target-member-builder"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "preserved-no-emission",
+          "component": "target-member-builder"
+        }
+      ],
+      "evidenceClasses": [
+        "manifest-absence",
+        "no-io-support-claim"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-028-MICROVM-AND-OCI-IO/dedicated-representable-device",
+      "condition": {
+        "kind": "constraint-satisfied",
+        "requiresFieldPresence": true,
+        "requirement": "Each logical resource maps exclusively to a dedicated verified block device and every requested direction and dimension is exactly representable.",
+        "predicateId": "TRL-028-MICROVM-AND-OCI-IO/dedicated-representable-device"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "N0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "manifest-only",
+          "component": "target-member-builder"
+        },
+        {
+          "phase": "C0",
+          "mode": "create-binding",
+          "component": "creation-resolver"
+        },
+        {
+          "phase": "O0",
+          "mode": "operator-binding",
+          "component": "operator-resolver"
+        },
+        {
+          "phase": "H0",
+          "mode": "host-preflight",
+          "component": "operator-preflight"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "logical-to-device-attribution",
+        "effective-directional-io-readback",
+        "io-throttle-conformance-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-028-MICROVM-AND-OCI-IO/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "A1",
+      "deadline": "A1",
+      "authority": {
+        "phase": "A1",
+        "component": "artifact-final-validator"
+      },
+      "steps": [
+        {
+          "phase": "A1",
+          "mode": "build-rejection",
+          "component": "artifact-final-validator"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-029-BUBBLEWRAP-SECURITY-POLICY/registered-representable-security-contract",
+      "condition": {
+        "kind": "constraint-satisfied",
+        "requirement": "Every capability-set relationship and kernel-policy identity/version/architecture/strength is exactly implemented by the registered profile.",
+        "predicateId": "TRL-029-BUBBLEWRAP-SECURITY-POLICY/registered-representable-security-contract"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "N0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "manifest-only",
+          "component": "target-member-builder"
+        },
+        {
+          "phase": "O0",
+          "mode": "operator-binding",
+          "component": "operator-resolver"
+        },
+        {
+          "phase": "H0",
+          "mode": "host-preflight",
+          "component": "operator-preflight"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "compiled-security-policy-identity",
+        "effective-privilege-and-policy-readback",
+        "security-negative-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-029-BUBBLEWRAP-SECURITY-POLICY/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "N1",
+      "deadline": "N1",
+      "authority": {
+        "phase": "N1",
+        "component": "target-member-builder"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "build-rejection",
+          "component": "target-member-builder"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-030-MICROVM-SECURITY-POLICY/registered-representable-security-contract",
+      "condition": {
+        "kind": "constraint-satisfied",
+        "requirement": "Every capability-set relationship and kernel-policy identity/version/architecture/strength is exactly implemented by the registered profile.",
+        "predicateId": "TRL-030-MICROVM-SECURITY-POLICY/registered-representable-security-contract"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "N0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "manifest-only",
+          "component": "target-member-builder"
+        },
+        {
+          "phase": "O0",
+          "mode": "operator-binding",
+          "component": "operator-resolver"
+        },
+        {
+          "phase": "H0",
+          "mode": "host-preflight",
+          "component": "operator-preflight"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "compiled-security-policy-identity",
+        "effective-privilege-and-policy-readback",
+        "security-negative-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-030-MICROVM-SECURITY-POLICY/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "N1",
+      "deadline": "N1",
+      "authority": {
+        "phase": "N1",
+        "component": "target-member-builder"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "build-rejection",
+          "component": "target-member-builder"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-031-OCI-SECURITY-POLICY/registered-representable-security-contract",
+      "condition": {
+        "kind": "constraint-satisfied",
+        "requirement": "Every capability-set relationship and kernel-policy identity/version/architecture/strength is exactly implemented by the registered profile.",
+        "predicateId": "TRL-031-OCI-SECURITY-POLICY/registered-representable-security-contract"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "N0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "manifest-only",
+          "component": "target-member-builder"
+        },
+        {
+          "phase": "O0",
+          "mode": "operator-binding",
+          "component": "operator-resolver"
+        },
+        {
+          "phase": "H0",
+          "mode": "host-preflight",
+          "component": "operator-preflight"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "compiled-security-policy-identity",
+        "effective-privilege-and-policy-readback",
+        "security-negative-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-031-OCI-SECURITY-POLICY/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "N1",
+      "deadline": "N1",
+      "authority": {
+        "phase": "N1",
+        "component": "target-member-builder"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "build-rejection",
+          "component": "target-member-builder"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-032-BUBBLEWRAP-DEVICES/registered-device-contract",
+      "condition": {
+        "kind": "constraint-satisfied",
+        "requirement": "Every logical device class, count, access, isolation, allocation, and projected authority effect is implemented and evidenced by the selected profile.",
+        "predicateId": "TRL-032-BUBBLEWRAP-DEVICES/registered-device-contract"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "N0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "manifest-only",
+          "component": "target-member-builder"
+        },
+        {
+          "phase": "C0",
+          "mode": "create-binding",
+          "component": "creation-resolver"
+        },
+        {
+          "phase": "O0",
+          "mode": "operator-binding",
+          "component": "operator-resolver"
+        },
+        {
+          "phase": "H0",
+          "mode": "host-preflight",
+          "component": "operator-preflight"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "device-baseline-manifest",
+        "effective-device-inventory",
+        "undeclared-device-negative-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-032-BUBBLEWRAP-DEVICES/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "A1",
+      "deadline": "A1",
+      "authority": {
+        "phase": "A1",
+        "component": "artifact-final-validator"
+      },
+      "steps": [
+        {
+          "phase": "A1",
+          "mode": "build-rejection",
+          "component": "artifact-final-validator"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-033-FIRECRACKER-DEVICES/registered-device-contract",
+      "condition": {
+        "kind": "constraint-satisfied",
+        "requirement": "Every logical device class, count, access, isolation, allocation, and projected authority effect is implemented and evidenced by the selected profile.",
+        "predicateId": "TRL-033-FIRECRACKER-DEVICES/registered-device-contract"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "N0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "manifest-only",
+          "component": "target-member-builder"
+        },
+        {
+          "phase": "C0",
+          "mode": "create-binding",
+          "component": "creation-resolver"
+        },
+        {
+          "phase": "O0",
+          "mode": "operator-binding",
+          "component": "operator-resolver"
+        },
+        {
+          "phase": "H0",
+          "mode": "host-preflight",
+          "component": "operator-preflight"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "device-baseline-manifest",
+        "effective-device-inventory",
+        "undeclared-device-negative-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-033-FIRECRACKER-DEVICES/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "A1",
+      "deadline": "A1",
+      "authority": {
+        "phase": "A1",
+        "component": "artifact-final-validator"
+      },
+      "steps": [
+        {
+          "phase": "A1",
+          "mode": "build-rejection",
+          "component": "artifact-final-validator"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-034-CLOUD-HYPERVISOR-DEVICES/registered-device-contract",
+      "condition": {
+        "kind": "constraint-satisfied",
+        "requirement": "Every logical device class, count, access, isolation, allocation, and projected authority effect is implemented and evidenced by the selected profile.",
+        "predicateId": "TRL-034-CLOUD-HYPERVISOR-DEVICES/registered-device-contract"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "N0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "manifest-only",
+          "component": "target-member-builder"
+        },
+        {
+          "phase": "C0",
+          "mode": "create-binding",
+          "component": "creation-resolver"
+        },
+        {
+          "phase": "O0",
+          "mode": "operator-binding",
+          "component": "operator-resolver"
+        },
+        {
+          "phase": "H0",
+          "mode": "host-preflight",
+          "component": "operator-preflight"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "device-baseline-manifest",
+        "effective-device-inventory",
+        "undeclared-device-negative-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-034-CLOUD-HYPERVISOR-DEVICES/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "A1",
+      "deadline": "A1",
+      "authority": {
+        "phase": "A1",
+        "component": "artifact-final-validator"
+      },
+      "steps": [
+        {
+          "phase": "A1",
+          "mode": "build-rejection",
+          "component": "artifact-final-validator"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-035-OCI-DEVICES/registered-device-contract",
+      "condition": {
+        "kind": "constraint-satisfied",
+        "requirement": "Every logical device class, count, access, isolation, allocation, and projected authority effect is implemented and evidenced by the selected profile.",
+        "predicateId": "TRL-035-OCI-DEVICES/registered-device-contract"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "N0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "manifest-only",
+          "component": "target-member-builder"
+        },
+        {
+          "phase": "C0",
+          "mode": "create-binding",
+          "component": "creation-resolver"
+        },
+        {
+          "phase": "O0",
+          "mode": "operator-binding",
+          "component": "operator-resolver"
+        },
+        {
+          "phase": "H0",
+          "mode": "host-preflight",
+          "component": "operator-preflight"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "device-baseline-manifest",
+        "effective-device-inventory",
+        "undeclared-device-negative-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-035-OCI-DEVICES/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "A1",
+      "deadline": "A1",
+      "authority": {
+        "phase": "A1",
+        "component": "artifact-final-validator"
+      },
+      "steps": [
+        {
+          "phase": "A1",
+          "mode": "build-rejection",
+          "component": "artifact-final-validator"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-036-BUBBLEWRAP-SECRETS/supported-secret-contract",
+      "condition": {
+        "kind": "constraint-satisfied",
+        "requirement": "Every delivery alternative, destination, audience, ownership/mode, lifetime, and snapshot treatment is enforceable by the selected profile.",
+        "predicateId": "TRL-036-BUBBLEWRAP-SECRETS/supported-secret-contract"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "N0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "manifest-only",
+          "component": "target-member-builder"
+        },
+        {
+          "phase": "C0",
+          "mode": "create-binding",
+          "component": "creation-resolver"
+        },
+        {
+          "phase": "O0",
+          "mode": "operator-binding",
+          "component": "operator-resolver"
+        },
+        {
+          "phase": "H0",
+          "mode": "host-preflight",
+          "component": "operator-preflight"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "secret-free-member-scan",
+        "redacted-secret-delivery-evidence",
+        "secret-expiry-and-cleanup-probe",
+        "snapshot-secret-treatment-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-036-BUBBLEWRAP-SECRETS/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "A1",
+      "deadline": "A1",
+      "authority": {
+        "phase": "A1",
+        "component": "artifact-final-validator"
+      },
+      "steps": [
+        {
+          "phase": "A1",
+          "mode": "build-rejection",
+          "component": "artifact-final-validator"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-037-MICROVM-SECRETS/supported-secret-contract",
+      "condition": {
+        "kind": "constraint-satisfied",
+        "requirement": "Every delivery alternative, destination, audience, ownership/mode, lifetime, and snapshot treatment is enforceable by the selected profile.",
+        "predicateId": "TRL-037-MICROVM-SECRETS/supported-secret-contract"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "N0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "manifest-only",
+          "component": "target-member-builder"
+        },
+        {
+          "phase": "C0",
+          "mode": "create-binding",
+          "component": "creation-resolver"
+        },
+        {
+          "phase": "O0",
+          "mode": "operator-binding",
+          "component": "operator-resolver"
+        },
+        {
+          "phase": "H0",
+          "mode": "host-preflight",
+          "component": "operator-preflight"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "secret-free-member-scan",
+        "redacted-secret-delivery-evidence",
+        "secret-expiry-and-cleanup-probe",
+        "snapshot-secret-treatment-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-037-MICROVM-SECRETS/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "A1",
+      "deadline": "A1",
+      "authority": {
+        "phase": "A1",
+        "component": "artifact-final-validator"
+      },
+      "steps": [
+        {
+          "phase": "A1",
+          "mode": "build-rejection",
+          "component": "artifact-final-validator"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-038-OCI-SECRETS/supported-secret-contract",
+      "condition": {
+        "kind": "constraint-satisfied",
+        "requirement": "Every delivery alternative, destination, audience, ownership/mode, lifetime, and snapshot treatment is enforceable by the selected profile.",
+        "predicateId": "TRL-038-OCI-SECRETS/supported-secret-contract"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "N0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "manifest-only",
+          "component": "target-member-builder"
+        },
+        {
+          "phase": "C0",
+          "mode": "create-binding",
+          "component": "creation-resolver"
+        },
+        {
+          "phase": "O0",
+          "mode": "operator-binding",
+          "component": "operator-resolver"
+        },
+        {
+          "phase": "H0",
+          "mode": "host-preflight",
+          "component": "operator-preflight"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "secret-free-member-scan",
+        "redacted-secret-delivery-evidence",
+        "secret-expiry-and-cleanup-probe",
+        "snapshot-secret-treatment-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-038-OCI-SECRETS/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "A1",
+      "deadline": "A1",
+      "authority": {
+        "phase": "A1",
+        "component": "artifact-final-validator"
+      },
+      "steps": [
+        {
+          "phase": "A1",
+          "mode": "build-rejection",
+          "component": "artifact-final-validator"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-039-REQUIREMENT-CLOSURE/satisfied-versioned-requirements",
+      "condition": {
+        "kind": "constraint-satisfied",
+        "requirement": "Every mandatory capability, protocol, dependency edge, enforcement class, and version constraint is implemented and covered by builder-linked conformance evidence.",
+        "predicateId": "TRL-039-REQUIREMENT-CLOSURE/satisfied-versioned-requirements"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "N0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "manifest-only",
+          "component": "target-member-builder"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "requirement-dependency-closure",
+        "builder-support-fact-verification",
+        "versioned-conformance-results"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-039-REQUIREMENT-CLOSURE/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "N1",
+      "deadline": "N1",
+      "authority": {
+        "phase": "N1",
+        "component": "target-member-builder"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "build-rejection",
+          "component": "target-member-builder"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-040-MAXIMUM-LIFETIME/all-values",
+      "condition": {
+        "kind": "all-values"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "N0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "manifest-only",
+          "component": "target-member-builder"
+        },
+        {
+          "phase": "C0",
+          "mode": "create-binding",
+          "component": "creation-resolver"
+        },
+        {
+          "phase": "O0",
+          "mode": "operator-binding",
+          "component": "operator-resolver"
+        },
+        {
+          "phase": "H0",
+          "mode": "host-preflight",
+          "component": "operator-preflight"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "resolved-monotonic-deadline",
+        "complete-process-tree-termination",
+        "lifetime-cleanup-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-041-NONSNAPSHOT-TARGETS/omitted",
+      "condition": {
+        "kind": "field-omitted",
+        "path": "artifact.lifecycleRequirements.snapshot"
+      },
+      "outcome": "conforming-lowering",
+      "firstSoundPhase": "N0",
+      "deadline": "N1",
+      "authority": {
+        "phase": "N1",
+        "component": "target-member-builder"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "preserved-no-emission",
+          "component": "target-member-builder"
+        }
+      ],
+      "evidenceClasses": [
+        "manifest-absence",
+        "no-snapshot-support-claim"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-041-NONSNAPSHOT-TARGETS/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "A1",
+      "deadline": "A1",
+      "authority": {
+        "phase": "A1",
+        "component": "artifact-final-validator"
+      },
+      "steps": [
+        {
+          "phase": "A1",
+          "mode": "build-rejection",
+          "component": "artifact-final-validator"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-042-MICROVM-SNAPSHOT/omitted",
+      "condition": {
+        "kind": "field-omitted",
+        "path": "artifact.lifecycleRequirements.snapshot"
+      },
+      "outcome": "conforming-lowering",
+      "firstSoundPhase": "N0",
+      "deadline": "N1",
+      "authority": {
+        "phase": "N1",
+        "component": "target-member-builder"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "preserved-no-emission",
+          "component": "target-member-builder"
+        }
+      ],
+      "evidenceClasses": [
+        "manifest-absence",
+        "separate-snapshot-capability-facts"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-042-MICROVM-SNAPSHOT/supported-exact-snapshot-class",
+      "condition": {
+        "kind": "constraint-satisfied",
+        "requiresFieldPresence": true,
+        "requirement": "The requested component set, external storage, device state, secret treatment, quiescing, clone identity refresh, and compatibility domain exactly match a proven profile class.",
+        "predicateId": "TRL-042-MICROVM-SNAPSHOT/supported-exact-snapshot-class"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "N0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "manifest-only",
+          "component": "target-member-builder"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "snapshot-component-inventory",
+        "snapshot-compatibility-envelope",
+        "restore-and-identity-refresh-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-042-MICROVM-SNAPSHOT/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "N1",
+      "deadline": "N1",
+      "authority": {
+        "phase": "N1",
+        "component": "target-member-builder"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "build-rejection",
+          "component": "target-member-builder"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-043-OPTIONAL-OPERATIONS/omitted",
+      "condition": {
+        "kind": "field-omitted",
+        "path": "artifact.lifecycleRequirements.optionalOperations"
+      },
+      "outcome": "conforming-lowering",
+      "firstSoundPhase": "N0",
+      "deadline": "N1",
+      "authority": {
+        "phase": "N1",
+        "component": "target-member-builder"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "preserved-no-emission",
+          "component": "target-member-builder"
+        }
+      ],
+      "evidenceClasses": [
+        "manifest-absence",
+        "separate-operation-capability-facts"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-043-OPTIONAL-OPERATIONS/supported-granular-operations",
+      "condition": {
+        "kind": "constraint-satisfied",
+        "requiresFieldPresence": true,
+        "requirement": "Every required operation and semantic version is individually implemented and covered by the selected profile's state-specific conformance suite.",
+        "predicateId": "TRL-043-OPTIONAL-OPERATIONS/supported-granular-operations"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "N0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "manifest-only",
+          "component": "target-member-builder"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "operation-capability-closure",
+        "state-machine-conformance",
+        "operation-authority-negative-probe"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-043-OPTIONAL-OPERATIONS/unsupported",
+      "condition": {
+        "kind": "otherwise"
+      },
+      "outcome": "build-time-unsupported",
+      "firstSoundPhase": "A1",
+      "deadline": "A1",
+      "authority": {
+        "phase": "A1",
+        "component": "artifact-final-validator"
+      },
+      "steps": [
+        {
+          "phase": "A1",
+          "mode": "build-rejection",
+          "component": "artifact-final-validator"
+        }
+      ],
+      "evidenceClasses": [
+        "target-build-rejection",
+        "secret-safe-target-diagnostic"
+      ],
+      "delegatedPackets": []
+    },
+    {
+      "identity": "TRL-044-OUTPUTS/all-values",
+      "condition": {
+        "kind": "all-values"
+      },
+      "outcome": "observed-conformance",
+      "firstSoundPhase": "N0",
+      "deadline": "R1",
+      "authority": {
+        "phase": "R1",
+        "component": "target-conformance-probe"
+      },
+      "steps": [
+        {
+          "phase": "N1",
+          "mode": "manifest-only",
+          "component": "target-member-builder"
+        },
+        {
+          "phase": "D0",
+          "mode": "driver-preparation",
+          "component": "target-driver"
+        },
+        {
+          "phase": "R1",
+          "mode": "post-start-probe",
+          "component": "target-conformance-probe"
+        }
+      ],
+      "evidenceClasses": [
+        "output-filesystem-graph-validation",
+        "effective-output-path-probe",
+        "collection-boundary-probe"
+      ],
+      "delegatedPackets": []
+    }
+  ]
+}

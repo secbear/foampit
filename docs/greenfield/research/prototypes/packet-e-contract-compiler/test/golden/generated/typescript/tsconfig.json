@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "target": "ES2024",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "rootDir": ".",
+    "outDir": "dist",
+    "noEmitOnError": true,
+    "exactOptionalPropertyTypes": true
+  },
+  "include": [
+    "contract.ts",
+    "static-construction.test.ts"
+  ]
+}

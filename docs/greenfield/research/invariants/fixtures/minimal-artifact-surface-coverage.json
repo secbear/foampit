@@ -1,0 +1,22 @@
+{
+  "reviewVersion": 1,
+  "packet": "A",
+  "status": "reviewed",
+  "requiredResources": [
+    "artifact"
+  ],
+  "surfaces": [
+    {
+      "id": "artifact.example",
+      "resource": "artifact",
+      "owner": "artifact",
+      "kind": "field-group",
+      "outcome": "delegated",
+      "invariants": [
+        "INV-001"
+      ],
+      "delegatedPacket": "B",
+      "rationale": "Minimal Packet A Artifact surface for Packet B validator tests."
+    }
+  ]
+}

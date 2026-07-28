@@ -1,0 +1,7 @@
+amends "amendable-base.pkl"
+
+input {
+  environment {
+    variables = Map("AMENDED", "yes")
+  }
+}

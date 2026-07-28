@@ -1,0 +1,817 @@
+{
+  "run_id": "trun_9d40d03960f34b8886c486611d4f6f39",
+  "interaction_id": "trun_9d40d03960f34b8886c486611d4f6f39",
+  "result_url": "https://platform.parallel.ai/play/deep-research/trun_9d40d03960f34b8886c486611d4f6f39",
+  "status": "completed",
+  "output": {
+    "basis": [
+      {
+        "field": "answer",
+        "reasoning": "Reasoning about completeness: The field_answer is a very long, detailed recommendation and analysis covering multiple candidate languages, architecture considerations, upstream references, and a proposed plan. It appears to address the asked topics: comparing Nix modules vs declarative frontends, evaluation of several candidate languages (Nix modules, Nickel, CUE, Dhall, Pkl, Jsonnet, JSON Schema, and a hybrid gate, plus a hypothetical typed DSL), how they handle closed tagged unions, refinement, merge semantics, evaluation vs compile-time checks, import pinning, tooling, and governance, and it includes concrete scenarios (Firecracker virtiofs, network none vs egress, secrets in artifacts, conflicting imports) and a prototype plan. It also discusses ownership boundaries and two-layer architecture (frontend + Nix) and provides a recommendation. However, the user\u2019s excerpts are limited, and some specific factual claims would require exact citations from primary sources to be fully verifiable. The answer appears to be largely complete in scope, but given the breadth and the need for near-verbatim sourcing, some individual factual assertions may not be strictly corroborated by the provided excerpts. Overall, I judge completeness as true, but confidence in every claim\u2019s sourcing is moderate (hence the \u201csupported\u201d field may be contested).",
+        "citations": [
+          {
+            "url": "https://github.com/nickel-lang/nickel",
+            "excerpts": [
+              "GitHub - nickel-lang/nickel: Better configuration for less\nIn a Nickel configuration, contracts act like schemas. You can write your own, mix them with existing contracts, and enforce that your configuration is correct by sprinkling simple type-like annotations."
+            ],
+            "title": "GitHub - nickel-lang/nickel: Better configuration for less"
+          },
+          {
+            "url": "https://docs.rs/crate/nickel-lang-cli/latest",
+            "excerpts": [
+              "nickel-lang-cli 1.15.1 - Docs.rs\nNickel is the cheap configuration language. Its purpose is to automate the generation of static configuration files - think JSON, YAML, XML, or your favorite data representation language - that are then fed to another system."
+            ],
+            "title": "nickel-lang-cli 1.15.1 - Docs.rs"
+          },
+          {
+            "url": "https://nickel-lang.org/user-manual/correctness",
+            "excerpts": [
+              "Correctness in Nickel - nickel-lang.org\nThis apparent dilemma is solved in Nickel through a combination of gradual typing and contracts. Gradual typing is a typing discipline where both static and dynamic typing may be used at will."
+            ],
+            "title": "Correctness in Nickel - nickel-lang.org"
+          },
+          {
+            "url": "https://nickel-lang.org/user-manual/introduction",
+            "excerpts": [
+              "The Nickel User Manual\nNickel is a good fit in any situation where you need to generate a complexconfiguration, be it for a single app, a machine, whole infrastructure, or abuild system. The motivating use cases are in particular: 1. The Nix package manager: Nix is a declarative packagemanager using its own language for specifying packages. Nickel is anevolution of the N"
+            ],
+            "title": "The Nickel User Manual"
+          },
+          {
+            "url": "https://nickel-lang.org/stdlib/std",
+            "excerpts": [
+              "std - Nickel\nDeep evaluation means deep_seq recursively forces the evaluation of the content of records and arrays, as opposed to std.seq."
+            ],
+            "title": "std - Nickel"
+          },
+          {
+            "url": "https://github.com/NixOS/nixpkgs/blob/master/lib/types.nix",
+            "excerpts": [
+              "nixpkgs/lib/types.nix at master\n# Function that merge type declarations. # internal, takes a functor as argument and returns the merged type. # returning null means the type is not mergeable."
+            ],
+            "title": "nixpkgs/lib/types.nix at master"
+          },
+          {
+            "url": "https://nixos.org/manual/nixos/stable",
+            "excerpts": [
+              "NixOS Manual\nThis manual describes how to install, use and extend NixOS, a Linux distribution based on the purely functional package management system Nix, that is composed using modules and packages defined in the Nixpkgs project."
+            ],
+            "title": "NixOS Manual"
+          },
+          {
+            "url": "https://nixos.org/nixos/manual",
+            "excerpts": [
+              "NixOS Manual\nPreface This manual describes how to install, use and extend NixOS, a Linux distribution based on the purely functional package management system Nix, that is composed using modules and packages defined in the Nixpkgs project."
+            ],
+            "title": "NixOS Manual"
+          },
+          {
+            "url": "https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/system/boot/stage-1.nix",
+            "excerpts": [
+              "nixpkgs/nixos/modules/system/boot/stage-1.nix at master\nThis module builds the initial ramdisk, which contains an init # script that performs the first stage of booting the system: it loads # the modules"
+            ],
+            "title": "nixpkgs/nixos/modules/system/boot/stage-1.nix at master"
+          },
+          {
+            "url": "https://wiki.nixos.org/wiki/Nixpkgs",
+            "excerpts": [
+              "Nixpkgs - Official NixOS Wiki\nNixpkgs is the largest repository of Nix packages and NixOS modules. The repository is hosted on GitHub and maintained by the community, with official backing from the NixOS Foundation. To search among available packages and options, see Searching packages."
+            ],
+            "title": "Nixpkgs - Official NixOS Wiki"
+          },
+          {
+            "url": "https://cuelang.org/",
+            "excerpts": [
+              "CUE\ncuelang.org"
+            ],
+            "title": "CUE cuelang.org https://cuelang.org"
+          },
+          {
+            "url": "https://cuelang.org/docs/tour/types/structs",
+            "excerpts": [
+              "Structs | CUE\nCUE\u2019s most important composite type is the struct, also known as a map. Its members are called fields.A regular field (field: value) must be made concrete if"
+            ],
+            "title": "Structs | CUE"
+          },
+          {
+            "url": "http://x.com/CatholicUniErbi?lang=en",
+            "excerpts": [
+              "(last verified: 2026-07-08) Website: http://www.cue.edu.krd."
+            ],
+            "title": null
+          },
+          {
+            "url": "https://cuelang.org/docs",
+            "excerpts": [
+              "Documentation"
+            ],
+            "title": "Documentation"
+          },
+          {
+            "url": "https://cuelang.org/docs/reference/spec",
+            "excerpts": [
+              "The CUE Language Specification\nCUE, pronounced cue or Q, is a general-purpose and strongly typed constraint-based language. It can be used for data templating, data validation, code generation, scripting, and many other applications involving structured data."
+            ],
+            "title": "The CUE Language Specification"
+          },
+          {
+            "url": "https://dhall-lang.org/",
+            "excerpts": [
+              "The Dhall configuration language\nDhall is a programmable configuration language that you can think of as: JSON + functions + types + imports"
+            ],
+            "title": "The Dhall configuration language"
+          },
+          {
+            "url": "https://docs.dhall-lang.org/",
+            "excerpts": [
+              "Dhall Documentation \u2014 Dhall documentation\nThis website\u2019s sources are located in the dhall-lang project docs directory. Please feel free to contribute by clicking the Edit me on GitHub button, located in the top right corner of each page, or use the issue system."
+            ],
+            "title": "Dhall Documentation \u2014 Dhall documentation"
+          },
+          {
+            "url": "https://docs.dhall-lang.org/tutorials/Language-Tour.html",
+            "excerpts": [
+              "Language Tour \u2014 Dhall documentation\nWalk through all language features. This tutorial covers all of the Dhall configuration language features, in a way that is not specific to an integration (like JSON or YAML) or language binding (like Go or Rust)."
+            ],
+            "title": "Language Tour \u2014 Dhall documentation"
+          },
+          {
+            "url": "https://formulae.brew.sh/formula/dhall",
+            "excerpts": [
+              "dhall \u2014 Homebrew Formulae\ndhall. Install command: brew install dhall. Interpreter for the Dhall language. https://dhall-lang.org/. License: BSD-3-Clause. Development: Pull requests."
+            ],
+            "title": "dhall \u2014 Homebrew Formulae"
+          },
+          {
+            "url": "https://hackage-content.haskell.org/package/dhall-1.42.3/docs/Dhall-Tutorial.html",
+            "excerpts": [
+              "Dhall.Tutorial - Haskell\nDhall is a programming language specialized for configuration files. This module contains a tutorial explaining how to author configuration files using this language. You might also be interested in the Language Tour, a Haskell-agnostic tour of Dhall's language features."
+            ],
+            "title": "Dhall.Tutorial - Haskell"
+          },
+          {
+            "url": "https://pkl-lang.org/",
+            "excerpts": [
+              "Apple\u304c\u958b\u767a\u3057\u305f\u8a2d\u5b9a\u30d5\u30a1\u30a4\u30eb\u8a18\u8ff0\u8a00\u8a9e\uff08Pkl\uff09"
+            ],
+            "title": "Pkl \u516c\u5f0f\u30b5\u30a4\u30c8"
+          },
+          {
+            "url": "https://pkl-lang.org/index.html",
+            "excerpts": [
+              "Pkl :: Pkl Docs"
+            ],
+            "title": "Pkl :: Pkl Docs Pkl Docs https://pkl-lang.org"
+          },
+          {
+            "url": "https://pkl-lang.org/main/current/pkl-core/index.html",
+            "excerpts": [
+              "pkl-core Library :: Pkl Docs"
+            ],
+            "title": "pkl-core Library :: Pkl Docs Pkl Docs https://pkl-lang.org \u203a main \u203a current \u203a pkl-..."
+          },
+          {
+            "url": "https://pkl-lang.org/main/current/pkl-cli/index.html",
+            "excerpts": [
+              "CLI :: Pkl Docs\nThe pkl command-line interface (CLI) evaluates Pkl modules and writes their output to the console or a file. For interactive development, the CLI includes a"
+            ],
+            "title": "CLI :: Pkl Docs"
+          },
+          {
+            "url": "https://pkl-lang.org/package-docs/pkl/current/Project/index.html",
+            "excerpts": [
+              "Project (pkl:0.31.1) \u2022 Packages - pkl-lang\nThe URI of the PklProject file. This value is used to resolve relative ... Type Aliases. link. typealias. PackageUri = Uri(startsWith(\"package:\"), hasVersion)."
+            ],
+            "title": "Project (pkl:0.31.1) \u2022 Packages - pkl-lang"
+          },
+          {
+            "url": "https://jsonnet.org/",
+            "excerpts": [
+              "Jsonnet - Jsonnet Configuration Language\nJsonnet is now used by many companies and projects. Jsonnet is not an official Google product (experimental or otherwise), it is just code that happens to be"
+            ],
+            "title": "Jsonnet - Jsonnet Configuration Language"
+          },
+          {
+            "url": "https://jsonnet.org/ref/stdlib.html",
+            "excerpts": [
+              "Standard Library\nThis page describes the functions available in Jsonnet's standard library, i.e. the object implicitly bound to the std variable. Some of the standard"
+            ],
+            "title": "Standard Library"
+          },
+          {
+            "url": "https://github.com/google/jsonnet",
+            "excerpts": [
+              "google/jsonnet - The data templating language\nFor an introduction to Jsonnet and documentation, visit our website. This repository contains the original implementation. You can also try go-jsonnet."
+            ],
+            "title": "google/jsonnet - The data templating language"
+          },
+          {
+            "url": "https://github.com/google/go-jsonnet",
+            "excerpts": [
+              "google/go-jsonnet\nJsonnet can be used on the command line to evaluate Jsonnet input files and produce JSON, Yaml, or other outputs, or it can be used as a library. Security note:"
+            ],
+            "title": "google/go-jsonnet"
+          },
+          {
+            "url": "https://blog.anqou.net/2024/08/jitsonnet",
+            "excerpts": [
+              "Jsonnet \u30b3\u30f3\u30d1\u30a4\u30e9\u3092\u66f8\u3044\u3066 Kubernetes \u306e\u30de\u30cb\u30d5\u30a7\u30b9\u30c8\u751f\u6210 ...\n2024/08/09 \u2014 Jsonnet \u306e\u516c\u5f0f\u306e\u51e6\u7406\u7cfb\u306f\u3001\u5165\u529b\u3059\u308b Jsonnet \u30d7\u30ed\u30b0\u30e9\u30e0\u306b\u3088\u3063\u3066\u306f\u5b9f\u884c\u306b\u3068\u3066\u3082\u6642\u9593\u304c\u304b\u304b\u308b\u5834\u5408\u304c\u3042\u308a\u3001\u305d\u308c\u304c\u696d\u52d9\u4e2d\u306b\u554f\u984c\u306b\u306a\u308b\u3053\u3068\u304c\u3042\u308a\u307e\u3057\u305f\u3002"
+            ],
+            "title": "Jsonnet \u30b3\u30f3\u30d1\u30a4\u30e9\u3092\u66f8\u3044\u3066 Kubernetes \u306e\u30de\u30cb\u30d5\u30a7\u30b9\u30c8\u751f\u6210 ..."
+          },
+          {
+            "url": "https://cuelang.org/docs/tour/types/structs/",
+            "excerpts": [],
+            "title": "Structs | CUE"
+          },
+          {
+            "url": "https://nixos.org/manual/nixos/stable/index.html#sec-writing-modules",
+            "excerpts": [],
+            "title": "NixOS Manual"
+          },
+          {
+            "url": "https://nixos.org/manual/nixos/stable/index.html#sec-options-common-module",
+            "excerpts": [],
+            "title": "NixOS Manual"
+          },
+          {
+            "url": "https://nixos.org/manual/nixos/stable/index.html",
+            "excerpts": [],
+            "title": "NixOS Manual"
+          },
+          {
+            "url": "https://nixos-and-flakes.thiscute.world/other-usage-of-flakes/module-system",
+            "excerpts": [
+              "Module System and Custom Options - NixOS & Flakes Book\nAdditionally, both NixOS and Home Manager are based on Nixpkgs' module system implementation. What is the Purpose of the Module System? As ordinary users, using various options implemented by NixOS and Home Manager based on the module system is sufficient to meet most of our needs. So, what are the benefits of delving into the module system for us?"
+            ],
+            "title": "Module System and Custom Options - NixOS & Flakes Book"
+          },
+          {
+            "url": "http://github.com/NixOS/nixpkgs/blob/master/nixos/modules/services/databases/postgresql.nix",
+            "excerpts": [
+              "ensureUsers = mkOption { type = types . listOf ( types . submodule { options = { name = mkOption { type = types . str ; description = '' Name of the user to ensure. '' ; } ; ensureDBOwnership = mkOption { type = types . bool ; default = false ; description = '' Grants the user ownership to a database with the same name. This database must be defined manually in . '' ; } ; ensureClauses = mkOption { description = '' An attrset of clauses to grant to the user. Under the hood this uses the [ALTER USER syntax](https://www.postgresql.org/docs/current/sql-alteruser.html) for each attrName where the attrValue is true in the attrSet: `ALTER USER user.name WITH attrName` '' ; example = literalExpression '' { superuser = true; createrole = true; createdb = true; connection_limit = 5; SCRAM-SHA-256 hashed password for \"password\" Generate hashes using PostgreSQL or a dedicated script rather than storing passwords in plain text. password = \"SCRAM-SHA-256$4096:SZEJF5Si4QZ6l4fedrZZWQ==$6u3PWVcz+dts+NdpByPIjKa4CaSnoXGG3M2vpo76bVU=:WSZ0iGUCmVtKYVvNX0pFOp/60IgsdJ+90Y67Eun+QE0=\"; } '' ; default = { } ; type = types . submodule { freeformType = types . attrsOf ( types . oneOf [ types . str types . int types . bool ] ) ; } ; } ; } ; } ) ; default = [ ] ; description = '' Ensures that the specified users exist. The PostgreSQL users will be identified using peer authentication. This authenticates the Unix user with the same name only, and that without the need for a password. This option will never delete existing users or remove DB ownership of databases once granted with `ensureDBOwnership = true;`. This means that this must be cleaned up manually when changing after changing the config in here. '' ; example = literalExpression '' [ { name = \"nextcloud\"; } { name = \"superuser\"; ensureDBOwnership = true; } ] '' ; } ;\noptionalString ( cfg . ensureDatabases != [ ] ) '' ${ concatMapStrings ( database : '' psql -tAc \"SELECT 1 FROM pg_database WHERE datname = ' ${ database } '\" | grep -q 1 || psql -tAc 'CREATE DATABASE \" ${ database } \"' '' ) cfg . ensureDatabases } ''\nservices . postgresql . dataDir = mkDefault \"/var/lib/postgresql/ ${ cfg . package . psqlSchema } \" ; services . postgresql . authentication = mkMerge [ ( mkBefore \"# Generated file; do not edit!\" ) ( mkAfter '' default value of services.postgresql.authentication local all postgres peer map=postgres local all all peer host all all 127.0.0.1/32 md5 host all all ::1/128 md5 '' ) ] ;"
+            ],
+            "title": "nixpkgs/nixos/modules/services/databases/postgresql.nix at master \u00b7 NixOS/nixpkgs \u00b7 GitHub"
+          },
+          {
+            "url": "https://wiki.nixos.org/wiki/NixOS_search",
+            "excerpts": [
+              "NixOS search - Official NixOS Wiki\nFor each option, you are presented with a description, example and the default setting. There is also a link to the source code of the module that defines the option."
+            ],
+            "title": "NixOS search - Official NixOS Wiki"
+          },
+          {
+            "url": "https://discourse.nixos.org/t/are-there-better-alternatives-to-the-impermanence-module/64701",
+            "excerpts": [
+              "Are there better alternatives to the impermanence module?\nFuseFS, Overlays, merging and commits are cool if you need exactly this features, otherwise you pay a high price when it comes to performance, stability and edge cases."
+            ],
+            "title": "Are there better alternatives to the impermanence module?"
+          },
+          {
+            "url": "http://search.nixos.org/",
+            "excerpts": [
+              "Search through thousands of packages, NixOS configuration options, and flakes available in the Nix ecosystem."
+            ],
+            "title": "NixOS Search - Packages"
+          },
+          {
+            "url": "https://discourse.nixos.org/t/a-module-or-config-file-that-adds-config-options-system-packages-and-python-packages/21705",
+            "excerpts": [
+              "A module (or config file) that adds config options, system ...\n15 sep. 2022 \u2014 I'd like to make a separate file that contains all sway configuration in a single separate file (probably would be a module, but I'm open to other solutions)"
+            ],
+            "title": "A module (or config file) that adds config options, system ..."
+          },
+          {
+            "url": "https://nixos.wiki/wiki/flakes",
+            "excerpts": [
+              "Flakes - NixOS Wiki\nA flake refers to a file-system tree whose root directory contains the Nix file specification called flake.nix. An installation may contain any number of flakes, independent of each other or even call each other. The contents of flake.nix file follow the uniform naming schema for expressing packages and dependencies on Nix."
+            ],
+            "title": "Flakes - NixOS Wiki"
+          },
+          {
+            "url": "https://www.reddit.com/r/NixOS/comments/1kdephe/nixos_modules_explained",
+            "excerpts": [
+              "NixOS Modules Explained\nKey Takeaways: A NixOS module is typically a function that can include config , lib , and pkgs , but it doesn't require them. The ... argument"
+            ],
+            "title": "NixOS Modules Explained"
+          },
+          {
+            "url": "https://wiki.nixos.org/wiki/NixOS_system_configuration",
+            "excerpts": [
+              "NixOS system configuration - Official NixOS Wiki\nThis page serves as an overview of how to work with and manage NixOS system configurations. For an introduction to declarative configuration, see the Overview of the NixOS Linux distribution#Declarative Configuration and the NixOS official manual."
+            ],
+            "title": "NixOS system configuration - Official NixOS Wiki"
+          },
+          {
+            "url": "https://deepwiki.com/apple/pkl/3.1-evaluation-commands",
+            "excerpts": [
+              "Evaluation Commands | apple/pkl | DeepWiki\nThe pkl eval command is the primary interface for evaluating Pkl modules and producing output in various formats. This page covers command-line options that control evaluation behavior, security settings, output formats, and other runtime parameters."
+            ],
+            "title": "Evaluation Commands | apple/pkl | DeepWiki"
+          },
+          {
+            "url": "https://www.reddit.com/r/rust/comments/1ay7i3a/pkl_apples_open_source_project",
+            "excerpts": [
+              "Pkl Apple's Open Source Project : r/rust\nIt main aim is to create configuration files rather than dto's application. Thought it currently supports creation of object in only 4 languages Java, Go,"
+            ],
+            "title": "Pkl Apple's Open Source Project : r/rust"
+          },
+          {
+            "url": "https://apps.apple.com/us/app/pkl-app/id6759809423",
+            "excerpts": [
+              "PKL App - App Store - Apple\n3\uc77c \uc804 \u2014 PKL is the all-in-one pickleball platform built for players and facilities. For Players Book courts at your home facility with a live calendar view Join"
+            ],
+            "title": "PKL App - App Store - Apple"
+          },
+          {
+            "url": "https://cuelang.org/docs/tour/types/disjunctions",
+            "excerpts": [
+              "Disjunctions - CUE\nA disjunction allows values that unify successfully with at least one of its elements. When a value constrained by a disjunction is exported it must unify successfully with only one of the disjunction\u2019s elements."
+            ],
+            "title": "Disjunctions - CUE"
+          },
+          {
+            "url": "https://study.com/academy/lesson/logical-math-connectors-conjunctions-and-disjunctions.html",
+            "excerpts": [
+              "Conjunction vs. Disjunction in Math | Overview & ...\nA disjunction, on the other hand, is when two statements are connected with an 'or.' The combined compound statement in this case can be labeled as true when"
+            ],
+            "title": "Conjunction vs. Disjunction in Math | Overview & ..."
+          },
+          {
+            "url": "https://www.varsitytutors.com/hotmath/hotmath_help/topics/disjunction",
+            "excerpts": [
+              "In logic, a disjunction is a compound statement formed by joining two propositions with the word \"or\". Symbolized as"
+            ],
+            "title": "In logic, a disjunction is a compound statement formed by joining two propositions with the word \"or\". Symbolized as"
+          },
+          {
+            "url": "https://github.com/dhall-lang/dhall-lang/issues/335",
+            "excerpts": [
+              "Store version separately from hash in integrity checks #335\nAs it stands, the version (of the standard) is an input to the sha256 hash which is generated for and used in the semantic integrity checks. It makes sense to invalidate hashes when the version cha"
+            ],
+            "title": "Store version separately from hash in integrity checks #335"
+          },
+          {
+            "url": "https://github.com/dhall-lang/dhall-lang/blob/master/standard/binary.md",
+            "excerpts": [
+              "dhall-lang/standard/binary.md at master \u00b7 dhall-lang/dhall-lang\nDhall's import system requires a standard way to convert expressions to and from a binary representation, for two reasons: Users can import expressions protected by a \"semantic integrity check\", which is a SHA-256 hash of the binary representation of an expression's normal form Interpreters can locally cache imported expressions if the user protects them with a semantic integrity check. The"
+            ],
+            "title": "dhall-lang/standard/binary.md at master \u00b7 dhall-lang/dhall-lang"
+          },
+          {
+            "url": "https://eakondratiev.github.io/sha256.htm",
+            "excerpts": [
+              "SHA-256 File Integrity Checker -- Free Online Tool\nValidate your downloads quickly \u2014 check a file\u2019s integrity with a SHA\u2011256 checksum, or create hashes for any files using this fast, easy tool."
+            ],
+            "title": "SHA-256 File Integrity Checker -- Free Online Tool"
+          },
+          {
+            "url": "https://hackage-content.haskell.org/package/dhall-1.42.3/docs/Dhall-TypeCheck.html",
+            "excerpts": [
+              "Dhall.TypeCheck - hackage-content.haskell.org\nConvert a TypeMessage to short- and long-form ErrorMessages. Output of prettyTypeMessage, containing short- and long-form error messages."
+            ],
+            "title": "Dhall.TypeCheck - hackage-content.haskell.org"
+          },
+          {
+            "url": "https://softwarefoundations.cis.upenn.edu/plf-current/RecordSub.html",
+            "excerpts": [
+              "RecordSub: Subtyping with Records - Software Foundations\nIn this chapter, we combine two significant extensions of the pure STLC -- records (from chapter Records) and subtyping (from chapter Sub) -- and explore"
+            ],
+            "title": "RecordSub: Subtyping with Records - Software Foundations"
+          },
+          {
+            "url": "https://jsonnet.org/articles/output-formats.html",
+            "excerpts": [
+              "Output Formats\nAnother option is to write your config as a protocol buffer and deserialize Jsonnet's JSON output using the proto3 canonical JSON representation. ... JSON data"
+            ],
+            "title": "Output Formats"
+          },
+          {
+            "url": "http://github.com/google/go-jsonnet",
+            "excerpts": [
+              "Make sure you build a jsonnet binary prior to making changes. go build -o jsonnet-old ./cmd/jsonnet."
+            ],
+            "title": "google/go-jsonnet"
+          },
+          {
+            "url": "https://jsonnet.org/articles/design.html",
+            "excerpts": [
+              "Jsonnet - Language Design\nThere are ideological and practical reasons for designing Jsonnet as a pure functional language. On the practical side, pure functional languages have no side-effects, which (together with determinism) gives us the property of hermeticity."
+            ],
+            "title": "Jsonnet - Language Design"
+          },
+          {
+            "url": "http://github.com/google/go-jsonnet/releases",
+            "excerpts": [
+              "(last verified: 2026-07-23) go-jsonnet_0.22.0_darwin_amd64.tar.gz sha256:2ada40ece13e8b4e1f37c06315783110c84b496963b0b8b90809daf69df7dfc9\n(last verified: 2026-07-23) go-jsonnet_0.22.0_darwin_arm64.tar.gz sha256:112534191b6e27f2ae01bb80c6ab82950fb7bf5772e2e81c5472f59a069700f5\n(last verified: 2026-07-23) go-jsonnet_0.22.0_linux_amd64.tar.gz sha256:e87a93ea44e34da92c15636205c7f2240bf3ac92d00ccb855dbb4e7e03ea6941\n(last verified: 2026-07-23) go-jsonnet_0.22.0_linux_arm64.tar.gz sha256:3016b049254cb92548ba99304b6f44ec3795e6173f908e3ce3c5add57243fe20\ngo-jsonnet_0.22.0_darwin_amd64.tar.gz sha256:2ada40ece13e8b4e1f37c06315783110c84b496963b0b8b90809daf69df7dfc9\ngo-jsonnet_0.22.0_darwin_arm64.tar.gz sha256:112534191b6e27f2ae01bb80c6ab82950fb7bf5772e2e81c5472f59a069700f5\ngo-jsonnet_0.22.0_linux_amd64.tar.gz sha256:e87a93ea44e34da92c15636205c7f2240bf3ac92d00ccb855dbb4e7e03ea6941\ngo-jsonnet_0.22.0_linux_arm64.tar.gz sha256:3016b049254cb92548ba99304b6f44ec3795e6173f908e3ce3c5add57243fe20"
+            ],
+            "title": null
+          },
+          {
+            "url": "https://qbec.io/reference/jsonnet-native-funcs",
+            "excerpts": [
+              "Jsonnet native functions - Qbec"
+            ],
+            "title": "Jsonnet native functions - Qbec qbec.io https://qbec.io \u203a reference \u203a json..."
+          },
+          {
+            "url": "https://nickel-lang.org/user-manual/syntax",
+            "excerpts": [
+              "Syntax - Nickel\nThe contract annotation is merely a convenient way to apply a contract to a value extracted from the pattern match on the fly. used to attach type and contract\u00a0"
+            ],
+            "title": "Syntax - Nickel"
+          },
+          {
+            "url": "https://nickel-lang.org/user-manual/contracts",
+            "excerpts": [
+              "Contracts in Nickel\nTo a first approximation, contracts are assertions. They check that a value satisfies some property at run-time. This documentation will propagate to the final\u00a0"
+            ],
+            "title": "Contracts in Nickel"
+          },
+          {
+            "url": "https://tweag.io/blog/2021-01-22-nickel-contracts",
+            "excerpts": [
+              "Programming with contracts in Nickel - Tweag\nJan 22, 2021 \u00b7 Nickel is the ability to validate data and enforce program invariants using so-called contracts. In this post, Nickel's meta-values, which,\u00a0"
+            ],
+            "title": "Programming with contracts in Nickel - Tweag"
+          },
+          {
+            "url": "https://github.com/tweag/nickel/issues/922",
+            "excerpts": [
+              "The Syntax Bikeshedding Dojo, round 9: optional & merge ...\nMerge priorities I like the current | default , | force and | priority n , with n a floating point, would use proper words, but default would"
+            ],
+            "title": "The Syntax Bikeshedding Dojo, round 9: optional & merge ..."
+          },
+          {
+            "url": "https://github.com/tweag/nickel/releases",
+            "excerpts": [
+              "Releases \u00b7 nickel-lang/nickel - GitHub\nDec 11, 2025 \u00b7 To fix an unsound and unexpected behavior appearing when first altering a record with dictionary operations ( std.record.remove , std.record."
+            ],
+            "title": "Releases \u00b7 nickel-lang/nickel - GitHub"
+          },
+          {
+            "url": "https://nixos.wiki/wiki/Flakes",
+            "excerpts": [],
+            "title": "Flakes - NixOS Wiki"
+          },
+          {
+            "url": "https://zero-to-nix.com/concepts/flakes",
+            "excerpts": [],
+            "title": "Nix flakes"
+          },
+          {
+            "url": "https://nickel-lang.org/user-manual/merging",
+            "excerpts": [],
+            "title": "Nickel"
+          },
+          {
+            "url": "https://nixos.wiki/wiki/NixOS_modules_system",
+            "excerpts": [],
+            "title": "NixOS modules system - NixOS Wiki"
+          },
+          {
+            "url": "https://github.com/NixOS/rfcs/blob/master/rfcs/0136-stabilize-incrementally.md",
+            "excerpts": [
+              "rfcs/rfcs/0136-stabilize-incrementally.md at master \u00b7 NixOS ...\nThe new NixOS Foundation gives the RFC authors hope that the Nix community is serious about addressing these sorts of governance issues, and accepting this RFC would be a good way to further demonstrate we are turning a new leaf."
+            ],
+            "title": "rfcs/rfcs/0136-stabilize-incrementally.md at master \u00b7 NixOS ..."
+          },
+          {
+            "url": "http://nix.dev/manual/nix/2.24/release-notes",
+            "excerpts": [
+              "Nix Release Notes. The Nix release cycle is calendar-based as follows: Nix has a release cycle of roughly 6 weeks. Notable changes and additions are announced Nix Release Notes. The Nix release cycle is calendar-based as follows: Nix has a release cycle of roughly 6 weeks. Notable changes and additions are announced"
+            ],
+            "title": "Releases - Nix Reference Manual"
+          },
+          {
+            "url": "http://determinate.systems/about",
+            "excerpts": [
+              "Determinate Systems is the company bringing Nix to the software delivery problems that matter most"
+            ],
+            "title": "About Determinate Systems"
+          },
+          {
+            "url": "https://github.com/nix-darwin/nix-darwin/issues/727",
+            "excerpts": [
+              "RFC: Start using stable branches tied to Nixpkgs releases \u00b7 Issue #727\nWe should make sure the master branch check always passes on Nixpkgs unstable even when they bump before we can react to it (i.e. the check"
+            ],
+            "title": "RFC: Start using stable branches tied to Nixpkgs releases \u00b7 Issue #727"
+          },
+          {
+            "url": "http://n-ix.com/company-overview",
+            "excerpts": [
+              "N-iX releases Pragmatic AI Software Engineering Report. 25 June 2026. logo. contact@n-ix.com. USA office: 4330 W Broward Boulevard \u2013 Space P/Q, Plantation, FL"
+            ],
+            "title": "About N-iX: Company Overview"
+          },
+          {
+            "url": "https://jsonic.io/guides/json-schema-discriminator",
+            "excerpts": [
+              "JSON Schema Discriminator: oneOf, Ajv & OpenAPI\nHow to implement a JSON Schema discriminator with oneOf + const, OpenAPI 3.x discriminator object, Ajv validation, and Zod discriminatedUnion () \u2014 with examples."
+            ],
+            "title": "JSON Schema Discriminator: oneOf, Ajv & OpenAPI"
+          },
+          {
+            "url": "https://json-schema.org/draft/2020-12/json-schema-core",
+            "excerpts": [
+              "A Media Type for Describing JSON Documents\nJSON Schema is a JSON media type for defining the structure of JSON data. JSON Schema is intended to define validation, documentation, hyperlink navigation,"
+            ],
+            "title": "A Media Type for Describing JSON Documents"
+          },
+          {
+            "url": "https://corvus-oss.org/Corvus.JsonSchema/examples/polymorphism-with-discriminators.html",
+            "excerpts": [
+              "Polymorphism with Discriminator Properties - Corvus.Text.Json ...\nThis recipe demonstrates how to use JSON Schema `oneOf` with `const` properties to create polymorphic types with discriminators - a pattern similar to OpenAPI's polymorphism feature and `System.Text.Json`'s polymorphic serialization."
+            ],
+            "title": "Polymorphism with Discriminator Properties - Corvus.Text.Json ..."
+          },
+          {
+            "url": "http://docs.pydantic.dev/2.3/usage/json_schema",
+            "excerpts": [
+              "\"$ref\": \"#/$defs/Foo\" }\n[JSON Schema Draft 2020-12](https://json-schema.org/draft/2020-12/release-notes.html)\nthe definitions are always stored under the key `$defs`"
+            ],
+            "title": "Json schema | Pydantic Docs"
+          },
+          {
+            "url": "http://docs.pydantic.dev/2.5/concepts/json_schema",
+            "excerpts": [
+              "Union[str, int]` | `anyOf` | `{\"anyOf\": [{\"type\": \"string\"}, {\"type\": \"integer\"}]}` | JSON Schema Validation | And equivalently for any other subfields for unions. |\n| `Enum` | `enum` | `{\"enum\": [...]}` | JSON Schema Validation | All the literal values in the enum are included in the definition. |\n| `None` | `null` | JSON Schema Core | Same for `type(None)` or `Literal[None]` |  |"
+            ],
+            "title": "Json schema | Pydantic Docs"
+          },
+          {
+            "url": "https://bazel.build/rules/language",
+            "excerpts": [
+              "Starlark Language\nThis page is an overview of Starlark, formerly known as Skylark, the language used in Bazel. For a complete list of functions and types, see the Bazel API"
+            ],
+            "title": "Starlark Language"
+          },
+          {
+            "url": "https://zoo.dev/research/introducing-kcl",
+            "excerpts": [
+              "KCL: A Programming Language for Parametric CAD\nMay 19, 2025 \u2014 The KittyCAD Programming Language (or just KCL) is a programming language, This language defines real-world artifacts, like gears and engines."
+            ],
+            "title": "KCL: A Programming Language for Parametric CAD"
+          },
+          {
+            "url": "http://docs.bazel.build/versions/3.1.0/skylark/config.html",
+            "excerpts": [
+              "Starlark configuration is Bazel's API for customizing how your project builds. This makes it possible to: define custom flags for your project, obsoleting the"
+            ],
+            "title": "Configurations - Bazel 3.1.0"
+          },
+          {
+            "url": "https://bazel.build/extending/rules",
+            "excerpts": [
+              "Rules\nBazel provides an extensibility model for writing rules using the Starlark language. These rules are written in .bzl files, which can be loaded directly from"
+            ],
+            "title": "Rules"
+          },
+          {
+            "url": "https://github.com/bazelbuild/starlark/blob/master/spec.md",
+            "excerpts": [
+              "starlark/spec.md at master\nThe fail(*args) function causes execution to fail with an error message that includes the string forms of the argument values. The precise formatting depends on"
+            ],
+            "title": "starlark/spec.md at master"
+          },
+          {
+            "url": "https://github.com/cilium/cilium/issues/28136",
+            "excerpts": [
+              "CiliumNetworkPolicy egressDeny blocking non-matching ...\nSep 13, 2023 \u2014 egress traffic to port 1026 is blocked (see monitor log below) even if it's not listed in the egressDeny and it has an explicit allow policy ."
+            ],
+            "title": "CiliumNetworkPolicy egressDeny blocking non-matching ..."
+          },
+          {
+            "url": "http://instavm.io/solutions/code-execution",
+            "excerpts": [
+              "Dedicated kernel per run\nDeny-by-default egress\nEach sandbox runs inside a Firecracker microVM \u2014 not a container. Own kernel, filesystem, memory, and network stack. No cross-tenant leakage.\nOutbound traffic is blocked unless explicitly allowed. Whitelist specific domains, CIDR ranges, or enable package managers per session or VM.\nRun untrusted or model-generated code in Firecracker microVMs. Each call to client.execute() gets a dedicated kernel, filesystem, and network stack.\nSession state persistence\nStdout, stderr, and file capture\nVariables, files, and installed packages persist across execute() calls within a session. New session starts clean.\nvery execute() returns stdout, stderr, and execution\\_time. Use upload\\_file() and download\\_file() to move artifacts in and out of the V"
+            ],
+            "title": "Execute untrusted code in isolated microVMs - InstaVM"
+          },
+          {
+            "url": "https://docs.cilium.io/en/latest/security/policy/intro",
+            "excerpts": [
+              "Policy Enforcement Modes\nIf any rule selects an Endpoint and the rule has an egress section, the endpoint goes into default- deny mode for egress . This means that endpoints start without"
+            ],
+            "title": "Policy Enforcement Modes"
+          },
+          {
+            "url": "https://jorel.dev/NixOS4Noobs/nixsandboxes.html",
+            "excerpts": [
+              "Nix shell sandboxes - NixOS4Noobs\nWhen using Nix shells, it can sometimes be useful to keep track of what packages are currently installed in that instance of the Nix shell. A helpful tool is the any-nix-shell, which shows the information of temporarily installed packages when using the fish shell or the z shell."
+            ],
+            "title": "Nix shell sandboxes - NixOS4Noobs"
+          },
+          {
+            "url": "http://github.com/bureado/awesome-agent-runtime-security",
+            "excerpts": [
+              "bureado/awesome-agent-runtime-security Top-level files .gitignore LICENSE README.md ...\n| [Sprites](https://sprites.dev/) | Firecracker, MicroVM, checkpoint-restore | Fly.io's managed Firecracker-based persistent Linux VMs for running coding agents or arbitrary code; checkpoint/restore in ~300ms, pre-installed with Claude Code and Codex CLI, API and CLI access. | | [InstaVM](https://instavm.io/) | MicroVM, egress-filtering, secrets-injection | Managed microVM sandboxes for AI agents: dedicated kernel per sandbox, default-deny egress with domain/CIDR allowlists, proxy-based secret injection (agents never see API keys), full execution logs and network traces. | ... | Name | Keywords | Description |\n| \ud83d\udd25 [Beams](https://www.beams.run/) | Firecracker, delegated-identity, zero-secrets | Teleport's agent runtime using Firecracker VMs (200ms startup) with delegated short-lived identity certificates, zero secrets in the sandbox, policy-controlled egress proxy, and inference endpoint routing that injects backend credentials without exposing API keys to the agent. | | \ud83d\udd25 [krunai](https://github.com/slp/krunai) | KVM, libkrun, MicroVM, gVisor | Purpose-built agent sandbox running AI agents inside [libkrun](https://github.com/containers/libkrun) KVM microVMs, transparent user-space networking via [gVisor](https://github.com/google/gvisor) netstack. |"
+            ],
+            "title": "GitHub - bureado/awesome-agent-runtime-security: Learning something new about runtime security for agents \u00b7 GitHub"
+          },
+          {
+            "url": "https://britter.dev/blog/2025/01/09/nixos-modules",
+            "excerpts": [
+              "Understanding NixOS Modules and Declaring Options\nIn this section, we will explore how to declare simple options using basic types without involving submodules. These options form the building blocks of a NixOS module and allow you to define configuration parameters such as strings, integers, and booleans."
+            ],
+            "title": "Understanding NixOS Modules and Declaring Options"
+          },
+          {
+            "url": "http://github.com/nixos/nixpkgs/blob/master/nixos/modules/services/misc/forgejo.nix",
+            "excerpts": [
+              "HTTP_PORT = mkOption { type = types.port; default = 3000; description = \"Listen port.\nROOT_URL = mkOption { type = types.str; default = \"http://${cfg.settings.server.DOMAIN}:${toString cfg.settings.server.HTTP_PORT}/\"; defaultText = literalExpression ''\"http://''${config.services.forgejo.settings.server.DOMAIN}:''${toString config.services.forgejo.settings.server.HTTP_PORT}/\"''; description = \"Full public URL of Forgejo server."
+            ],
+            "title": "nixpkgs/nixos/modules/services/misc/forgejo.nix at master \u00b7 NixOS/nixpkgs \u00b7 GitHub"
+          },
+          {
+            "url": "https://github.com/NixOS/nixpkgs/issues/112494",
+            "excerpts": [
+              "NixOS: default = {} for submodule not respected #112494 - GitHub\nFeb 9, 2021 \u00b7 the workaround is to just wrap the submodule in a nullOr type and default = null mkOption and check for null in the implementation."
+            ],
+            "title": "NixOS: default = {} for submodule not respected #112494 - GitHub"
+          },
+          {
+            "url": "https://wiki.nixos.org/w/index.php?title=NixOS_modules",
+            "excerpts": [
+              "NixOS modules - Official NixOS Wiki\nThat's what the NixOS module system does, which lives in the ./lib directory (in modules.nix, options.nix and types.nix). The module system can even be used without NixOS, allowing you to use it for your own option sets."
+            ],
+            "title": "NixOS modules - Official NixOS Wiki"
+          },
+          {
+            "url": "https://github.com/firecracker-microvm/firecracker/issues/1180",
+            "excerpts": [
+              "Host Filesystem Sharing \u00b7 Issue #1180 \u00b7 firecracker-microvm ...\nJul 15, 2019 \u00b7 virtio-fs support is not currently on our roadmap as we answered on this comment. If you have specific use case requiring virtio-fs, feel free"
+            ],
+            "title": "Host Filesystem Sharing \u00b7 Issue #1180 \u00b7 firecracker-microvm ..."
+          },
+          {
+            "url": "https://blog.cloudkernels.net/posts/kata-fc-k3s-k8s",
+            "excerpts": [
+              "Running containers on Firecracker microVMs using kata on ...\nIn the case of AWS Firecracker, however, virtiofs is not supported. So, the only option is to use a virtio block device. devmapper Link to"
+            ],
+            "title": "Running containers on Firecracker microVMs using kata on ..."
+          },
+          {
+            "url": "https://docs.kernel.org/filesystems/virtiofs.html",
+            "excerpts": [
+              "virtiofs: virtio-fs host<->guest shared file system\nIt allows a guest to mount a directory that has been exported on the host. Guests often require access to files residing on the host or remote systems. Use"
+            ],
+            "title": "virtiofs: virtio-fs host<->guest shared file system"
+          },
+          {
+            "url": "https://news.ycombinator.com/item?id=19100365",
+            "excerpts": [
+              "Virtio-fs: shared file system for virtual machines | Hacker News\nFeb 6, 2019 \u00b7 The point of something like virtio-fs would be to allow multiple VMs to share a file tree. It is a compromise between bind mounds (which are simpler, but only"
+            ],
+            "title": "Virtio-fs: shared file system for virtual machines | Hacker News"
+          },
+          {
+            "url": "https://browserbase.com/blog/what-is-firecracker",
+            "excerpts": [
+              "What is Firecracker?\nMay 11, 2026 \u2014 Containers: 50ms boot, 5 MiB overhead, shared-kernel attack surface. VMs: 5+ second boot, 300+ MiB overhead, hardware-isolated. Everyone running"
+            ],
+            "title": "What is Firecracker?"
+          },
+          {
+            "url": "https://link.springer.com/rwe/10.1007/978-0-387-79948-3_921",
+            "excerpts": [
+              "Semantic Cue | Springer Nature Link\nLanguage intervention strategies in aphasia and related neurogenic communication disorders. Effects of two cueing treatments. Semantic Cue. ) Encyclopedia of"
+            ],
+            "title": "Semantic Cue | Springer Nature Link"
+          },
+          {
+            "url": "https://github.com/cue-lang/cue/blob/master/doc/ref/spec.md",
+            "excerpts": [
+              "cue/doc/ref/spec.md at master \u00b7 cue-lang/cue \u00b7 GitHub\nThis is a reference manual for the CUE data constraint language.CUE, pronounced cue or Q, is a general-purpose and strongly typedconstraint-based language.It can be used for data templating, data validation, code generation, scripting,and many other applications involving structured data.The CUE tooling, layered on top of CUE, providesa general pur"
+            ],
+            "title": "cue/doc/ref/spec.md at master \u00b7 cue-lang/cue \u00b7 GitHub"
+          },
+          {
+            "url": "https://stackoverflow.com/questions/54615229/how-to-write-a-new-nix-config-file-for-packages",
+            "excerpts": [
+              "How to write a new .nix config file for packages?\nYour /etc/ nixos / configuration . nix is simply one of the many NixOS modules, and it is evaluated using the machinery of NixOS modules in lib ."
+            ],
+            "title": "How to write a new .nix config file for packages?"
+          },
+          {
+            "url": "https://danklinux.com/docs/dankmaterialshell/nixos",
+            "excerpts": [
+              "NixOS Installation - Dank Linux\nThe NixOS module installs DMS but doesn't generate compositor-specific config files (keybinds, colors, layout, etc.). Use dms setup to deploy the defaults for your compositor, or generate individual configs:"
+            ],
+            "title": "NixOS Installation - Dank Linux"
+          },
+          {
+            "url": "https://pkl-lang.org/security.html",
+            "excerpts": [
+              "Security :: Pkl Docs - pkl-lang.org\nFor the protection of our community, the Pkl team does not disclose, discuss, or confirm security issues until our investigation is complete and any necessary updates are generally available. If you have discovered a security vulnerability within the Pkl project, please report it to us."
+            ],
+            "title": "Security :: Pkl Docs - pkl-lang.org"
+          },
+          {
+            "url": "https://pkl-lang.org/threat-model.html",
+            "excerpts": [
+              "Threat Model :: Pkl Docs - pkl-lang.org\nIt is intended to help security researchers and reporters understand what we consider to be within scope and assess whether a potential vulnerability is relevant to Pkl\u2019s security goals."
+            ],
+            "title": "Threat Model :: Pkl Docs - pkl-lang.org"
+          },
+          {
+            "url": "https://pkl-lang.org/go/current/codegen.html",
+            "excerpts": [
+              "Code generation :: Pkl Docs\nBy default, the code generator will look for a generator-settings.pkl file residing in the current working directory. If found, it is used to configure the code generator. The settings file may also be set using the --generator-settings flag."
+            ],
+            "title": "Code generation :: Pkl Docs"
+          },
+          {
+            "url": "https://discourse.nixos.org/t/flakes-inputs-with-custom-nixpkgs/46093",
+            "excerpts": [
+              "Flakes inputs with custom nixpkgs - Help - NixOS Discourse\nMay 28, 2024 \u00b7 The pattern of passing inputs to all modules via specialArgs seems useful, but I'm not sure the best pattern to \u201cconfigure\u201d alternate nixpkgs inputs. Questions about `inputs.nixpkgs` Lock flake input to selected revision More results from discourse.nixos.org"
+            ],
+            "title": "Flakes inputs with custom nixpkgs - Help - NixOS Discourse"
+          },
+          {
+            "url": "https://nix.dev/concepts/flakes.html",
+            "excerpts": [
+              "Flakes \u2014 nix.dev documentation\nNix creates a flake.lock to pin dependencies once you run a nix command. If these dependencies have inputs of their own, Nix will check their lock files to find the versions to use. Using the same versions helps make sure programs work as intended, but you can override these. nix command s natively integrate with flakes by default."
+            ],
+            "title": "Flakes \u2014 nix.dev documentation"
+          },
+          {
+            "url": "http://nixos.asia/en/howto/local-flake-input",
+            "excerpts": [
+              "The alternative is to pass --override-input foo ~/code/foo to nix build or nix develop commands; this will override the hash for \"foo\" in the flake.lock file."
+            ],
+            "title": "Use a local directory as flake input"
+          },
+          {
+            "url": "https://community.fly.io/t/running-reproducible-rust-a-fly-and-nix-love-story/3781",
+            "excerpts": [
+              "Running Reproducible Rust: A Fly and Nix Love Story\nJan 24, 2022 \u2014 Next, let's ask cargo to setup its lock file so that we're ready to build against pinned dependencies. cargo update. Don't forget to stage"
+            ],
+            "title": "Running Reproducible Rust: A Fly and Nix Love Story"
+          },
+          {
+            "url": "https://devopsboys.com/blog/nix-reproducible-devops-environments-guide-2026",
+            "excerpts": [
+              "Nix for DevOps \u2014 Reproducible Development Environments ...\nComplete guide to using Nix and Nix flakes for reproducible DevOps environments. Covers installation, dev shells, CI/CD integration, Docker image building with Nix, and team adoption strategies."
+            ],
+            "title": "Nix for DevOps \u2014 Reproducible Development Environments ..."
+          },
+          {
+            "url": "https://github.com/firecracker-microvm/firecracker/blob/main/docs/getting-started.md",
+            "excerpts": [
+              "firecracker/docs/getting-started.md at main - GitHub\nWe suggest that users enable the PCI transport, as it yields higher throughput and lower latency for VirtIO devices. For more information regarding guest kernel"
+            ],
+            "title": "firecracker/docs/getting-started.md at main - GitHub"
+          },
+          {
+            "url": "https://firecracker-microvm.github.io/",
+            "excerpts": [
+              "Firecracker\nFirecracker initiates user space or application code in as little as 125 ms and supports microVM creation rates of up to 150 microVMs per second per host."
+            ],
+            "title": "Firecracker"
+          },
+          {
+            "url": "http://github.com/firecracker-microvm/firecracker",
+            "excerpts": [
+              "*API endpoint** can be used to:\n\n* Configure the microvm by:\n  \n    + Setting the number of vCPUs (the default is 1).\n    + Setting the memory size (the default is 128 MiB).\n    + Configuring a [CPU template](https://github.com/firecracker-microvm/firecracker/blob/main/docs/cpu_templates/\nFirecracker is an open source virtualization technology that is purpose-built\nfor creating and managing secure, multi-tenant container and function-based\nservices that provide serverless operational models.\nFirecracker runs workloads\nin lightweight virtual machines, called microVMs, which combine the security and\nisolation properties provided by hardware virtualization technology with the\nspeed and flexibility of containers.\nFirecracker was developed at Amazon Web Services to accelerate the speed and\nefficiency of services like [AWS Lambda](https://aws.amazon.com/lambda/) and [AWS Fargate](https://aws.amazon.com/fargate/) .\nFirecracker's overall architecture is described in [the design document](https://github.com/firecracker-microvm/firecracker/blob/main/docs/design.md) .\nRead more about the Firecracker Charter [here](https://github.com/firecracker-microvm/firecracker/blob/main/CHARTER.md) .\nThe API is [specified in OpenAPI format](https://github.com/firecracker-microvm/firecracker/blob/main/src/firecracker/swagger/firecracker.yaml) . Read\nmore about it in the [API docs](https://github.com/firecracker-microvm/firecracker/blob/main/docs/api_requests) .\nTo get started with Firecracker, download the latest [release](https://github.com/firecracker-microvm/firecracker/releases) binaries\nor build it from source.\nTo read more about Firecracker, check out [firecracker-microvm.io](https://firecracker-microvm.github.io/) .\nhe Firecracker release policy is detailed [here](https://github.\ncom/firecracker-microvm/firecracker/blob/main/docs/RELEASE_POLICY.md) .\nSECURITY.md SPECIFICATION.md THIRD-PARTY deny.toml rust-toolchain.toml rustfmt.toml README.md Our mission is to enable secure, multi-tenant, minimal-overhead execution of container and function workloads. Read more about the Firecracker Charter [here](https://github.com/firecracker-microvm/firecracker/blob/main/CHARTER.md) . What is Firecracker? Firecracker is an open source virtualization technology that is purpose-built for creating and managing secure, multi-tenant container and function-based services that provide serverless operational models. Firecracker runs workloads in lightweight virtual machines, called microVMs, which combine the security and isolation properties provided by hardware virtualization technology with the speed and flexibility of containers. Overview\nThe API is [specified in OpenAPI format](https://github.com/firecracker-microvm/firecracker/blob/main/src/firecracker/swagger/firecracker.yaml) . Read more about it in the [API docs](https://github.com/firecracker-microvm/firecracker/blob/main/docs/api_requests) . The **API endpoint** can be used to: Configure the microvm by: Setting the number of vCPUs (the default is 1). Setting the memory size (the default is 128 MiB). Configuring a [CPU template](https://github.com/firecracker-microvm/firecracker/blob/main/docs/cpu_templates/cpu-templates.md) . Add one or more network interfaces to the microVM.\nfirecracker-microvm/firecracker Page: GitHub repository URL: https://github.com/firecracker-microvm/firecracker Description: Secure and fast microVMs for serverless computing. - firecracker-microvm/firecracker Stars: 35,520 Forks: 2,507 Topics: rust, open-source, serverless, containers, virtual-machine, sandbox, virtualization, minimalist, oversubscription License: Apache-2.0 license Default branch: main Created: 2017-10-19T06:18:47.000Z Commits: 8,171 Top-level files .buildkite/ .cargo/ .github/ docs/ resources/ src/ tests/ tools/ .dockerignore .git-blame-ignore-revs .gitignore .gitlint .mailmap .mdformat.toml .python-version CHANGELOG.md CHARTER.md CODE_OF_CONDUCT.md CONTRIBUTING.md CREDITS.md Cargo.lock Cargo.toml DEPRECATED.md FAQ.md LICENSE MAINTAINERS.md NOTICE PGP-KEY.asc README.md\nFirecracker consists of a single micro Virtual Machine Manager process that exposes an API endpoint to the host once started. The API is specified in OpenAPI\nThe Firecracker binary will be placed at `build/cargo_target/${toolchain}/debug/firecracker` . For more information on\nbuilding, testing, and running Firecracker, go to the [quickstart guide](https://github.com/firecracker-microvm/firecracker/blob/main/docs/getting-started.md) ."
+            ],
+            "title": "GitHub - firecracker-microvm/firecracker: Secure and fast microVMs for serverless computing. \u00b7 GitHub"
+          },
+          {
+            "url": "https://ryantm.github.io/nixpkgs/languages-frameworks/dhall",
+            "excerpts": [
+              "Dhall | nixpkgs - GitHub Pages\ndhall-to-nixpkgs has the ability to fetch and build remote imports as fixed-output derivations by using their Dhall integrity check. This is sometimes easier than manually packaging all remote imports."
+            ],
+            "title": "Dhall | nixpkgs - GitHub Pages"
+          },
+          {
+            "url": "https://docs.dhall-lang.org/discussions/Safety-guarantees.html",
+            "excerpts": [
+              "Safety Guarantees \u2014 Dhall documentation\nThe integrity check is not a hash of the text of the import because the textual payload of an import does not uniquely determine the import\u2019s meaning. To see why, suppose that the following contrived configuration file imports a boolean value from another file named ./bool.dhall, like this:"
+            ],
+            "title": "Safety Guarantees \u2014 Dhall documentation"
+          },
+          {
+            "url": "https://github.com/Cobertos/nixpkgs-local/blob/master/doc/languages-frameworks/dhall.section.md",
+            "excerpts": [
+              "nixpkgs-local/doc/languages-frameworks/dhall.section.md at ...\ndhall-to-nixpkgs has the ability to fetch and build remote imports as fixed-output derivations by using their Dhall integrity check. This is sometimes easier than manually packaging all remote imports."
+            ],
+            "title": "nixpkgs-local/doc/languages-frameworks/dhall.section.md at ..."
+          },
+          {
+            "url": "https://github.com/dhall-lang/dhall-lang/blob/master/standard/imports.md",
+            "excerpts": [
+              "dhall-lang/standard/imports.md at master \u00b7 dhall-lang/dhall-lang\nIf the Access-Control-Allow-Origin header does not match the scheme and authority then the transitive remote import is rejected. If there is not exactly one value for the Access-Control-Allow-Origin header then the transitive remote import is also rejected."
+            ],
+            "title": "dhall-lang/standard/imports.md at master \u00b7 dhall-lang/dhall-lang"
+          }
+        ],
+        "confidence": "medium"
+      }
+    ],
+    "type": "text",
+    "beta_fields": null,
+    "mcp_tool_calls": null,
+    "content_file": "configuration-language-primary-source.md"
+  }
+}

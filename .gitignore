@@ -1,0 +1,11 @@
+.DS_Store
+.direnv/
+.envrc
+.fastembed_cache/
+.skelesearch/
+result
+result-*
+node_modules/
+dist/
+tsp-output/
+target/

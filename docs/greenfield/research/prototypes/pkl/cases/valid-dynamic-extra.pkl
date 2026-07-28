@@ -1,0 +1,8 @@
+local lexicalLocal = "not-a-module-member"
+
+result = new Dynamic {
+  visible = lexicalLocal
+  extensionField = new Dynamic {
+    accepted = true
+  }
+}

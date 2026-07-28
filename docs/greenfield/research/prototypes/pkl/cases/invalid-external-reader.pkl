@@ -1,0 +1,3 @@
+import "package://example.invalid/ambient@1.0.0#/ambient.pkl"
+
+result = ambient

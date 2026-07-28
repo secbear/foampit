@@ -1,0 +1,7 @@
+extends "amendable-base.pkl"
+
+result {
+  workspace {
+    destination = "workspace"
+  }
+}
