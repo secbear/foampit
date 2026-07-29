@@ -49,6 +49,24 @@ async function localGraph(entry) {
     }
   }
 
+  function propertyName(node) {
+    if (node?.type !== "MemberExpression") return null;
+    if (!node.computed && node.property?.type === "Identifier") {
+      return node.property.name;
+    }
+    if (node.computed && node.property?.type === "Literal") {
+      return typeof node.property.value === "string" ? node.property.value : null;
+    }
+    if (
+      node.computed &&
+      node.property?.type === "TemplateLiteral" &&
+      node.property.expressions.length === 0
+    ) {
+      return node.property.quasis[0]?.value?.cooked ?? null;
+    }
+    return null;
+  }
+
   async function visit(file) {
     const absolute = await realpath(resolve(file));
     if (visited.has(absolute)) return;
@@ -70,6 +88,26 @@ async function localGraph(entry) {
       }
       if (node.type === "ImportExpression") {
         die(`dynamic dependency is forbidden: ${absolute}`);
+      }
+      if (
+        node.type === "MemberExpression" &&
+        (
+          ["getBuiltinModule", "createRequire"].includes(propertyName(node)) ||
+          (
+            node.computed &&
+            node.object?.type === "Identifier" &&
+            node.object.name === "process"
+          )
+        )
+      ) {
+        die(`indirect dependency is forbidden: ${absolute}`);
+      }
+      if (
+        (node.type === "VariableDeclarator" || node.type === "AssignmentExpression") &&
+        (node.init ?? node.right)?.type === "Identifier" &&
+        (node.init ?? node.right).name === "process"
+      ) {
+        die(`indirect dependency is forbidden: ${absolute}`);
       }
       if (
         node.type === "CallExpression" &&
@@ -159,6 +197,8 @@ const testCases = [
   "dependency-symlink-alias",
   "dependency-dynamic-loading",
   "dependency-indirect-loading",
+  "dependency-computed-loader-property",
+  "dependency-multihop-loader-alias",
   "dependency-package-loading",
   "source-digest-mismatch",
   "model-digest-mismatch",
@@ -360,6 +400,29 @@ async function runTestCase(name) {
         "indirect-loading",
         'import { createRequire as factory } from "node:module";\n' +
           'const load = factory(import.meta.url);\nload("./normalizer.mjs");',
+        "indirect dependency"
+      );
+      break;
+    case "dependency-computed-loader-property":
+      await expectDependencyRejected(
+        "computed-loader-property",
+        'const moduleApi = process["getBuiltinModule"]("node:module");\n' +
+          'const load = moduleApi["createRequire"](import.meta.url);\n' +
+          'load("./normalizer.mjs");',
+        "indirect dependency"
+      );
+      break;
+    case "dependency-multihop-loader-alias":
+      await expectDependencyRejected(
+        "multihop-loader-alias",
+        'const access = process["getBuiltinModule"];\n' +
+          "const obtain = access;\n" +
+          'const moduleApi = obtain("node:module");\n' +
+          "const maker = moduleApi.createRequire;\n" +
+          "const renamedMaker = maker;\n" +
+          "const load = renamedMaker(import.meta.url);\n" +
+          "const renamedLoad = load;\n" +
+          'renamedLoad("./normalizer.mjs");',
         "indirect dependency"
       );
       break;

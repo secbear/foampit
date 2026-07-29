@@ -169,11 +169,9 @@ def enumerateRight (population : Nat) (index : Fin population) :
       (symbolicCoverageShardSpec population).rightRegion coordinate } :=
   ⟨.right index, True.intro⟩
 
-def IsBijective {α β : Sort _} (function : α → β) : Prop :=
-  Function.Injective function ∧ Function.Surjective function
-
 theorem enumerateLeftBijective (population : Nat) :
-    IsBijective (enumerateLeft population) := by
+    Function.Injective (enumerateLeft population) ∧
+      Function.Surjective (enumerateLeft population) := by
   constructor
   · intro leftIndex rightIndex equality
     cases equality
@@ -187,7 +185,8 @@ theorem enumerateLeftBijective (population : Nat) :
         contradiction
 
 theorem enumerateRightBijective (population : Nat) :
-    IsBijective (enumerateRight population) := by
+    Function.Injective (enumerateRight population) ∧
+      Function.Surjective (enumerateRight population) := by
   constructor
   · intro leftIndex rightIndex equality
     cases equality
@@ -209,8 +208,10 @@ theorem coverageShardSpecUniversal (population : Nat) :
     (∀ coordinate : CoverageCoordinate population,
       (symbolicCoverageShardSpec population).leftRegion coordinate ∨
         (symbolicCoverageShardSpec population).rightRegion coordinate) ∧
-    IsBijective (enumerateLeft population) ∧
-    IsBijective (enumerateRight population) ∧
+    (Function.Injective (enumerateLeft population) ∧
+      Function.Surjective (enumerateLeft population)) ∧
+    (Function.Injective (enumerateRight population) ∧
+      Function.Surjective (enumerateRight population)) ∧
     (symbolicCoverageShardSpec population).leftCardinality = population ∧
     (symbolicCoverageShardSpec population).rightCardinality = population ∧
     (symbolicCoverageShardSpec population).totalCardinality = 2 * population ∧

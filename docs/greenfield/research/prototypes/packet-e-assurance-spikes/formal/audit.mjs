@@ -3,7 +3,7 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { mkdtemp, readFile, writeFile } from "node:fs/promises";
-import { existsSync, readFileSync, realpathSync } from "node:fs";
+import { existsSync, readFileSync, realpathSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -11,7 +11,8 @@ import { performance } from "node:perf_hooks";
 import { spawnSync } from "node:child_process";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const buildLibrary = join(here, ".lake", "build", "lib", "lean");
+const buildLibrary = await mkdtemp(join(tmpdir(), "packet-e-formal-build-"));
+process.on("exit", () => rmSync(buildLibrary, { recursive: true, force: true }));
 const proofMaterialPath = join(here, "proof-material.json");
 const catalogPath = join(here, "..", "normalization", "fixtures", "catalog.json");
 const modelPath = join(here, "..", "normalization", "fixtures", "expected-model.json");
@@ -54,8 +55,12 @@ const cases = [
   "expr-private-generated",
   "expr-implicit-prop",
   "expr-transparent-multihop",
+  "expr-nested-container-subtype",
+  "expr-higher-order-nested-type",
+  "expr-dependency-type-hiding",
   "incomplete-transitive-closure",
   "unpinned-dependency",
+  "pinned-dependency-missing-pin",
   "pinned-dependency-wrong-pin"
 ];
 
@@ -86,6 +91,14 @@ function command(program, args, options = {}) {
 function leanProbe(source, options = {}) {
   const result = command("lean", ["--stdin"], { ...options, input: source });
   return `${result.stdout}${result.stderr}`;
+}
+
+function buildPacketESpike() {
+  command(
+    "lean",
+    ["-o", join(buildLibrary, "PacketESpike.olean"), join(here, "PacketESpike.lean")],
+    { leanPath: buildLibrary }
+  );
 }
 
 async function validateProofMaterial(material, exactBytes = null) {
@@ -162,37 +175,120 @@ open Lean Elab Command Meta
 private def packetEBelongsToProject (root : String) (name : Name) : Bool :=
   (name.toString.splitOn ".").contains root
 
+private def packetEIsGeneratedAuxiliary (name : Name) : Bool :=
+  (name.toString.splitOn ".").any fun part =>
+    part.startsWith "match_" ||
+    part.startsWith "noConfusion" ||
+    ["casesOn", "rec", "recOn", "below"].contains part
+
 private def packetEHeadName? (expression : Expr) : Option String :=
   expression.getAppFn.constName?.map Name.toString
+
+private def packetEValidateBinderInfo
+    (domain : Expr)
+    (binderInfo : BinderInfo) : MetaM Unit := do
+  let reducedDomain ← whnf domain
+  if packetEHeadName? reducedDomain == some "Decidable" then
+    throwError "semantic Decidable premise"
+  if binderInfo.isInstImplicit then
+    throwError "typeclass premise"
+
+partial def packetEValidateDomain (expression : Expr) : MetaM Unit := do
+  let reduced ← whnf expression
+  let headName := packetEHeadName? reduced
+  if headName == some "Exists" then
+    throwError "Exists premise"
+  if headName == some "Decidable" then
+    throwError "semantic Decidable premise"
+  if headName == some "Subtype" then
+    throwError "subtype premise"
+  if headName == some "Nonempty" then
+    throwError "Nonempty premise"
+  match reduced with
+  | .sort _ => throwError "nested Type parameter"
+  | _ => pure ()
+  if ← isProp reduced then
+    if headName == some "True" then
+      throwError "local proposition premise"
+    else if headName == some "Eq" then
+      throwError "conclusion-as-assumption"
+    else
+      throwError "proposition premise"
+  match reduced with
+  | .app function argument =>
+      packetEValidateDomain function
+      packetEValidateDomain argument
+  | .forallE binderName domain body binderInfo =>
+      packetEValidateBinderInfo domain binderInfo
+      packetEValidateDomain domain
+      withLocalDecl binderName binderInfo domain fun localValue =>
+        packetEValidateDomain (body.instantiate1 localValue)
+  | .lam binderName domain body binderInfo =>
+      packetEValidateBinderInfo domain binderInfo
+      packetEValidateDomain domain
+      withLocalDecl binderName binderInfo domain fun localValue =>
+        packetEValidateDomain (body.instantiate1 localValue)
+  | .letE binderName type value body _ =>
+      packetEValidateDomain type
+      packetEValidateDomain value
+      withLetDecl binderName type value fun localValue =>
+        packetEValidateDomain (body.instantiate1 localValue)
+  | .mdata _ nested => packetEValidateDomain nested
+  | .proj _ _ nested => packetEValidateDomain nested
+  | _ => pure ()
 
 partial def packetEValidateBinders (type : Expr) : MetaM Unit := do
   let type ← whnf type
   match type with
   | .forallE binderName domain body binderInfo =>
-      let reducedDomain ← whnf domain
-      let headName := packetEHeadName? reducedDomain
-      if headName == some "Exists" then
-        throwError "Exists premise"
-      if headName == some "Decidable" then
-        throwError "semantic Decidable premise"
-      if headName == some "Subtype" then
-        throwError "subtype premise"
-      if headName == some "Nonempty" then
-        throwError "Nonempty premise"
-      if binderInfo.isInstImplicit then
-        throwError "typeclass premise"
-      match reducedDomain with
-      | .sort _ => throwError "nested Type parameter"
-      | _ => pure ()
-      if ← isProp reducedDomain then
-        if headName == some "True" then
-          throwError "local proposition premise"
-        else if headName == some "Eq" then
-          throwError "conclusion-as-assumption"
-        else
-          throwError "proposition premise"
+      packetEValidateBinderInfo domain binderInfo
+      packetEValidateDomain domain
       withLocalDecl binderName binderInfo domain fun localValue =>
         packetEValidateBinders (body.instantiate1 localValue)
+  | _ => pure ()
+
+partial def packetEContainsExplicitSort (expression : Expr) : MetaM Bool := do
+  let reduced ← whnf expression
+  match reduced with
+  | .sort _ => return true
+  | .fvar _ => packetEContainsExplicitSort (← inferType reduced)
+  | .app function argument =>
+      if ← packetEContainsExplicitSort function then
+        return true
+      packetEContainsExplicitSort argument
+  | .forallE binderName domain body binderInfo =>
+      if ← packetEContainsExplicitSort domain then
+        return true
+      withLocalDecl binderName binderInfo domain fun localValue =>
+        packetEContainsExplicitSort (body.instantiate1 localValue)
+  | .lam binderName domain body binderInfo =>
+      if ← packetEContainsExplicitSort domain then
+        return true
+      withLocalDecl binderName binderInfo domain fun localValue =>
+        packetEContainsExplicitSort (body.instantiate1 localValue)
+  | .letE binderName type value body _ =>
+      if ← packetEContainsExplicitSort type then
+        return true
+      if ← packetEContainsExplicitSort value then
+        return true
+      withLetDecl binderName type value fun localValue =>
+        packetEContainsExplicitSort (body.instantiate1 localValue)
+  | .mdata _ nested => packetEContainsExplicitSort nested
+  | .proj _ _ nested => packetEContainsExplicitSort nested
+  | _ => return false
+
+partial def packetEValidateGeneratedBinders (type : Expr) : MetaM Unit := do
+  let type ← whnf type
+  match type with
+  | .forallE binderName domain body binderInfo =>
+      let reducedDomain ← whnf domain
+      let isMechanical :=
+        (← packetEContainsExplicitSort reducedDomain) || (← isProp reducedDomain)
+      unless isMechanical do
+        packetEValidateBinderInfo domain binderInfo
+        packetEValidateDomain domain
+      withLocalDecl binderName binderInfo domain fun localValue =>
+        packetEValidateGeneratedBinders (body.instantiate1 localValue)
   | _ => pure ()
 
 partial def packetEConstants : Expr → List Name
@@ -218,8 +314,17 @@ partial def packetEValidateBody
     match info with
     | .axiomInfo _ => throwError "project semantic axiom: {declaration}"
     | .opaqueInfo _ => throwError "opaque semantic dependency: {declaration}"
+    | .defnInfo _ =>
+        if packetEIsGeneratedAuxiliary declaration then
+          packetEValidateGeneratedBinders info.type
+        else
+          packetEValidateBinders info.type
+    | .thmInfo _ => packetEValidateBinders info.type
     | _ => pure ()
   let mut result := visited.push declaration
+  for reference in packetEConstants info.type do
+    if packetEBelongsToProject root reference then
+      result ← packetEValidateBody root reference result
   if let some value := info.value? true then
     for reference in packetEConstants value do
       if packetEBelongsToProject root reference then
@@ -380,7 +485,7 @@ async function expectFixtureRejected({
 
 async function runPositiveAudit() {
   const start = performance.now();
-  command("lake", ["build"]);
+  buildPacketESpike();
   const proofBytes = await readFile(proofMaterialPath, "utf8");
   const proofMaterial = JSON.parse(proofBytes);
   await validateProofMaterial(proofMaterial, proofBytes);
@@ -478,7 +583,8 @@ async function runPositiveAudit() {
   assert.match(interfaces.get(requiredTheorems[1]), /left right : Nat/);
   assert.match(interfaces.get(requiredTheorems[2]), /FamilyCoordinate/);
   assert.match(interfaces.get(requiredTheorems[3]), /CoverageCoordinate population/);
-  assert.match(interfaces.get(requiredTheorems[3]), /IsBijective/);
+  assert.match(interfaces.get(requiredTheorems[3]), /Function\.Injective/);
+  assert.match(interfaces.get(requiredTheorems[3]), /Function\.Surjective/);
   assert.match(
     interfaces.get(requiredTheorems[3]),
     /HMul\.hMul[\s\S]*2 population/
@@ -516,7 +622,7 @@ async function runCase(name) {
     return;
   }
   if (name === "required-theorems-proof-bound") {
-    command("lake", ["build"]);
+    buildPacketESpike();
     for (const theorem of requiredTheorems) {
       const body = leanProbe(
         `import PacketESpike\nset_option pp.all true in\n#print ${theorem}\n`
@@ -530,7 +636,7 @@ async function runCase(name) {
     return;
   }
   if (name === "contextual-arbitrary-carrier") {
-    command("lake", ["build"]);
+    buildPacketESpike();
     const output = leanProbe(
       "import PacketESpike\n#check @PacketESpike.contextualReductionCompleteCarrier\n"
     );
@@ -539,7 +645,7 @@ async function runCase(name) {
     return;
   }
   if (name === "semantic-coverage-cardinality") {
-    command("lake", ["build"]);
+    buildPacketESpike();
     const source = await readFile(join(here, "PacketESpike.lean"), "utf8");
     assert.doesNotMatch(source, /cardinalityFormula\s*:\s*String/);
     const output = leanProbe(
@@ -698,6 +804,33 @@ async function runCase(name) {
       },
       expected: "proposition premise"
     },
+    "expr-nested-container-subtype": {
+      modules: {
+        Fixture:
+          "namespace Fixture\n" +
+          "theorem target (hidden : List { number : Nat // number = number }) : True := " +
+          "True.intro\nend Fixture\n"
+      },
+      expected: "subtype premise"
+    },
+    "expr-higher-order-nested-type": {
+      modules: {
+        Fixture:
+          "namespace Fixture\n" +
+          "theorem target (consumer : (Carrier : Type) → Carrier → Nat) : True := " +
+          "True.intro\nend Fixture\n"
+      },
+      expected: "nested Type parameter"
+    },
+    "expr-dependency-type-hiding": {
+      modules: {
+        Fixture:
+          "namespace Fixture\n" +
+          "theorem helper {Carrier : Type} (value : Carrier) : True := True.intro\n" +
+          "theorem target : True := helper (Carrier := Nat) 0\nend Fixture\n"
+      },
+      expected: "nested Type parameter"
+    },
     "incomplete-transitive-closure": {
       modules: {
         ThirdParty:
@@ -718,6 +851,16 @@ async function runCase(name) {
           "import ThirdParty\nnamespace Fixture\ntheorem target : True := ThirdParty.imported\nend Fixture\n"
       },
       expected: "incomplete transitive dependency closure"
+    },
+    "pinned-dependency-missing-pin": {
+      modules: {
+        ThirdParty:
+          "namespace ThirdParty\ntheorem imported : True := True.intro\nend ThirdParty\n",
+        Fixture:
+          "import ThirdParty\nnamespace Fixture\ntheorem target : True := ThirdParty.imported\nend Fixture\n"
+      },
+      declaredLocalModules: ["ThirdParty"],
+      expected: "incomplete transitive dependency pins"
     },
     "pinned-dependency-wrong-pin": {
       modules: {

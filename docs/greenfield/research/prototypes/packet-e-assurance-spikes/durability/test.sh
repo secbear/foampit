@@ -35,7 +35,7 @@ if [[ "${1:-}" == "--case" ]]; then
 fi
 
 for case_name in "${cases[@]}"; do
-  python3 "$driver" --case "$case_name"
+  PYTHONDONTWRITEBYTECODE=1 python3 "$driver" --case "$case_name"
   echo "PASS durability/$case_name"
 done
 

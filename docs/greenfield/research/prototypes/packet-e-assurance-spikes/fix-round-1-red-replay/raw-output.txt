@@ -1,0 +1,161 @@
+CASE normalization/coordinated-source-model-replacement
+COMMAND node normalization/dependency-audit.mjs --case coordinated-source-model-replacement
+EXIT 1
+OUTPUT
+dependency audit: mutation survived: literal source digest mismatch
+END normalization/coordinated-source-model-replacement
+CASE normalization/dependency-static-obfuscation
+COMMAND node normalization/dependency-audit.mjs --case dependency-static-obfuscation
+EXIT 1
+OUTPUT
+dependency audit: dependency mutation survived: static-obfuscation
+END normalization/dependency-static-obfuscation
+CASE normalization/dependency-reexport
+COMMAND node normalization/dependency-audit.mjs --case dependency-reexport
+EXIT 1
+OUTPUT
+dependency audit: dependency mutation survived: reexport
+END normalization/dependency-reexport
+CASE normalization/dependency-symlink-alias
+COMMAND node normalization/dependency-audit.mjs --case dependency-symlink-alias
+EXIT 1
+OUTPUT
+dependency audit: dependency mutation survived: symlink-alias
+END normalization/dependency-symlink-alias
+CASE normalization/dependency-indirect-loading
+COMMAND node normalization/dependency-audit.mjs --case dependency-indirect-loading
+EXIT 1
+OUTPUT
+dependency audit: dependency mutation survived: indirect-loading
+END normalization/dependency-indirect-loading
+CASE formal/typed-proof-material-binding
+COMMAND node formal/audit.mjs --case typed-proof-material-binding
+EXIT 1
+OUTPUT
+formal audit: missing structure ExactBytesBinding
+END formal/typed-proof-material-binding
+CASE formal/required-theorems-proof-bound
+COMMAND node formal/audit.mjs --case required-theorems-proof-bound
+EXIT 1
+OUTPUT
+formal audit: PacketESpike.populationAbstractionUnbounded is not kernel-bound to exact proof material
+END formal/required-theorems-proof-bound
+CASE formal/contextual-arbitrary-carrier
+COMMAND node formal/audit.mjs --case contextual-arbitrary-carrier
+EXIT 1
+OUTPUT
+formal audit: missing carrier : SemanticCarrier binder
+END formal/contextual-arbitrary-carrier
+CASE formal/semantic-coverage-cardinality
+COMMAND node formal/audit.mjs --case semantic-coverage-cardinality
+EXIT 1
+OUTPUT
+formal audit: string cardinalityFormula remains
+END formal/semantic-coverage-cardinality
+CASE formal/expr-alias-prop
+COMMAND node formal/audit.mjs --case expr-alias-prop
+EXIT 1
+OUTPUT
+formal audit: negative fixture was accepted: proposition premise
+END formal/expr-alias-prop
+CASE formal/expr-arbitrary-prop
+COMMAND node formal/audit.mjs --case expr-arbitrary-prop
+EXIT 1
+OUTPUT
+formal audit: negative fixture was accepted: proposition premise
+END formal/expr-arbitrary-prop
+CASE formal/expr-private-generated
+COMMAND node formal/audit.mjs --case expr-private-generated
+EXIT 1
+OUTPUT
+formal audit: private declaration produced unknown-constant audit failure instead of Expr classification
+END formal/expr-private-generated
+CASE formal/expr-implicit-prop
+COMMAND node formal/audit.mjs --case expr-implicit-prop
+EXIT 1
+OUTPUT
+formal audit: negative fixture was accepted: proposition premise
+END formal/expr-implicit-prop
+CASE formal/expr-transparent-multihop
+COMMAND node formal/audit.mjs --case expr-transparent-multihop
+EXIT 1
+OUTPUT
+formal audit: negative fixture was accepted: proposition premise
+END formal/expr-transparent-multihop
+CASE formal/pinned-dependency-wrong-pin
+COMMAND node formal/audit.mjs --case pinned-dependency-wrong-pin
+EXIT 1
+OUTPUT
+formal audit: negative fixture was accepted: dependency identity mismatch
+END formal/pinned-dependency-wrong-pin
+CASE durability/log-sequence-future
+COMMAND python3 durability/crash_driver.py --case log-sequence-future
+EXIT 1
+OUTPUT
+durability audit: SQLite store accepted future log sequence
+END durability/log-sequence-future
+CASE durability/log-sequence-stale
+COMMAND python3 durability/crash_driver.py --case log-sequence-stale
+EXIT 1
+OUTPUT
+durability audit: SQLite store/model error mismatch for stale: sqlite store: UNIQUE constraint failed: log_entries.sequence
+
+END durability/log-sequence-stale
+CASE durability/log-sequence-duplicate
+COMMAND python3 durability/crash_driver.py --case log-sequence-duplicate
+EXIT 1
+OUTPUT
+durability audit: SQLite store/model error mismatch for duplicate: sqlite store: UNIQUE constraint failed: log_entries.sequence
+
+END durability/log-sequence-duplicate
+CASE durability/observer-missing-database
+COMMAND python3 durability/crash_driver.py --case observer-missing-database
+EXIT 1
+OUTPUT
+durability audit: malformed observation schema was accepted
+END durability/observer-missing-database
+CASE durability/observer-extra-table
+COMMAND python3 durability/crash_driver.py --case observer-extra-table
+EXIT 1
+OUTPUT
+durability audit: malformed observation schema was accepted
+END durability/observer-extra-table
+CASE durability/observer-schema-shape
+COMMAND python3 durability/crash_driver.py --case observer-schema-shape
+EXIT 1
+OUTPUT
+durability audit: malformed observation schema was accepted
+END durability/observer-schema-shape
+CASE toolchain/wrong-deriver
+COMMAND bash run.sh --toolchain-case wrong-deriver
+EXIT 1
+OUTPUT
+warning: Git tree '<WORKTREE>' is dirty
+toolchain audit: PASS tools=7 system=aarch64-darwin
+mutation survived: wrong-deriver
+END toolchain/wrong-deriver
+CASE toolchain/lake-outside-lean
+COMMAND bash run.sh --toolchain-case lake-outside-lean
+EXIT 1
+OUTPUT
+warning: Git tree '<WORKTREE>' is dirty
+toolchain audit: PASS tools=7 system=aarch64-darwin
+mutation survived: lake-outside-lean
+END toolchain/lake-outside-lean
+CASE toolchain/library-outside-lean
+COMMAND bash run.sh --toolchain-case library-outside-lean
+EXIT 1
+OUTPUT
+warning: Git tree '<WORKTREE>' is dirty
+toolchain audit: PASS tools=7 system=aarch64-darwin
+mutation survived: library-outside-lean
+END toolchain/library-outside-lean
+CASE toolchain/wrong-nixpkgs-source
+COMMAND bash run.sh --toolchain-case wrong-nixpkgs-source
+EXIT 1
+OUTPUT
+warning: Git tree '<WORKTREE>' is dirty
+toolchain audit: PASS tools=7 system=aarch64-darwin
+mutation survived: wrong-nixpkgs-source
+END toolchain/wrong-nixpkgs-source
+RED replay: PASS cases=25 base=6462aa751470cdd08d49f1792432871a17d35fb3

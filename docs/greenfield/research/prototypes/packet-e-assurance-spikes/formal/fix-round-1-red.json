@@ -1,83 +1,16 @@
 {
+  "format": "packet-e-red-evidence-pointer-v2",
+  "status": "superseded-by-replay-bundle",
   "baseCommit": "6462aa751470cdd08d49f1792432871a17d35fb3",
-  "testSources": {
-    "formal/audit.mjs": "b490caf358a532e9672012bc35023633c284bcfa94989c334a3e874620e9c4a1",
-    "run.sh": "81c9801fe1924ef6ab4094b0920cb55cda42b0677306414fc4916c5d868e4a78"
-  },
-  "replay": {
-    "formal": "nix develop --command node formal/audit.mjs --case CASE",
-    "toolchain": "nix develop --command bash run.sh --toolchain-case CASE"
-  },
-  "focusedRed": [
-    {
-      "case": "typed-proof-material-binding",
-      "exit": 1,
-      "failure": "missing structure ExactBytesBinding"
-    },
-    {
-      "case": "required-theorems-proof-bound",
-      "exit": 1,
-      "failure": "populationAbstractionUnbounded is not kernel-bound to exact proof material"
-    },
-    {
-      "case": "contextual-arbitrary-carrier",
-      "exit": 1,
-      "failure": "missing carrier : SemanticCarrier binder"
-    },
-    {
-      "case": "semantic-coverage-cardinality",
-      "exit": 1,
-      "failure": "string cardinalityFormula remains"
-    },
-    {
-      "case": "expr-alias-prop",
-      "exit": 1,
-      "failure": "negative fixture was accepted: proposition premise"
-    },
-    {
-      "case": "expr-arbitrary-prop",
-      "exit": 1,
-      "failure": "negative fixture was accepted: proposition premise"
-    },
-    {
-      "case": "expr-private-generated",
-      "exit": 1,
-      "failure": "private declaration produced unknown-constant audit failure instead of Expr classification"
-    },
-    {
-      "case": "expr-implicit-prop",
-      "exit": 1,
-      "failure": "negative fixture was accepted: proposition premise"
-    },
-    {
-      "case": "expr-transparent-multihop",
-      "exit": 1,
-      "failure": "negative fixture was accepted: proposition premise"
-    },
-    {
-      "case": "pinned-dependency-wrong-pin",
-      "exit": 1,
-      "failure": "negative fixture was accepted: dependency identity mismatch"
-    },
-    {
-      "case": "wrong-deriver",
-      "exit": 1,
-      "failure": "mutation survived: wrong-deriver"
-    },
-    {
-      "case": "lake-outside-lean",
-      "exit": 1,
-      "failure": "mutation survived: lake-outside-lean"
-    },
-    {
-      "case": "library-outside-lean",
-      "exit": 1,
-      "failure": "mutation survived: library-outside-lean"
-    },
-    {
-      "case": "wrong-nixpkgs-source",
-      "exit": 1,
-      "failure": "mutation survived: wrong-nixpkgs-source"
-    }
-  ]
+  "casePrefixes": [
+    "formal/",
+    "toolchain/"
+  ],
+  "bundle": {
+    "directory": "../fix-round-1-red-replay",
+    "testPatch": "../fix-round-1-red-replay/test-only.patch",
+    "testPatchSha256": "12113c290d212c74b10ca0c8f20a3475837e8fbff631b62c572566b533fee107",
+    "rawOutput": "../fix-round-1-red-replay/raw-output.txt",
+    "replay": "bash ../fix-round-1-red-replay/replay.sh"
+  }
 }

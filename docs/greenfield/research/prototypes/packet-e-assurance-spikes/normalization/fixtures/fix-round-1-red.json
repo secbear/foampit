@@ -1,35 +1,13 @@
 {
+  "format": "packet-e-red-evidence-pointer-v2",
+  "status": "superseded-by-replay-bundle",
   "baseCommit": "6462aa751470cdd08d49f1792432871a17d35fb3",
-  "testSource": {
-    "path": "normalization/dependency-audit.mjs",
-    "sha256": "9f6b331d007d533290bfea2e7feefd7b31530faab82ac96e2093c1c67a896751"
-  },
-  "replay": "nix develop --command node --expose-internals normalization/dependency-audit.mjs --case CASE",
-  "focusedRed": [
-    {
-      "case": "coordinated-source-model-replacement",
-      "exit": 1,
-      "failure": "dependency audit: mutation survived: literal source digest mismatch"
-    },
-    {
-      "case": "dependency-static-obfuscation",
-      "exit": 1,
-      "failure": "dependency audit: dependency mutation survived: static-obfuscation"
-    },
-    {
-      "case": "dependency-reexport",
-      "exit": 1,
-      "failure": "dependency audit: dependency mutation survived: reexport"
-    },
-    {
-      "case": "dependency-symlink-alias",
-      "exit": 1,
-      "failure": "dependency audit: dependency mutation survived: symlink-alias"
-    },
-    {
-      "case": "dependency-indirect-loading",
-      "exit": 1,
-      "failure": "dependency audit: dependency mutation survived: indirect-loading"
-    }
-  ]
+  "casePrefix": "normalization/",
+  "bundle": {
+    "directory": "../../fix-round-1-red-replay",
+    "testPatch": "../../fix-round-1-red-replay/test-only.patch",
+    "testPatchSha256": "12113c290d212c74b10ca0c8f20a3475837e8fbff631b62c572566b533fee107",
+    "rawOutput": "../../fix-round-1-red-replay/raw-output.txt",
+    "replay": "bash ../../fix-round-1-red-replay/replay.sh"
+  }
 }
