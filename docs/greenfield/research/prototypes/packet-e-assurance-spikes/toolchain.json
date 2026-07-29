@@ -1,0 +1,71 @@
+{
+  "format": "packet-e-assurance-spike-toolchain-v1",
+  "system": "aarch64-darwin",
+  "nix": {
+    "version": "2.34.7",
+    "nixpkgs": {
+      "rev": "624af665418d3c65d544145b4d34ad696439570e",
+      "narHash": "sha256-m0pDuRJG7EDo9ri+4Ksu83VsI+PlxNC9lNBfydejce4=",
+      "storePath": "/nix/store/aiapnjc6w07cz0jxy8s3j8cg1vfh1k8b-source"
+    },
+    "devShellDrvPath": "/nix/store/mq82nsligrb2fsjnkp147qav31zsj1nk-inputDerivation-nix-shell"
+  },
+  "tools": {
+    "node": {
+      "version": "22.23.1",
+      "commandVersion": "v22.23.1",
+      "outPath": "/nix/store/3vg1dzhdv5pqsykpbm8cxy7v276p1wgg-nodejs-22.23.1",
+      "drvPath": "/nix/store/g95q2h3b2afamy9v7y8krvy0p4w4xcjh-nodejs-22.23.1.drv"
+    },
+    "jq": {
+      "version": "1.8.2",
+      "commandVersion": "jq-1.8.2",
+      "outPath": "/nix/store/1fi2mymhcrnjf4cz0z69plamcdqfnary-jq-1.8.2-bin",
+      "drvPath": "/nix/store/662cqsdyrr29anrxi3bawiic1dya25vz-jq-1.8.2.drv"
+    },
+    "cue": {
+      "version": "0.17.1",
+      "commandVersion": "cue version (devel)",
+      "outPath": "/nix/store/z1a8pm70bffnjjiy8iw4iqpb0xsjy6h1-cue-0.17.1",
+      "drvPath": "/nix/store/lab2qqdmgs1jnx9m70rkqrn4al10iz4w-cue-0.17.1.drv"
+    },
+    "lean": {
+      "version": "4.30.0",
+      "commandVersion": "Lean (version 4.30.0, arm64-apple-darwin, commit v4.30.0, Release)",
+      "lakeVersion": "Lake version 5.0.0-src+v4.30.0 (Lean version 4.30.0)",
+      "outPath": "/nix/store/1m9vrcg3pk9yagirygw77ccwf1l3kdks-lean4-4.30.0",
+      "drvPath": "/nix/store/3b5y4x6rp4s1z8f690hcjafmzp6z66jl-lean4-4.30.0.drv",
+      "libraries": [
+        {
+          "name": "Init",
+          "version": "4.30.0",
+          "storePath": "/nix/store/1m9vrcg3pk9yagirygw77ccwf1l3kdks-lean4-4.30.0/lib/lean/Init.olean"
+        },
+        {
+          "name": "Std",
+          "version": "4.30.0",
+          "storePath": "/nix/store/1m9vrcg3pk9yagirygw77ccwf1l3kdks-lean4-4.30.0/lib/lean/Std.olean"
+        }
+      ]
+    },
+    "check-jsonschema": {
+      "version": "0.37.4",
+      "commandVersion": "check-jsonschema, version 0.37.4",
+      "outPath": "/nix/store/2y0s8ah8khvfz0mngsbh5lnfn8hnz993-check-jsonschema-0.37.4",
+      "drvPath": "/nix/store/58qxgm4lcx7m87syl4l3zv9vrh8g0hr6-check-jsonschema-0.37.4.drv"
+    },
+    "python": {
+      "version": "3.13.14",
+      "commandVersion": "Python 3.13.14",
+      "outPath": "/nix/store/rry0klmcnwx2jg493w5li2p7i8q8zpdp-python3-3.13.14",
+      "drvPath": "/nix/store/sdlbknbq11j2rmzqbc4yszgg4p16nwvr-python3-3.13.14.drv",
+      "sqliteModuleVersion": "3.53.3"
+    },
+    "sqlite": {
+      "version": "3.53.3",
+      "commandVersionPrefix": "3.53.3 ",
+      "outPath": "/nix/store/k7hxk5jf1x97azhh9r8l1w09rly3nhbk-sqlite-3.53.3-bin",
+      "drvPath": "/nix/store/08j6j30r12v4jf115zwkh91qg61ighnk-sqlite-3.53.3.drv"
+    }
+  }
+}

@@ -1,0 +1,7 @@
+name = "packet-e-assurance-spike"
+version = "0.1.0"
+defaultTargets = ["PacketESpike"]
+
+[[lean_lib]]
+name = "PacketESpike"
+roots = ["PacketESpike"]

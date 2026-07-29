@@ -1,0 +1,48 @@
+{
+  "catalogFile": "fixtures/catalog.json",
+  "foreignFile": "fixtures/foreign.json",
+  "expectedModelFile": "fixtures/expected-model.json",
+  "expectedCatalogSha256": "0d13ae01d2e1cbd62706e43abc3701272713ceb967ccd43ae05af234022709c1",
+  "expectedForeignSha256": "c87745eb88a5ee4bc3d787a4865df0a91b45c8a81cadd37cf87c6910dfe41c76",
+  "expectedSourceSetSha256": "d4e3916266a34876d0f821ed29b536d18e50dcb5c29d5057f5b62e7abfa592d6",
+  "expectedModelSha256": "2f3305d053ecf4e7f3ae1b0d1b0e55e65ced79c5fb481a544251468b7aa46e98",
+  "semanticSourcePaths": {
+    "catalog.json": [
+      "/imports/0/id",
+      "/imports/0/path",
+      "/imports/0/sha256",
+      "/operations/0/id",
+      "/operations/0/order",
+      "/operations/0/outcome",
+      "/operations/0/profile",
+      "/operations/0/reference",
+      "/operations/0/selector/capability",
+      "/operations/0/selector/family",
+      "/operations/1/id",
+      "/operations/1/order",
+      "/operations/1/outcome",
+      "/operations/1/profile",
+      "/operations/1/reference",
+      "/operations/1/selector/capability",
+      "/operations/1/selector/family",
+      "/operations/2/id",
+      "/operations/2/order",
+      "/operations/2/outcome",
+      "/operations/2/profile",
+      "/operations/2/reference",
+      "/operations/2/selector/capability",
+      "/operations/2/selector/family",
+      "/profiles/strict/effect",
+      "/profiles/strict/gates/0",
+      "/profiles/strict/gates/1",
+      "/schemaRevision"
+    ],
+    "foreign.json": [
+      "/definitions/base-read/enabled",
+      "/definitions/base-read/lane",
+      "/definitions/base-write/enabled",
+      "/definitions/base-write/lane",
+      "/schemaRevision"
+    ]
+  }
+}

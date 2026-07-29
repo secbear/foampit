@@ -1,0 +1,1 @@
+{"definitions":{"base-read":{"enabled":true,"lane":"observation"},"base-write":{"enabled":true,"lane":"effect"}},"schemaRevision":"packet-e-foreign-v1"}
