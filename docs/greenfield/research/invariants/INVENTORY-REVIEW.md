@@ -1,7 +1,8 @@
 # Gate 2A Invariant Inventory Review
 
 Status: **Open — Packets A through D reviewed; Packet E identity, lifecycle,
-operation taxonomy, and result/error contract locked; Packets E and F remain**
+operation taxonomy, result/error contract, and machine-inventory architecture
+locked; Packets E and F remain**
 
 This is the working review record for Gate 2A in the
 [Invariant Inventory and Enforcement Protocol](../INVARIANT-ENFORCEMENT.md).
@@ -297,9 +298,16 @@ The request/result/error/recovery architecture is locked in
 - six exact call classes, including sequenced Process-control commands; and
 - fail-closed machine generation and formal-model obligations.
 
-These foundations do not close Packet E. The next review must turn all four
-decision records' registry obligations into an exhaustive machine-readable
-operation-contract, transition, and compatibility inventory, then walk:
+The implementation boundary for that inventory is locked in
+[Packet E: Machine-Readable Operation Contract and Inventory Architecture](./PACKET-E-OPERATION-CONTRACT-INVENTORY-DESIGN.md).
+It separates the independently reviewed scope and review baselines, the sole
+semantic catalog, the canonical model, and the verification-only coverage
+ledger.
+
+These foundations do not close Packet E. The next review must implement that
+architecture and turn the four semantic decision records' registry obligations
+into an exhaustive machine-readable method, transition, and compatibility
+inventory, then walk:
 
 - Create, prepare, Start, Exec, Process I/O, Signal, Terminate, Suspend,
   Resume, Stop, Snapshot, Restore, Fork, Resize, expiration, Delete,

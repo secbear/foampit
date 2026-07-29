@@ -208,10 +208,15 @@ Its locked durable-acceptance boundary, call classes, public
 error/outcome/recovery architecture, evidence-refinement rule, and sequenced
 Process-control contract are
 [`invariants/PACKET-E-RESULT-ERROR-CONTRACT-DESIGN.md`](./invariants/PACKET-E-RESULT-ERROR-CONTRACT-DESIGN.md).
-These are normative decision records, not Packet E inventory or enforcement
-closure. Their registry-obligation lists must be partitioned and assigned
-stable identifiers by the exhaustive Packet E walk before Gate 2A can close or
-implementation can consume them as reviewed coverage.
+The independently pinned scope, sole semantic catalog, canonical model,
+verification-only ledger, cross-packet import, semantic-change, and adversarial
+oracle architecture for the exhaustive walk is
+[`invariants/PACKET-E-OPERATION-CONTRACT-INVENTORY-DESIGN.md`](./invariants/PACKET-E-OPERATION-CONTRACT-INVENTORY-DESIGN.md).
+These are normative decision records and inventory architecture, not Packet E
+inventory or enforcement closure. Their registry-obligation lists must be
+partitioned and assigned stable identifiers by the exhaustive Packet E walk
+before Gate 2A can close or implementation can consume them as reviewed
+coverage.
 
 Packet C is generated from 45 reviewable selector rules and validates to
 exactly 324 Artifact-field × runtime-profile cells. Every rule has a
