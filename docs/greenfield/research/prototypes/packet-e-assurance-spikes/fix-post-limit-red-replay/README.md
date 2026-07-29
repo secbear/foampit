@@ -20,6 +20,8 @@ worktree at the pinned base; applies only the test patch with Git's explicit
 byte-compares normalized output and every child status; and uses the shared
 exact-target cleanup implementation.
 
-Each negative case executes first in its own hardened child process and binds
-exact evidence that the base audit accepted a source which demonstrated its
-property-state effect. The parent process is not altered.
+The three sensitive-key negative cases execute first in isolated hardened child
+processes and bind exact evidence that the base audit accepted sources which
+demonstrated their property-state effects. The unsupported-key case is
+static-only evidence that the base audit did not fail closed for syntax outside
+the accepted subset. The parent process is not altered.
