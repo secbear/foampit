@@ -18,21 +18,21 @@ process recovers to a partial state.
 
 ## Measured result
 
-The final 2026-07-29 Stage 00 round-four candidate run passed 85 focused
-semantic/crash tests, six toolchain-provenance mutation tests, and twelve replay
-cleanup wrapper-scenario checks:
+The final 2026-07-29 Stage 00 round-five candidate run passed 96 focused
+semantic/crash tests, six toolchain-provenance mutation tests, and sixteen
+replay cleanup wrapper-scenario checks:
 
 | Group | Tests | Result |
 | --- | ---: | --- |
-| independent normalization | 33 | all passed |
+| independent normalization | 44 | all passed |
 | Lean kernel/interface audit | 38 | all passed |
 | pure model/SQLite crash refinement | 14 | all passed |
 | toolchain-provenance mutations | 6 | all killed |
-| replay cleanup/TMPDIR confinement | 12 | all passed |
+| replay cleanup/TMPDIR confinement | 16 | all passed |
 
 The positive Lean build plus exact-byte, elaborated-interface, transitive
-dependency-identity, opaque-definition, and axiom-closure audit took 13,530.5
-ms in the fresh full run. Six Lean declarations were kernel checked: the
+dependency-identity, opaque-definition, and axiom-closure audit took 10,842.5
+ms in a round-five full run. Six Lean declarations were kernel checked: the
 proof-material translation binding and the five required theorem families.
 Every required theorem reported an empty transitive axiom set.
 
@@ -61,7 +61,9 @@ except the closed ambient set actually used by the two modules. `Array`,
 shapes. The prior exact direct `process.argv`, named mutation-environment,
 stdout/stderr, and exit operations remain the only admitted `process` uses.
 The builtin import members are likewise closed to the exact read/crypto/path/
-URL functions in the audited source.
+URL functions in the audited source. Named builtin re-exports use the same
+exact source/member allowlist, while builtin export-star is forbidden. Local
+re-exports remain part of the recursively resolved real-path graph.
 
 The mutation matrix kills omitted reachability, selector/profile/reference/
 import/order changes, constant output, normalizer/checker co-drift, forbidden
@@ -71,37 +73,52 @@ comment-obfuscated/re-exported/symlinked/indirect dependency edges.
 The capability-origin cases include the exact array storage/index recovery,
 string-concatenated `getBuiltinModule`/`createRequire`, and multi-hop renamed
 loader attack, plus object/destructuring and sequence-expression variants.
-Round four adds exact AsyncFunction and function-prototype constructor escapes,
-ambient `fetch` and `WebSocket`, a disallowed safe-global member, and a positive
-lexical-shadowing control. Literal/template/concatenated constant property
-names are resolved to reject `constructor`, `prototype`, and `__proto__`.
+Round four added exact AsyncFunction and function-prototype constructor
+escapes, ambient `fetch` and `WebSocket`, a disallowed safe-global member, and
+a positive lexical-shadowing control. Round five closes computed member access:
+the two audited programs contain no computed `MemberExpression`; they instead
+use `Array.at`, `Object.entries`, `Map`, and separately authored own-entry
+lookup helpers. The audit rejects every unresolved computed member or property,
+still resolves literal/template/concatenated/constant names, and rejects
+resolved `constructor`, `prototype`, and `__proto__`. Positive controls cover
+every retained static resolution form. Runtime-backed negative cases first
+prove prototype mutation in isolated children and then require static
+rejection of the unresolved access.
 
 Pinned Node child invocations add defense in depth with exact read permissions,
 string-code generation disabled, and Fetch/WebSocket globals disabled. The
-suite proves that omitting any one of those four runtime controls exposes its
-focused probe. A computed constructor key that the static constant evaluator
-cannot resolve relies on the no-string-code-generation runtime backstop; this
-is closed-source feasibility evidence, not a claim of complete constant
-evaluation, general ECMAScript analysis, or arbitrary-input sandbox soundness.
+suite has separate fixed-path cases proving each protection blocks its focused
+probe and retains omission mutations proving each control is necessary. The
+round-five RED replay exercises the round-four base's existing `invoke`
+function directly and binds the exact exposed status/output for each omission.
+It supersedes the round-four historical claim: that earlier test stopped at an
+absent helper and did not prove the four vulnerable outcomes. This remains
+closed-source feasibility evidence, not a claim of general ECMAScript analysis
+or arbitrary-input sandbox soundness.
 
 ## Replay cleanup boundary
 
-All three retained RED replay wrappers use one shared cleanup implementation.
+All four committed RED replay wrappers use one shared cleanup implementation.
 Initialization explicitly checks repository resolution, `mktemp`,
 canonicalization, and child-directory creation before deriving a checkout
-path. Each cleanup decision captures `git worktree list --porcelain` once and
-treats query failure as cleanup failure. A registered target is removed only
-with `git worktree remove --force` against its exact canonical path, with one
-exact retry. The wrappers never invoke repository-wide prune or manually
-delete a failed checkout.
+path. Cleanup captures a pre-removal `git worktree list --porcelain` inventory
+and, after a successful exact removal, conditionally captures a post-removal
+inventory. Any required query failure is cleanup failure. A registered target
+is removed only with `git worktree remove --force` against its exact canonical
+path, with one exact retry. The wrappers never invoke repository-wide prune or
+manually delete a failed checkout.
 
 Normal, fail-first removal, inventory-query failure, exact-removal failure,
-child-status preservation after successful cleanup, and nonzero-child status
-preservation during query failure are exercised against both wrappers in
-disposable local repositories. Successful cleanup removes the exact
-registration and wrapper root. An unresolved query/removal failure preserves
-that exact registration/root for recovery; cleanup failure changes child
-status zero to one, while a nonzero child status remains authoritative.
+post-removal inventory-query failure, and the three corresponding nonzero-child
+status paths are exercised against both historical wrappers retained in the
+cleanup matrix, in disposable local repositories. Successful cleanup removes
+the exact registration and wrapper root. Every cleanup failure retains the
+wrapper root and leaves whatever exact-target Git state remains for recovery.
+Registration preservation is claimed only for verified
+pre-removal/no-side-effect cases; after a successful removal followed by a
+failed inventory query, registration state is explicitly unknown and the tests
+make no assertion about it. Cleanup failure changes child status zero to one,
+while a nonzero child status remains authoritative.
 
 ## Lean feasibility and audit boundary
 

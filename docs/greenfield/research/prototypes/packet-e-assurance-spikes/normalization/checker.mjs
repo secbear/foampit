@@ -13,23 +13,37 @@ function abort(message) {
 }
 
 function argumentsOf(argv) {
-  const parsed = {};
+  const parsed = new Map();
   for (let index = 0; index < argv.length; index += 2) {
-    if (!argv[index]?.startsWith("--") || argv[index + 1] === undefined) {
+    const flag = argv.at(index);
+    const value = argv.at(index + 1);
+    if (!flag?.startsWith("--") || value === undefined) {
       abort("usage: checker.mjs --proof FILE --cases FILE");
     }
-    parsed[argv[index].slice(2)] = argv[index + 1];
+    parsed.set(flag.slice(2), value);
   }
-  if (!parsed.proof || !parsed.cases) abort("proof and cases files are required");
+  if (!parsed.get("proof") || !parsed.get("cases")) {
+    abort("proof and cases files are required");
+  }
   return parsed;
+}
+
+function findOwnMember(value, wantedName) {
+  for (const [name, child] of Object.entries(value)) {
+    if (name === wantedName) return { found: true, value: child };
+  }
+  return { found: false, value: undefined };
 }
 
 function encodeCanonical(value) {
   if (value === null || typeof value !== "object") return JSON.stringify(value);
   if (Array.isArray(value)) return `[${value.map(encodeCanonical).join(",")}]`;
   const members = [];
-  for (const name of Object.keys(value).sort()) {
-    members.push(`${JSON.stringify(name)}:${encodeCanonical(value[name])}`);
+  const entries = Object.entries(value).sort(([left], [right]) =>
+    left.localeCompare(right)
+  );
+  for (const [name, child] of entries) {
+    members.push(`${JSON.stringify(name)}:${encodeCanonical(child)}`);
   }
   return `{${members.join(",")}}`;
 }
@@ -49,10 +63,22 @@ function decodePointer(pointer) {
 function lookup(value, pointer) {
   let current = value;
   for (const token of decodePointer(pointer)) {
-    if (current === null || current === undefined || !(token in current)) {
+    if (current === null || current === undefined) {
       abort(`model reachability target is absent: ${pointer}`);
     }
-    current = current[token];
+    if (Array.isArray(current)) {
+      const child = current.at(Number(token));
+      if (child === undefined) {
+        abort(`model reachability target is absent: ${pointer}`);
+      }
+      current = child;
+    } else {
+      const member = findOwnMember(current, token);
+      if (!member.found) {
+        abort(`model reachability target is absent: ${pointer}`);
+      }
+      current = member.value;
+    }
   }
   return current;
 }
@@ -62,10 +88,13 @@ function enumerateLeaves(value, prefix = "") {
     if (Array.isArray(value)) {
       return value.flatMap((item, index) => enumerateLeaves(item, `${prefix}/${index}`));
     }
-    return Object.keys(value)
-      .sort()
-      .flatMap((key) =>
-        enumerateLeaves(value[key], `${prefix}/${key.replaceAll("~", "~0").replaceAll("/", "~1")}`)
+    return Object.entries(value)
+      .sort(([left], [right]) => left.localeCompare(right))
+      .flatMap(([key, child]) =>
+        enumerateLeaves(
+          child,
+          `${prefix}/${key.replaceAll("~", "~0").replaceAll("/", "~1")}`
+        )
       );
   }
   return [prefix];
@@ -92,7 +121,7 @@ function validateClosedSources(catalog, foreign, foreignBytes) {
   exactKeys(catalog, ["imports", "operations", "profiles", "schemaRevision"], "catalog");
   exactKeys(foreign, ["definitions", "schemaRevision"], "foreign catalog");
   if (catalog.imports.length !== 1) abort("closed import count mismatch");
-  const imported = catalog.imports[0];
+  const imported = catalog.imports.at(0);
   exactKeys(imported, ["id", "path", "sha256"], "import");
   if (
     imported.id !== "foreign-ops" ||
@@ -110,12 +139,14 @@ function validateClosedSources(catalog, foreign, foreignBytes) {
       `operation ${operation.id}`
     );
     exactKeys(operation.selector, ["capability", "family"], `selector ${operation.id}`);
-    if (!(operation.profile in catalog.profiles)) abort(`profile is unresolved: ${operation.profile}`);
+    if (!findOwnMember(catalog.profiles, operation.profile).found) {
+      abort(`profile is unresolved: ${operation.profile}`);
+    }
     const [referenceKind, target] = operation.reference.split(":");
     if (referenceKind === "local" && !operationIds.includes(target)) {
       abort(`local reference is unresolved: ${operation.reference}`);
     }
-    if (referenceKind === "foreign" && !(target in foreign.definitions)) {
+    if (referenceKind === "foreign" && !findOwnMember(foreign.definitions, target).found) {
       abort(`foreign reference is unresolved: ${operation.reference}`);
     }
     if (!["local", "foreign"].includes(referenceKind)) {
@@ -134,7 +165,7 @@ function expandReference(rawReference, foreign, checkerMutation) {
       target: checkerMutation === "reference" ? "zeta" : target
     };
   }
-  const definition = foreign.definitions[target];
+  const definition = findOwnMember(foreign.definitions, target).value;
   return {
     definition: target,
     enabled: definition.enabled,
@@ -147,12 +178,15 @@ function expandReference(rawReference, foreign, checkerMutation) {
 function replay(catalog, foreign, checkerMutation) {
   const expanded = [];
   for (const sourceOperation of catalog.operations) {
-    const selectedProfile = catalog.profiles[sourceOperation.profile];
+    const selectedProfile = findOwnMember(
+      catalog.profiles,
+      sourceOperation.profile
+    ).value;
     expanded.push({
       effect: selectedProfile.effect,
       gates:
         checkerMutation === "profile"
-          ? [selectedProfile.gates[0], "mutated-quota"]
+          ? [selectedProfile.gates.at(0), "mutated-quota"]
           : selectedProfile.gates.map((gate) => gate),
       id: sourceOperation.id,
       order: sourceOperation.order,
@@ -177,9 +211,9 @@ function replay(catalog, foreign, checkerMutation) {
     foreignRevision: foreign.schemaRevision,
     imports: [
       {
-        id: catalog.imports[0].id,
-        path: catalog.imports[0].path,
-        sha256: catalog.imports[0].sha256,
+        id: catalog.imports.at(0).id,
+        path: catalog.imports.at(0).path,
+        sha256: catalog.imports.at(0).sha256,
         sourceRevision: foreign.schemaRevision
       }
     ],
@@ -192,11 +226,11 @@ function replay(catalog, foreign, checkerMutation) {
 function expectedTargets(file, sourcePath, catalog, model) {
   const tokens = decodePointer(sourcePath);
   if (file === "catalog.json" && sourcePath === "/schemaRevision") return ["/sourceRevision"];
-  if (file === "catalog.json" && tokens[0] === "imports") {
-    return [`/imports/${tokens[1]}/${tokens.slice(2).join("/")}`];
+  if (file === "catalog.json" && tokens.at(0) === "imports") {
+    return [`/imports/${tokens.at(1)}/${tokens.slice(2).join("/")}`];
   }
-  if (file === "catalog.json" && tokens[0] === "profiles") {
-    const profile = tokens[1];
+  if (file === "catalog.json" && tokens.at(0) === "profiles") {
+    const profile = tokens.at(1);
     const outputField = tokens.slice(2).join("/");
     const targets = [];
     model.operations.forEach((operation, index) => {
@@ -204,10 +238,10 @@ function expectedTargets(file, sourcePath, catalog, model) {
     });
     return targets;
   }
-  if (file === "catalog.json" && tokens[0] === "operations") {
-    const sourceOperation = catalog.operations[Number(tokens[1])];
+  if (file === "catalog.json" && tokens.at(0) === "operations") {
+    const sourceOperation = catalog.operations.at(Number(tokens.at(1)));
     const destination = model.operations.findIndex((operation) => operation.id === sourceOperation.id);
-    if (tokens[2] === "profile") {
+    if (tokens.at(2) === "profile") {
       return [
         `/operations/${destination}/profile`,
         `/operations/${destination}/effect`,
@@ -219,9 +253,9 @@ function expectedTargets(file, sourcePath, catalog, model) {
   if (file === "foreign.json" && sourcePath === "/schemaRevision") {
     return ["/foreignRevision", "/imports/0/sourceRevision"];
   }
-  if (file === "foreign.json" && tokens[0] === "definitions") {
-    const definition = tokens[1];
-    const outputField = tokens[2];
+  if (file === "foreign.json" && tokens.at(0) === "definitions") {
+    const definition = tokens.at(1);
+    const outputField = tokens.at(2);
     const targets = [];
     model.operations.forEach((operation, index) => {
       if (operation.reference.definition === definition) {
@@ -239,8 +273,8 @@ function compareReachability(proof, catalog, foreign, model, cases) {
     ["catalog.json", catalog],
     ["foreign.json", foreign]
   ]);
-  const actualPaths = {};
-  for (const file of sourceValues.keys()) actualPaths[file] = [];
+  const actualPaths = new Map();
+  for (const file of sourceValues.keys()) actualPaths.set(file, []);
   const seen = new Set();
   for (const entry of proof.sourceReachability) {
     exactKeys(
@@ -252,7 +286,7 @@ function compareReachability(proof, catalog, foreign, model, cases) {
     if (seen.has(identity)) abort(`duplicate reachability entry ${identity}`);
     seen.add(identity);
     if (!sourceValues.has(entry.file)) abort(`unknown reachability source ${entry.file}`);
-    actualPaths[entry.file].push(entry.sourcePath);
+    actualPaths.get(entry.file).push(entry.sourcePath);
     const source = sourceValues.get(entry.file);
     const expectedSourceDigest = digest(encodeCanonical(lookup(source, entry.sourcePath)));
     if (entry.sourceValueSha256 !== expectedSourceDigest) {
@@ -268,7 +302,7 @@ function compareReachability(proof, catalog, foreign, model, cases) {
     }
   }
   for (const [file, expectedPaths] of Object.entries(cases.semanticSourcePaths)) {
-    const observed = (actualPaths[file] ?? []).sort();
+    const observed = [...(actualPaths.get(file) ?? [])].sort();
     const literal = [...expectedPaths].sort();
     const parsedLeaves = enumerateLeaves(sourceValues.get(file)).sort();
     if (encodeCanonical(parsedLeaves) !== encodeCanonical(literal)) {
@@ -281,8 +315,8 @@ function compareReachability(proof, catalog, foreign, model, cases) {
 }
 
 const args = argumentsOf(process.argv.slice(2));
-const proof = JSON.parse(await readFile(resolve(args.proof), "utf8"));
-const cases = JSON.parse(await readFile(resolve(args.cases), "utf8"));
+const proof = JSON.parse(await readFile(resolve(args.get("proof")), "utf8"));
+const cases = JSON.parse(await readFile(resolve(args.get("cases")), "utf8"));
 const forbidden = findForbiddenOutput(proof);
 if (forbidden) abort(`forbidden normalizer output at ${forbidden}`);
 
@@ -325,7 +359,10 @@ if (
 ) {
   abort("literal source digest mismatch");
 }
-const literalExpectedModel = await readFile(resolve(dirname(resolve(args.cases)), cases.expectedModelFile), "utf8");
+const literalExpectedModel = await readFile(
+  resolve(dirname(resolve(args.get("cases"))), cases.expectedModelFile),
+  "utf8"
+);
 if (proof.modelBytes !== literalExpectedModel) abort("literal expected model bytes mismatch");
 if (proof.modelSha256 !== cases.expectedModelSha256) abort("literal expected model digest mismatch");
 

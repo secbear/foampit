@@ -1,0 +1,13 @@
+RED normalization/unresolved-let-computed-member: dependency mutation survived: unresolved-let-computed-member; prototypeEvidenceStatus=0 prototypeEvidenceStdout="MUTATED unresolved-let-computed-member\n"
+RED normalization/unresolved-join-computed-member: dependency mutation survived: unresolved-join-computed-member; prototypeEvidenceStatus=0 prototypeEvidenceStdout="MUTATED unresolved-join-computed-member\n"
+CONTROL normalization/resolved-computed-members-control: PASS normalization/dependency-resolved-computed-members-control
+RED normalization/builtin-named-reexport-member: dependency mutation survived: builtin-named-reexport-member
+RED normalization/builtin-export-all: dependency mutation survived: builtin-export-all
+CONTROL normalization/builtin-named-reexport-control: PASS normalization/dependency-builtin-named-reexport-control
+RED runtime/permission: RED runtime/permission: childStatus=23 childStdout="EXPOSED permission\n"
+RED runtime/code-generation: RED runtime/code-generation: childStatus=23 childStdout="EXPOSED code-generation\n"
+RED runtime/fetch: RED runtime/fetch: childStatus=23 childStdout="EXPOSED fetch\n"
+RED runtime/websocket: RED runtime/websocket: childStatus=23 childStdout="EXPOSED websocket\n"
+CONTROL replay/post-remove-query-failure: PASS replay/post-remove-query-failure wrappers=2
+CONTROL replay/status-preservation-post-remove-query-failure: PASS replay/status-preservation-post-remove-query-failure wrappers=2
+RED round 5 summary: vulnerabilities=8 controls=4

@@ -1,0 +1,291 @@
+diff --git a/docs/greenfield/research/prototypes/packet-e-assurance-spikes/fix-round-1-red-replay/replay-tests.sh b/docs/greenfield/research/prototypes/packet-e-assurance-spikes/fix-round-1-red-replay/replay-tests.sh
+index 20d2a995705b1701e52574d676c07489ab6b2ad1..e5613073f6491b151f833d441c276377f59d7bb6 100755
+--- a/docs/greenfield/research/prototypes/packet-e-assurance-spikes/fix-round-1-red-replay/replay-tests.sh
++++ b/docs/greenfield/research/prototypes/packet-e-assurance-spikes/fix-round-1-red-replay/replay-tests.sh
+@@ -22,0 +23,6 @@ stub_git() {
++    if [[ (
++      "$PACKET_E_REPLAY_STUB_SCENARIO" == "post-remove-query-failure" ||
++      "$PACKET_E_REPLAY_STUB_SCENARIO" == "status-preservation-post-remove-query-failure"
++    ) && "$count" == 2 ]]; then
++      exit 74
++    fi
+@@ -68,0 +75 @@ cases=(
++  post-remove-query-failure
+@@ -70,0 +78 @@ cases=(
++  status-preservation-post-remove-query-failure
+@@ -117 +125,2 @@ run_wrapper() {
+-  local target root child_tmp remove_count expected_status expect_recovery
++  local target root child_tmp remove_count expected_status root_expectation
++  local registration_expectation
+@@ -161 +170,2 @@ run_wrapper() {
+-  expect_recovery=0
++  root_expectation=absent
++  registration_expectation=absent
+@@ -173 +183,2 @@ run_wrapper() {
+-      expect_recovery=1
++      root_expectation=present-with-checkout
++      registration_expectation=present
+@@ -179 +190,2 @@ run_wrapper() {
+-      expect_recovery=1
++      root_expectation=present-with-checkout
++      registration_expectation=present
+@@ -182,0 +195,7 @@ run_wrapper() {
++    post-remove-query-failure)
++      expected_status=1
++      root_expectation=present
++      registration_expectation=unknown
++      [[ "$remove_count" == 1 ]] ||
++        fail "$scenario/$wrapper_key did not perform one successful exact removal"
++      ;;
+@@ -190 +209,2 @@ run_wrapper() {
+-      expect_recovery=1
++      root_expectation=present-with-checkout
++      registration_expectation=present
+@@ -193,0 +214,7 @@ run_wrapper() {
++    status-preservation-post-remove-query-failure)
++      expected_status=7
++      root_expectation=present
++      registration_expectation=unknown
++      [[ "$remove_count" == 1 ]] ||
++        fail "$scenario/$wrapper_key did not perform one successful exact removal"
++      ;;
+@@ -201,12 +228,27 @@ run_wrapper() {
+-  if (( expect_recovery == 1 )); then
+-    [[ -d "$root" && -d "$target" ]] ||
+-      fail "$scenario/$wrapper_key did not retain the exact recovery root"
+-    capture_registration "$clone" "$target" ||
+-      fail "$scenario/$wrapper_key did not retain the exact registration"
+-  else
+-    [[ ! -e "$root" ]] ||
+-      fail "$scenario/$wrapper_key left a successful cleanup root"
+-    if capture_registration "$clone" "$target"; then
+-      fail "$scenario/$wrapper_key left a successful cleanup registration"
+-    fi
+-  fi
++  case "$root_expectation" in
++    present-with-checkout)
++      [[ -d "$root" && -d "$target" ]] ||
++        fail "$scenario/$wrapper_key did not retain the exact recovery root and checkout"
++      ;;
++    present)
++      [[ -d "$root" ]] ||
++        fail "$scenario/$wrapper_key did not retain the exact recovery root"
++      ;;
++    absent)
++      [[ ! -e "$root" ]] ||
++        fail "$scenario/$wrapper_key left a successful cleanup root"
++      ;;
++  esac
++  case "$registration_expectation" in
++    present)
++      capture_registration "$clone" "$target" ||
++        fail "$scenario/$wrapper_key did not retain the exact registration"
++      ;;
++    absent)
++      if capture_registration "$clone" "$target"; then
++        fail "$scenario/$wrapper_key left a successful cleanup registration"
++      fi
++      ;;
++    unknown)
++      ;;
++  esac
+@@ -223 +265,2 @@ run_case() {
+-      "$scenario" == "status-preservation-query-failure" ]]; then
++      "$scenario" == "status-preservation-query-failure" ||
++      "$scenario" == "status-preservation-post-remove-query-failure" ]]; then
+diff --git a/docs/greenfield/research/prototypes/packet-e-assurance-spikes/normalization/dependency-audit.mjs b/docs/greenfield/research/prototypes/packet-e-assurance-spikes/normalization/dependency-audit.mjs
+index ed89b82e833e820560033a33e2c0e265b8324dd0..0dffc3154dfb0fb41525dedddd540d0edc5c1cfe 100644
+--- a/docs/greenfield/research/prototypes/packet-e-assurance-spikes/normalization/dependency-audit.mjs
++++ b/docs/greenfield/research/prototypes/packet-e-assurance-spikes/normalization/dependency-audit.mjs
+@@ -673,0 +674,10 @@ const testCases = [
++  "dependency-unresolved-let-computed-member",
++  "dependency-unresolved-join-computed-member",
++  "dependency-resolved-computed-members-control",
++  "dependency-builtin-named-reexport-member",
++  "dependency-builtin-export-all",
++  "dependency-builtin-named-reexport-control",
++  "runtime-permission-hardening",
++  "runtime-code-generation-hardening",
++  "runtime-fetch-hardening",
++  "runtime-websocket-hardening",
+@@ -780 +790 @@ async function expectDependencyAccepted(prefix, injectedSource) {
+-async function assertRuntimeHardeningFlags() {
++async function invokeRuntimeProbe(flag, omittedRuntimeFlag = null) {
+@@ -789 +799,4 @@ async function assertRuntimeHardeningFlags() {
+-        `try { readFileSync(${JSON.stringify(secret)}); process.exit(23); } catch {}\n`
++        "let exposed = false;\n" +
++        `try { readFileSync(${JSON.stringify(secret)}); exposed = true; } catch {}\n` +
++        'process.stdout.write(`${exposed ? "EXPOSED" : "BLOCKED"} permission\\n`);\n' +
++        "if (exposed) process.exit(23);\n"
+@@ -794 +807,4 @@ async function assertRuntimeHardeningFlags() {
+-        'try { Function("return 1")(); process.exit(23); } catch {}\n'
++        "let exposed = false;\n" +
++        'try { Function("return 1")(); exposed = true; } catch {}\n' +
++        'process.stdout.write(`${exposed ? "EXPOSED" : "BLOCKED"} code-generation\\n`);\n' +
++        "if (exposed) process.exit(23);\n"
+@@ -798 +814,4 @@ async function assertRuntimeHardeningFlags() {
+-      source: 'if (typeof fetch !== "undefined") process.exit(23);\n'
++      source:
++        'const exposed = typeof fetch !== "undefined";\n' +
++        'process.stdout.write(`${exposed ? "EXPOSED" : "BLOCKED"} fetch\\n`);\n' +
++        "if (exposed) process.exit(23);\n"
+@@ -802 +821,4 @@ async function assertRuntimeHardeningFlags() {
+-      source: 'if (typeof WebSocket !== "undefined") process.exit(23);\n'
++      source:
++        'const exposed = typeof WebSocket !== "undefined";\n' +
++        'process.stdout.write(`${exposed ? "EXPOSED" : "BLOCKED"} websocket\\n`);\n' +
++        "if (exposed) process.exit(23);\n"
+@@ -805,8 +827,40 @@ async function assertRuntimeHardeningFlags() {
+-  for (const probe of probes) {
+-    const probePath = join(temporary, `${probe.flag}.mjs`);
+-    await writeFile(probePath, probe.source);
+-    const baseline = invoke(probePath, []);
+-    assert.equal(
+-      baseline.status,
+-      0,
+-      `runtime hardening baseline failed for ${probe.flag}: ${baseline.stderr}`
++  const probe = probes.find((candidate) => candidate.flag === flag);
++  assert.ok(probe, `unknown runtime hardening probe: ${flag}`);
++  const probePath = join(temporary, `${probe.flag}.mjs`);
++  await writeFile(probePath, probe.source);
++  return invoke(probePath, [], {}, omittedRuntimeFlag);
++}
++
++async function assertRuntimeHardeningFlag(flag) {
++  const baseline = await invokeRuntimeProbe(flag);
++  assert.equal(
++    baseline.status,
++    0,
++    `runtime hardening baseline failed for ${flag}: ${baseline.stderr}`
++  );
++  assert.equal(baseline.stdout, `BLOCKED ${flag}\n`);
++  const mutation = await invokeRuntimeProbe(flag, flag);
++  assert.equal(
++    mutation.status,
++    23,
++    `runtime hardening flag mutation survived: ${flag}`
++  );
++  assert.equal(mutation.stdout, `EXPOSED ${flag}\n`);
++}
++
++async function assertRuntimeBackedDependencyRejected(prefix, injectedSource) {
++  const temporary = await mkdtemp(join(tmpdir(), `packet-e-${prefix}-runtime-`));
++  const probePath = join(temporary, "prototype-mutation.mjs");
++  await writeFile(probePath, `${injectedSource}\n`);
++  const runtime = invoke(probePath, []);
++  assert.equal(
++    runtime.status,
++    0,
++    `prototype mutation probe did not execute: ${prefix}: ${runtime.stderr}`
++  );
++  assert.equal(runtime.stdout, `MUTATED ${prefix}\n`);
++  try {
++    await expectDependencyRejected(
++      prefix,
++      injectedSource,
++      "unresolved computed member"
+@@ -814,5 +868,4 @@ async function assertRuntimeHardeningFlags() {
+-    const mutation = invoke(probePath, [], {}, probe.flag);
+-    assert.equal(
+-      mutation.status,
+-      23,
+-      `runtime hardening flag mutation survived: ${probe.flag}`
++  } catch (error) {
++    throw new Error(
++      `${error.message}; prototypeEvidenceStatus=${runtime.status} ` +
++        `prototypeEvidenceStdout=${JSON.stringify(runtime.stdout)}`
+@@ -822,0 +876,16 @@ async function assertRuntimeHardeningFlags() {
++async function assertRuntimeHardeningFlags() {
++  for (const flag of ["permission", "code-generation", "fetch", "websocket"]) {
++    await assertRuntimeHardeningFlag(flag);
++  }
++}
++
++async function runRuntimeOmissionRed(flag) {
++  const result = await invokeRuntimeProbe(flag, flag);
++  assert.equal(result.status, 23, `runtime omission did not expose ${flag}`);
++  assert.equal(result.stdout, `EXPOSED ${flag}\n`);
++  process.stdout.write(
++    `RED runtime/${flag}: childStatus=${result.status} childStdout=${JSON.stringify(result.stdout)}\n`
++  );
++  process.exitCode = result.status;
++}
++
+@@ -1088,0 +1158,72 @@ async function runTestCase(name) {
++    case "dependency-unresolved-let-computed-member":
++      await assertRuntimeBackedDependencyRejected(
++        "unresolved-let-computed-member",
++        "const target = {};\n" +
++          'let constructorKey = "constructor";\n' +
++          'let prototypeKey = "prototype";\n' +
++          "target[constructorKey][prototypeKey].packetERound5LetMutation = true;\n" +
++          "if (({}).packetERound5LetMutation !== true) {\n" +
++          '  throw new Error("prototype mutation was not observed");\n' +
++          "}\n" +
++          'process.stdout.write("MUTATED unresolved-let-computed-member\\n");'
++      );
++      break;
++    case "dependency-unresolved-join-computed-member":
++      await assertRuntimeBackedDependencyRejected(
++        "unresolved-join-computed-member",
++        "const target = {};\n" +
++          'const constructorKey = ["con", "structor"].join("");\n' +
++          'const prototypeKey = ["proto", "type"].join("");\n' +
++          "target[constructorKey][prototypeKey].packetERound5JoinMutation = true;\n" +
++          "if (({}).packetERound5JoinMutation !== true) {\n" +
++          '  throw new Error("prototype mutation was not observed");\n' +
++          "}\n" +
++          'process.stdout.write("MUTATED unresolved-join-computed-member\\n");'
++      );
++      break;
++    case "dependency-resolved-computed-members-control":
++      await expectDependencyAccepted(
++        "resolved-computed-members-control",
++        "const data = { value: 7 };\n" +
++          'const key = "value";\n' +
++          'const left = data["value"];\n' +
++          "const middle = data[`value`];\n" +
++          'const joined = data["val" + "ue"];\n' +
++          "const right = data[key];\n" +
++          "if (left + middle + joined + right !== 28) {\n" +
++          '  throw new Error("resolved computed-member control failed");\n' +
++          "}"
++      );
++      break;
++    case "dependency-builtin-named-reexport-member":
++      await expectDependencyRejected(
++        "builtin-named-reexport-member",
++        'export { writeFile } from "node:fs/promises";',
++        "builtin re-export member"
++      );
++      break;
++    case "dependency-builtin-export-all":
++      await expectDependencyRejected(
++        "builtin-export-all",
++        'export * from "node:path";',
++        "builtin export-star"
++      );
++      break;
++    case "dependency-builtin-named-reexport-control":
++      await expectDependencyAccepted(
++        "builtin-named-reexport-control",
++        'export { readFile as exactRead } from "node:fs/promises";'
++      );
++      break;
++    case "runtime-permission-hardening":
++      await assertRuntimeHardeningFlag("permission");
++      break;
++    case "runtime-code-generation-hardening":
++      await assertRuntimeHardeningFlag("code-generation");
++      break;
++    case "runtime-fetch-hardening":
++      await assertRuntimeHardeningFlag("fetch");
++      break;
++    case "runtime-websocket-hardening":
++      await assertRuntimeHardeningFlag("websocket");
++      break;
+@@ -1129 +1270,3 @@ try {
+-  if (process.argv[2] === "--all" || process.argv[2] === "--case") {
++  if (process.argv[2] === "--runtime-omission-red") {
++    await runRuntimeOmissionRed(process.argv[3]);
++  } else if (process.argv[2] === "--all" || process.argv[2] === "--case") {

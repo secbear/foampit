@@ -8,19 +8,26 @@ import { fileURLToPath } from "node:url";
 const here = dirname(fileURLToPath(import.meta.url));
 
 function parseArgs(argv) {
-  const result = {};
+  const result = new Map();
   for (let index = 0; index < argv.length; index += 2) {
-    const flag = argv[index];
-    const value = argv[index + 1];
+    const flag = argv.at(index);
+    const value = argv.at(index + 1);
     if (!flag?.startsWith("--") || value === undefined) {
       throw new Error("usage: normalizer.mjs --catalog FILE --foreign FILE");
     }
-    result[flag.slice(2)] = value;
+    result.set(flag.slice(2), value);
   }
-  if (!result.catalog || !result.foreign) {
+  if (!result.get("catalog") || !result.get("foreign")) {
     throw new Error("catalog and foreign files are required");
   }
   return result;
+}
+
+function ownValue(value, wantedKey) {
+  for (const [key, child] of Object.entries(value)) {
+    if (key === wantedKey) return child;
+  }
+  return undefined;
 }
 
 function canonical(value) {
@@ -28,9 +35,9 @@ function canonical(value) {
     return `[${value.map(canonical).join(",")}]`;
   }
   if (value !== null && typeof value === "object") {
-    return `{${Object.keys(value)
-      .sort()
-      .map((key) => `${JSON.stringify(key)}:${canonical(value[key])}`)
+    return `{${Object.entries(value)
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([key, child]) => `${JSON.stringify(key)}:${canonical(child)}`)
       .join(",")}}`;
   }
   return JSON.stringify(value);
@@ -48,7 +55,13 @@ function pointerTokens(pointer) {
 }
 
 function atPointer(value, pointer) {
-  return pointerTokens(pointer).reduce((current, token) => current[token], value);
+  return pointerTokens(pointer).reduce(
+    (current, token) =>
+      Array.isArray(current)
+        ? current.at(Number(token))
+        : ownValue(current, token),
+    value
+  );
 }
 
 function leafPaths(value, prefix = "") {
@@ -56,9 +69,14 @@ function leafPaths(value, prefix = "") {
     return value.flatMap((entry, index) => leafPaths(entry, `${prefix}/${index}`));
   }
   if (value !== null && typeof value === "object") {
-    return Object.keys(value)
-      .sort()
-      .flatMap((key) => leafPaths(value[key], `${prefix}/${key.replaceAll("~", "~0").replaceAll("/", "~1")}`));
+    return Object.entries(value)
+      .sort(([left], [right]) => left.localeCompare(right))
+      .flatMap(([key, child]) =>
+        leafPaths(
+          child,
+          `${prefix}/${key.replaceAll("~", "~0").replaceAll("/", "~1")}`
+        )
+      );
   }
   return [prefix];
 }
@@ -74,10 +92,11 @@ function assertKeys(value, expected, label) {
 function validateCatalog(catalog, foreign, foreignBytes) {
   assertKeys(catalog, ["imports", "operations", "profiles", "schemaRevision"], "catalog");
   assertKeys(foreign, ["definitions", "schemaRevision"], "foreign catalog");
-  if (catalog.imports.length !== 1 || catalog.imports[0].path !== "foreign.json") {
+  const imported = catalog.imports.at(0);
+  if (catalog.imports.length !== 1 || imported.path !== "foreign.json") {
     throw new Error("the closed spike requires exactly foreign.json");
   }
-  if (catalog.imports[0].sha256 !== sha256(foreignBytes)) {
+  if (imported.sha256 !== sha256(foreignBytes)) {
     throw new Error("pinned foreign import digest mismatch");
   }
   const ids = new Set(catalog.operations.map((operation) => operation.id));
@@ -89,13 +108,15 @@ function validateCatalog(catalog, foreign, foreignBytes) {
       `operation ${operation.id}`
     );
     assertKeys(operation.selector, ["capability", "family"], `selector ${operation.id}`);
-    if (!catalog.profiles[operation.profile]) throw new Error(`unknown profile ${operation.profile}`);
+    if (!ownValue(catalog.profiles, operation.profile)) {
+      throw new Error(`unknown profile ${operation.profile}`);
+    }
     if (operation.reference.startsWith("local:") && !ids.has(operation.reference.slice(6))) {
       throw new Error(`unknown local reference ${operation.reference}`);
     }
     if (
       operation.reference.startsWith("foreign:") &&
-      !foreign.definitions[operation.reference.slice(8)]
+      !ownValue(foreign.definitions, operation.reference.slice(8))
     ) {
       throw new Error(`unknown foreign reference ${operation.reference}`);
     }
@@ -110,7 +131,7 @@ function referenceBinding(reference, foreign, mutation) {
     };
   }
   const definition = reference.slice(8);
-  const imported = foreign.definitions[definition];
+  const imported = ownValue(foreign.definitions, definition);
   return {
     definition,
     enabled: imported.enabled,
@@ -122,12 +143,12 @@ function referenceBinding(reference, foreign, mutation) {
 
 function buildModel(catalog, foreign, mutation) {
   const operations = catalog.operations.map((operation) => {
-    const profile = catalog.profiles[operation.profile];
+    const profile = ownValue(catalog.profiles, operation.profile);
     return {
       effect: profile.effect,
       gates:
         mutation === "profile"
-          ? [profile.gates[0], "mutated-quota"]
+          ? [profile.gates.at(0), "mutated-quota"]
           : [...profile.gates],
       id: operation.id,
       order: operation.order,
@@ -164,21 +185,21 @@ function modelPathsFor(file, sourcePath, catalog, model) {
   if (file === "catalog.json" && sourcePath === "/schemaRevision") {
     return ["/sourceRevision"];
   }
-  if (file === "catalog.json" && tokens[0] === "imports") {
-    return [`/imports/${tokens[1]}/${tokens.slice(2).join("/")}`];
+  if (file === "catalog.json" && tokens.at(0) === "imports") {
+    return [`/imports/${tokens.at(1)}/${tokens.slice(2).join("/")}`];
   }
-  if (file === "catalog.json" && tokens[0] === "profiles") {
-    const profileName = tokens[1];
+  if (file === "catalog.json" && tokens.at(0) === "profiles") {
+    const profileName = tokens.at(1);
     const suffix = tokens.slice(2).join("/");
     return model.operations
       .map((operation, index) => ({ operation, index }))
       .filter(({ operation }) => operation.profile === profileName)
       .map(({ index }) => `/operations/${index}/${suffix}`);
   }
-  if (file === "catalog.json" && tokens[0] === "operations") {
-    const sourceOperation = catalog.operations[Number(tokens[1])];
+  if (file === "catalog.json" && tokens.at(0) === "operations") {
+    const sourceOperation = catalog.operations.at(Number(tokens.at(1)));
     const modelIndex = model.operations.findIndex((operation) => operation.id === sourceOperation.id);
-    const field = tokens[2];
+    const field = tokens.at(2);
     if (field === "profile") {
       return [
         `/operations/${modelIndex}/profile`,
@@ -191,9 +212,9 @@ function modelPathsFor(file, sourcePath, catalog, model) {
   if (file === "foreign.json" && sourcePath === "/schemaRevision") {
     return ["/foreignRevision", "/imports/0/sourceRevision"];
   }
-  if (file === "foreign.json" && tokens[0] === "definitions") {
-    const definition = tokens[1];
-    const field = tokens[2];
+  if (file === "foreign.json" && tokens.at(0) === "definitions") {
+    const definition = tokens.at(1);
+    const field = tokens.at(2);
     return model.operations
       .map((operation, index) => ({ operation, index }))
       .filter(({ operation }) => operation.reference.definition === definition)
@@ -223,8 +244,8 @@ function reachability(catalog, foreign, model) {
 
 const args = parseArgs(process.argv.slice(2));
 const mutation = process.env.PACKET_E_NORMALIZER_MUTATION ?? "";
-const catalogBytes = await readFile(resolve(args.catalog), "utf8");
-const foreignBytes = await readFile(resolve(args.foreign), "utf8");
+const catalogBytes = await readFile(resolve(args.get("catalog")), "utf8");
+const foreignBytes = await readFile(resolve(args.get("foreign")), "utf8");
 const catalog = JSON.parse(catalogBytes);
 const foreign = JSON.parse(foreignBytes);
 validateCatalog(catalog, foreign, foreignBytes);

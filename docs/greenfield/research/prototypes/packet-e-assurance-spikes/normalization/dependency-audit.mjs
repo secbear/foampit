@@ -199,7 +199,16 @@ async function localGraph(entry) {
           if (property.type === "RestElement") {
             analyzePatternExpressions(property.argument, scope, ancestors);
           } else {
-            if (property.computed) analyzeNode(property.key, scope, ancestors);
+            if (property.computed) {
+              const member = staticString(property.key, scope);
+              if (member === null) {
+                die("unresolved computed property is forbidden");
+              }
+              if (sensitiveProperties.has(member)) {
+                die("prototype or constructor introspection is forbidden");
+              }
+              analyzeNode(property.key, scope, ancestors);
+            }
             analyzePatternExpressions(property.value, scope, ancestors);
           }
         }
@@ -287,6 +296,20 @@ async function localGraph(entry) {
     }
   }
 
+  function validateBuiltinReexport(node) {
+    const allowedMembers = allowedBuiltinMembers.get(node.source?.value);
+    if (!allowedMembers) return;
+    for (const specifier of node.specifiers) {
+      if (
+        specifier.type !== "ExportSpecifier" ||
+        specifier.local?.type !== "Identifier" ||
+        !allowedMembers.has(specifier.local.name)
+      ) {
+        die(`builtin re-export member is forbidden: ${node.source.value}`);
+      }
+    }
+  }
+
   function analyzeFunction(node, scope, ancestors) {
     const functionScope = new Scope(scope);
     if (node.type === "FunctionExpression" && node.id) {
@@ -323,6 +346,14 @@ async function localGraph(entry) {
         validateImport(node);
         return;
       case "ExportNamedDeclaration":
+        if (node.source) validateBuiltinReexport(node);
+        analyzeNode(node.declaration, scope, nestedAncestors);
+        if (!node.source) {
+          for (const specifier of node.specifiers ?? []) {
+            if (specifier.local) analyzeNode(specifier.local, scope, nestedAncestors);
+          }
+        }
+        return;
       case "ExportDefaultDeclaration":
         analyzeNode(node.declaration, scope, nestedAncestors);
         if (!node.source) {
@@ -332,6 +363,10 @@ async function localGraph(entry) {
         }
         return;
       case "ExportAllDeclaration":
+        if (node.source?.value?.startsWith("node:")) {
+          die(`builtin export-star is forbidden: ${node.source.value}`);
+        }
+        return;
       case "ImportSpecifier":
       case "ImportDefaultSpecifier":
       case "ImportNamespaceSpecifier":
@@ -377,6 +412,9 @@ async function localGraph(entry) {
         return;
       case "MemberExpression": {
         const member = scopedPropertyName(node, scope);
+        if (node.computed && member === null) {
+          die("unresolved computed member is forbidden");
+        }
         if (sensitiveProperties.has(member)) {
           die("prototype or constructor introspection is forbidden");
         }
@@ -427,7 +465,16 @@ async function localGraph(entry) {
         for (const property of node.properties) analyzeNode(property, scope, nestedAncestors);
         return;
       case "Property":
-        if (node.computed) analyzeNode(node.key, scope, nestedAncestors);
+        if (node.computed) {
+          const member = staticString(node.key, scope);
+          if (member === null) {
+            die("unresolved computed property is forbidden");
+          }
+          if (sensitiveProperties.has(member)) {
+            die("prototype or constructor introspection is forbidden");
+          }
+          analyzeNode(node.key, scope, nestedAncestors);
+        }
         analyzeNode(node.value, scope, nestedAncestors);
         return;
       case "ObjectPattern":
@@ -671,6 +718,17 @@ const testCases = [
   "dependency-ambient-websocket",
   "dependency-safe-global-member",
   "dependency-lexical-shadowing-control",
+  "dependency-unresolved-let-computed-member",
+  "dependency-unresolved-join-computed-member",
+  "dependency-resolved-computed-members-control",
+  "dependency-builtin-named-reexport-member",
+  "dependency-builtin-export-all",
+  "dependency-builtin-named-reexport-control",
+  "dependency-local-export-all-reexport",
+  "runtime-permission-hardening",
+  "runtime-code-generation-hardening",
+  "runtime-fetch-hardening",
+  "runtime-websocket-hardening",
   "runtime-hardening-flags",
   "dependency-package-loading",
   "source-digest-mismatch",
@@ -777,7 +835,7 @@ async function expectDependencyAccepted(prefix, injectedSource) {
   assert.equal(result.status, 0, result.stderr || result.stdout);
 }
 
-async function assertRuntimeHardeningFlags() {
+async function invokeRuntimeProbe(flag, omittedRuntimeFlag = null) {
   const temporary = await mkdtemp(join(tmpdir(), "packet-e-runtime-hardening-"));
   const secret = join(temporary, "forbidden-read.txt");
   await writeFile(secret, "closed\n");
@@ -786,37 +844,86 @@ async function assertRuntimeHardeningFlags() {
       flag: "permission",
       source:
         'import { readFileSync } from "node:fs";\n' +
-        `try { readFileSync(${JSON.stringify(secret)}); process.exit(23); } catch {}\n`
+        "let exposed = false;\n" +
+        `try { readFileSync(${JSON.stringify(secret)}); exposed = true; } catch {}\n` +
+        'process.stdout.write(`${exposed ? "EXPOSED" : "BLOCKED"} permission\\n`);\n' +
+        "if (exposed) process.exit(23);\n"
     },
     {
       flag: "code-generation",
       source:
-        'try { Function("return 1")(); process.exit(23); } catch {}\n'
+        "let exposed = false;\n" +
+        'try { Function("return 1")(); exposed = true; } catch {}\n' +
+        'process.stdout.write(`${exposed ? "EXPOSED" : "BLOCKED"} code-generation\\n`);\n' +
+        "if (exposed) process.exit(23);\n"
     },
     {
       flag: "fetch",
-      source: 'if (typeof fetch !== "undefined") process.exit(23);\n'
+      source:
+        'const exposed = typeof fetch !== "undefined";\n' +
+        'process.stdout.write(`${exposed ? "EXPOSED" : "BLOCKED"} fetch\\n`);\n' +
+        "if (exposed) process.exit(23);\n"
     },
     {
       flag: "websocket",
-      source: 'if (typeof WebSocket !== "undefined") process.exit(23);\n'
+      source:
+        'const exposed = typeof WebSocket !== "undefined";\n' +
+        'process.stdout.write(`${exposed ? "EXPOSED" : "BLOCKED"} websocket\\n`);\n' +
+        "if (exposed) process.exit(23);\n"
     }
   ];
-  for (const probe of probes) {
-    const probePath = join(temporary, `${probe.flag}.mjs`);
-    await writeFile(probePath, probe.source);
-    const baseline = invoke(probePath, []);
-    assert.equal(
-      baseline.status,
-      0,
-      `runtime hardening baseline failed for ${probe.flag}: ${baseline.stderr}`
+  const probe = probes.find((candidate) => candidate.flag === flag);
+  assert.ok(probe, `unknown runtime hardening probe: ${flag}`);
+  const probePath = join(temporary, `${probe.flag}.mjs`);
+  await writeFile(probePath, probe.source);
+  return invoke(probePath, [], {}, omittedRuntimeFlag);
+}
+
+async function assertRuntimeHardeningFlag(flag) {
+  const baseline = await invokeRuntimeProbe(flag);
+  assert.equal(
+    baseline.status,
+    0,
+    `runtime hardening baseline failed for ${flag}: ${baseline.stderr}`
+  );
+  assert.equal(baseline.stdout, `BLOCKED ${flag}\n`);
+  const mutation = await invokeRuntimeProbe(flag, flag);
+  assert.equal(
+    mutation.status,
+    23,
+    `runtime hardening flag mutation survived: ${flag}`
+  );
+  assert.equal(mutation.stdout, `EXPOSED ${flag}\n`);
+}
+
+async function assertRuntimeBackedDependencyRejected(prefix, injectedSource) {
+  const temporary = await mkdtemp(join(tmpdir(), `packet-e-${prefix}-runtime-`));
+  const probePath = join(temporary, "prototype-mutation.mjs");
+  await writeFile(probePath, `${injectedSource}\n`);
+  const runtime = invoke(probePath, []);
+  assert.equal(
+    runtime.status,
+    0,
+    `prototype mutation probe did not execute: ${prefix}: ${runtime.stderr}`
+  );
+  assert.equal(runtime.stdout, `MUTATED ${prefix}\n`);
+  try {
+    await expectDependencyRejected(
+      prefix,
+      injectedSource,
+      "unresolved computed member"
     );
-    const mutation = invoke(probePath, [], {}, probe.flag);
-    assert.equal(
-      mutation.status,
-      23,
-      `runtime hardening flag mutation survived: ${probe.flag}`
+  } catch (error) {
+    throw new Error(
+      `${error.message}; prototypeEvidenceStatus=${runtime.status} ` +
+        `prototypeEvidenceStdout=${JSON.stringify(runtime.stdout)}`
     );
+  }
+}
+
+async function assertRuntimeHardeningFlags() {
+  for (const flag of ["permission", "code-generation", "fetch", "websocket"]) {
+    await assertRuntimeHardeningFlag(flag);
   }
 }
 
@@ -1085,6 +1192,88 @@ async function runTestCase(name) {
           "}\n" +
           'localNetwork((value) => value, "closed");'
       );
+      break;
+    case "dependency-unresolved-let-computed-member":
+      await assertRuntimeBackedDependencyRejected(
+        "unresolved-let-computed-member",
+        "const target = {};\n" +
+          'let constructorKey = "constructor";\n' +
+          'let prototypeKey = "prototype";\n' +
+          "target[constructorKey][prototypeKey].packetERound5LetMutation = true;\n" +
+          "if (({}).packetERound5LetMutation !== true) {\n" +
+          '  throw new Error("prototype mutation was not observed");\n' +
+          "}\n" +
+          'process.stdout.write("MUTATED unresolved-let-computed-member\\n");'
+      );
+      break;
+    case "dependency-unresolved-join-computed-member":
+      await assertRuntimeBackedDependencyRejected(
+        "unresolved-join-computed-member",
+        "const target = {};\n" +
+          'const constructorKey = ["con", "structor"].join("");\n' +
+          'const prototypeKey = ["proto", "type"].join("");\n' +
+          "target[constructorKey][prototypeKey].packetERound5JoinMutation = true;\n" +
+          "if (({}).packetERound5JoinMutation !== true) {\n" +
+          '  throw new Error("prototype mutation was not observed");\n' +
+          "}\n" +
+          'process.stdout.write("MUTATED unresolved-join-computed-member\\n");'
+      );
+      break;
+    case "dependency-resolved-computed-members-control":
+      await expectDependencyAccepted(
+        "resolved-computed-members-control",
+        'const key = "value";\n' +
+          'const literalData = { ["value"]: 7 };\n' +
+          "const templateData = { [`value`]: 7 };\n" +
+          'const joinedData = { ["val" + "ue"]: 7 };\n' +
+          "const constantData = { [key]: 7 };\n" +
+          'const left = literalData["value"];\n' +
+          "const middle = templateData[`value`];\n" +
+          'const joined = joinedData["val" + "ue"];\n' +
+          "const right = constantData[key];\n" +
+          "if (left + middle + joined + right !== 28) {\n" +
+          '  throw new Error("resolved computed-member control failed");\n' +
+          "}"
+      );
+      break;
+    case "dependency-builtin-named-reexport-member":
+      await expectDependencyRejected(
+        "builtin-named-reexport-member",
+        'export { writeFile } from "node:fs/promises";',
+        "builtin re-export member"
+      );
+      break;
+    case "dependency-builtin-export-all":
+      await expectDependencyRejected(
+        "builtin-export-all",
+        'export * from "node:path";',
+        "builtin export-star"
+      );
+      break;
+    case "dependency-builtin-named-reexport-control":
+      await expectDependencyAccepted(
+        "builtin-named-reexport-control",
+        'export { readFile as exactRead } from "node:fs/promises";'
+      );
+      break;
+    case "dependency-local-export-all-reexport":
+      await expectDependencyRejected(
+        "local-export-all-reexport",
+        'export * from "./normalizer.mjs";',
+        "cross-import"
+      );
+      break;
+    case "runtime-permission-hardening":
+      await assertRuntimeHardeningFlag("permission");
+      break;
+    case "runtime-code-generation-hardening":
+      await assertRuntimeHardeningFlag("code-generation");
+      break;
+    case "runtime-fetch-hardening":
+      await assertRuntimeHardeningFlag("fetch");
+      break;
+    case "runtime-websocket-hardening":
+      await assertRuntimeHardeningFlag("websocket");
       break;
     case "runtime-hardening-flags":
       await assertRuntimeHardeningFlags();

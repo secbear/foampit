@@ -1,0 +1,12 @@
+normalization/unresolved-let-computed-member=1
+normalization/unresolved-join-computed-member=1
+normalization/resolved-computed-members-control=0
+normalization/builtin-named-reexport-member=1
+normalization/builtin-export-all=1
+normalization/builtin-named-reexport-control=0
+runtime/permission=23
+runtime/code-generation=23
+runtime/fetch=23
+runtime/websocket=23
+replay/post-remove-query-failure=0
+replay/status-preservation-post-remove-query-failure=0

@@ -20,6 +20,12 @@ stub_git() {
     ) && "$count" == 1 ]]; then
       exit 71
     fi
+    if [[ (
+      "$PACKET_E_REPLAY_STUB_SCENARIO" == "post-remove-query-failure" ||
+      "$PACKET_E_REPLAY_STUB_SCENARIO" == "status-preservation-post-remove-query-failure"
+    ) && "$count" == 2 ]]; then
+      exit 74
+    fi
   elif [[ "$command" == "worktree" && "$operation" == "remove" ]]; then
     count=0
     if [[ -f "$PACKET_E_REPLAY_STUB_STATE/remove-count" ]]; then
@@ -66,8 +72,10 @@ cases=(
   fail-first-remove
   query-failure
   exact-remove-failure
+  post-remove-query-failure
   status-preservation
   status-preservation-query-failure
+  status-preservation-post-remove-query-failure
 )
 wrappers=(
   fix-round-1-red-replay/replay.sh
@@ -114,7 +122,8 @@ run_wrapper() {
   local wrapper_relative="$3"
   local child_status="$4"
   local wrapper_key clone state fake_bin temp_parent wrapper expected status
-  local target root child_tmp remove_count expected_status expect_recovery
+  local target root child_tmp remove_count expected_status root_expectation
+  local registration_expectation
 
   wrapper_key="${wrapper_relative//\//-}"
   clone="$case_root/repository-$wrapper_key"
@@ -158,7 +167,8 @@ run_wrapper() {
     remove_count="$(<"$state/remove-count")"
   fi
   expected_status=0
-  expect_recovery=0
+  root_expectation=absent
+  registration_expectation=absent
   case "$scenario" in
     normal)
       [[ "$remove_count" == 1 ]] ||
@@ -170,15 +180,24 @@ run_wrapper() {
       ;;
     query-failure)
       expected_status=1
-      expect_recovery=1
+      root_expectation=present-with-checkout
+      registration_expectation=present
       [[ "$remove_count" == 0 ]] ||
         fail "$scenario/$wrapper_key removed after inventory query failure"
       ;;
     exact-remove-failure)
       expected_status=1
-      expect_recovery=1
+      root_expectation=present-with-checkout
+      registration_expectation=present
       [[ "$remove_count" == 2 ]] ||
         fail "$scenario/$wrapper_key did not stop after two exact attempts"
+      ;;
+    post-remove-query-failure)
+      expected_status=1
+      root_expectation=present
+      registration_expectation=unknown
+      [[ "$remove_count" == 1 ]] ||
+        fail "$scenario/$wrapper_key did not perform one successful exact removal"
       ;;
     status-preservation)
       expected_status=7
@@ -187,9 +206,17 @@ run_wrapper() {
       ;;
     status-preservation-query-failure)
       expected_status=7
-      expect_recovery=1
+      root_expectation=present-with-checkout
+      registration_expectation=present
       [[ "$remove_count" == 0 ]] ||
         fail "$scenario/$wrapper_key removed after inventory query failure"
+      ;;
+    status-preservation-post-remove-query-failure)
+      expected_status=7
+      root_expectation=present
+      registration_expectation=unknown
+      [[ "$remove_count" == 1 ]] ||
+        fail "$scenario/$wrapper_key did not perform one successful exact removal"
       ;;
     *)
       fail "unknown replay scenario: $scenario"
@@ -198,18 +225,33 @@ run_wrapper() {
   [[ "$status" == "$expected_status" ]] ||
     fail "$scenario/$wrapper_key status=$status expected=$expected_status"
 
-  if (( expect_recovery == 1 )); then
-    [[ -d "$root" && -d "$target" ]] ||
-      fail "$scenario/$wrapper_key did not retain the exact recovery root"
-    capture_registration "$clone" "$target" ||
-      fail "$scenario/$wrapper_key did not retain the exact registration"
-  else
-    [[ ! -e "$root" ]] ||
-      fail "$scenario/$wrapper_key left a successful cleanup root"
-    if capture_registration "$clone" "$target"; then
-      fail "$scenario/$wrapper_key left a successful cleanup registration"
-    fi
-  fi
+  case "$root_expectation" in
+    present-with-checkout)
+      [[ -d "$root" && -d "$target" ]] ||
+        fail "$scenario/$wrapper_key did not retain the exact recovery root and checkout"
+      ;;
+    present)
+      [[ -d "$root" ]] ||
+        fail "$scenario/$wrapper_key did not retain the exact recovery root"
+      ;;
+    absent)
+      [[ ! -e "$root" ]] ||
+        fail "$scenario/$wrapper_key left a successful cleanup root"
+      ;;
+  esac
+  case "$registration_expectation" in
+    present)
+      capture_registration "$clone" "$target" ||
+        fail "$scenario/$wrapper_key did not retain the exact registration"
+      ;;
+    absent)
+      if capture_registration "$clone" "$target"; then
+        fail "$scenario/$wrapper_key left a successful cleanup registration"
+      fi
+      ;;
+    unknown)
+      ;;
+  esac
 }
 
 run_case() {
@@ -220,7 +262,8 @@ run_case() {
   (
     trap 'find "$case_root" -depth -delete' EXIT
     if [[ "$scenario" == "status-preservation" ||
-      "$scenario" == "status-preservation-query-failure" ]]; then
+      "$scenario" == "status-preservation-query-failure" ||
+      "$scenario" == "status-preservation-post-remove-query-failure" ]]; then
       child_status=7
     fi
     for wrapper in "${wrappers[@]}"; do
