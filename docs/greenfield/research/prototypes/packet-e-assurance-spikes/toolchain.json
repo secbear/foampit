@@ -39,12 +39,14 @@
         {
           "name": "Init",
           "version": "4.30.0",
-          "storePath": "/nix/store/1m9vrcg3pk9yagirygw77ccwf1l3kdks-lean4-4.30.0/lib/lean/Init.olean"
+          "storePath": "/nix/store/1m9vrcg3pk9yagirygw77ccwf1l3kdks-lean4-4.30.0/lib/lean/Init.olean",
+          "sha256": "e6e94e5f64bb438d9c44b5004ca9f321beae11d27f5a439ec7c5af08d66ef871"
         },
         {
           "name": "Std",
           "version": "4.30.0",
-          "storePath": "/nix/store/1m9vrcg3pk9yagirygw77ccwf1l3kdks-lean4-4.30.0/lib/lean/Std.olean"
+          "storePath": "/nix/store/1m9vrcg3pk9yagirygw77ccwf1l3kdks-lean4-4.30.0/lib/lean/Std.olean",
+          "sha256": "792b40d95e7ff493727514304e3e1af557b51354901cb22f81616eacc8084863"
         }
       ]
     },

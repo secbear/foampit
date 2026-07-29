@@ -1,12 +1,21 @@
 #!/usr/bin/env node
 
 import assert from "node:assert/strict";
-import { copyFile, mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { copyFile, mkdtemp, readFile, symlink, writeFile } from "node:fs/promises";
+import { realpath } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
+
+const { parse } = (await import("node:internal/deps/acorn/acorn/dist/acorn")).default;
+const allowedBuiltins = new Set([
+  "node:crypto",
+  "node:fs/promises",
+  "node:path",
+  "node:url"
+]);
 
 function die(message) {
   throw new Error(message);
@@ -26,20 +35,73 @@ function parseAuditArgs(argv) {
 
 async function localGraph(entry) {
   const visited = new Set();
+
+  function walk(node, visitNode) {
+    if (!node || typeof node !== "object") return;
+    if (typeof node.type === "string") visitNode(node);
+    for (const [key, value] of Object.entries(node)) {
+      if (key === "start" || key === "end" || key === "loc") continue;
+      if (Array.isArray(value)) {
+        for (const child of value) walk(child, visitNode);
+      } else {
+        walk(value, visitNode);
+      }
+    }
+  }
+
   async function visit(file) {
-    const absolute = resolve(file);
+    const absolute = await realpath(resolve(file));
     if (visited.has(absolute)) return;
     visited.add(absolute);
     const source = await readFile(absolute, "utf8");
-    if (/\brequire\s*\(|\bimport\s*\(/.test(source)) {
-      die(`dynamic dependency is forbidden: ${absolute}`);
-    }
-    const specifiers = [
-      ...source.matchAll(/^\s*import\s*["']([^"']+)["']\s*;?/gm),
-      ...source.matchAll(/^\s*import\b[^\n]*\bfrom\s*["']([^"']+)["']\s*;?/gm)
-    ].map((match) => match[1]);
+    const syntax = parse(source, {
+      ecmaVersion: "latest",
+      sourceType: "module",
+      allowHashBang: true
+    });
+    const specifiers = [];
+    walk(syntax, (node) => {
+      if (
+        node.type === "ImportDeclaration" ||
+        node.type === "ExportNamedDeclaration" ||
+        node.type === "ExportAllDeclaration"
+      ) {
+        if (node.source?.value !== undefined) specifiers.push(node.source.value);
+      }
+      if (node.type === "ImportExpression") {
+        die(`dynamic dependency is forbidden: ${absolute}`);
+      }
+      if (
+        node.type === "CallExpression" &&
+        node.callee?.type === "Identifier" &&
+        ["require", "eval"].includes(node.callee.name)
+      ) {
+        die(`indirect dependency is forbidden: ${absolute}`);
+      }
+      if (
+        node.type === "CallExpression" &&
+        node.callee?.type === "MemberExpression" &&
+        node.callee.object?.type === "Identifier" &&
+        node.callee.object.name === "process" &&
+        node.callee.property?.name === "getBuiltinModule"
+      ) {
+        die(`indirect dependency is forbidden: ${absolute}`);
+      }
+      if (
+        (node.type === "CallExpression" || node.type === "NewExpression") &&
+        node.callee?.type === "Identifier" &&
+        node.callee.name === "Function"
+      ) {
+        die(`indirect dependency is forbidden: ${absolute}`);
+      }
+    });
     for (const specifier of specifiers) {
-      if (specifier.startsWith("node:")) continue;
+      if (specifier.startsWith("node:")) {
+        if (!allowedBuiltins.has(specifier)) {
+          die(`indirect dependency builtin is forbidden in ${absolute}: ${specifier}`);
+        }
+        continue;
+      }
       if (!specifier.startsWith(".") && !specifier.startsWith("/")) {
         die(`unpinned package import in ${absolute}: ${specifier}`);
       }
@@ -52,15 +114,19 @@ async function localGraph(entry) {
 }
 
 async function auditDependencies(normalizerEntry, checkerEntry) {
-  const [normalizerGraph, checkerGraph] = await Promise.all([
-    localGraph(normalizerEntry),
-    localGraph(checkerEntry)
+  const [canonicalNormalizer, canonicalChecker] = await Promise.all([
+    realpath(normalizerEntry),
+    realpath(checkerEntry)
   ]);
-  if (normalizerGraph.has(checkerEntry) || checkerGraph.has(normalizerEntry)) {
+  const [normalizerGraph, checkerGraph] = await Promise.all([
+    localGraph(canonicalNormalizer),
+    localGraph(canonicalChecker)
+  ]);
+  if (normalizerGraph.has(canonicalChecker) || checkerGraph.has(canonicalNormalizer)) {
     die("normalizer/checker cross-import detected");
   }
   const sharedSemanticModules = [...normalizerGraph].filter(
-    (file) => file !== normalizerEntry && checkerGraph.has(file)
+    (file) => file !== canonicalNormalizer && checkerGraph.has(file)
   );
   if (sharedSemanticModules.length !== 0) {
     die(`shared semantic implementation module: ${sharedSemanticModules.join(", ")}`);
@@ -85,8 +151,15 @@ const testCases = [
   "import-semantics",
   "authored-order-semantics",
   "constant-normalizer-output",
+  "coordinated-source-model-replacement",
   "normalizer-checker-co-drift",
   "forbidden-cross-import",
+  "dependency-static-obfuscation",
+  "dependency-reexport",
+  "dependency-symlink-alias",
+  "dependency-dynamic-loading",
+  "dependency-indirect-loading",
+  "dependency-package-loading",
   "source-digest-mismatch",
   "model-digest-mismatch",
   "normalizer-verdict-output",
@@ -94,7 +167,8 @@ const testCases = [
 ];
 
 function invoke(script, args, env = {}) {
-  return spawnSync(process.execPath, [script, ...args], {
+  const runtimeArgs = script === self ? process.execArgv : [];
+  return spawnSync(process.execPath, [...runtimeArgs, script, ...args], {
     cwd: here,
     encoding: "utf8",
     env: { ...process.env, ...env }
@@ -130,6 +204,23 @@ async function check(proof, { checkerMutation } = {}) {
 async function expectRejected(proof, expected, options = {}) {
   const result = await check(proof, options);
   assert.notEqual(result.status, 0, `mutation survived: ${expected}`);
+  assert.match(result.stderr, new RegExp(expected));
+}
+
+async function expectDependencyRejected(prefix, injectedSource, expected) {
+  const temporary = await mkdtemp(join(tmpdir(), `packet-e-${prefix}-`));
+  const badNormalizer = join(temporary, "normalizer.mjs");
+  const badChecker = join(temporary, "checker.mjs");
+  await copyFile(normalizer, badNormalizer);
+  const checkerSource = (await readFile(checker, "utf8")).replace(/^#![^\n]*\n/, "");
+  await writeFile(badChecker, `${injectedSource}\n${checkerSource}`);
+  const result = invoke(self, [
+    "--normalizer",
+    badNormalizer,
+    "--checker",
+    badChecker
+  ]);
+  assert.notEqual(result.status, 0, `dependency mutation survived: ${prefix}`);
   assert.match(result.stderr, new RegExp(expected));
 }
 
@@ -182,6 +273,20 @@ async function runTestCase(name) {
       );
       break;
     }
+    case "coordinated-source-model-replacement": {
+      const temporary = await mkdtemp(join(tmpdir(), "packet-e-coordinated-"));
+      const alternateCatalog = join(temporary, "catalog.json");
+      const bytes = await readFile(catalog, "utf8");
+      await writeFile(
+        alternateCatalog,
+        bytes.replace('"outcome":"observed"', '"outcome":"denied"')
+      );
+      await expectRejected(
+        normalize({ catalogPath: alternateCatalog }),
+        "literal source digest mismatch"
+      );
+      break;
+    }
     case "normalizer-checker-co-drift":
       await expectRejected(
         normalize({ mutation: "profile" }),
@@ -196,7 +301,7 @@ async function runTestCase(name) {
       await copyFile(normalizer, badNormalizer);
       await writeFile(
         badChecker,
-        `import "./normalizer.mjs";\n${await readFile(checker, "utf8")}`
+        `import "./normalizer.mjs";\n${(await readFile(checker, "utf8")).replace(/^#![^\n]*\n/, "")}`
       );
       const result = invoke(self, [
         "--normalizer",
@@ -208,6 +313,63 @@ async function runTestCase(name) {
       assert.match(result.stderr, /cross-import/);
       break;
     }
+    case "dependency-static-obfuscation":
+      await expectDependencyRejected(
+        "static-obfuscation",
+        'import/* hidden edge */"./normalizer.mjs";',
+        "cross-import"
+      );
+      break;
+    case "dependency-reexport":
+      await expectDependencyRejected(
+        "reexport",
+        'export { default as hidden } from "./normalizer.mjs";',
+        "cross-import"
+      );
+      break;
+    case "dependency-symlink-alias": {
+      const temporary = await mkdtemp(join(tmpdir(), "packet-e-symlink-"));
+      const badNormalizer = join(temporary, "normalizer.mjs");
+      const alias = join(temporary, "alias.mjs");
+      const badChecker = join(temporary, "checker.mjs");
+      await copyFile(normalizer, badNormalizer);
+      await symlink(badNormalizer, alias);
+      await writeFile(
+        badChecker,
+        `import "./alias.mjs";\n${(await readFile(checker, "utf8")).replace(/^#![^\n]*\n/, "")}`
+      );
+      const result = invoke(self, [
+        "--normalizer",
+        badNormalizer,
+        "--checker",
+        badChecker
+      ]);
+      assert.notEqual(result.status, 0, "dependency mutation survived: symlink-alias");
+      assert.match(result.stderr, /cross-import/);
+      break;
+    }
+    case "dependency-dynamic-loading":
+      await expectDependencyRejected(
+        "dynamic-loading",
+        'await import("./normalizer.mjs");',
+        "dynamic dependency"
+      );
+      break;
+    case "dependency-indirect-loading":
+      await expectDependencyRejected(
+        "indirect-loading",
+        'import { createRequire as factory } from "node:module";\n' +
+          'const load = factory(import.meta.url);\nload("./normalizer.mjs");',
+        "indirect dependency"
+      );
+      break;
+    case "dependency-package-loading":
+      await expectDependencyRejected(
+        "package-loading",
+        'import "unlisted-semantic-package";',
+        "unpinned package"
+      );
+      break;
     case "source-digest-mismatch": {
       const proof = normalize();
       proof.sourceSetSha256 = "0".repeat(64);

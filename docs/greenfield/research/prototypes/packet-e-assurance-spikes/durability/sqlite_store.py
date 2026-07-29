@@ -19,6 +19,32 @@ PINNED_SETTINGS = {
     "foreign_keys": 1,
     "wal_autocheckpoint": 0,
 }
+EXPECTED_TABLES = {
+    "metadata": [
+        ("key", "TEXT", 1, None, 1),
+        ("value", "TEXT", 1, None, 0),
+    ],
+    "log_entries": [
+        ("sequence", "INTEGER", 0, None, 1),
+        ("payload", "TEXT", 1, None, 0),
+    ],
+    "attempts": [
+        ("attempt_id", "TEXT", 1, None, 1),
+        ("state", "TEXT", 1, None, 0),
+        ("version", "INTEGER", 1, None, 0),
+    ],
+    "slots": [
+        ("slot_id", "TEXT", 1, None, 1),
+        ("head", "TEXT", 1, None, 0),
+        ("version", "INTEGER", 1, None, 0),
+    ],
+}
+EXPECTED_WITHOUT_ROWID = {
+    "metadata": 1,
+    "log_entries": 0,
+    "attempts": 1,
+    "slots": 1,
+}
 
 
 class StoreError(Exception):
@@ -134,9 +160,42 @@ def seed_database(database: Path, state: dict[str, Any]) -> None:
 
 
 def observable_state(database: Path) -> dict[str, Any]:
-    connection = connect(database)
+    if not database.is_file():
+        raise StoreError("observation/schema-mismatch:database-absent")
     try:
-        initialize_schema(connection)
+        connection = sqlite3.connect(
+            f"{database.resolve().as_uri()}?mode=ro",
+            uri=True,
+            isolation_level=None,
+            timeout=30.0,
+        )
+    except sqlite3.Error as error:
+        raise StoreError(f"observation/schema-mismatch:{error}") from error
+    try:
+        table_rows = connection.execute("PRAGMA table_list").fetchall()
+        observed_tables = {
+            name: (columns, without_rowid, strict)
+            for schema, name, kind, columns, without_rowid, strict in table_rows
+            if schema == "main" and kind == "table" and not name.startswith("sqlite_")
+        }
+        expected_inventory = {
+            name: (len(columns), EXPECTED_WITHOUT_ROWID[name], 0)
+            for name, columns in EXPECTED_TABLES.items()
+        }
+        if observed_tables != expected_inventory:
+            raise StoreError(
+                f"observation/schema-mismatch:tables={sorted(observed_tables)}"
+            )
+        for table, expected_columns in EXPECTED_TABLES.items():
+            observed_columns = [
+                (name, column_type.upper(), not_null, default, primary_key)
+                for _, name, column_type, not_null, default, primary_key
+                in connection.execute(f"PRAGMA table_info({table})")
+            ]
+            if observed_columns != expected_columns:
+                raise StoreError(
+                    f"observation/schema-mismatch:columns={table}"
+                )
         metadata = {
             key: value
             for key, value in connection.execute(
@@ -161,12 +220,17 @@ def observable_state(database: Path) -> dict[str, Any]:
                 "SELECT slot_id, head, version FROM slots ORDER BY slot_id"
             )
         }
-        return {
+        state = {
             "metadata": metadata,
             "logs": logs,
             "attempts": attempts,
             "slots": slots,
         }
+        if state["metadata"].get("schema_revision") != SCHEMA_REVISION:
+            raise StoreError("observation/schema-mismatch:revision")
+        return state
+    except sqlite3.Error as error:
+        raise StoreError(f"observation/schema-mismatch:{error}") from error
     finally:
         connection.close()
 
@@ -194,10 +258,19 @@ def apply_operation(
         kind = operation["kind"]
         if kind == "log-append":
             cursor = connection.execute(
-                "INSERT INTO log_entries(sequence, payload) VALUES (?, ?)",
+                """
+                INSERT INTO log_entries(sequence, payload)
+                SELECT ?, ?
+                 WHERE ? = (SELECT COUNT(*) FROM log_entries)
+                   AND NOT EXISTS (
+                     SELECT 1 FROM log_entries WHERE sequence = ?
+                   )
+                """,
                 (
                     operation["expectedSequence"],
                     json.dumps(operation["payload"], sort_keys=True, separators=(",", ":")),
+                    operation["expectedSequence"],
+                    operation["expectedSequence"],
                 ),
             )
             require_one_row(cursor, "log/predecessor-mismatch")

@@ -18,17 +18,19 @@ process recovers to a partial state.
 
 ## Measured result
 
-The 2026-07-29 Stage 00 candidate run passed 41 focused tests:
+The 2026-07-29 Stage 00 candidate run passed 64 focused semantic/crash tests
+plus four toolchain-provenance mutation tests:
 
 | Group | Tests | Result |
 | --- | ---: | --- |
-| independent normalization | 14 | all passed |
-| Lean kernel/interface audit | 19 | all passed |
-| pure model/SQLite crash refinement | 8 | all passed |
+| independent normalization | 21 | all passed |
+| Lean kernel/interface audit | 29 | all passed |
+| pure model/SQLite crash refinement | 14 | all passed |
+| toolchain-provenance mutations | 4 | all killed |
 
 The positive Lean build plus exact-byte, elaborated-interface, transitive
-dependency, opaque-definition, and axiom-closure audit took 11,892.6 ms in the
-recorded cumulative run. Six Lean declarations were kernel checked: the
+dependency-identity, opaque-definition, and axiom-closure audit took 12,550.5
+ms in the fresh full run. Six Lean declarations were kernel checked: the
 proof-material translation binding and the five required theorem families.
 Every required theorem reported an empty transitive axiom set.
 
@@ -45,25 +47,29 @@ verdict, acceptance bit, certificate, or baseline.
 The checker is separately implemented and imports no normalizer code. It
 re-parses exact source bytes, verifies the pinned foreign digest, independently
 replays selector/profile/reference/import/order semantics, reconstructs all 33
-semantic leaf mappings, compares the literal expected canonical model bytes,
-and binds both byte sequences to their SHA-256 digests. The dependency audit
-walks both module graphs and rejects cross-imports, shared semantic modules,
-dynamic imports, and unpinned package imports.
+semantic leaf mappings, and unconditionally binds the exact source set and
+literal expected canonical model bytes/digests. The dependency audit parses
+ECMAScript syntax, resolves canonical real paths, walks static imports and
+re-exports, and rejects cross-imports, shared semantic modules, symlink aliases,
+dynamic or indirect loaders, and unpinned packages.
 
 The mutation matrix kills omitted reachability, selector/profile/reference/
 import/order changes, constant output, normalizer/checker co-drift, forbidden
 cross-import, source/model digest mismatch, and normalizer-issued verdict or
-certificate output.
+certificate output. It also kills coordinated source/model replacement and
+comment-obfuscated/re-exported/symlinked/indirect dependency edges.
 
 ## Lean feasibility and audit boundary
 
 `formal/proof-material.json` is canonical JSON containing the exact catalog
 and model bytes as hexadecimal plus their literal digests, the complete
 semantic carrier field list, symbolic shard count, and a kernel-checked solver
-status. The external audit verifies those bytes against the normalization
-fixtures, hashes the exact proof-material file, evaluates the bound Lean
-translation constants, builds with the pinned kernel, and audits elaborated
-interfaces rather than relying on source spelling.
+status. Lean embeds the exact canonical proof-material, catalog, and model bytes
+with `include_str` into a typed `ProofMaterialTranslation`; every required
+theorem returns a proposition containing `ProofMaterialBound`. The external
+audit verifies every translated field against the fixtures, builds with the
+pinned kernel, and uses Lean `Environment`, `Expr`, and `MetaM` inspection
+rather than accepting pretty-printed text.
 
 The kernel checks:
 
@@ -72,16 +78,21 @@ The kernel checks:
 - mixed-family increment commutation;
 - a proof-independent symbolic `CoverageShardSpec` theorem with universal
   pairwise disjointness, exhaustiveness, and exact per-shard cardinality
-  witnessed by bijections for every population; and
-- contextual reduction quantified over a primary family, another family,
-  interleavings, and the full seven-field `SemanticCarrier`.
+  witnessed by bijections for every population, with the returned spec's
+  per-shard counts and total `2 * population` linked by proof; and
+- contextual reduction quantified over an arbitrary full seven-field
+  `SemanticCarrier`, another family, and interleavings, with a field-by-field
+  relation over all seven fields.
 
 The negative audit rejects `sorry`/`admit`, direct and transitive axioms, local
 premises, conclusion-as-assumption, subtype/`Nonempty`/`Exists`/semantic
 `Decidable`/typeclass/nested-`Type` smuggling, opaque semantic dependencies,
-omitted source/model bytes, unknown procedures, unpinned dependencies, and
-incomplete transitive dependency closure. The only imported libraries are
-`Init` and `Std` from the same pinned Lean store derivation.
+omitted source/model bytes, unknown procedures, unpinned/wrongly pinned
+dependencies, and incomplete transitive dependency closure. Alias, arbitrary
+proposition, implicit, generated/private, and multi-hop transparent premise
+wrappers are negative fixtures. The only imported libraries are exact
+SHA-256-pinned `Init` and `Std` objects from the same pinned Lean store
+derivation.
 
 ## SQLite process-crash refinement
 
@@ -107,6 +118,11 @@ values.
 Normal, non-killed execution also equals the pure successor for all four
 operations. A mutation that commits each conflict update separately is
 detected as partial recovery, and a store/model drift mutation is rejected.
+Future, stale, and duplicate log sequences are rejected with the pure model's
+`log/predecessor-mismatch` while leaving complete state unchanged. Recovery
+observation opens the database read-only, requires the exact table/column
+schema, and then reads all semantic tables; missing, extra, and altered schemas
+are rejected without repair.
 
 This result assumes one local filesystem, normal OS process termination
 semantics, SQLite 3.53.3's documented WAL transaction behavior, successful
@@ -120,7 +136,10 @@ loss, hardware failure, or hostile concurrent database modification.
 The flake locks Nixpkgs revision
 `624af665418d3c65d544145b4d34ad696439570e`. The executable manifest
 `toolchain.json` records every exact output/store derivation and is checked by
-`run.sh`.
+`run.sh`. The audit resolves each tool output's actual Nix deriver, requires
+`lake` and bundled library objects under the Lean output, hashes the
+`Init`/`Std` objects, and confirms the archived flake's Nixpkgs source identity.
+Four coordinated manifest/PATH mutations exercise those checks.
 
 | Tool | Version |
 | --- | --- |

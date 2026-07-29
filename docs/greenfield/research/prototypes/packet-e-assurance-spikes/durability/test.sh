@@ -15,6 +15,12 @@ cases=(
   conflict-resolution-multi-cas
   partial-commit-mutation
   store-model-drift
+  log-sequence-future
+  log-sequence-stale
+  log-sequence-duplicate
+  observer-missing-database
+  observer-extra-table
+  observer-schema-shape
 )
 
 for required in "$driver" "$model" "$store"; do

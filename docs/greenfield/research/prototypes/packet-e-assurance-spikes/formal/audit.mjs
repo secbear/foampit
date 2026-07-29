@@ -3,7 +3,7 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { mkdtemp, readFile, writeFile } from "node:fs/promises";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync, realpathSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -15,6 +15,9 @@ const buildLibrary = join(here, ".lake", "build", "lib", "lean");
 const proofMaterialPath = join(here, "proof-material.json");
 const catalogPath = join(here, "..", "normalization", "fixtures", "catalog.json");
 const modelPath = join(here, "..", "normalization", "fixtures", "expected-model.json");
+const toolchain = JSON.parse(
+  await readFile(join(here, "..", "toolchain.json"), "utf8")
+);
 
 const requiredTheorems = [
   "PacketESpike.populationAbstractionUnbounded",
@@ -26,6 +29,10 @@ const requiredTheorems = [
 
 const cases = [
   "positive-kernel-interface",
+  "typed-proof-material-binding",
+  "required-theorems-proof-bound",
+  "contextual-arbitrary-carrier",
+  "semantic-coverage-cardinality",
   "omitted-source-bytes",
   "omitted-model-bytes",
   "solver-unknown",
@@ -42,8 +49,14 @@ const cases = [
   "typeclass-premise",
   "opaque-premise",
   "nested-type-parameter",
+  "expr-alias-prop",
+  "expr-arbitrary-prop",
+  "expr-private-generated",
+  "expr-implicit-prop",
+  "expr-transparent-multihop",
   "incomplete-transitive-closure",
-  "unpinned-dependency"
+  "unpinned-dependency",
+  "pinned-dependency-wrong-pin"
 ];
 
 function hash(bytes) {
@@ -137,81 +150,164 @@ function parseAxioms(output, theorem) {
     .filter(Boolean);
 }
 
-function inspectElaboratedInterface(interfaceText) {
-  const forbiddenMarkers = [
-    [/\bsorryAx\b/, "sorry/admit"],
-    [/\bNonempty\b/, "Nonempty premise"],
-    [/\bExists\b|∃/, "Exists premise"],
-    [/\bDecidable\b/, "semantic Decidable premise"],
-    [/\bSubtype\b|\{ [^}]+ \/\/ /, "subtype premise"],
-    [/∀ \[[^\]]+\]/, "typeclass premise"],
-    [/: Type(?:\s|[}),])/, "nested Type parameter"],
-    [/∀ \([^)]* : True\)|:\s*True\s*→/, "local proposition premise"],
-    [
-      /∀ \([^)]* : [^)]* = [^)]*\)|:\s*\d+\s*=\s*\d+\s*→|:\s*Eq\.\{\d+\}\s+\d+\s+\d+\s*→/,
-      "conclusion-as-assumption"
-    ]
-  ];
-  for (const [pattern, label] of forbiddenMarkers) {
-    if (pattern.test(interfaceText)) throw new Error(label);
-  }
+function leanExprAudit(moduleName, theorem, leanPath) {
+  const projectRoot = moduleName.split(".")[0];
+  return leanProbe(
+    `
+import Lean
+import ${moduleName}
+
+open Lean Elab Command Meta
+
+private def packetEBelongsToProject (root : String) (name : Name) : Bool :=
+  (name.toString.splitOn ".").contains root
+
+private def packetEHeadName? (expression : Expr) : Option String :=
+  expression.getAppFn.constName?.map Name.toString
+
+partial def packetEValidateBinders (type : Expr) : MetaM Unit := do
+  let type ← whnf type
+  match type with
+  | .forallE binderName domain body binderInfo =>
+      let reducedDomain ← whnf domain
+      let headName := packetEHeadName? reducedDomain
+      if headName == some "Exists" then
+        throwError "Exists premise"
+      if headName == some "Decidable" then
+        throwError "semantic Decidable premise"
+      if headName == some "Subtype" then
+        throwError "subtype premise"
+      if headName == some "Nonempty" then
+        throwError "Nonempty premise"
+      if binderInfo.isInstImplicit then
+        throwError "typeclass premise"
+      match reducedDomain with
+      | .sort _ => throwError "nested Type parameter"
+      | _ => pure ()
+      if ← isProp reducedDomain then
+        if headName == some "True" then
+          throwError "local proposition premise"
+        else if headName == some "Eq" then
+          throwError "conclusion-as-assumption"
+        else
+          throwError "proposition premise"
+      withLocalDecl binderName binderInfo domain fun localValue =>
+        packetEValidateBinders (body.instantiate1 localValue)
+  | _ => pure ()
+
+partial def packetEConstants : Expr → List Name
+  | .const name _ => [name]
+  | .app function argument =>
+      packetEConstants function ++ packetEConstants argument
+  | .lam _ domain body _ =>
+      packetEConstants domain ++ packetEConstants body
+  | .forallE _ domain body _ =>
+      packetEConstants domain ++ packetEConstants body
+  | .letE _ type value body _ =>
+      packetEConstants type ++ packetEConstants value ++ packetEConstants body
+  | .mdata _ expression => packetEConstants expression
+  | .proj _ _ expression => packetEConstants expression
+  | _ => []
+
+partial def packetEValidateBody
+    (root : String) (declaration : Name) (visited : Array Name) : MetaM (Array Name) := do
+  if visited.contains declaration then
+    return visited
+  let info ← getConstInfo declaration
+  if packetEBelongsToProject root declaration then
+    match info with
+    | .axiomInfo _ => throwError "project semantic axiom: {declaration}"
+    | .opaqueInfo _ => throwError "opaque semantic dependency: {declaration}"
+    | _ => pure ()
+  let mut result := visited.push declaration
+  if let some value := info.value? true then
+    for reference in packetEConstants value do
+      if packetEBelongsToProject root reference then
+        result ← packetEValidateBody root reference result
+  return result
+
+run_cmd do
+  liftTermElabM do
+    let info ← getConstInfo \`${theorem}
+    packetEValidateBinders info.type
+    let _ ← packetEValidateBody "${projectRoot}" \`${theorem} #[]
+    logInfo "PACKET_E_EXPR_AUDIT:PASS"
+`,
+    { leanPath }
+  );
 }
 
-function dependencyClosure(sourcePath, leanPath, declaredLocalModules = []) {
-  const prefix = command("lean", ["--print-prefix"]).stdout.trim();
-  const dependencies = new Set();
-  const localModules = new Set();
+function dependencyClosure(
+  sourcePath,
+  leanPath,
+  declaredLocalModules = [],
+  declaredLocalPins = {}
+) {
+  const leanOutput = realpathSync(toolchain.tools.lean.outPath);
+  const standardPins = new Map(
+    toolchain.tools.lean.libraries.map((library) => [
+      realpathSync(library.storePath),
+      library.sha256
+    ])
+  );
+  const dependencies = new Map();
+  const localModules = new Map();
   const scannedSources = new Set();
   function scan(currentSource) {
-    const absoluteSource = resolve(currentSource);
+    const absoluteSource = realpathSync(resolve(currentSource));
     if (scannedSources.has(absoluteSource)) return;
     scannedSources.add(absoluteSource);
     const result = command("lean", ["--deps", absoluteSource], { leanPath });
     for (const line of result.stdout.split("\n")) {
       const dependency = line.trim();
       if (!dependency) continue;
-      dependencies.add(dependency);
-      if (dependency.startsWith(`${prefix}/`)) continue;
-      const module = basename(dependency, ".olean");
-      localModules.add(module);
-      const dependencySource = join(dirname(dependency), `${module}.lean`);
+      const identity = realpathSync(dependency);
+      const digest = hash(readFileSync(identity));
+      dependencies.set(identity, digest);
+      if (identity.startsWith(`${leanOutput}/`)) {
+        if (!standardPins.has(identity) || standardPins.get(identity) !== digest) {
+          throw new Error(`dependency identity mismatch: ${identity}`);
+        }
+        continue;
+      }
+      const relativeModule = leanPath
+        ? identity
+            .slice(realpathSync(leanPath).length + 1, -".olean".length)
+            .replaceAll("/", ".")
+        : basename(identity, ".olean");
+      localModules.set(relativeModule, { identity, digest });
+      const dependencySource = dependency.replace(/\.olean$/, ".lean");
       if (existsSync(dependencySource)) scan(dependencySource);
     }
   }
   scan(sourcePath);
   const expected = new Set(declaredLocalModules);
   if (
-    [...localModules].sort().join(",") !== [...expected].sort().join(",")
+    [...localModules.keys()].sort().join(",") !== [...expected].sort().join(",")
   ) {
     throw new Error(
-      `incomplete transitive dependency closure: observed=${[...localModules].sort()} declared=${[
+      `incomplete transitive dependency closure: observed=${[
+        ...localModules.keys()
+      ].sort()} declared=${[...expected].sort()}`
+    );
+  }
+  const declaredPinNames = Object.keys(declaredLocalPins).sort();
+  if (declaredPinNames.join(",") !== [...expected].sort().join(",")) {
+    throw new Error(
+      `incomplete transitive dependency pins: declared=${declaredPinNames} expected=${[
         ...expected
       ].sort()}`
     );
   }
-  return { dependencies: [...dependencies], prefix };
-}
-
-function rejectOpaqueSemanticDependencies(moduleName, theorem, leanPath) {
-  const pending = [theorem];
-  const visited = new Set();
-  while (pending.length !== 0) {
-    const declaration = pending.pop();
-    if (visited.has(declaration)) continue;
-    visited.add(declaration);
-    const printed = leanProbe(
-      `import ${moduleName}\nset_option pp.all true in\n#print ${declaration}\n`,
-      { leanPath }
-    );
-    if (declaration !== theorem && new RegExp(`opaque\\s+${declaration.replaceAll(".", "\\.")}\\b`).test(printed)) {
-      throw new Error(`opaque semantic dependency: ${declaration}`);
-    }
-    const localName = new RegExp(`\\b${moduleName}\\.[A-Za-z_][A-Za-z0-9_']*`, "g");
-    for (const referenced of printed.match(localName) ?? []) {
-      if (!visited.has(referenced)) pending.push(referenced);
+  for (const [module, { digest }] of localModules) {
+    if (declaredLocalPins[module] !== digest) {
+      throw new Error(`dependency identity mismatch: ${module}`);
     }
   }
-  return [...visited].sort();
+  return {
+    dependencies: [...dependencies].map(([path, sha256]) => ({ path, sha256 })),
+    leanOutput
+  };
 }
 
 function auditModule({
@@ -220,9 +316,15 @@ function auditModule({
   theorem,
   leanPath,
   declaredLocalModules = [],
+  declaredLocalPins = {},
   inspectInterface = true
 }) {
-  dependencyClosure(sourcePath, leanPath, declaredLocalModules);
+  dependencyClosure(
+    sourcePath,
+    leanPath,
+    declaredLocalModules,
+    declaredLocalPins
+  );
   const output = leanProbe(
     `import ${moduleName}\nset_option pp.universes true in\n#check @${theorem}\n#print axioms ${theorem}\n`,
     { leanPath }
@@ -231,8 +333,10 @@ function auditModule({
   if (axioms.length !== 0) {
     throw new Error(`unclassified axiom closure: ${axioms.join(",")}`);
   }
-  rejectOpaqueSemanticDependencies(moduleName, theorem, leanPath);
-  if (inspectInterface) inspectElaboratedInterface(output);
+  if (inspectInterface) {
+    const exprAudit = leanExprAudit(moduleName, theorem, leanPath);
+    assert.match(exprAudit, /PACKET_E_EXPR_AUDIT:PASS/);
+  }
   return output;
 }
 
@@ -253,7 +357,8 @@ async function expectFixtureRejected({
   modules,
   theorem = "Fixture.target",
   expected,
-  declaredLocalModules = []
+  declaredLocalModules = [],
+  declaredLocalPins = {}
 }) {
   const directory = await buildFixture(modules);
   let rejected = null;
@@ -263,7 +368,8 @@ async function expectFixtureRejected({
       sourcePath: join(directory, "Fixture.lean"),
       theorem,
       leanPath: directory,
-      declaredLocalModules
+      declaredLocalModules,
+      declaredLocalPins
     });
   } catch (error) {
     rejected = error;
@@ -279,23 +385,64 @@ async function runPositiveAudit() {
   const proofMaterial = JSON.parse(proofBytes);
   await validateProofMaterial(proofMaterial, proofBytes);
 
-  const evaluatedBindings = leanProbe(
-    [
-      "import PacketESpike",
-      "#eval PacketESpike.proofMaterialSha256",
-      "#eval PacketESpike.translatedCatalogBytesSha256",
-      "#eval PacketESpike.translatedModelBytesSha256",
-      "#eval PacketESpike.translatedCompleteCarrierFields",
-      "#eval PacketESpike.translatedShardCount"
-    ].join("\n")
+  const evaluate = (expression) =>
+    leanProbe(`import PacketESpike\n#eval ${expression}\n`).trim();
+  const evaluateJson = (expression) => JSON.parse(evaluate(expression));
+  assert.equal(
+    evaluateJson("PacketESpike.boundProofMaterial.canonicalBytes"),
+    proofBytes,
+    "Lean canonical proof-material bytes differ"
   );
-  assert.match(evaluatedBindings, new RegExp(hash(proofBytes)));
-  assert.match(evaluatedBindings, new RegExp(proofMaterial.catalogBytesSha256));
-  assert.match(evaluatedBindings, new RegExp(proofMaterial.modelBytesSha256));
-  for (const field of proofMaterial.completeCarrierFields) {
-    assert.match(evaluatedBindings, new RegExp(`"${field}"`));
-  }
-  assert.match(evaluatedBindings, /\n2\n/);
+  assert.equal(
+    evaluateJson("PacketESpike.boundProofMaterial.canonicalSha256"),
+    hash(proofBytes),
+    "Lean canonical proof-material digest differs"
+  );
+  assert.equal(
+    evaluateJson("PacketESpike.boundProofMaterial.catalog.bytes"),
+    Buffer.from(proofMaterial.catalogBytesHex, "hex").toString("utf8"),
+    "Lean catalog bytes differ"
+  );
+  assert.equal(
+    Number(evaluate("PacketESpike.boundProofMaterial.catalog.byteCount")),
+    Buffer.from(proofMaterial.catalogBytesHex, "hex").length,
+    "Lean catalog byte count differs"
+  );
+  assert.equal(
+    evaluateJson("PacketESpike.boundProofMaterial.catalog.sha256"),
+    proofMaterial.catalogBytesSha256,
+    "Lean catalog digest differs"
+  );
+  assert.deepEqual(
+    evaluateJson("PacketESpike.boundProofMaterial.completeCarrierFields"),
+    proofMaterial.completeCarrierFields,
+    "Lean complete carrier fields differ"
+  );
+  assert.equal(
+    evaluateJson("PacketESpike.boundProofMaterial.model.bytes"),
+    Buffer.from(proofMaterial.modelBytesHex, "hex").toString("utf8"),
+    "Lean model bytes differ"
+  );
+  assert.equal(
+    Number(evaluate("PacketESpike.boundProofMaterial.model.byteCount")),
+    Buffer.from(proofMaterial.modelBytesHex, "hex").length,
+    "Lean model byte count differs"
+  );
+  assert.equal(
+    evaluateJson("PacketESpike.boundProofMaterial.model.sha256"),
+    proofMaterial.modelBytesSha256,
+    "Lean model digest differs"
+  );
+  assert.equal(
+    Number(evaluate("PacketESpike.boundProofMaterial.shardCount")),
+    proofMaterial.shardCount,
+    "Lean shard count differs"
+  );
+  assert.match(
+    evaluate("PacketESpike.boundProofMaterial.solverResult"),
+    /kernelChecked$/,
+    "Lean solver/procedure result differs"
+  );
 
   const source = await readFile(join(here, "PacketESpike.lean"), "utf8");
   if (/\b(?:sorry|admit)\b/.test(source)) throw new Error("sorry/admit source token");
@@ -305,7 +452,16 @@ async function runPositiveAudit() {
   for (const field of proofMaterial.completeCarrierFields) {
     assert.match(declarationOutput, new RegExp(`\\b${field}\\b`));
   }
-  assert.match(declarationOutput, /\bcardinalityFormula\b/);
+  assert.doesNotMatch(declarationOutput, /\bcardinalityFormula\b/);
+  for (const field of [
+    "leftRegion",
+    "rightRegion",
+    "leftCardinality",
+    "rightCardinality",
+    "totalCardinality"
+  ]) {
+    assert.match(declarationOutput, new RegExp(`\\b${field}\\b`));
+  }
 
   const interfaces = new Map();
   for (const theorem of requiredTheorems) {
@@ -323,8 +479,17 @@ async function runPositiveAudit() {
   assert.match(interfaces.get(requiredTheorems[2]), /FamilyCoordinate/);
   assert.match(interfaces.get(requiredTheorems[3]), /CoverageCoordinate population/);
   assert.match(interfaces.get(requiredTheorems[3]), /IsBijective/);
-  assert.match(interfaces.get(requiredTheorems[4]), /primary other interleavings : Nat/);
+  assert.match(
+    interfaces.get(requiredTheorems[3]),
+    /HMul\.hMul[\s\S]*2 population/
+  );
+  assert.match(
+    interfaces.get(requiredTheorems[4]),
+    /carrier : (?:PacketESpike\.)?SemanticCarrier/
+  );
+  assert.match(interfaces.get(requiredTheorems[4]), /other interleavings : Nat/);
   assert.match(interfaces.get(requiredTheorems[4]), /SemanticCarrier/);
+  assert.match(interfaces.get(requiredTheorems[4]), /contextualCarrierRelation/);
   auditModule({
     moduleName: "PacketESpike",
     sourcePath: join(here, "PacketESpike.lean"),
@@ -340,6 +505,51 @@ async function runPositiveAudit() {
 async function runCase(name) {
   if (name === "positive-kernel-interface") {
     await runPositiveAudit();
+    return;
+  }
+  if (name === "typed-proof-material-binding") {
+    const source = await readFile(join(here, "PacketESpike.lean"), "utf8");
+    assert.match(source, /structure ExactBytesBinding\b/);
+    assert.match(source, /structure ProofMaterialTranslation\b/);
+    assert.match(source, /def boundProofMaterial\b/);
+    assert.match(source, /structure ProofMaterialBound\b/);
+    return;
+  }
+  if (name === "required-theorems-proof-bound") {
+    command("lake", ["build"]);
+    for (const theorem of requiredTheorems) {
+      const body = leanProbe(
+        `import PacketESpike\nset_option pp.all true in\n#print ${theorem}\n`
+      );
+      assert.match(
+        body,
+        /ProofMaterialBound/,
+        `${theorem} is not kernel-bound to exact proof material`
+      );
+    }
+    return;
+  }
+  if (name === "contextual-arbitrary-carrier") {
+    command("lake", ["build"]);
+    const output = leanProbe(
+      "import PacketESpike\n#check @PacketESpike.contextualReductionCompleteCarrier\n"
+    );
+    assert.match(output, /\(carrier : PacketESpike\.SemanticCarrier\)/);
+    assert.match(output, /contextualCarrierRelation/);
+    return;
+  }
+  if (name === "semantic-coverage-cardinality") {
+    command("lake", ["build"]);
+    const source = await readFile(join(here, "PacketESpike.lean"), "utf8");
+    assert.doesNotMatch(source, /cardinalityFormula\s*:\s*String/);
+    const output = leanProbe(
+      "import PacketESpike\n#print PacketESpike.CoverageShardSpec\n" +
+        "#check @PacketESpike.coverageShardSpecUniversal\n"
+    );
+    assert.match(output, /leftCardinality/);
+    assert.match(output, /rightCardinality/);
+    assert.match(output, /totalCardinality/);
+    assert.match(output, /2 \* population|population \* 2/);
     return;
   }
   if (["omitted-source-bytes", "omitted-model-bytes", "solver-unknown"].includes(name)) {
@@ -449,6 +659,45 @@ async function runCase(name) {
       },
       expected: "nested Type parameter"
     },
+    "expr-alias-prop": {
+      modules: {
+        Fixture:
+          "namespace Fixture\nabbrev HiddenPremise := 1 < 2\n" +
+          "theorem target (hidden : HiddenPremise) : True := True.intro\nend Fixture\n"
+      },
+      expected: "proposition premise"
+    },
+    "expr-arbitrary-prop": {
+      modules: {
+        Fixture:
+          "namespace Fixture\ntheorem target (hidden : 1 < 2) : True := True.intro\nend Fixture\n"
+      },
+      expected: "proposition premise"
+    },
+    "expr-private-generated": {
+      modules: {
+        Fixture:
+          "namespace Fixture\nprivate abbrev HiddenPremise := 1 < 2\n" +
+          "theorem target (hidden : HiddenPremise) : True := True.intro\nend Fixture\n"
+      },
+      expected: "proposition premise"
+    },
+    "expr-implicit-prop": {
+      modules: {
+        Fixture:
+          "namespace Fixture\ntheorem target {hidden : 1 < 2} : True := True.intro\nend Fixture\n"
+      },
+      expected: "proposition premise"
+    },
+    "expr-transparent-multihop": {
+      modules: {
+        Fixture:
+          "namespace Fixture\nabbrev HiddenA := 1 < 2\nabbrev HiddenB := HiddenA\n" +
+          "abbrev HiddenC := HiddenB\n" +
+          "theorem target (hidden : HiddenC) : True := True.intro\nend Fixture\n"
+      },
+      expected: "proposition premise"
+    },
     "incomplete-transitive-closure": {
       modules: {
         ThirdParty:
@@ -469,6 +718,17 @@ async function runCase(name) {
           "import ThirdParty\nnamespace Fixture\ntheorem target : True := ThirdParty.imported\nend Fixture\n"
       },
       expected: "incomplete transitive dependency closure"
+    },
+    "pinned-dependency-wrong-pin": {
+      modules: {
+        ThirdParty:
+          "namespace ThirdParty\ntheorem imported : True := True.intro\nend ThirdParty\n",
+        Fixture:
+          "import ThirdParty\nnamespace Fixture\ntheorem target : True := ThirdParty.imported\nend Fixture\n"
+      },
+      declaredLocalModules: ["ThirdParty"],
+      declaredLocalPins: { ThirdParty: "0".repeat(64) },
+      expected: "dependency identity mismatch"
     }
   };
   const fixture = fixtures[name];

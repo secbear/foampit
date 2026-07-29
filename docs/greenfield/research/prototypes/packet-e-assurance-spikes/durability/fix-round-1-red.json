@@ -1,0 +1,40 @@
+{
+  "baseCommit": "6462aa751470cdd08d49f1792432871a17d35fb3",
+  "testSource": {
+    "path": "durability/crash_driver.py",
+    "sha256": "7fcb1990696187912f93651a77d25975f0024dbabf9db3c1d42076868e9cb8d9"
+  },
+  "replay": "nix develop --command python3 durability/crash_driver.py --case CASE",
+  "focusedRed": [
+    {
+      "case": "log-sequence-future",
+      "exit": 1,
+      "failure": "SQLite store accepted future log sequence"
+    },
+    {
+      "case": "log-sequence-stale",
+      "exit": 1,
+      "failure": "SQLite store/model error mismatch: UNIQUE constraint failed"
+    },
+    {
+      "case": "log-sequence-duplicate",
+      "exit": 1,
+      "failure": "SQLite store/model error mismatch: UNIQUE constraint failed"
+    },
+    {
+      "case": "observer-missing-database",
+      "exit": 1,
+      "failure": "malformed observation schema was accepted"
+    },
+    {
+      "case": "observer-extra-table",
+      "exit": 1,
+      "failure": "malformed observation schema was accepted"
+    },
+    {
+      "case": "observer-schema-shape",
+      "exit": 1,
+      "failure": "malformed observation schema was accepted"
+    }
+  ]
+}

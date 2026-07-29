@@ -316,17 +316,18 @@ const replayedBytes = `${encodeCanonical(replayedModel)}\n`;
 if (proof.modelBytes !== replayedBytes) abort("model bytes do not match independent replay");
 if (digest(proof.modelBytes) !== proof.modelSha256) abort("model digest mismatch");
 
-if (proof.sourceSetSha256 === cases.expectedSourceSetSha256) {
-  if (
-    catalogSource.sha256 !== cases.expectedCatalogSha256 ||
-    foreignSource.sha256 !== cases.expectedForeignSha256
-  ) {
-    abort("literal source digest mismatch");
-  }
-  const literalExpectedModel = await readFile(resolve(dirname(resolve(args.cases)), cases.expectedModelFile), "utf8");
-  if (proof.modelBytes !== literalExpectedModel) abort("literal expected model bytes mismatch");
-  if (proof.modelSha256 !== cases.expectedModelSha256) abort("literal expected model digest mismatch");
+if (proof.sourceSetSha256 !== cases.expectedSourceSetSha256) {
+  abort("literal source digest mismatch for exact source set");
 }
+if (
+  catalogSource.sha256 !== cases.expectedCatalogSha256 ||
+  foreignSource.sha256 !== cases.expectedForeignSha256
+) {
+  abort("literal source digest mismatch");
+}
+const literalExpectedModel = await readFile(resolve(dirname(resolve(args.cases)), cases.expectedModelFile), "utf8");
+if (proof.modelBytes !== literalExpectedModel) abort("literal expected model bytes mismatch");
+if (proof.modelSha256 !== cases.expectedModelSha256) abort("literal expected model digest mismatch");
 
 compareReachability(proof, catalog, foreign, replayedModel, cases);
 process.stdout.write(
