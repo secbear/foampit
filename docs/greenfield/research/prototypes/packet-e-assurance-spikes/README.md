@@ -18,20 +18,20 @@ process recovers to a partial state.
 
 ## Measured result
 
-The final 2026-07-29 Stage 00 round-three candidate run passed 78 focused
-semantic/crash tests, six toolchain-provenance mutation tests, and four replay
-cleanup tests:
+The final 2026-07-29 Stage 00 round-four candidate run passed 85 focused
+semantic/crash tests, six toolchain-provenance mutation tests, and twelve replay
+cleanup wrapper-scenario checks:
 
 | Group | Tests | Result |
 | --- | ---: | --- |
-| independent normalization | 26 | all passed |
+| independent normalization | 33 | all passed |
 | Lean kernel/interface audit | 38 | all passed |
 | pure model/SQLite crash refinement | 14 | all passed |
 | toolchain-provenance mutations | 6 | all killed |
-| replay cleanup/TMPDIR confinement | 4 | all passed |
+| replay cleanup/TMPDIR confinement | 12 | all passed |
 
 The positive Lean build plus exact-byte, elaborated-interface, transitive
-dependency-identity, opaque-definition, and axiom-closure audit took 11,647.2
+dependency-identity, opaque-definition, and axiom-closure audit took 13,530.5
 ms in the fresh full run. Six Lean declarations were kernel checked: the
 proof-material translation binding and the five required theorem families.
 Every required theorem reported an empty transitive axiom set.
@@ -53,11 +53,15 @@ semantic leaf mappings, and unconditionally binds the exact source set and
 literal expected canonical model bytes/digests. The dependency audit parses
 ECMAScript syntax, resolves canonical real paths, walks static imports and
 re-exports, and rejects cross-imports, shared semantic modules, symlink aliases,
-dynamic or indirect loaders, and unpinned packages. It also applies a
-conservative capability-origin boundary: only the exact direct `process.argv`,
-named mutation-environment, stdout/stderr, and exit operations used by these
-two programs are admitted; raw `process`, privileged globals, constructor
-metaprogramming, and computed loader capabilities are rejected.
+dynamic or indirect loaders, and unpinned packages. It also builds lexical
+program/block/function/loop scopes and rejects every unresolved identifier
+except the closed ambient set actually used by the two modules. `Array`,
+`Object`, and `JSON` admit only their exact direct data-operation members;
+`Number`, `Error`, `Set`, and `Map` admit only their exact call/construction
+shapes. The prior exact direct `process.argv`, named mutation-environment,
+stdout/stderr, and exit operations remain the only admitted `process` uses.
+The builtin import members are likewise closed to the exact read/crypto/path/
+URL functions in the audited source.
 
 The mutation matrix kills omitted reachability, selector/profile/reference/
 import/order changes, constant output, normalizer/checker co-drift, forbidden
@@ -67,8 +71,37 @@ comment-obfuscated/re-exported/symlinked/indirect dependency edges.
 The capability-origin cases include the exact array storage/index recovery,
 string-concatenated `getBuiltinModule`/`createRequire`, and multi-hop renamed
 loader attack, plus object/destructuring and sequence-expression variants.
-This is executable feasibility evidence for those static origin rules, not a
-general ECMAScript taint-analysis claim.
+Round four adds exact AsyncFunction and function-prototype constructor escapes,
+ambient `fetch` and `WebSocket`, a disallowed safe-global member, and a positive
+lexical-shadowing control. Literal/template/concatenated constant property
+names are resolved to reject `constructor`, `prototype`, and `__proto__`.
+
+Pinned Node child invocations add defense in depth with exact read permissions,
+string-code generation disabled, and Fetch/WebSocket globals disabled. The
+suite proves that omitting any one of those four runtime controls exposes its
+focused probe. A computed constructor key that the static constant evaluator
+cannot resolve relies on the no-string-code-generation runtime backstop; this
+is closed-source feasibility evidence, not a claim of complete constant
+evaluation, general ECMAScript analysis, or arbitrary-input sandbox soundness.
+
+## Replay cleanup boundary
+
+All three retained RED replay wrappers use one shared cleanup implementation.
+Initialization explicitly checks repository resolution, `mktemp`,
+canonicalization, and child-directory creation before deriving a checkout
+path. Each cleanup decision captures `git worktree list --porcelain` once and
+treats query failure as cleanup failure. A registered target is removed only
+with `git worktree remove --force` against its exact canonical path, with one
+exact retry. The wrappers never invoke repository-wide prune or manually
+delete a failed checkout.
+
+Normal, fail-first removal, inventory-query failure, exact-removal failure,
+child-status preservation after successful cleanup, and nonzero-child status
+preservation during query failure are exercised against both wrappers in
+disposable local repositories. Successful cleanup removes the exact
+registration and wrapper root. An unresolved query/removal failure preserves
+that exact registration/root for recovery; cleanup failure changes child
+status zero to one, while a nonzero child status remains authoritative.
 
 ## Lean feasibility and audit boundary
 
@@ -156,7 +189,7 @@ The flake locks Nixpkgs revision
 `run.sh`. The audit resolves each tool output's actual Nix deriver, requires
 `lake` and bundled library objects under the Lean output, hashes the
 `Init`/`Std` objects, and confirms the archived flake's Nixpkgs source identity.
-Four coordinated manifest/PATH mutations exercise those checks.
+Six coordinated manifest/PATH mutations exercise those checks.
 
 | Tool | Version |
 | --- | --- |

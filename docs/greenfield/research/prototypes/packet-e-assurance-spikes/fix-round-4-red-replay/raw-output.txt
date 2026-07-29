@@ -1,0 +1,13 @@
+RED normalization/async-function-constructor: dependency mutation survived: async-function-constructor
+RED normalization/function-prototype-constructor: dependency mutation survived: function-prototype-constructor
+RED normalization/ambient-fetch: dependency mutation survived: ambient-fetch
+RED normalization/ambient-websocket: dependency mutation survived: ambient-websocket
+RED normalization/safe-global-member: dependency mutation survived: safe-global-member
+CONTROL normalization/lexical-shadowing: accepted
+RED runtime/hardening-flags: hardenedRuntimeArgs is not defined
+CONTROL replay/normal: accepted
+RED replay/fail-first-remove: invoked repository-wide worktree prune
+RED replay/query-failure: did not retain the exact recovery root
+RED replay/exact-remove-failure: invoked repository-wide worktree prune
+CONTROL replay/status-preservation: accepted
+RED round 4 summary: vulnerabilities=9 controls=3

@@ -1,0 +1,12 @@
+normalization/async-function-constructor=1
+normalization/function-prototype-constructor=1
+normalization/ambient-fetch=1
+normalization/ambient-websocket=1
+normalization/safe-global-member=1
+normalization/lexical-shadowing=0
+runtime/hardening-flags=1
+replay/normal=0
+replay/fail-first-remove=1
+replay/query-failure=1
+replay/exact-remove-failure=1
+replay/status-preservation=0

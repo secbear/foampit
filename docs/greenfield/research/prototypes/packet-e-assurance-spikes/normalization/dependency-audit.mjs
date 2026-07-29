@@ -3,7 +3,7 @@
 import assert from "node:assert/strict";
 import { copyFile, mkdtemp, readFile, symlink, writeFile } from "node:fs/promises";
 import { realpath } from "node:fs/promises";
-import { existsSync } from "node:fs";
+import { existsSync, realpathSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -15,6 +15,12 @@ const allowedBuiltins = new Set([
   "node:fs/promises",
   "node:path",
   "node:url"
+]);
+const allowedBuiltinMembers = new Map([
+  ["node:crypto", new Set(["createHash"])],
+  ["node:fs/promises", new Set(["readFile"])],
+  ["node:path", new Set(["dirname", "resolve"])],
+  ["node:url", new Set(["fileURLToPath"])]
 ]);
 
 function die(message) {
@@ -39,16 +45,14 @@ async function localGraph(entry) {
     "PACKET_E_CHECKER_MUTATION",
     "PACKET_E_NORMALIZER_MUTATION"
   ]);
-  const privilegedGlobals = new Set([
-    "Function",
-    "Proxy",
-    "Reflect",
-    "WebAssembly",
-    "eval",
-    "global",
-    "globalThis",
-    "require"
+  const safeGlobalMembers = new Map([
+    ["Array", new Set(["isArray"])],
+    ["Object", new Set(["entries", "keys"])],
+    ["JSON", new Set(["parse", "stringify"])]
   ]);
+  const safeDirectCalls = new Set(["Number"]);
+  const safeConstructors = new Set(["Error", "Map", "Set"]);
+  const sensitiveProperties = new Set(["__proto__", "constructor", "prototype"]);
 
   function walk(node, visitNode, ancestors = []) {
     if (!node || typeof node !== "object") return;
@@ -79,6 +83,401 @@ async function localGraph(entry) {
       return node.property.quasis[0]?.value?.cooked ?? null;
     }
     return null;
+  }
+
+  class Scope {
+    constructor(parent = null) {
+      this.parent = parent;
+      this.bindings = new Map();
+    }
+
+    declare(name) {
+      if (!this.bindings.has(name)) {
+        this.bindings.set(name, { constantString: null });
+      }
+    }
+
+    resolve(name) {
+      if (this.bindings.has(name)) return this.bindings.get(name);
+      return this.parent?.resolve(name) ?? null;
+    }
+  }
+
+  function declarePattern(pattern, scope) {
+    if (!pattern) return;
+    switch (pattern.type) {
+      case "Identifier":
+        scope.declare(pattern.name);
+        return;
+      case "ArrayPattern":
+        for (const element of pattern.elements) declarePattern(element, scope);
+        return;
+      case "ObjectPattern":
+        for (const property of pattern.properties) {
+          declarePattern(
+            property.type === "RestElement" ? property.argument : property.value,
+            scope
+          );
+        }
+        return;
+      case "AssignmentPattern":
+        declarePattern(pattern.left, scope);
+        return;
+      case "RestElement":
+        declarePattern(pattern.argument, scope);
+        return;
+      default:
+        die(`binding syntax is outside the closed subset: ${pattern.type}`);
+    }
+  }
+
+  function predeclareStatements(statements, scope) {
+    for (const statement of statements) {
+      const declaration =
+        statement.type === "ExportNamedDeclaration" ||
+        statement.type === "ExportDefaultDeclaration"
+          ? statement.declaration
+          : statement;
+      if (!declaration) continue;
+      if (declaration.type === "ImportDeclaration") {
+        for (const specifier of declaration.specifiers) {
+          scope.declare(specifier.local.name);
+        }
+      } else if (declaration.type === "FunctionDeclaration") {
+        if (declaration.id) scope.declare(declaration.id.name);
+      } else if (declaration.type === "VariableDeclaration") {
+        for (const declarator of declaration.declarations) {
+          declarePattern(declarator.id, scope);
+        }
+      }
+    }
+  }
+
+  function staticString(node, scope) {
+    if (!node) return null;
+    if (node.type === "Literal" && typeof node.value === "string") {
+      return node.value;
+    }
+    if (
+      node.type === "TemplateLiteral" &&
+      node.expressions.length === 0 &&
+      node.quasis.length === 1
+    ) {
+      return node.quasis[0].value.cooked;
+    }
+    if (node.type === "BinaryExpression" && node.operator === "+") {
+      const left = staticString(node.left, scope);
+      const right = staticString(node.right, scope);
+      return left === null || right === null ? null : left + right;
+    }
+    if (node.type === "Identifier") {
+      return scope.resolve(node.name)?.constantString ?? null;
+    }
+    return null;
+  }
+
+  function scopedPropertyName(node, scope) {
+    if (node?.type !== "MemberExpression") return null;
+    if (!node.computed && node.property?.type === "Identifier") {
+      return node.property.name;
+    }
+    return node.computed ? staticString(node.property, scope) : null;
+  }
+
+  function analyzePatternExpressions(pattern, scope, ancestors) {
+    if (!pattern) return;
+    switch (pattern.type) {
+      case "Identifier":
+        return;
+      case "ArrayPattern":
+        for (const element of pattern.elements) {
+          analyzePatternExpressions(element, scope, ancestors);
+        }
+        return;
+      case "ObjectPattern":
+        for (const property of pattern.properties) {
+          if (property.type === "RestElement") {
+            analyzePatternExpressions(property.argument, scope, ancestors);
+          } else {
+            if (property.computed) analyzeNode(property.key, scope, ancestors);
+            analyzePatternExpressions(property.value, scope, ancestors);
+          }
+        }
+        return;
+      case "AssignmentPattern":
+        analyzePatternExpressions(pattern.left, scope, ancestors);
+        analyzeNode(pattern.right, scope, ancestors);
+        return;
+      case "RestElement":
+        analyzePatternExpressions(pattern.argument, scope, ancestors);
+        return;
+      default:
+        die(`binding syntax is outside the closed subset: ${pattern.type}`);
+    }
+  }
+
+  function validateSafeGlobal(name, ancestors) {
+    const parent = ancestors.at(-1);
+    const grandparent = ancestors.at(-2);
+    if (name === "undefined") {
+      if (
+        parent?.type === "CallExpression" ||
+        parent?.type === "NewExpression" ||
+        (parent?.type === "MemberExpression" && parent.object?.type === "Identifier")
+      ) {
+        die("safe global use is outside the closed subset: undefined");
+      }
+      return;
+    }
+    if (safeGlobalMembers.has(name)) {
+      const allowedMembers = safeGlobalMembers.get(name);
+      if (
+        parent?.type !== "MemberExpression" ||
+        parent.object?.type !== "Identifier" ||
+        parent.object.name !== name ||
+        parent.computed ||
+        parent.property?.type !== "Identifier" ||
+        !allowedMembers.has(parent.property.name) ||
+        grandparent?.type !== "CallExpression" ||
+        grandparent.callee !== parent
+      ) {
+        die(`safe global member is forbidden: ${name}`);
+      }
+      return;
+    }
+    if (safeDirectCalls.has(name)) {
+      if (
+        parent?.type !== "CallExpression" ||
+        parent.callee?.type !== "Identifier" ||
+        parent.callee.name !== name ||
+        parent.arguments.length !== 1
+      ) {
+        die(`safe global use is outside the closed subset: ${name}`);
+      }
+      return;
+    }
+    if (safeConstructors.has(name)) {
+      const maximumArguments = name === "Error" ? 1 : 1;
+      const minimumArguments = name === "Error" ? 1 : 0;
+      if (
+        parent?.type !== "NewExpression" ||
+        parent.callee?.type !== "Identifier" ||
+        parent.callee.name !== name ||
+        parent.arguments.length < minimumArguments ||
+        parent.arguments.length > maximumArguments
+      ) {
+        die(`safe global use is outside the closed subset: ${name}`);
+      }
+      return;
+    }
+    die(`unbound ambient identifier is forbidden: ${name}`);
+  }
+
+  function validateImport(node) {
+    const allowedMembers = allowedBuiltinMembers.get(node.source?.value);
+    if (!allowedMembers) return;
+    for (const specifier of node.specifiers) {
+      if (
+        specifier.type !== "ImportSpecifier" ||
+        specifier.imported?.type !== "Identifier" ||
+        !allowedMembers.has(specifier.imported.name)
+      ) {
+        die(`builtin import member is forbidden: ${node.source.value}`);
+      }
+    }
+  }
+
+  function analyzeFunction(node, scope, ancestors) {
+    const functionScope = new Scope(scope);
+    if (node.type === "FunctionExpression" && node.id) {
+      functionScope.declare(node.id.name);
+    }
+    for (const parameter of node.params) declarePattern(parameter, functionScope);
+    for (const parameter of node.params) {
+      analyzePatternExpressions(parameter, functionScope, [...ancestors, node]);
+    }
+    if (node.body.type === "BlockStatement") {
+      analyzeNode(node.body, functionScope, ancestors);
+    } else {
+      analyzeNode(node.body, functionScope, [...ancestors, node]);
+    }
+  }
+
+  function analyzeNode(node, scope, ancestors = []) {
+    if (!node) return;
+    const nestedAncestors = [...ancestors, node];
+    switch (node.type) {
+      case "Program":
+        predeclareStatements(node.body, scope);
+        for (const statement of node.body) analyzeNode(statement, scope, nestedAncestors);
+        return;
+      case "BlockStatement": {
+        const blockScope = new Scope(scope);
+        predeclareStatements(node.body, blockScope);
+        for (const statement of node.body) {
+          analyzeNode(statement, blockScope, nestedAncestors);
+        }
+        return;
+      }
+      case "ImportDeclaration":
+        validateImport(node);
+        return;
+      case "ExportNamedDeclaration":
+      case "ExportDefaultDeclaration":
+        analyzeNode(node.declaration, scope, nestedAncestors);
+        if (!node.source) {
+          for (const specifier of node.specifiers ?? []) {
+            if (specifier.local) analyzeNode(specifier.local, scope, nestedAncestors);
+          }
+        }
+        return;
+      case "ExportAllDeclaration":
+      case "ImportSpecifier":
+      case "ImportDefaultSpecifier":
+      case "ImportNamespaceSpecifier":
+      case "TemplateElement":
+      case "Literal":
+      case "EmptyStatement":
+        return;
+      case "VariableDeclaration":
+        if (!["const", "let"].includes(node.kind)) {
+          die(`variable declaration is outside the closed subset: ${node.kind}`);
+        }
+        for (const declarator of node.declarations) {
+          if (declarator.init) analyzeNode(declarator.init, scope, nestedAncestors);
+          analyzePatternExpressions(declarator.id, scope, nestedAncestors);
+          if (node.kind === "const" && declarator.id.type === "Identifier") {
+            scope.resolve(declarator.id.name).constantString =
+              staticString(declarator.init, scope);
+          }
+        }
+        return;
+      case "FunctionDeclaration":
+      case "FunctionExpression":
+      case "ArrowFunctionExpression":
+        analyzeFunction(node, scope, ancestors);
+        return;
+      case "Identifier":
+        if (scope.resolve(node.name)) return;
+        if (node.name === "process" && exactAllowedProcessUse(ancestors)) return;
+        if (node.name === "process") {
+          die("privileged capability is forbidden: process");
+        }
+        validateSafeGlobal(node.name, ancestors);
+        return;
+      case "ExpressionStatement":
+        analyzeNode(node.expression, scope, nestedAncestors);
+        return;
+      case "CallExpression":
+      case "NewExpression":
+        analyzeNode(node.callee, scope, nestedAncestors);
+        for (const argument of node.arguments) {
+          analyzeNode(argument, scope, nestedAncestors);
+        }
+        return;
+      case "MemberExpression": {
+        const member = scopedPropertyName(node, scope);
+        if (sensitiveProperties.has(member)) {
+          die("prototype or constructor introspection is forbidden");
+        }
+        analyzeNode(node.object, scope, nestedAncestors);
+        if (node.computed) analyzeNode(node.property, scope, nestedAncestors);
+        return;
+      }
+      case "MetaProperty":
+        if (node.meta.name !== "import" || node.property.name !== "meta") {
+          die("meta property is outside the closed subset");
+        }
+        return;
+      case "ChainExpression":
+        analyzeNode(node.expression, scope, nestedAncestors);
+        return;
+      case "AwaitExpression":
+      case "UnaryExpression":
+      case "UpdateExpression":
+      case "SpreadElement":
+        analyzeNode(node.argument, scope, nestedAncestors);
+        return;
+      case "BinaryExpression":
+      case "LogicalExpression":
+        analyzeNode(node.left, scope, nestedAncestors);
+        analyzeNode(node.right, scope, nestedAncestors);
+        return;
+      case "ConditionalExpression":
+        analyzeNode(node.test, scope, nestedAncestors);
+        analyzeNode(node.consequent, scope, nestedAncestors);
+        analyzeNode(node.alternate, scope, nestedAncestors);
+        return;
+      case "AssignmentExpression":
+        analyzeNode(node.left, scope, nestedAncestors);
+        analyzeNode(node.right, scope, nestedAncestors);
+        return;
+      case "AssignmentPattern":
+        analyzePatternExpressions(node, scope, nestedAncestors);
+        return;
+      case "ArrayExpression":
+        for (const element of node.elements) analyzeNode(element, scope, nestedAncestors);
+        return;
+      case "SequenceExpression":
+        for (const expression of node.expressions) {
+          analyzeNode(expression, scope, nestedAncestors);
+        }
+        return;
+      case "ObjectExpression":
+        for (const property of node.properties) analyzeNode(property, scope, nestedAncestors);
+        return;
+      case "Property":
+        if (node.computed) analyzeNode(node.key, scope, nestedAncestors);
+        analyzeNode(node.value, scope, nestedAncestors);
+        return;
+      case "ObjectPattern":
+      case "ArrayPattern":
+      case "RestElement":
+        analyzePatternExpressions(node, scope, nestedAncestors);
+        return;
+      case "ReturnStatement":
+      case "ThrowStatement":
+        analyzeNode(node.argument, scope, nestedAncestors);
+        return;
+      case "IfStatement":
+        analyzeNode(node.test, scope, nestedAncestors);
+        analyzeNode(node.consequent, scope, nestedAncestors);
+        analyzeNode(node.alternate, scope, nestedAncestors);
+        return;
+      case "ForStatement": {
+        const loopScope = new Scope(scope);
+        if (node.init?.type === "VariableDeclaration") {
+          for (const declarator of node.init.declarations) {
+            declarePattern(declarator.id, loopScope);
+          }
+        }
+        analyzeNode(node.init, loopScope, nestedAncestors);
+        analyzeNode(node.test, loopScope, nestedAncestors);
+        analyzeNode(node.update, loopScope, nestedAncestors);
+        analyzeNode(node.body, loopScope, nestedAncestors);
+        return;
+      }
+      case "ForOfStatement":
+      case "ForInStatement": {
+        const loopScope = new Scope(scope);
+        if (node.left?.type === "VariableDeclaration") {
+          for (const declarator of node.left.declarations) {
+            declarePattern(declarator.id, loopScope);
+          }
+        }
+        analyzeNode(node.left, loopScope, nestedAncestors);
+        analyzeNode(node.right, loopScope, nestedAncestors);
+        analyzeNode(node.body, loopScope, nestedAncestors);
+        return;
+      }
+      case "TemplateLiteral":
+        for (const expression of node.expressions) {
+          analyzeNode(expression, scope, nestedAncestors);
+        }
+        return;
+      default:
+        die(`syntax is outside the closed scope-aware subset: ${node.type}`);
+    }
   }
 
   function exactAllowedProcessUse(ancestors) {
@@ -179,46 +578,8 @@ async function localGraph(entry) {
       ) {
         die(`privileged capability is forbidden: ${absolute}`);
       }
-      if (
-        node.type === "Identifier" &&
-        (
-          privilegedGlobals.has(node.name) ||
-          (node.name === "process" && !exactAllowedProcessUse(ancestors))
-        )
-      ) {
-        die(`privileged capability is forbidden: ${absolute}`);
-      }
-      if (
-        (node.type === "VariableDeclarator" || node.type === "AssignmentExpression") &&
-        (node.init ?? node.right)?.type === "Identifier" &&
-        (node.init ?? node.right).name === "process"
-      ) {
-        die(`indirect dependency is forbidden: ${absolute}`);
-      }
-      if (
-        node.type === "CallExpression" &&
-        node.callee?.type === "Identifier" &&
-        ["require", "eval"].includes(node.callee.name)
-      ) {
-        die(`indirect dependency is forbidden: ${absolute}`);
-      }
-      if (
-        node.type === "CallExpression" &&
-        node.callee?.type === "MemberExpression" &&
-        node.callee.object?.type === "Identifier" &&
-        node.callee.object.name === "process" &&
-        node.callee.property?.name === "getBuiltinModule"
-      ) {
-        die(`indirect dependency is forbidden: ${absolute}`);
-      }
-      if (
-        (node.type === "CallExpression" || node.type === "NewExpression") &&
-        node.callee?.type === "Identifier" &&
-        node.callee.name === "Function"
-      ) {
-        die(`indirect dependency is forbidden: ${absolute}`);
-      }
     });
+    analyzeNode(syntax, new Scope());
     for (const specifier of specifiers) {
       if (specifier.startsWith("node:")) {
         if (!allowedBuiltins.has(specifier)) {
@@ -258,6 +619,22 @@ async function auditDependencies(normalizerEntry, checkerEntry) {
   return { normalizerModules: normalizerGraph.size, checkerModules: checkerGraph.size };
 }
 
+function hardenedRuntimeArgs(readPaths, omittedFlag = null) {
+  const flags = [];
+  if (omittedFlag !== "permission") {
+    flags.push("--permission");
+    for (const path of new Set(readPaths.map((entry) => realpathSync(resolve(entry))))) {
+      flags.push(`--allow-fs-read=${path}`);
+    }
+  }
+  if (omittedFlag !== "code-generation") {
+    flags.push("--disallow-code-generation-from-strings");
+  }
+  if (omittedFlag !== "fetch") flags.push("--no-experimental-fetch");
+  if (omittedFlag !== "websocket") flags.push("--no-experimental-websocket");
+  return flags;
+}
+
 const here = dirname(fileURLToPath(import.meta.url));
 const self = fileURLToPath(import.meta.url);
 const normalizer = join(here, "normalizer.mjs");
@@ -288,6 +665,13 @@ const testCases = [
   "dependency-capability-array-concat-multihop",
   "dependency-capability-object-destructure",
   "dependency-capability-sequence",
+  "dependency-async-function-constructor",
+  "dependency-function-prototype-constructor",
+  "dependency-ambient-fetch",
+  "dependency-ambient-websocket",
+  "dependency-safe-global-member",
+  "dependency-lexical-shadowing-control",
+  "runtime-hardening-flags",
   "dependency-package-loading",
   "source-digest-mismatch",
   "model-digest-mismatch",
@@ -295,13 +679,37 @@ const testCases = [
   "normalizer-certificate-output"
 ];
 
-function invoke(script, args, env = {}) {
-  const runtimeArgs = script === self ? process.execArgv : [];
-  return spawnSync(process.execPath, [...runtimeArgs, script, ...args], {
-    cwd: here,
-    encoding: "utf8",
-    env: { ...process.env, ...env }
-  });
+function invoke(script, args, env = {}, omittedRuntimeFlag = null) {
+  const runtimeScript = script === self ? script : realpathSync(script);
+  const runtimeCallArgs =
+    script === self
+      ? args
+      : args.map((entry, index) =>
+          index % 2 === 1 ? realpathSync(resolve(entry)) : entry
+        );
+  const runtimeArgs =
+    script === self
+      ? process.execArgv
+      : hardenedRuntimeArgs(
+          [
+            runtimeScript,
+            ...runtimeCallArgs.filter((_, index) => index % 2 === 1),
+            ...(script === normalizer ? [catalog] : []),
+            ...(script === checker
+              ? [resolve(here, cases.expectedModelFile)]
+              : [])
+          ],
+          omittedRuntimeFlag
+        );
+  return spawnSync(
+    process.execPath,
+    [...runtimeArgs, runtimeScript, ...runtimeCallArgs],
+    {
+      cwd: here,
+      encoding: "utf8",
+      env: { ...process.env, ...env }
+    }
+  );
 }
 
 function requireImplementations() {
@@ -351,6 +759,65 @@ async function expectDependencyRejected(prefix, injectedSource, expected) {
   ]);
   assert.notEqual(result.status, 0, `dependency mutation survived: ${prefix}`);
   assert.match(result.stderr, new RegExp(expected));
+}
+
+async function expectDependencyAccepted(prefix, injectedSource) {
+  const temporary = await mkdtemp(join(tmpdir(), `packet-e-${prefix}-`));
+  const acceptedNormalizer = join(temporary, "normalizer.mjs");
+  const acceptedChecker = join(temporary, "checker.mjs");
+  await copyFile(normalizer, acceptedNormalizer);
+  const checkerSource = (await readFile(checker, "utf8")).replace(/^#![^\n]*\n/, "");
+  await writeFile(acceptedChecker, `${injectedSource}\n${checkerSource}`);
+  const result = invoke(self, [
+    "--normalizer",
+    acceptedNormalizer,
+    "--checker",
+    acceptedChecker
+  ]);
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+}
+
+async function assertRuntimeHardeningFlags() {
+  const temporary = await mkdtemp(join(tmpdir(), "packet-e-runtime-hardening-"));
+  const secret = join(temporary, "forbidden-read.txt");
+  await writeFile(secret, "closed\n");
+  const probes = [
+    {
+      flag: "permission",
+      source:
+        'import { readFileSync } from "node:fs";\n' +
+        `try { readFileSync(${JSON.stringify(secret)}); process.exit(23); } catch {}\n`
+    },
+    {
+      flag: "code-generation",
+      source:
+        'try { Function("return 1")(); process.exit(23); } catch {}\n'
+    },
+    {
+      flag: "fetch",
+      source: 'if (typeof fetch !== "undefined") process.exit(23);\n'
+    },
+    {
+      flag: "websocket",
+      source: 'if (typeof WebSocket !== "undefined") process.exit(23);\n'
+    }
+  ];
+  for (const probe of probes) {
+    const probePath = join(temporary, `${probe.flag}.mjs`);
+    await writeFile(probePath, probe.source);
+    const baseline = invoke(probePath, []);
+    assert.equal(
+      baseline.status,
+      0,
+      `runtime hardening baseline failed for ${probe.flag}: ${baseline.stderr}`
+    );
+    const mutation = invoke(probePath, [], {}, probe.flag);
+    assert.equal(
+      mutation.status,
+      23,
+      `runtime hardening flag mutation survived: ${probe.flag}`
+    );
+  }
 }
 
 async function runTestCase(name) {
@@ -562,6 +1029,65 @@ async function runTestCase(name) {
           'finalLoader("./normalizer.mjs");',
         "privileged capability"
       );
+      break;
+    case "dependency-async-function-constructor":
+      await expectDependencyRejected(
+        "async-function-constructor",
+        'const key = "con" + "structor";\n' +
+          "const AsyncFunction = Object.getPrototypeOf(async function () {})[key];\n" +
+          'const load = AsyncFunction(\'return import("./normalizer.mjs")\');\n' +
+          "await load();",
+        "prototype or constructor introspection"
+      );
+      break;
+    case "dependency-function-prototype-constructor":
+      await expectDependencyRejected(
+        "function-prototype-constructor",
+        'const key = "con" + "structor";\n' +
+          "const FunctionConstructor = (function () {})[key];\n" +
+          'const load = FunctionConstructor(\'return import("./normalizer.mjs")\');\n' +
+          "await load();",
+        "prototype or constructor introspection"
+      );
+      break;
+    case "dependency-ambient-fetch":
+      await expectDependencyRejected(
+        "ambient-fetch",
+        'await fetch("https://example.invalid/");',
+        "unbound ambient identifier"
+      );
+      break;
+    case "dependency-ambient-websocket":
+      assert.equal(
+        typeof WebSocket,
+        "function",
+        "the pinned Node runtime does not expose the WebSocket global"
+      );
+      await expectDependencyRejected(
+        "ambient-websocket",
+        'new WebSocket("ws://127.0.0.1:9");',
+        "unbound ambient identifier"
+      );
+      break;
+    case "dependency-safe-global-member":
+      await expectDependencyRejected(
+        "safe-global-member",
+        "const merged = Object.assign({}, { value: 1 });\n" +
+          "void merged;",
+        "safe global member"
+      );
+      break;
+    case "dependency-lexical-shadowing-control":
+      await expectDependencyAccepted(
+        "lexical-shadowing-control",
+        "function localNetwork(fetch, WebSocket) {\n" +
+          "  return fetch(WebSocket);\n" +
+          "}\n" +
+          'localNetwork((value) => value, "closed");'
+      );
+      break;
+    case "runtime-hardening-flags":
+      await assertRuntimeHardeningFlags();
       break;
     case "dependency-package-loading":
       await expectDependencyRejected(

@@ -1,0 +1,458 @@
+diff --git a/docs/greenfield/research/prototypes/packet-e-assurance-spikes/fix-round-1-red-replay/replay-tests.sh b/docs/greenfield/research/prototypes/packet-e-assurance-spikes/fix-round-1-red-replay/replay-tests.sh
+index 752fc13..0957f87 100755
+--- a/docs/greenfield/research/prototypes/packet-e-assurance-spikes/fix-round-1-red-replay/replay-tests.sh
++++ b/docs/greenfield/research/prototypes/packet-e-assurance-spikes/fix-round-1-red-replay/replay-tests.sh
+@@ -3,0 +4,54 @@ set -euo pipefail
++stub_git() {
++  local command="${3:-}"
++  local operation="${4:-}"
++  local count
++  if [[ "$command" == "worktree" && "$operation" == "add" ]]; then
++    printf '%s\n' "$6" >"$PACKET_E_REPLAY_STUB_STATE/target"
++  elif [[ "$command" == "worktree" && "$operation" == "list" ]]; then
++    count=0
++    if [[ -f "$PACKET_E_REPLAY_STUB_STATE/query-count" ]]; then
++      count="$(<"$PACKET_E_REPLAY_STUB_STATE/query-count")"
++    fi
++    count=$((count + 1))
++    printf '%s\n' "$count" >"$PACKET_E_REPLAY_STUB_STATE/query-count"
++    if [[ "$PACKET_E_REPLAY_STUB_SCENARIO" == "query-failure" && "$count" == 1 ]]; then
++      exit 71
++    fi
++  elif [[ "$command" == "worktree" && "$operation" == "remove" ]]; then
++    count=0
++    if [[ -f "$PACKET_E_REPLAY_STUB_STATE/remove-count" ]]; then
++      count="$(<"$PACKET_E_REPLAY_STUB_STATE/remove-count")"
++    fi
++    count=$((count + 1))
++    printf '%s\n' "$count" >"$PACKET_E_REPLAY_STUB_STATE/remove-count"
++    if [[ "$PACKET_E_REPLAY_STUB_SCENARIO" == "fail-first-remove" && "$count" == 1 ]]; then
++      exit 72
++    fi
++    if [[ "$PACKET_E_REPLAY_STUB_SCENARIO" == "exact-remove-failure" ]]; then
++      exit 73
++    fi
++  elif [[ "$command" == "worktree" && "$operation" == "prune" ]]; then
++    : >"$PACKET_E_REPLAY_STUB_STATE/prune"
++  fi
++  exec "$PACKET_E_REPLAY_REAL_GIT" "$@"
++}
++
++stub_nix() {
++  printf '%s\n' "${TMPDIR:-}" >"$PACKET_E_REPLAY_STUB_STATE/child-tmp"
++  if (( PACKET_E_REPLAY_STUB_CHILD_STATUS != 0 )); then
++    exit "$PACKET_E_REPLAY_STUB_CHILD_STATUS"
++  fi
++  command cat "$PACKET_E_REPLAY_STUB_EXPECTED"
++}
++
++case "${0##*/}" in
++  git)
++    stub_git "$@"
++    exit
++    ;;
++  nix)
++    stub_nix "$@"
++    exit
++    ;;
++esac
++
+@@ -5,0 +60 @@ repository="$(git -C "$here" rev-parse --show-toplevel)"
++real_git="$(command -v git)"
+@@ -7,4 +62,9 @@ cases=(
+-  tmpdir-confinement
+-  failed-remove-fallback
+-  stale-registration-prune
+-  cleanup-failure-status
++  normal
++  fail-first-remove
++  query-failure
++  exact-remove-failure
++  status-preservation
++)
++wrappers=(
++  fix-round-1-red-replay/replay.sh
++  fix-round-3-red-replay/replay.sh
+@@ -13,33 +73,3 @@ cases=(
+-run_replay() {
+-  local case_root="$1"
+-  local scenario="$2"
+-  local child_status="${3:-0}"
+-  local observation="$case_root/observation-$scenario-$child_status.json"
+-  local temp_parent="$case_root/temp-parent"
+-  mkdir -p "$temp_parent"
+-  set +e
+-  TMPDIR="$temp_parent" \
+-    PACKET_E_REPLAY_TEST_FAST=1 \
+-    PACKET_E_REPLAY_TEST_SCENARIO="$scenario" \
+-    PACKET_E_REPLAY_TEST_CHILD_STATUS="$child_status" \
+-    PACKET_E_REPLAY_TEST_OBSERVATION="$observation" \
+-    bash "$here/replay.sh" >/dev/null 2>"$case_root/stderr-$scenario-$child_status.txt"
+-  replay_status=$?
+-  set -e
+-  [[ -f "$observation" ]] || {
+-    echo "replay observation missing: $scenario" >&2
+-    return 1
+-  }
+-}
+-
+-assert_common_cleanup() {
+-  local observation="$1"
+-  jq -e '
+-    . as $observation |
+-    ($observation.temporary | type == "string" and length > 0) and
+-    ($observation.childTmp | startswith($observation.temporary + "/")) and
+-    ($observation.childProbe | startswith($observation.childTmp + "/")) and
+-    ($observation.checkout | startswith($observation.temporary + "/")) and
+-    ($observation.registeredAfter == false) and
+-    ($observation.temporaryAfter == false)
+-  ' "$observation" >/dev/null
++fail() {
++  echo "replay matrix assertion failed: $*" >&2
++  return 1
+@@ -48,8 +78,13 @@ assert_common_cleanup() {
+-with_case_root() {
+-  local case_name="$1"
+-  local case_root
+-  case_root="$(mktemp -d "${TMPDIR:-/tmp}/packet-e-replay-test.$case_name.XXXXXX")"
+-  (
+-    trap 'find "$case_root" -depth -delete' EXIT
+-    "$2" "$case_root"
+-  )
++capture_registration() {
++  local clone="$1"
++  local target="$2"
++  local inventory
++  if ! inventory="$("$real_git" -C "$clone" worktree list --porcelain)"; then
++    fail "disposable inventory query failed"
++  fi
++  while IFS= read -r line; do
++    if [[ "$line" == "worktree $target" ]]; then
++      return 0
++    fi
++  done <<<"$inventory"
++  return 1
+@@ -58,6 +93,12 @@ with_case_root() {
+-test_tmpdir_confinement() {
+-  local case_root="$1"
+-  run_replay "$case_root" normal
+-  [[ "$replay_status" == 0 ]]
+-  assert_common_cleanup "$case_root/observation-normal-0.json"
+-  jq -e '.cleanupFailure == false' "$case_root/observation-normal-0.json" >/dev/null
++prepare_disposable_clone() {
++  local clone="$1"
++  local wrapper_relative="$2"
++  "$real_git" clone --quiet --no-hardlinks "$repository" "$clone"
++  command cp "$repository/docs/greenfield/research/prototypes/packet-e-assurance-spikes/$wrapper_relative" \
++    "$clone/docs/greenfield/research/prototypes/packet-e-assurance-spikes/$wrapper_relative"
++  if [[ -f \
++    "$repository/docs/greenfield/research/prototypes/packet-e-assurance-spikes/replay-cleanup.sh" ]]; then
++    command cp \
++      "$repository/docs/greenfield/research/prototypes/packet-e-assurance-spikes/replay-cleanup.sh" \
++      "$clone/docs/greenfield/research/prototypes/packet-e-assurance-spikes/replay-cleanup.sh"
++  fi
+@@ -66 +107 @@ test_tmpdir_confinement() {
+-test_failed_remove_fallback() {
++run_wrapper() {
+@@ -68,6 +109,5 @@ test_failed_remove_fallback() {
+-  run_replay "$case_root" fail-remove-once
+-  [[ "$replay_status" == 0 ]]
+-  assert_common_cleanup "$case_root/observation-fail-remove-once-0.json"
+-  jq -e '.removeFallback == true and .cleanupFailure == false' \
+-    "$case_root/observation-fail-remove-once-0.json" >/dev/null
+-}
++  local scenario="$2"
++  local wrapper_relative="$3"
++  local child_status="$4"
++  local wrapper_key clone state fake_bin temp_parent wrapper expected status
++  local target root child_tmp remove_count expected_status expect_recovery
+@@ -75,8 +115,9 @@ test_failed_remove_fallback() {
+-test_stale_registration_prune() {
+-  local case_root="$1"
+-  run_replay "$case_root" stale-registration
+-  [[ "$replay_status" == 0 ]]
+-  assert_common_cleanup "$case_root/observation-stale-registration-0.json"
+-  jq -e '.pruneUsed == true and .cleanupFailure == false' \
+-    "$case_root/observation-stale-registration-0.json" >/dev/null
+-}
++  wrapper_key="${wrapper_relative//\//-}"
++  clone="$case_root/repository-$wrapper_key"
++  state="$case_root/state-$wrapper_key"
++  fake_bin="$case_root/bin-$wrapper_key"
++  temp_parent="$case_root/temp-$wrapper_key"
++  command mkdir -p "$state" "$fake_bin" "$temp_parent"
++  prepare_disposable_clone "$clone" "$wrapper_relative"
++  command ln -s "$here/replay-tests.sh" "$fake_bin/git"
++  command ln -s "$here/replay-tests.sh" "$fake_bin/nix"
+@@ -84,7 +125,13 @@ test_stale_registration_prune() {
+-test_cleanup_failure_status() {
+-  local case_root="$1"
+-  run_replay "$case_root" reported-cleanup-failure 0
+-  [[ "$replay_status" == 1 ]]
+-  assert_common_cleanup "$case_root/observation-reported-cleanup-failure-0.json"
+-  jq -e '.cleanupFailure == true and .childStatus == 0 and .finalStatus == 1' \
+-    "$case_root/observation-reported-cleanup-failure-0.json" >/dev/null
++  wrapper="$clone/docs/greenfield/research/prototypes/packet-e-assurance-spikes/$wrapper_relative"
++  expected="${wrapper%/*}/raw-output.txt"
++  set +e
++  PATH="$fake_bin:$PATH" \
++    TMPDIR="$temp_parent" \
++    PACKET_E_REPLAY_STUB_STATE="$state" \
++    PACKET_E_REPLAY_STUB_SCENARIO="$scenario" \
++    PACKET_E_REPLAY_STUB_CHILD_STATUS="$child_status" \
++    PACKET_E_REPLAY_STUB_EXPECTED="$expected" \
++    PACKET_E_REPLAY_REAL_GIT="$real_git" \
++    bash "$wrapper" >"$state/stdout" 2>"$state/stderr"
++  status=$?
++  set -e
+@@ -92,6 +139,12 @@ test_cleanup_failure_status() {
+-  run_replay "$case_root" reported-cleanup-failure 7
+-  [[ "$replay_status" == 7 ]]
+-  assert_common_cleanup "$case_root/observation-reported-cleanup-failure-7.json"
+-  jq -e '.cleanupFailure == true and .childStatus == 7 and .finalStatus == 7' \
+-    "$case_root/observation-reported-cleanup-failure-7.json" >/dev/null
+-}
++  [[ -s "$state/target" ]] || fail "$scenario/$wrapper_key did not record an exact target"
++  target="$(<"$state/target")"
++  root="${target%/base}"
++  child_tmp="$(<"$state/child-tmp")"
++  [[ "$target" == "$root/base" ]] ||
++    fail "$scenario/$wrapper_key target is not the literal base child"
++  [[ "$root" == "$(realpath "$temp_parent")/"* ]] ||
++    fail "$scenario/$wrapper_key root escaped the canonical test TMPDIR"
++  [[ "$child_tmp" == "$root/child-tmp" ]] ||
++    fail "$scenario/$wrapper_key child TMPDIR was not confined"
++  [[ ! -e "$state/prune" ]] ||
++    fail "$scenario/$wrapper_key invoked repository-wide worktree prune"
+@@ -99,5 +152,10 @@ test_cleanup_failure_status() {
+-run_case() {
+-  local name="$1"
+-  case "$name" in
+-    tmpdir-confinement)
+-      with_case_root "$name" test_tmpdir_confinement
++  remove_count=0
++  if [[ -f "$state/remove-count" ]]; then
++    remove_count="$(<"$state/remove-count")"
++  fi
++  expected_status=0
++  expect_recovery=0
++  case "$scenario" in
++    normal)
++      [[ "$remove_count" == 1 ]] ||
++        fail "$scenario/$wrapper_key did not remove the target exactly once"
+@@ -105,2 +163,3 @@ run_case() {
+-    failed-remove-fallback)
+-      with_case_root "$name" test_failed_remove_fallback
++    fail-first-remove)
++      [[ "$remove_count" == 2 ]] ||
++        fail "$scenario/$wrapper_key did not retry the exact target once"
+@@ -108,2 +167,5 @@ run_case() {
+-    stale-registration-prune)
+-      with_case_root "$name" test_stale_registration_prune
++    query-failure)
++      expected_status=1
++      expect_recovery=1
++      [[ "$remove_count" == 0 ]] ||
++        fail "$scenario/$wrapper_key removed after inventory query failure"
+@@ -111,2 +173,10 @@ run_case() {
+-    cleanup-failure-status)
+-      with_case_root "$name" test_cleanup_failure_status
++    exact-remove-failure)
++      expected_status=1
++      expect_recovery=1
++      [[ "$remove_count" == 2 ]] ||
++        fail "$scenario/$wrapper_key did not stop after two exact attempts"
++      ;;
++    status-preservation)
++      expected_status=7
++      [[ "$remove_count" == 1 ]] ||
++        fail "$scenario/$wrapper_key did not clean after child failure"
+@@ -115,2 +185 @@ run_case() {
+-      echo "unknown replay case: $name" >&2
+-      return 2
++      fail "unknown replay scenario: $scenario"
+@@ -119 +188,32 @@ run_case() {
+-  echo "PASS replay/$name"
++  [[ "$status" == "$expected_status" ]] ||
++    fail "$scenario/$wrapper_key status=$status expected=$expected_status"
++
++  if (( expect_recovery == 1 )); then
++    [[ -d "$root" && -d "$target" ]] ||
++      fail "$scenario/$wrapper_key did not retain the exact recovery root"
++    capture_registration "$clone" "$target" ||
++      fail "$scenario/$wrapper_key did not retain the exact registration"
++  else
++    [[ ! -e "$root" ]] ||
++      fail "$scenario/$wrapper_key left a successful cleanup root"
++    if capture_registration "$clone" "$target"; then
++      fail "$scenario/$wrapper_key left a successful cleanup registration"
++    fi
++  fi
++}
++
++run_case() {
++  local scenario="$1"
++  local case_root child_status=0 wrapper
++  case_root="$(mktemp -d "${TMPDIR:-/tmp}/packet-e-replay-matrix.$scenario.XXXXXX")"
++  case_root="$(realpath "$case_root")"
++  (
++    trap 'find "$case_root" -depth -delete' EXIT
++    if [[ "$scenario" == "status-preservation" ]]; then
++      child_status=7
++    fi
++    for wrapper in "${wrappers[@]}"; do
++      run_wrapper "$case_root" "$scenario" "$wrapper" "$child_status"
++    done
++  )
++  echo "PASS replay/$scenario wrappers=${#wrappers[@]}"
+@@ -132 +232 @@ elif [[ "${1:-}" == "--all" ]]; then
+-  echo "replay tests: ${#cases[@]} passed"
++  echo "replay tests: ${#cases[@]} cases x ${#wrappers[@]} wrappers passed"
+diff --git a/docs/greenfield/research/prototypes/packet-e-assurance-spikes/normalization/dependency-audit.mjs b/docs/greenfield/research/prototypes/packet-e-assurance-spikes/normalization/dependency-audit.mjs
+index f8cc9a4..376b3e8 100644
+--- a/docs/greenfield/research/prototypes/packet-e-assurance-spikes/normalization/dependency-audit.mjs
++++ b/docs/greenfield/research/prototypes/packet-e-assurance-spikes/normalization/dependency-audit.mjs
+@@ -290,0 +291,7 @@ const testCases = [
++  "dependency-async-function-constructor",
++  "dependency-function-prototype-constructor",
++  "dependency-ambient-fetch",
++  "dependency-ambient-websocket",
++  "dependency-safe-global-member",
++  "dependency-lexical-shadowing-control",
++  "runtime-hardening-flags",
+@@ -355,0 +363,75 @@ async function expectDependencyRejected(prefix, injectedSource, expected) {
++async function expectDependencyAccepted(prefix, injectedSource) {
++  const temporary = await mkdtemp(join(tmpdir(), `packet-e-${prefix}-`));
++  const acceptedNormalizer = join(temporary, "normalizer.mjs");
++  const acceptedChecker = join(temporary, "checker.mjs");
++  await copyFile(normalizer, acceptedNormalizer);
++  const checkerSource = (await readFile(checker, "utf8")).replace(/^#![^\n]*\n/, "");
++  await writeFile(acceptedChecker, `${injectedSource}\n${checkerSource}`);
++  const result = invoke(self, [
++    "--normalizer",
++    acceptedNormalizer,
++    "--checker",
++    acceptedChecker
++  ]);
++  assert.equal(result.status, 0, result.stderr || result.stdout);
++}
++
++async function assertRuntimeHardeningFlags() {
++  const temporary = await mkdtemp(join(tmpdir(), "packet-e-runtime-hardening-"));
++  const secret = join(temporary, "forbidden-read.txt");
++  await writeFile(secret, "closed\n");
++  const probes = [
++    {
++      flag: "permission",
++      source:
++        'import { readFileSync } from "node:fs";\n' +
++        `try { readFileSync(${JSON.stringify(secret)}); process.exit(23); } catch {}\n`
++    },
++    {
++      flag: "code-generation",
++      source:
++        'try { Function("return 1")(); process.exit(23); } catch {}\n'
++    },
++    {
++      flag: "fetch",
++      source: 'if (typeof fetch !== "undefined") process.exit(23);\n'
++    },
++    {
++      flag: "websocket",
++      source: 'if (typeof WebSocket !== "undefined") process.exit(23);\n'
++    }
++  ];
++  for (const probe of probes) {
++    const baseline = spawnSync(
++      process.execPath,
++      [
++        ...hardenedRuntimeArgs([]),
++        "--input-type=module",
++        "--eval",
++        probe.source
++      ],
++      { encoding: "utf8" }
++    );
++    assert.equal(
++      baseline.status,
++      0,
++      `runtime hardening baseline failed for ${probe.flag}: ${baseline.stderr}`
++    );
++    const mutation = spawnSync(
++      process.execPath,
++      [
++        ...hardenedRuntimeArgs([], probe.flag),
++        "--input-type=module",
++        "--eval",
++        probe.source
++      ],
++      { encoding: "utf8" }
++    );
++    assert.equal(
++      mutation.status,
++      23,
++      `runtime hardening flag mutation survived: ${probe.flag}`
++    );
++  }
++}
++
+@@ -565,0 +648,59 @@ async function runTestCase(name) {
++    case "dependency-async-function-constructor":
++      await expectDependencyRejected(
++        "async-function-constructor",
++        'const key = "con" + "structor";\n' +
++          "const AsyncFunction = Object.getPrototypeOf(async function () {})[key];\n" +
++          'const load = AsyncFunction(\'return import("./normalizer.mjs")\');\n' +
++          "await load();",
++        "prototype or constructor introspection"
++      );
++      break;
++    case "dependency-function-prototype-constructor":
++      await expectDependencyRejected(
++        "function-prototype-constructor",
++        'const key = "con" + "structor";\n' +
++          "const FunctionConstructor = (function () {})[key];\n" +
++          'const load = FunctionConstructor(\'return import("./normalizer.mjs")\');\n' +
++          "await load();",
++        "prototype or constructor introspection"
++      );
++      break;
++    case "dependency-ambient-fetch":
++      await expectDependencyRejected(
++        "ambient-fetch",
++        'await fetch("https://example.invalid/");',
++        "unbound ambient identifier"
++      );
++      break;
++    case "dependency-ambient-websocket":
++      assert.equal(
++        typeof WebSocket,
++        "function",
++        "the pinned Node runtime does not expose the WebSocket global"
++      );
++      await expectDependencyRejected(
++        "ambient-websocket",
++        'new WebSocket("ws://127.0.0.1:9");',
++        "unbound ambient identifier"
++      );
++      break;
++    case "dependency-safe-global-member":
++      await expectDependencyRejected(
++        "safe-global-member",
++        "const merged = Object.assign({}, { value: 1 });\n" +
++          "void merged;",
++        "safe global member"
++      );
++      break;
++    case "dependency-lexical-shadowing-control":
++      await expectDependencyAccepted(
++        "lexical-shadowing-control",
++        "function localNetwork(fetch, WebSocket) {\n" +
++          "  return fetch(WebSocket);\n" +
++          "}\n" +
++          'localNetwork((value) => value, "closed");'
++      );
++      break;
++    case "runtime-hardening-flags":
++      await assertRuntimeHardeningFlags();
++      break;
