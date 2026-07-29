@@ -1,0 +1,5 @@
+normalization/noncomputed-pattern-identifier-sensitive=1
+normalization/noncomputed-pattern-string-sensitive=1
+normalization/noncomputed-object-proto-sensitive=1
+normalization/noncomputed-property-controls=0
+normalization/noncomputed-unsupported-key=1

@@ -1,0 +1,77 @@
+diff --git a/docs/greenfield/research/prototypes/packet-e-assurance-spikes/normalization/dependency-audit.mjs b/docs/greenfield/research/prototypes/packet-e-assurance-spikes/normalization/dependency-audit.mjs
+index 734a8b4552de11e5cca51470b1a38bec80762843..191ff92ea306eedfc5451e5ee2adcd580a3bc915 100644
+--- a/docs/greenfield/research/prototypes/packet-e-assurance-spikes/normalization/dependency-audit.mjs
++++ b/docs/greenfield/research/prototypes/packet-e-assurance-spikes/normalization/dependency-audit.mjs
+@@ -723,0 +724,5 @@ const testCases = [
++  "dependency-noncomputed-pattern-identifier-sensitive",
++  "dependency-noncomputed-pattern-string-sensitive",
++  "dependency-noncomputed-object-proto-sensitive",
++  "dependency-noncomputed-property-controls",
++  "dependency-noncomputed-unsupported-key",
+@@ -899 +904,5 @@ async function assertRuntimeHardeningFlag(flag) {
+-async function assertRuntimeBackedDependencyRejected(prefix, injectedSource) {
++async function assertRuntimeBackedDependencyRejected(
++  prefix,
++  injectedSource,
++  expected = "unresolved computed member"
++) {
+@@ -914 +923 @@ async function assertRuntimeBackedDependencyRejected(prefix, injectedSource) {
+-      "unresolved computed member"
++      expected
+@@ -1238,0 +1248,56 @@ async function runTestCase(name) {
++    case "dependency-noncomputed-pattern-identifier-sensitive":
++      await assertRuntimeBackedDependencyRejected(
++        "noncomputed-pattern-identifier-sensitive",
++        "const target = {};\n" +
++          "const { constructor: { prototype: recovered } } = target;\n" +
++          "recovered.packetEPostLimitPatternIdentifier = true;\n" +
++          "if (({}).packetEPostLimitPatternIdentifier !== true) {\n" +
++          '  throw new Error("prototype mutation was not observed");\n' +
++          "}\n" +
++          'process.stdout.write("MUTATED noncomputed-pattern-identifier-sensitive\\n");',
++        "prototype or constructor introspection"
++      );
++      break;
++    case "dependency-noncomputed-pattern-string-sensitive":
++      await assertRuntimeBackedDependencyRejected(
++        "noncomputed-pattern-string-sensitive",
++        "function Carrier() {}\n" +
++          'const { "prototype": recovered } = Carrier;\n' +
++          "recovered.packetEPostLimitPatternString = true;\n" +
++          "const instance = new Carrier();\n" +
++          "if (instance.packetEPostLimitPatternString !== true) {\n" +
++          '  throw new Error("prototype mutation was not observed");\n' +
++          "}\n" +
++          'process.stdout.write("MUTATED noncomputed-pattern-string-sensitive\\n");',
++        "prototype or constructor introspection"
++      );
++      break;
++    case "dependency-noncomputed-object-proto-sensitive":
++      await assertRuntimeBackedDependencyRejected(
++        "noncomputed-object-proto-sensitive",
++        "const inherited = { packetEPostLimitObjectProto: true };\n" +
++          "const target = { __proto__: inherited };\n" +
++          "if (target.packetEPostLimitObjectProto !== true) {\n" +
++          '  throw new Error("object prototype state was not observed");\n' +
++          "}\n" +
++          'process.stdout.write("MUTATED noncomputed-object-proto-sensitive\\n");',
++        "prototype or constructor introspection"
++      );
++      break;
++    case "dependency-noncomputed-property-controls":
++      await expectDependencyAccepted(
++        "noncomputed-property-controls",
++        'const data = { value: 7, "other": 11 };\n' +
++          'const { value: left, "other": right } = data;\n' +
++          "if (left + right !== 18) {\n" +
++          '  throw new Error("noncomputed property controls failed");\n' +
++          "}"
++      );
++      break;
++    case "dependency-noncomputed-unsupported-key":
++      await expectDependencyRejected(
++        "noncomputed-unsupported-key",
++        'const data = { 7: "value" };\nvoid data;',
++        "noncomputed property key"
++      );
++      break;

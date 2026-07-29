@@ -184,6 +184,36 @@ async function localGraph(entry) {
     return node.computed ? staticString(node.property, scope) : null;
   }
 
+  function semanticObjectPropertyName(property, scope) {
+    if (property.computed) {
+      const member = staticString(property.key, scope);
+      if (member === null) {
+        die("unresolved computed property is forbidden");
+      }
+      return member;
+    }
+    if (property.key?.type === "Identifier") {
+      return property.key.name;
+    }
+    if (
+      property.key?.type === "Literal" &&
+      typeof property.key.value === "string"
+    ) {
+      return property.key.value;
+    }
+    die("noncomputed property key is outside the closed subset");
+  }
+
+  function analyzeObjectPropertyKey(property, scope, ancestors) {
+    const member = semanticObjectPropertyName(property, scope);
+    if (sensitiveProperties.has(member)) {
+      die("prototype or constructor introspection is forbidden");
+    }
+    if (property.computed) {
+      analyzeNode(property.key, scope, ancestors);
+    }
+  }
+
   function analyzePatternExpressions(pattern, scope, ancestors) {
     if (!pattern) return;
     switch (pattern.type) {
@@ -199,16 +229,7 @@ async function localGraph(entry) {
           if (property.type === "RestElement") {
             analyzePatternExpressions(property.argument, scope, ancestors);
           } else {
-            if (property.computed) {
-              const member = staticString(property.key, scope);
-              if (member === null) {
-                die("unresolved computed property is forbidden");
-              }
-              if (sensitiveProperties.has(member)) {
-                die("prototype or constructor introspection is forbidden");
-              }
-              analyzeNode(property.key, scope, ancestors);
-            }
+            analyzeObjectPropertyKey(property, scope, ancestors);
             analyzePatternExpressions(property.value, scope, ancestors);
           }
         }
@@ -465,16 +486,7 @@ async function localGraph(entry) {
         for (const property of node.properties) analyzeNode(property, scope, nestedAncestors);
         return;
       case "Property":
-        if (node.computed) {
-          const member = staticString(node.key, scope);
-          if (member === null) {
-            die("unresolved computed property is forbidden");
-          }
-          if (sensitiveProperties.has(member)) {
-            die("prototype or constructor introspection is forbidden");
-          }
-          analyzeNode(node.key, scope, nestedAncestors);
-        }
+        analyzeObjectPropertyKey(node, scope, nestedAncestors);
         analyzeNode(node.value, scope, nestedAncestors);
         return;
       case "ObjectPattern":
@@ -721,6 +733,11 @@ const testCases = [
   "dependency-unresolved-let-computed-member",
   "dependency-unresolved-join-computed-member",
   "dependency-resolved-computed-members-control",
+  "dependency-noncomputed-pattern-identifier-sensitive",
+  "dependency-noncomputed-pattern-string-sensitive",
+  "dependency-noncomputed-object-proto-sensitive",
+  "dependency-noncomputed-property-controls",
+  "dependency-noncomputed-unsupported-key",
   "dependency-builtin-named-reexport-member",
   "dependency-builtin-export-all",
   "dependency-builtin-named-reexport-control",
@@ -896,7 +913,11 @@ async function assertRuntimeHardeningFlag(flag) {
   assert.equal(mutation.stdout, `EXPOSED ${flag}\n`);
 }
 
-async function assertRuntimeBackedDependencyRejected(prefix, injectedSource) {
+async function assertRuntimeBackedDependencyRejected(
+  prefix,
+  injectedSource,
+  expected = "unresolved computed member"
+) {
   const temporary = await mkdtemp(join(tmpdir(), `packet-e-${prefix}-runtime-`));
   const probePath = join(temporary, "prototype-mutation.mjs");
   await writeFile(probePath, `${injectedSource}\n`);
@@ -911,7 +932,7 @@ async function assertRuntimeBackedDependencyRejected(prefix, injectedSource) {
     await expectDependencyRejected(
       prefix,
       injectedSource,
-      "unresolved computed member"
+      expected
     );
   } catch (error) {
     throw new Error(
@@ -1234,6 +1255,62 @@ async function runTestCase(name) {
           "if (left + middle + joined + right !== 28) {\n" +
           '  throw new Error("resolved computed-member control failed");\n' +
           "}"
+      );
+      break;
+    case "dependency-noncomputed-pattern-identifier-sensitive":
+      await assertRuntimeBackedDependencyRejected(
+        "noncomputed-pattern-identifier-sensitive",
+        "const target = {};\n" +
+          "const { constructor: { prototype: recovered } } = target;\n" +
+          "recovered.packetEPostLimitPatternIdentifier = true;\n" +
+          "if (({}).packetEPostLimitPatternIdentifier !== true) {\n" +
+          '  throw new Error("prototype mutation was not observed");\n' +
+          "}\n" +
+          'process.stdout.write("MUTATED noncomputed-pattern-identifier-sensitive\\n");',
+        "prototype or constructor introspection"
+      );
+      break;
+    case "dependency-noncomputed-pattern-string-sensitive":
+      await assertRuntimeBackedDependencyRejected(
+        "noncomputed-pattern-string-sensitive",
+        "function Carrier() {}\n" +
+          'const { "prototype": recovered } = Carrier;\n' +
+          "recovered.packetEPostLimitPatternString = true;\n" +
+          "const instance = new Carrier();\n" +
+          "if (instance.packetEPostLimitPatternString !== true) {\n" +
+          '  throw new Error("prototype mutation was not observed");\n' +
+          "}\n" +
+          'process.stdout.write("MUTATED noncomputed-pattern-string-sensitive\\n");',
+        "prototype or constructor introspection"
+      );
+      break;
+    case "dependency-noncomputed-object-proto-sensitive":
+      await assertRuntimeBackedDependencyRejected(
+        "noncomputed-object-proto-sensitive",
+        "const inherited = { packetEPostLimitObjectProto: true };\n" +
+          "const target = { __proto__: inherited };\n" +
+          "if (target.packetEPostLimitObjectProto !== true) {\n" +
+          '  throw new Error("object prototype state was not observed");\n' +
+          "}\n" +
+          'process.stdout.write("MUTATED noncomputed-object-proto-sensitive\\n");',
+        "prototype or constructor introspection"
+      );
+      break;
+    case "dependency-noncomputed-property-controls":
+      await expectDependencyAccepted(
+        "noncomputed-property-controls",
+        'const data = { value: 7, "other": 11 };\n' +
+          'const { value: left, "other": right } = data;\n' +
+          "if (left + right !== 18) {\n" +
+          '  throw new Error("noncomputed property controls failed");\n' +
+          "}"
+      );
+      break;
+    case "dependency-noncomputed-unsupported-key":
+      await expectDependencyRejected(
+        "noncomputed-unsupported-key",
+        'const data = { 7: "value" };\nvoid data;',
+        "noncomputed property key"
       );
       break;
     case "dependency-builtin-named-reexport-member":

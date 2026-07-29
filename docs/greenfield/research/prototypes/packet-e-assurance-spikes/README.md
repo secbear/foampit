@@ -18,21 +18,21 @@ process recovers to a partial state.
 
 ## Measured result
 
-The final 2026-07-29 Stage 00 round-five candidate run passed 96 focused
+The final 2026-07-29 Stage 00 post-limit candidate run passed 101 focused
 semantic/crash tests, six toolchain-provenance mutation tests, and sixteen
 replay cleanup wrapper-scenario checks:
 
 | Group | Tests | Result |
 | --- | ---: | --- |
-| independent normalization | 44 | all passed |
+| independent normalization | 49 | all passed |
 | Lean kernel/interface audit | 38 | all passed |
 | pure model/SQLite crash refinement | 14 | all passed |
 | toolchain-provenance mutations | 6 | all killed |
 | replay cleanup/TMPDIR confinement | 16 | all passed |
 
 The positive Lean build plus exact-byte, elaborated-interface, transitive
-dependency-identity, opaque-definition, and axiom-closure audit took 10,842.5
-ms in a round-five full run. Six Lean declarations were kernel checked: the
+dependency-identity, opaque-definition, and axiom-closure audit took 13,604.4
+ms in the post-limit full run. Six Lean declarations were kernel checked: the
 proof-material translation binding and the five required theorem families.
 Every required theorem reported an empty transitive axiom set.
 
@@ -83,7 +83,11 @@ still resolves literal/template/concatenated/constant names, and rejects
 resolved `constructor`, `prototype`, and `__proto__`. Positive controls cover
 every retained static resolution form. Runtime-backed negative cases first
 prove prototype mutation in isolated children and then require static
-rejection of the unresolved access.
+rejection of the unresolved access. The post-limit hardening classifies
+noncomputed object and destructuring keys by their semantic identifier or
+string name, rejects the same sensitive set on both paths, and fails closed on
+other noncomputed key forms. Ordinary identifier and string-key controls remain
+accepted.
 
 Pinned Node child invocations add defense in depth with exact read permissions,
 string-code generation disabled, and Fetch/WebSocket globals disabled. The
@@ -98,7 +102,7 @@ or arbitrary-input sandbox soundness.
 
 ## Replay cleanup boundary
 
-All four committed RED replay wrappers use one shared cleanup implementation.
+All five committed RED replay wrappers use one shared cleanup implementation.
 Initialization explicitly checks repository resolution, `mktemp`,
 canonicalization, and child-directory creation before deriving a checkout
 path. Cleanup captures a pre-removal `git worktree list --porcelain` inventory

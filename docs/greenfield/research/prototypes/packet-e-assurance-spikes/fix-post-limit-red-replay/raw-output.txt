@@ -1,0 +1,6 @@
+RED normalization/noncomputed-pattern-identifier-sensitive: dependency mutation survived: noncomputed-pattern-identifier-sensitive; prototypeEvidenceStatus=0 prototypeEvidenceStdout="MUTATED noncomputed-pattern-identifier-sensitive\n"
+RED normalization/noncomputed-pattern-string-sensitive: dependency mutation survived: noncomputed-pattern-string-sensitive; prototypeEvidenceStatus=0 prototypeEvidenceStdout="MUTATED noncomputed-pattern-string-sensitive\n"
+RED normalization/noncomputed-object-proto-sensitive: dependency mutation survived: noncomputed-object-proto-sensitive; prototypeEvidenceStatus=0 prototypeEvidenceStdout="MUTATED noncomputed-object-proto-sensitive\n"
+CONTROL normalization/noncomputed-property-controls: PASS normalization/dependency-noncomputed-property-controls
+RED normalization/noncomputed-unsupported-key: dependency mutation survived: noncomputed-unsupported-key
+RED post-limit summary: vulnerabilities=4 controls=1
