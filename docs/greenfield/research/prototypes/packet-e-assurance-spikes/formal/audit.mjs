@@ -58,6 +58,11 @@ const cases = [
   "expr-nested-container-subtype",
   "expr-higher-order-nested-type",
   "expr-dependency-type-hiding",
+  "expr-forged-match-prop",
+  "expr-forged-rec-prop",
+  "expr-forged-cases-on-higher-type",
+  "expr-forged-no-confusion-nested-type",
+  "expr-actual-recursor-metadata",
   "incomplete-transitive-closure",
   "unpinned-dependency",
   "pinned-dependency-missing-pin",
@@ -175,12 +180,6 @@ open Lean Elab Command Meta
 private def packetEBelongsToProject (root : String) (name : Name) : Bool :=
   (name.toString.splitOn ".").contains root
 
-private def packetEIsGeneratedAuxiliary (name : Name) : Bool :=
-  (name.toString.splitOn ".").any fun part =>
-    part.startsWith "match_" ||
-    part.startsWith "noConfusion" ||
-    ["casesOn", "rec", "recOn", "below"].contains part
-
 private def packetEHeadName? (expression : Expr) : Option String :=
   expression.getAppFn.constName?.map Name.toString
 
@@ -247,49 +246,97 @@ partial def packetEValidateBinders (type : Expr) : MetaM Unit := do
         packetEValidateBinders (body.instantiate1 localValue)
   | _ => pure ()
 
-partial def packetEContainsExplicitSort (expression : Expr) : MetaM Bool := do
-  let reduced ← whnf expression
-  match reduced with
-  | .sort _ => return true
-  | .fvar _ => packetEContainsExplicitSort (← inferType reduced)
-  | .app function argument =>
-      if ← packetEContainsExplicitSort function then
-        return true
-      packetEContainsExplicitSort argument
-  | .forallE binderName domain body binderInfo =>
-      if ← packetEContainsExplicitSort domain then
-        return true
-      withLocalDecl binderName binderInfo domain fun localValue =>
-        packetEContainsExplicitSort (body.instantiate1 localValue)
-  | .lam binderName domain body binderInfo =>
-      if ← packetEContainsExplicitSort domain then
-        return true
-      withLocalDecl binderName binderInfo domain fun localValue =>
-        packetEContainsExplicitSort (body.instantiate1 localValue)
-  | .letE binderName type value body _ =>
-      if ← packetEContainsExplicitSort type then
-        return true
-      if ← packetEContainsExplicitSort value then
-        return true
-      withLetDecl binderName type value fun localValue =>
-        packetEContainsExplicitSort (body.instantiate1 localValue)
-  | .mdata _ nested => packetEContainsExplicitSort nested
-  | .proj _ _ nested => packetEContainsExplicitSort nested
-  | _ => return false
+private def packetEMetadataError (declaration : Name) (detail : String) : MetaM Unit :=
+  throwError "invalid compiler metadata for {declaration}: {detail}"
 
-partial def packetEValidateGeneratedBinders (type : Expr) : MetaM Unit := do
-  let type ← whnf type
-  match type with
-  | .forallE binderName domain body binderInfo =>
-      let reducedDomain ← whnf domain
-      let isMechanical :=
-        (← packetEContainsExplicitSort reducedDomain) || (← isProp reducedDomain)
-      unless isMechanical do
-        packetEValidateBinderInfo domain binderInfo
-        packetEValidateDomain domain
-      withLocalDecl binderName binderInfo domain fun localValue =>
-        packetEValidateGeneratedBinders (body.instantiate1 localValue)
-  | _ => pure ()
+private def packetEValidateConstructorInfo
+    (declaration : Name) (value : ConstructorVal) : MetaM Unit := do
+  let parentInfo ← getConstInfo value.induct
+  let parent ←
+    match parentInfo with
+    | .inductInfo parent => pure parent
+    | _ =>
+        packetEMetadataError declaration "constructor parent is not inductive"
+        unreachable!
+  unless (parent.ctors.drop value.cidx).head? == some declaration do
+    packetEMetadataError declaration "constructor index/parent relation"
+  unless value.numParams == parent.numParams do
+    packetEMetadataError declaration "constructor parameter count"
+  forallTelescopeReducing value.type fun binders body => do
+    unless binders.size == value.numParams + value.numFields do
+      packetEMetadataError declaration "constructor binder count"
+    unless body.getAppFn.constName? == some value.induct do
+      packetEMetadataError declaration "constructor result family"
+    for binder in binders do
+      packetEValidateBinderInfo (← inferType binder) (← binder.fvarId!.getBinderInfo)
+      packetEValidateDomain (← inferType binder)
+
+private def packetEValidateInductiveInfo
+    (declaration : Name) (value : InductiveVal) : MetaM Unit := do
+  unless value.all.contains declaration do
+    packetEMetadataError declaration "family membership"
+  forallTelescopeReducing value.type fun binders body => do
+    unless binders.size == value.numParams + value.numIndices do
+      packetEMetadataError declaration "inductive binder count"
+    match ← whnf body with
+    | .sort _ => pure ()
+    | _ => packetEMetadataError declaration "inductive result sort"
+    for binder in binders do
+      packetEValidateBinderInfo (← inferType binder) (← binder.fvarId!.getBinderInfo)
+      packetEValidateDomain (← inferType binder)
+  for familyName in value.all do
+    match ← getConstInfo familyName with
+    | .inductInfo family =>
+        unless family.all == value.all && family.numParams == value.numParams do
+          packetEMetadataError declaration "mutual family relation"
+    | _ => packetEMetadataError declaration "mutual family kind"
+  let mut expectedIndex := 0
+  for constructorName in value.ctors do
+    match ← getConstInfo constructorName with
+    | .ctorInfo constructor =>
+        unless constructor.induct == declaration &&
+            constructor.cidx == expectedIndex &&
+            constructor.numParams == value.numParams do
+          packetEMetadataError declaration "constructor metadata relation"
+        packetEValidateConstructorInfo constructorName constructor
+    | _ => packetEMetadataError declaration "constructor metadata kind"
+    expectedIndex := expectedIndex + 1
+
+private def packetEValidateRecursorInfo
+    (declaration : Name) (value : RecursorVal) : MetaM Unit := do
+  unless value.numMotives == value.all.length do
+    packetEMetadataError declaration "recursor motive count"
+  let mut expectedConstructors : List Name := []
+  for familyName in value.all do
+    match ← getConstInfo familyName with
+    | .inductInfo family =>
+        unless family.all == value.all && family.numParams == value.numParams do
+          packetEMetadataError declaration "recursor family relation"
+        expectedConstructors := expectedConstructors ++ family.ctors
+    | _ => packetEMetadataError declaration "recursor family kind"
+  unless value.numMinors == expectedConstructors.length &&
+      value.rules.length == expectedConstructors.length do
+    packetEMetadataError declaration "recursor minor/rule count"
+  for (rule, expectedConstructor) in value.rules.zip expectedConstructors do
+    unless rule.ctor == expectedConstructor do
+      packetEMetadataError declaration "recursor rule order"
+    match ← getConstInfo rule.ctor with
+    | .ctorInfo constructor =>
+        unless value.all.contains constructor.induct &&
+            rule.nfields == constructor.numFields do
+          packetEMetadataError declaration "recursor rule constructor relation"
+    | _ => packetEMetadataError declaration "recursor rule constructor kind"
+  forallTelescopeReducing value.type fun binders _ => do
+    let mechanicalStart := value.numParams
+    let mechanicalEnd := value.numParams + value.numMotives + value.numMinors
+    let expectedCount := mechanicalEnd + value.numIndices + 1
+    unless binders.size == expectedCount do
+      packetEMetadataError declaration "recursor binder count"
+    for h : index in [:binders.size] do
+      unless mechanicalStart ≤ index && index < mechanicalEnd do
+        let binder := binders[index]
+        packetEValidateBinderInfo (← inferType binder) (← binder.fvarId!.getBinderInfo)
+        packetEValidateDomain (← inferType binder)
 
 partial def packetEConstants : Expr → List Name
   | .const name _ => [name]
@@ -314,13 +361,12 @@ partial def packetEValidateBody
     match info with
     | .axiomInfo _ => throwError "project semantic axiom: {declaration}"
     | .opaqueInfo _ => throwError "opaque semantic dependency: {declaration}"
-    | .defnInfo _ =>
-        if packetEIsGeneratedAuxiliary declaration then
-          packetEValidateGeneratedBinders info.type
-        else
-          packetEValidateBinders info.type
+    | .defnInfo _ => packetEValidateBinders info.type
     | .thmInfo _ => packetEValidateBinders info.type
-    | _ => pure ()
+    | .inductInfo value => packetEValidateInductiveInfo declaration value
+    | .ctorInfo value => packetEValidateConstructorInfo declaration value
+    | .recInfo value => packetEValidateRecursorInfo declaration value
+    | _ => packetEMetadataError declaration "unsupported ConstantInfo kind"
   let mut result := visited.push declaration
   for reference in packetEConstants info.type do
     if packetEBelongsToProject root reference then
@@ -483,6 +529,24 @@ async function expectFixtureRejected({
   assert.match(rejected.message, new RegExp(expected));
 }
 
+async function expectFixtureAccepted({
+  modules,
+  theorem = "Fixture.target",
+  declaredLocalModules = [],
+  declaredLocalPins = {}
+}) {
+  const directory = await buildFixture(modules);
+  const output = auditModule({
+    moduleName: "Fixture",
+    sourcePath: join(directory, "Fixture.lean"),
+    theorem,
+    leanPath: directory,
+    declaredLocalModules,
+    declaredLocalPins
+  });
+  assert.match(output, /Fixture\.target/);
+}
+
 async function runPositiveAudit() {
   const start = performance.now();
   buildPacketESpike();
@@ -618,7 +682,7 @@ async function runCase(name) {
     assert.match(source, /structure ExactBytesBinding\b/);
     assert.match(source, /structure ProofMaterialTranslation\b/);
     assert.match(source, /def boundProofMaterial\b/);
-    assert.match(source, /structure ProofMaterialBound\b/);
+    assert.match(source, /def ProofMaterialBound\b/);
     return;
   }
   if (name === "required-theorems-proof-bound") {
@@ -656,6 +720,19 @@ async function runCase(name) {
     assert.match(output, /rightCardinality/);
     assert.match(output, /totalCardinality/);
     assert.match(output, /2 \* population|population \* 2/);
+    return;
+  }
+  if (name === "expr-actual-recursor-metadata") {
+    await expectFixtureAccepted({
+      modules: {
+        Fixture:
+          "namespace Fixture\n" +
+          "inductive Choice where\n  | left\n  | right\n" +
+          "theorem target : " +
+          "Choice.rec (motive := fun _ => Prop) True True .left := True.intro\n" +
+          "end Fixture\n"
+      }
+    });
     return;
   }
   if (["omitted-source-bytes", "omitted-model-bytes", "solver-unknown"].includes(name)) {
@@ -828,6 +905,49 @@ async function runCase(name) {
           "namespace Fixture\n" +
           "theorem helper {Carrier : Type} (value : Carrier) : True := True.intro\n" +
           "theorem target : True := helper (Carrier := Nat) 0\nend Fixture\n"
+      },
+      expected: "nested Type parameter"
+    },
+    "expr-forged-match-prop": {
+      modules: {
+        Fixture:
+          "namespace Fixture\n" +
+          "def match_forged (hidden : True) : True := hidden\n" +
+          "theorem target : True := match_forged True.intro\n" +
+          "end Fixture\n"
+      },
+      expected: "proposition premise"
+    },
+    "expr-forged-rec-prop": {
+      modules: {
+        Fixture:
+          "namespace Fixture\n" +
+          "namespace Forged\n" +
+          "def rec (hidden : True) : True := hidden\n" +
+          "end Forged\n" +
+          "theorem target : True := Forged.rec True.intro\n" +
+          "end Fixture\n"
+      },
+      expected: "proposition premise"
+    },
+    "expr-forged-cases-on-higher-type": {
+      modules: {
+        Fixture:
+          "namespace Fixture\n" +
+          "def casesOn (consumer : (Carrier : Type) → Carrier → Nat) : True := True.intro\n" +
+          "theorem target : True := casesOn (fun _ _ => 0)\n" +
+          "end Fixture\n"
+      },
+      expected: "nested Type parameter"
+    },
+    "expr-forged-no-confusion-nested-type": {
+      modules: {
+        Fixture:
+          "namespace Fixture\n" +
+          "def noConfusion " +
+          "(consumers : List ((Carrier : Type) → Carrier → Nat)) : True := True.intro\n" +
+          "theorem target : True := noConfusion []\n" +
+          "end Fixture\n"
       },
       expected: "nested Type parameter"
     },

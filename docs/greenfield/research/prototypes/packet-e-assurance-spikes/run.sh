@@ -198,6 +198,7 @@ run_group toolchain audit_toolchain_suite
 run_group normalization node --expose-internals "$here/normalization/dependency-audit.mjs" --all
 run_group formal node "$here/formal/audit.mjs" --all
 run_group durability bash "$here/durability/test.sh"
+run_group replay-cleanup bash "$here/fix-round-1-red-replay/replay-tests.sh" --all
 run_group artifact-hygiene artifact_hygiene_case
 
 if (( failures != 0 )); then

@@ -35,16 +35,30 @@ function parseAuditArgs(argv) {
 
 async function localGraph(entry) {
   const visited = new Set();
+  const allowedEnvironmentReads = new Set([
+    "PACKET_E_CHECKER_MUTATION",
+    "PACKET_E_NORMALIZER_MUTATION"
+  ]);
+  const privilegedGlobals = new Set([
+    "Function",
+    "Proxy",
+    "Reflect",
+    "WebAssembly",
+    "eval",
+    "global",
+    "globalThis",
+    "require"
+  ]);
 
-  function walk(node, visitNode) {
+  function walk(node, visitNode, ancestors = []) {
     if (!node || typeof node !== "object") return;
-    if (typeof node.type === "string") visitNode(node);
+    if (typeof node.type === "string") visitNode(node, ancestors);
     for (const [key, value] of Object.entries(node)) {
       if (key === "start" || key === "end" || key === "loc") continue;
       if (Array.isArray(value)) {
-        for (const child of value) walk(child, visitNode);
+        for (const child of value) walk(child, visitNode, [...ancestors, node]);
       } else {
-        walk(value, visitNode);
+        walk(value, visitNode, [...ancestors, node]);
       }
     }
   }
@@ -67,6 +81,63 @@ async function localGraph(entry) {
     return null;
   }
 
+  function exactAllowedProcessUse(ancestors) {
+    const parent = ancestors.at(-1);
+    const grandparent = ancestors.at(-2);
+    const greatGrandparent = ancestors.at(-3);
+    if (
+      parent?.type !== "MemberExpression" ||
+      parent.object?.type !== "Identifier" ||
+      parent.object.name !== "process" ||
+      parent.computed ||
+      parent.property?.type !== "Identifier"
+    ) {
+      return false;
+    }
+    if (parent.property.name === "argv") {
+      return (
+        grandparent?.type === "MemberExpression" &&
+        grandparent.object === parent &&
+        !grandparent.computed &&
+        grandparent.property?.name === "slice" &&
+        greatGrandparent?.type === "CallExpression" &&
+        greatGrandparent.callee === grandparent &&
+        greatGrandparent.arguments.length === 1 &&
+        greatGrandparent.arguments[0]?.type === "Literal" &&
+        greatGrandparent.arguments[0].value === 2
+      );
+    }
+    if (parent.property.name === "env") {
+      return (
+        grandparent?.type === "MemberExpression" &&
+        grandparent.object === parent &&
+        !grandparent.computed &&
+        grandparent.property?.type === "Identifier" &&
+        allowedEnvironmentReads.has(grandparent.property.name)
+      );
+    }
+    if (["stdout", "stderr"].includes(parent.property.name)) {
+      return (
+        grandparent?.type === "MemberExpression" &&
+        grandparent.object === parent &&
+        !grandparent.computed &&
+        grandparent.property?.name === "write" &&
+        greatGrandparent?.type === "CallExpression" &&
+        greatGrandparent.callee === grandparent
+      );
+    }
+    if (parent.property.name === "exit") {
+      return (
+        grandparent?.type === "CallExpression" &&
+        grandparent.callee === parent &&
+        grandparent.arguments.length === 1 &&
+        grandparent.arguments[0]?.type === "Literal" &&
+        grandparent.arguments[0].value === 1
+      );
+    }
+    return false;
+  }
+
   async function visit(file) {
     const absolute = await realpath(resolve(file));
     if (visited.has(absolute)) return;
@@ -78,7 +149,7 @@ async function localGraph(entry) {
       allowHashBang: true
     });
     const specifiers = [];
-    walk(syntax, (node) => {
+    walk(syntax, (node, ancestors) => {
       if (
         node.type === "ImportDeclaration" ||
         node.type === "ExportNamedDeclaration" ||
@@ -101,6 +172,21 @@ async function localGraph(entry) {
         )
       ) {
         die(`indirect dependency is forbidden: ${absolute}`);
+      }
+      if (
+        node.type === "MemberExpression" &&
+        ["__proto__", "constructor", "prototype"].includes(propertyName(node))
+      ) {
+        die(`privileged capability is forbidden: ${absolute}`);
+      }
+      if (
+        node.type === "Identifier" &&
+        (
+          privilegedGlobals.has(node.name) ||
+          (node.name === "process" && !exactAllowedProcessUse(ancestors))
+        )
+      ) {
+        die(`privileged capability is forbidden: ${absolute}`);
       }
       if (
         (node.type === "VariableDeclarator" || node.type === "AssignmentExpression") &&
@@ -199,6 +285,9 @@ const testCases = [
   "dependency-indirect-loading",
   "dependency-computed-loader-property",
   "dependency-multihop-loader-alias",
+  "dependency-capability-array-concat-multihop",
+  "dependency-capability-object-destructure",
+  "dependency-capability-sequence",
   "dependency-package-loading",
   "source-digest-mismatch",
   "model-digest-mismatch",
@@ -424,6 +513,54 @@ async function runTestCase(name) {
           "const renamedLoad = load;\n" +
           'renamedLoad("./normalizer.mjs");',
         "indirect dependency"
+      );
+      break;
+    case "dependency-capability-array-concat-multihop":
+      await expectDependencyRejected(
+        "capability-array-concat-multihop",
+        "const vault = [process];\n" +
+          "const recovered = vault[0];\n" +
+          'const builtinKey = "getBuiltin" + "Module";\n' +
+          "const getBuiltin = recovered[builtinKey];\n" +
+          'const moduleApi = getBuiltin("node:" + "module");\n' +
+          'const requireKey = "create" + "Require";\n' +
+          "const create = moduleApi[requireKey];\n" +
+          "const makeLoader = create;\n" +
+          "const loader = makeLoader(import.meta.url);\n" +
+          "const finalLoader = loader;\n" +
+          'finalLoader("./normalizer.mjs");',
+        "privileged capability"
+      );
+      break;
+    case "dependency-capability-object-destructure":
+      await expectDependencyRejected(
+        "capability-object-destructure",
+        "const vault = { capability: process };\n" +
+          "const { capability: recovered } = vault;\n" +
+          'const builtinKey = "getBuiltin" + "Module";\n' +
+          "const getBuiltin = recovered[builtinKey];\n" +
+          'const moduleApi = getBuiltin("node:" + "module");\n' +
+          'const requireKey = "create" + "Require";\n' +
+          "const create = moduleApi[requireKey];\n" +
+          "const loader = create(import.meta.url);\n" +
+          "const finalLoader = loader;\n" +
+          'finalLoader("./normalizer.mjs");',
+        "privileged capability"
+      );
+      break;
+    case "dependency-capability-sequence":
+      await expectDependencyRejected(
+        "capability-sequence",
+        "const recovered = (0, process);\n" +
+          'const builtinKey = "getBuiltin" + "Module";\n' +
+          "const getBuiltin = recovered[builtinKey];\n" +
+          'const moduleApi = getBuiltin("node:" + "module");\n' +
+          'const requireKey = "create" + "Require";\n' +
+          "const create = moduleApi[requireKey];\n" +
+          "const loader = create(import.meta.url);\n" +
+          "const finalLoader = loader;\n" +
+          'finalLoader("./normalizer.mjs");',
+        "privileged capability"
       );
       break;
     case "dependency-package-loading":

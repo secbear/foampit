@@ -1,0 +1,323 @@
+diff --git a/docs/greenfield/research/prototypes/packet-e-assurance-spikes/fix-round-1-red-replay/replay-tests.sh b/docs/greenfield/research/prototypes/packet-e-assurance-spikes/fix-round-1-red-replay/replay-tests.sh
+new file mode 100644
+index 0000000..d3dd264
+--- /dev/null
++++ b/docs/greenfield/research/prototypes/packet-e-assurance-spikes/fix-round-1-red-replay/replay-tests.sh
+@@ -0,0 +1,136 @@
++#!/usr/bin/env bash
++set -euo pipefail
++
++here="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
++repository="$(git -C "$here" rev-parse --show-toplevel)"
++cases=(
++  tmpdir-confinement
++  failed-remove-fallback
++  stale-registration-prune
++  cleanup-failure-status
++)
++
++run_replay() {
++  local case_root="$1"
++  local scenario="$2"
++  local child_status="${3:-0}"
++  local observation="$case_root/observation-$scenario-$child_status.json"
++  local temp_parent="$case_root/temp-parent"
++  mkdir -p "$temp_parent"
++  set +e
++  TMPDIR="$temp_parent" \
++    PACKET_E_REPLAY_TEST_FAST=1 \
++    PACKET_E_REPLAY_TEST_SCENARIO="$scenario" \
++    PACKET_E_REPLAY_TEST_CHILD_STATUS="$child_status" \
++    PACKET_E_REPLAY_TEST_OBSERVATION="$observation" \
++    bash "$here/replay.sh" >/dev/null 2>"$case_root/stderr-$scenario-$child_status.txt"
++  replay_status=$?
++  set -e
++  [[ -f "$observation" ]] || {
++    echo "replay observation missing: $scenario" >&2
++    return 1
++  }
++}
++
++assert_common_cleanup() {
++  local observation="$1"
++  jq -e '
++    . as $observation |
++    ($observation.temporary | type == "string" and length > 0) and
++    ($observation.childTmp | startswith($observation.temporary + "/")) and
++    ($observation.childProbe | startswith($observation.childTmp + "/")) and
++    ($observation.checkout | startswith($observation.temporary + "/")) and
++    ($observation.registeredAfter == false) and
++    ($observation.temporaryAfter == false)
++  ' "$observation" >/dev/null
++}
++
++with_case_root() {
++  local case_name="$1"
++  local case_root
++  case_root="$(mktemp -d "${TMPDIR:-/tmp}/packet-e-replay-test.$case_name.XXXXXX")"
++  (
++    trap 'find "$case_root" -depth -delete' EXIT
++    "$2" "$case_root"
++  )
++}
++
++test_tmpdir_confinement() {
++  local case_root="$1"
++  run_replay "$case_root" normal
++  [[ "$replay_status" == 0 ]]
++  assert_common_cleanup "$case_root/observation-normal-0.json"
++  jq -e '.cleanupFailure == false' "$case_root/observation-normal-0.json" >/dev/null
++}
++
++test_failed_remove_fallback() {
++  local case_root="$1"
++  run_replay "$case_root" fail-remove-once
++  [[ "$replay_status" == 0 ]]
++  assert_common_cleanup "$case_root/observation-fail-remove-once-0.json"
++  jq -e '.removeFallback == true and .cleanupFailure == false' \
++    "$case_root/observation-fail-remove-once-0.json" >/dev/null
++}
++
++test_stale_registration_prune() {
++  local case_root="$1"
++  run_replay "$case_root" stale-registration
++  [[ "$replay_status" == 0 ]]
++  assert_common_cleanup "$case_root/observation-stale-registration-0.json"
++  jq -e '.pruneUsed == true and .cleanupFailure == false' \
++    "$case_root/observation-stale-registration-0.json" >/dev/null
++}
++
++test_cleanup_failure_status() {
++  local case_root="$1"
++  run_replay "$case_root" reported-cleanup-failure 0
++  [[ "$replay_status" == 1 ]]
++  assert_common_cleanup "$case_root/observation-reported-cleanup-failure-0.json"
++  jq -e '.cleanupFailure == true and .childStatus == 0 and .finalStatus == 1' \
++    "$case_root/observation-reported-cleanup-failure-0.json" >/dev/null
++
++  run_replay "$case_root" reported-cleanup-failure 7
++  [[ "$replay_status" == 7 ]]
++  assert_common_cleanup "$case_root/observation-reported-cleanup-failure-7.json"
++  jq -e '.cleanupFailure == true and .childStatus == 7 and .finalStatus == 7' \
++    "$case_root/observation-reported-cleanup-failure-7.json" >/dev/null
++}
++
++run_case() {
++  local name="$1"
++  case "$name" in
++    tmpdir-confinement)
++      with_case_root "$name" test_tmpdir_confinement
++      ;;
++    failed-remove-fallback)
++      with_case_root "$name" test_failed_remove_fallback
++      ;;
++    stale-registration-prune)
++      with_case_root "$name" test_stale_registration_prune
++      ;;
++    cleanup-failure-status)
++      with_case_root "$name" test_cleanup_failure_status
++      ;;
++    *)
++      echo "unknown replay case: $name" >&2
++      return 2
++      ;;
++  esac
++  echo "PASS replay/$name"
++}
++
++if [[ "${1:-}" == "--case" ]]; then
++  [[ -n "${2:-}" ]] || {
++    echo "usage: replay-tests.sh --all | --case ${cases[*]}" >&2
++    exit 2
++  }
++  run_case "$2"
++elif [[ "${1:-}" == "--all" ]]; then
++  for case_name in "${cases[@]}"; do
++    run_case "$case_name"
++  done
++  echo "replay tests: ${#cases[@]} passed"
++else
++  echo "usage: replay-tests.sh --all | --case ${cases[*]}" >&2
++  exit 2
++fi
+diff --git a/docs/greenfield/research/prototypes/packet-e-assurance-spikes/formal/audit.mjs b/docs/greenfield/research/prototypes/packet-e-assurance-spikes/formal/audit.mjs
+index 4b253df..9fc422b 100644
+--- a/docs/greenfield/research/prototypes/packet-e-assurance-spikes/formal/audit.mjs
++++ b/docs/greenfield/research/prototypes/packet-e-assurance-spikes/formal/audit.mjs
+@@ -58,6 +58,11 @@ const cases = [
+   "expr-nested-container-subtype",
+   "expr-higher-order-nested-type",
+   "expr-dependency-type-hiding",
++  "expr-forged-match-prop",
++  "expr-forged-rec-prop",
++  "expr-forged-cases-on-higher-type",
++  "expr-forged-no-confusion-nested-type",
++  "expr-actual-recursor-metadata",
+   "incomplete-transitive-closure",
+   "unpinned-dependency",
+   "pinned-dependency-missing-pin",
+@@ -483,6 +488,24 @@ async function expectFixtureRejected({
+   assert.match(rejected.message, new RegExp(expected));
+ }
+-
++
++async function expectFixtureAccepted({
++  modules,
++  theorem = "Fixture.target",
++  declaredLocalModules = [],
++  declaredLocalPins = {}
++}) {
++  const directory = await buildFixture(modules);
++  const output = auditModule({
++    moduleName: "Fixture",
++    sourcePath: join(directory, "Fixture.lean"),
++    theorem,
++    leanPath: directory,
++    declaredLocalModules,
++    declaredLocalPins
++  });
++  assert.match(output, /Fixture\.target/);
++}
++
+ async function runPositiveAudit() {
+   const start = performance.now();
+   buildPacketESpike();
+@@ -658,6 +681,19 @@ async function runCase(name) {
+     assert.match(output, /2 \* population|population \* 2/);
+     return;
+   }
++  if (name === "expr-actual-recursor-metadata") {
++    await expectFixtureAccepted({
++      modules: {
++        Fixture:
++          "namespace Fixture\n" +
++          "inductive Choice where\n  | left\n  | right\n" +
++          "theorem target : " +
++          "Choice.rec (motive := fun _ => Prop) True True .left := True.intro\n" +
++          "end Fixture\n"
++      }
++    });
++    return;
++  }
+   if (["omitted-source-bytes", "omitted-model-bytes", "solver-unknown"].includes(name)) {
+     const proof = JSON.parse(await readFile(proofMaterialPath, "utf8"));
+     if (name === "omitted-source-bytes") delete proof.catalogBytesHex;
+@@ -831,6 +867,49 @@ async function runCase(name) {
+       },
+       expected: "nested Type parameter"
+     },
++    "expr-forged-match-prop": {
++      modules: {
++        Fixture:
++          "namespace Fixture\n" +
++          "def match_forged (hidden : True) : True := hidden\n" +
++          "theorem target : True := match_forged True.intro\n" +
++          "end Fixture\n"
++      },
++      expected: "proposition premise"
++    },
++    "expr-forged-rec-prop": {
++      modules: {
++        Fixture:
++          "namespace Fixture\n" +
++          "namespace Forged\n" +
++          "def rec (hidden : True) : True := hidden\n" +
++          "end Forged\n" +
++          "theorem target : True := Forged.rec True.intro\n" +
++          "end Fixture\n"
++      },
++      expected: "proposition premise"
++    },
++    "expr-forged-cases-on-higher-type": {
++      modules: {
++        Fixture:
++          "namespace Fixture\n" +
++          "def casesOn (consumer : (Carrier : Type) → Carrier → Nat) : True := True.intro\n" +
++          "theorem target : True := casesOn (fun _ _ => 0)\n" +
++          "end Fixture\n"
++      },
++      expected: "nested Type parameter"
++    },
++    "expr-forged-no-confusion-nested-type": {
++      modules: {
++        Fixture:
++          "namespace Fixture\n" +
++          "def noConfusion " +
++          "(consumers : List ((Carrier : Type) → Carrier → Nat)) : True := True.intro\n" +
++          "theorem target : True := noConfusion []\n" +
++          "end Fixture\n"
++      },
++      expected: "nested Type parameter"
++    },
+     "incomplete-transitive-closure": {
+       modules: {
+         ThirdParty:
+diff --git a/docs/greenfield/research/prototypes/packet-e-assurance-spikes/normalization/dependency-audit.mjs b/docs/greenfield/research/prototypes/packet-e-assurance-spikes/normalization/dependency-audit.mjs
+index b375cdb..c528ca2 100644
+--- a/docs/greenfield/research/prototypes/packet-e-assurance-spikes/normalization/dependency-audit.mjs
++++ b/docs/greenfield/research/prototypes/packet-e-assurance-spikes/normalization/dependency-audit.mjs
+@@ -199,6 +199,9 @@ const testCases = [
+   "dependency-indirect-loading",
+   "dependency-computed-loader-property",
+   "dependency-multihop-loader-alias",
++  "dependency-capability-array-concat-multihop",
++  "dependency-capability-object-destructure",
++  "dependency-capability-sequence",
+   "dependency-package-loading",
+   "source-digest-mismatch",
+   "model-digest-mismatch",
+@@ -426,6 +429,54 @@ async function runTestCase(name) {
+         "indirect dependency"
+       );
+       break;
++    case "dependency-capability-array-concat-multihop":
++      await expectDependencyRejected(
++        "capability-array-concat-multihop",
++        "const vault = [process];\n" +
++          "const recovered = vault[0];\n" +
++          'const builtinKey = "getBuiltin" + "Module";\n' +
++          "const getBuiltin = recovered[builtinKey];\n" +
++          'const moduleApi = getBuiltin("node:" + "module");\n' +
++          'const requireKey = "create" + "Require";\n' +
++          "const create = moduleApi[requireKey];\n" +
++          "const makeLoader = create;\n" +
++          "const loader = makeLoader(import.meta.url);\n" +
++          "const finalLoader = loader;\n" +
++          'finalLoader("./normalizer.mjs");',
++        "privileged capability"
++      );
++      break;
++    case "dependency-capability-object-destructure":
++      await expectDependencyRejected(
++        "capability-object-destructure",
++        "const vault = { capability: process };\n" +
++          "const { capability: recovered } = vault;\n" +
++          'const builtinKey = "getBuiltin" + "Module";\n' +
++          "const getBuiltin = recovered[builtinKey];\n" +
++          'const moduleApi = getBuiltin("node:" + "module");\n' +
++          'const requireKey = "create" + "Require";\n' +
++          "const create = moduleApi[requireKey];\n" +
++          "const loader = create(import.meta.url);\n" +
++          "const finalLoader = loader;\n" +
++          'finalLoader("./normalizer.mjs");',
++        "privileged capability"
++      );
++      break;
++    case "dependency-capability-sequence":
++      await expectDependencyRejected(
++        "capability-sequence",
++        "const recovered = (0, process);\n" +
++          'const builtinKey = "getBuiltin" + "Module";\n' +
++          "const getBuiltin = recovered[builtinKey];\n" +
++          'const moduleApi = getBuiltin("node:" + "module");\n' +
++          'const requireKey = "create" + "Require";\n' +
++          "const create = moduleApi[requireKey];\n" +
++          "const loader = create(import.meta.url);\n" +
++          "const finalLoader = loader;\n" +
++          'finalLoader("./normalizer.mjs");',
++        "privileged capability"
++      );
++      break;
+     case "dependency-package-loading":
+       await expectDependencyRejected(
+         "package-loading",

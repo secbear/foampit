@@ -18,18 +18,20 @@ process recovers to a partial state.
 
 ## Measured result
 
-The 2026-07-29 Stage 00 candidate run passed 64 focused semantic/crash tests
-plus four toolchain-provenance mutation tests:
+The final 2026-07-29 Stage 00 round-three candidate run passed 78 focused
+semantic/crash tests, six toolchain-provenance mutation tests, and four replay
+cleanup tests:
 
 | Group | Tests | Result |
 | --- | ---: | --- |
-| independent normalization | 21 | all passed |
-| Lean kernel/interface audit | 29 | all passed |
+| independent normalization | 26 | all passed |
+| Lean kernel/interface audit | 38 | all passed |
 | pure model/SQLite crash refinement | 14 | all passed |
-| toolchain-provenance mutations | 4 | all killed |
+| toolchain-provenance mutations | 6 | all killed |
+| replay cleanup/TMPDIR confinement | 4 | all passed |
 
 The positive Lean build plus exact-byte, elaborated-interface, transitive
-dependency-identity, opaque-definition, and axiom-closure audit took 12,550.5
+dependency-identity, opaque-definition, and axiom-closure audit took 11,647.2
 ms in the fresh full run. Six Lean declarations were kernel checked: the
 proof-material translation binding and the five required theorem families.
 Every required theorem reported an empty transitive axiom set.
@@ -51,13 +53,22 @@ semantic leaf mappings, and unconditionally binds the exact source set and
 literal expected canonical model bytes/digests. The dependency audit parses
 ECMAScript syntax, resolves canonical real paths, walks static imports and
 re-exports, and rejects cross-imports, shared semantic modules, symlink aliases,
-dynamic or indirect loaders, and unpinned packages.
+dynamic or indirect loaders, and unpinned packages. It also applies a
+conservative capability-origin boundary: only the exact direct `process.argv`,
+named mutation-environment, stdout/stderr, and exit operations used by these
+two programs are admitted; raw `process`, privileged globals, constructor
+metaprogramming, and computed loader capabilities are rejected.
 
 The mutation matrix kills omitted reachability, selector/profile/reference/
 import/order changes, constant output, normalizer/checker co-drift, forbidden
 cross-import, source/model digest mismatch, and normalizer-issued verdict or
 certificate output. It also kills coordinated source/model replacement and
 comment-obfuscated/re-exported/symlinked/indirect dependency edges.
+The capability-origin cases include the exact array storage/index recovery,
+string-concatenated `getBuiltinModule`/`createRequire`, and multi-hop renamed
+loader attack, plus object/destructuring and sequence-expression variants.
+This is executable feasibility evidence for those static origin rules, not a
+general ECMAScript taint-analysis claim.
 
 ## Lean feasibility and audit boundary
 
@@ -89,8 +100,14 @@ premises, conclusion-as-assumption, subtype/`Nonempty`/`Exists`/semantic
 `Decidable`/typeclass/nested-`Type` smuggling, opaque semantic dependencies,
 omitted source/model bytes, unknown procedures, unpinned/wrongly pinned
 dependencies, and incomplete transitive dependency closure. Alias, arbitrary
-proposition, implicit, generated/private, and multi-hop transparent premise
-wrappers are negative fixtures. The only imported libraries are exact
+proposition, implicit, private, and multi-hop transparent premise wrappers are
+negative fixtures. Authored definitions are always checked strictly, including
+adversarial `match_*`, `rec`, `casesOn`, and `noConfusion` spellings.
+Compiler status is accepted only from Lean's non-forgeable `inductInfo`,
+`ctorInfo`, and `recInfo` variants after exact family, parent, constructor,
+rule, field-count, and binder-count checks; only the exact recursor
+motive/minor positions are mechanical. The actual compiler recursor is a
+positive fixture. The only imported libraries are exact
 SHA-256-pinned `Init` and `Std` objects from the same pinned Lean store
 derivation.
 

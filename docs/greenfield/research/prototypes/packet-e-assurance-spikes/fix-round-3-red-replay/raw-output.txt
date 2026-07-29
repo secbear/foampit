@@ -1,0 +1,10 @@
+RED formal/forged-match: negative fixture was accepted: proposition premise
+RED formal/forged-rec: negative fixture was accepted: proposition premise
+RED formal/forged-cases-on: negative fixture was accepted: nested Type parameter
+RED formal/forged-no-confusion: negative fixture was accepted: nested Type parameter
+CONTROL formal/actual-recursor: accepted
+RED normalization/capability-array: dependency mutation survived: capability-array-concat-multihop
+RED normalization/capability-object: dependency mutation survived: capability-object-destructure
+RED normalization/capability-sequence: dependency mutation survived: capability-sequence
+RED replay/tmpdir-confinement: replay observation missing: normal
+RED round 3 summary: vulnerabilities=8 controls=1

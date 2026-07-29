@@ -56,25 +56,25 @@ def boundProofMaterial : ProofMaterialTranslation :=
     solverResult := .kernelChecked
   }
 
-structure ProofMaterialBound (material : ProofMaterialTranslation) : Prop where
-  canonicalBytes : material.canonicalBytes = exactCanonicalProofMaterialBytes
-  canonicalSha256 : material.canonicalSha256 =
+def ProofMaterialBound (material : ProofMaterialTranslation) : Prop :=
+  material.canonicalBytes = exactCanonicalProofMaterialBytes ∧
+  material.canonicalSha256 =
     "1b38211ffa11b8fb25dc87262a65911555e4d6ce4e19a02bfc2a8cf7037beb70"
-  catalogBytes : material.catalog.bytes = exactCatalogBytes
-  catalogByteCount : material.catalog.byteCount = exactCatalogBytes.toUTF8.size
-  catalogSha256 : material.catalog.sha256 =
+  ∧ material.catalog.bytes = exactCatalogBytes
+  ∧ material.catalog.byteCount = exactCatalogBytes.toUTF8.size
+  ∧ material.catalog.sha256 =
     "0d13ae01d2e1cbd62706e43abc3701272713ceb967ccd43ae05af234022709c1"
-  completeCarrierFields : material.completeCarrierFields =
+  ∧ material.completeCarrierFields =
     ["enabled", "gates", "nextState", "outcomes", "postcondition", "effects", "evidence"]
-  modelBytes : material.model.bytes = exactModelBytes
-  modelByteCount : material.model.byteCount = exactModelBytes.toUTF8.size
-  modelSha256 : material.model.sha256 =
+  ∧ material.model.bytes = exactModelBytes
+  ∧ material.model.byteCount = exactModelBytes.toUTF8.size
+  ∧ material.model.sha256 =
     "2f3305d053ecf4e7f3ae1b0d1b0e55e65ced79c5fb481a544251468b7aa46e98"
-  shardCount : material.shardCount = 2
-  solverResult : material.solverResult = .kernelChecked
+  ∧ material.shardCount = 2
+  ∧ material.solverResult = .kernelChecked
 
 theorem proofMaterialTranslationBound : ProofMaterialBound boundProofMaterial := by
-  constructor <;> rfl
+  exact ⟨rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl, rfl⟩
 
 structure SemanticCarrier where
   enabled : Bool
@@ -131,24 +131,45 @@ inductive CoverageCoordinate (population : Nat) where
   | left (index : Fin population)
   | right (index : Fin population)
 
-def leftRegion {population : Nat} : CoverageCoordinate population → Prop
-  | .left _ => True
-  | .right _ => False
+noncomputable def leftRegion {population : Nat} :
+    CoverageCoordinate population → Bool :=
+  CoverageCoordinate.rec
+    (motive := fun _ => Bool)
+    (fun _ => true)
+    (fun _ => false)
 
-def rightRegion {population : Nat} : CoverageCoordinate population → Prop
-  | .left _ => False
-  | .right _ => True
+noncomputable def rightRegion {population : Nat} :
+    CoverageCoordinate population → Bool :=
+  CoverageCoordinate.rec
+    (motive := fun _ => Bool)
+    (fun _ => false)
+    (fun _ => true)
+
+noncomputable def leftIndex? {population : Nat} :
+    CoverageCoordinate population → Option (Fin population) :=
+  CoverageCoordinate.rec
+    (motive := fun _ => Option (Fin population))
+    (fun index => some index)
+    (fun _ => none)
+
+noncomputable def rightIndex? {population : Nat} :
+    CoverageCoordinate population → Option (Fin population) :=
+  CoverageCoordinate.rec
+    (motive := fun _ => Option (Fin population))
+    (fun _ => none)
+    (fun index => some index)
 
 structure CoverageShardSpec (population : Nat) where
   family : String
   shardCount : Nat
-  leftRegion : CoverageCoordinate population → Prop
-  rightRegion : CoverageCoordinate population → Prop
+  leftRegion : CoverageCoordinate population → Bool
+  rightRegion : CoverageCoordinate population → Bool
   leftCardinality : Nat
   rightCardinality : Nat
   totalCardinality : Nat
 
-def symbolicCoverageShardSpec (population : Nat) : CoverageShardSpec population :=
+noncomputable def symbolicCoverageShardSpec
+    (population : Nat) : CoverageShardSpec population :=
   {
     family := "two-family-symbolic-spike"
     shardCount := 2
@@ -159,55 +180,65 @@ def symbolicCoverageShardSpec (population : Nat) : CoverageShardSpec population 
     totalCardinality := 2 * population
   }
 
-def enumerateLeft (population : Nat) (index : Fin population) :
+noncomputable def enumerateLeft (population : Nat) (index : Fin population) :
     { coordinate : CoverageCoordinate population //
-      (symbolicCoverageShardSpec population).leftRegion coordinate } :=
-  ⟨.left index, True.intro⟩
+      (symbolicCoverageShardSpec population).leftRegion coordinate = true } :=
+  ⟨.left index, rfl⟩
 
-def enumerateRight (population : Nat) (index : Fin population) :
+noncomputable def enumerateRight (population : Nat) (index : Fin population) :
     { coordinate : CoverageCoordinate population //
-      (symbolicCoverageShardSpec population).rightRegion coordinate } :=
-  ⟨.right index, True.intro⟩
+      (symbolicCoverageShardSpec population).rightRegion coordinate = true } :=
+  ⟨.right index, rfl⟩
 
 theorem enumerateLeftBijective (population : Nat) :
     Function.Injective (enumerateLeft population) ∧
       Function.Surjective (enumerateLeft population) := by
   constructor
   · intro leftIndex rightIndex equality
-    cases equality
-    rfl
+    have lifted :=
+      congrArg (fun coordinate => leftIndex? coordinate.val) equality
+    exact Option.some.inj lifted
   · intro coordinate
     rcases coordinate with ⟨coordinate, membership⟩
-    cases coordinate with
-    | left index =>
-        exact ⟨index, rfl⟩
-    | right index =>
-        contradiction
+    exact CoverageCoordinate.rec
+      (motive := fun coordinate =>
+        ∀ membership :
+            (symbolicCoverageShardSpec population).leftRegion coordinate = true,
+          ∃ index, enumerateLeft population index = ⟨coordinate, membership⟩)
+      (fun index _ => ⟨index, rfl⟩)
+      (fun _ impossible => False.elim (Bool.false_ne_true impossible))
+      coordinate
+      membership
 
 theorem enumerateRightBijective (population : Nat) :
     Function.Injective (enumerateRight population) ∧
       Function.Surjective (enumerateRight population) := by
   constructor
   · intro leftIndex rightIndex equality
-    cases equality
-    rfl
+    have lifted :=
+      congrArg (fun coordinate => rightIndex? coordinate.val) equality
+    exact Option.some.inj lifted
   · intro coordinate
     rcases coordinate with ⟨coordinate, membership⟩
-    cases coordinate with
-    | left index =>
-        contradiction
-    | right index =>
-        exact ⟨index, rfl⟩
+    exact CoverageCoordinate.rec
+      (motive := fun coordinate =>
+        ∀ membership :
+            (symbolicCoverageShardSpec population).rightRegion coordinate = true,
+          ∃ index, enumerateRight population index = ⟨coordinate, membership⟩)
+      (fun _ impossible => False.elim (Bool.false_ne_true impossible))
+      (fun index _ => ⟨index, rfl⟩)
+      coordinate
+      membership
 
 theorem coverageShardSpecUniversal (population : Nat) :
     ProofMaterialBound boundProofMaterial ∧
     (symbolicCoverageShardSpec population).shardCount = 2 ∧
     (∀ coordinate : CoverageCoordinate population,
-      ¬ ((symbolicCoverageShardSpec population).leftRegion coordinate ∧
-        (symbolicCoverageShardSpec population).rightRegion coordinate)) ∧
+      ¬ ((symbolicCoverageShardSpec population).leftRegion coordinate = true ∧
+        (symbolicCoverageShardSpec population).rightRegion coordinate = true)) ∧
     (∀ coordinate : CoverageCoordinate population,
-      (symbolicCoverageShardSpec population).leftRegion coordinate ∨
-        (symbolicCoverageShardSpec population).rightRegion coordinate) ∧
+      (symbolicCoverageShardSpec population).leftRegion coordinate = true ∨
+        (symbolicCoverageShardSpec population).rightRegion coordinate = true) ∧
     (Function.Injective (enumerateLeft population) ∧
       Function.Surjective (enumerateLeft population)) ∧
     (Function.Injective (enumerateRight population) ∧
@@ -224,20 +255,22 @@ theorem coverageShardSpecUniversal (population : Nat) :
   · rfl
   constructor
   · intro coordinate
-    cases coordinate with
-    | left index =>
-        intro overlap
-        exact overlap.2
-    | right index =>
-        intro overlap
-        exact overlap.1
+    exact CoverageCoordinate.rec
+      (motive := fun coordinate =>
+        ¬ ((symbolicCoverageShardSpec population).leftRegion coordinate = true ∧
+          (symbolicCoverageShardSpec population).rightRegion coordinate = true))
+      (fun _ overlap => Bool.false_ne_true overlap.2)
+      (fun _ overlap => Bool.false_ne_true overlap.1)
+      coordinate
   constructor
   · intro coordinate
-    cases coordinate with
-    | left index =>
-        exact Or.inl True.intro
-    | right index =>
-        exact Or.inr True.intro
+    exact CoverageCoordinate.rec
+      (motive := fun coordinate =>
+        (symbolicCoverageShardSpec population).leftRegion coordinate = true ∨
+          (symbolicCoverageShardSpec population).rightRegion coordinate = true)
+      (fun _ => Or.inl rfl)
+      (fun _ => Or.inr rfl)
+      coordinate
   constructor
   · exact enumerateLeftBijective population
   constructor
