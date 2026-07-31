@@ -57,7 +57,7 @@ def locked_path_ids:
   ];
 
 def owners:
-  ["artifact", "create", "operator", "service", "live", "exec", "framework", "runtime"];
+  ["artifact", "create", "operator", "service", "live", "exec", "framework", "runtime", "core"];
 
 def effects:
   ["may-contribute", "may-narrow", "may-select", "no-authority", "boundary-input"];

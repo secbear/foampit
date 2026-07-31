@@ -53,6 +53,7 @@ Every fixture and diagnostic has exactly one primary owner:
 | `exec` | `Exec` input | One Process request inside an existing Sandbox; may narrow but never alter its isolation boundary |
 | `framework` | Framework/CLI adapter | Agent lifecycle translation and tool routing; never Artifact environment or runtime policy |
 | `runtime` | Core runtime/driver mechanism | Trusted decoding, resolution, preparation, supervision, conformance, cleanup, and evidence mechanisms; never caller policy |
+| `core` | Core Sandbox API control plane | Durable Operation acceptance and records, identity and coordinate allocation, authority fencing, idempotency binding, terminal outcome commitment, retention and tombstones, and reconciliation; never a caller request surface and never a driver mechanism |
 
 Framework, service, live, Exec, and runtime owners remain separate from
 Artifact authoring. Their fixtures exercise the shared product boundary; they

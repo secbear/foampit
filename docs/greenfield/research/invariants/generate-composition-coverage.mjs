@@ -24,6 +24,7 @@ const owners = [
   "exec",
   "framework",
   "runtime",
+  "core",
 ];
 const effects = [
   "may-contribute",

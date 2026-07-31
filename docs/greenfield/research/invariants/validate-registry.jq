@@ -51,7 +51,8 @@ def owners:
     "live",
     "exec",
     "framework",
-    "runtime"
+    "runtime",
+    "core"
   ];
 
 def scopes:
