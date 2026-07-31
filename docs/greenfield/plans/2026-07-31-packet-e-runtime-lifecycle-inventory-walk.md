@@ -78,7 +78,7 @@ shell), `shasum -a 256`, `comm`, `awk`.
 
 ---
 
-### Task 1: Resolve the four blocking structural decisions
+### Task 1: Record the binding structural rulings
 
 **Files:**
 
@@ -146,27 +146,56 @@ shell), `shasum -a 256`, `comm`, `awk`.
   3. System-originated reconciliation, adoption, fencing, and quarantine
      Operations have no ingress phase comparable to `F0`/`S0`.
 
-  Record the selected option:
+  **RULED (2026-07-31): no phase or edge is added. The graph is a
+  validation-order model over a single traversal, not a runtime-history model.**
 
-  - **Option A (no phase change — recommended default):** partition around the
-    gaps. A Start-on-stopped obligation becomes two entries: the Core admission
-    rule at `firstSoundPhase L0 -> rejectionDeadline L1`, and the launch
-    postcondition rule on the `C0 -> R1` branch. Retention obligations are
-    committed at `T0` (defensible: the obligation is committed at teardown even
-    though a violation manifests later). System-originated Operations reuse the
-    existing ingress most closely matching their trigger. Costs nothing and
-    reopens nothing.
-  - **Option B (extend):** add ingress and post-teardown phases. Any new phase
-    must be added to **four** models in lockstep — `validate-registry.jq:1-6`
-    (`phase_order`) and `:20-46` (`phase_paths`),
-    `generate-composition-coverage.mjs:171-196`,
-    `validate-composition-coverage.jq:1147-1171` (re-asserted whole at
-    `:1458-1489`) — plus the corpus "Observable Product Phases" table and the
-    `INVARIANT-ENFORCEMENT.md` mermaid graph. Per
-    `INVARIANT-ENFORCEMENT.md:140` this **reopens both gates**.
+  Each node names an **information set** — the facts completely available at
+  that station. Reachability is a soundness relation over *decidability*, not a
+  claim about temporal succession: two phases may both occur after launch and
+  remain mutually unreachable (`L0 -> E0`). Repetition, re-entry, and succession
+  *between* operations are deliberately unrepresentable. An operation that ends
+  and thereby authorizes another **begins a new traversal with its own
+  first-sound phase**, linked by a handoff record, never by a phase edge.
+  Runtime history is modeled on a different substrate entirely: the
+  monotonically increasing runtime epoch over immutable Operation, Process,
+  event, and tombstone records.
 
-  If Option B is selected it becomes Task 1a and must complete, with all four
-  models green, before any identifier is allocated.
+  A phase may be added only when a genuinely new **information set** enters the
+  product — typically a new trust boundary decoding a value no existing phase
+  can describe — and never to express that an existing information set was
+  reached *again*, *from a different caller*, or *later in time*.
+
+  The ruling is computationally forced, not merely textual. Every candidate
+  restart edge creates a cycle **and** makes `reachable(L0;E0)` true, which
+  directly contradicts `INVARIANT-ENFORCEMENT.md:332-333`:
+
+  | Candidate edge | Cycle created | `reachable(L0;E0)` |
+  |---|---|---|
+  | `L1 -> R0` | `{R0,R1,L0,L1}` | **true** |
+  | `L1 -> C0` | `{C0,O0,H0,D0,R0,R1,L0,L1}` | **true** |
+  | `L1 -> D0` | `{D0,R0,R1,L0,L1}` | **true** |
+  | `T0 -> C0` | 11-node cycle | **true** |
+
+  Supporting evidence: the corpus column heading is literally "Complete
+  information available"; `INVARIANT-ENFORCEMENT.md:279-280` says the phases
+  "form a graph, **not one false global timeline**"; `:328-329` says handoff
+  records "do not add phase edges"; and `crossPathHandoffs` in
+  `PACKET-D-CASE-CONTRACTS.json` **already** models a backward `D0 -> C0` jump
+  with no edge.
+
+  **Hard prohibition (normative, not stylistic).** `firstSoundPhase` may never
+  name an ingress or resolution phase that the operation being described does
+  not itself traverse. The phase pair is the *filter input* to
+  `activeBoundaryChain` (`generate-composition-coverage.mjs:263-270`) and
+  `expected_active_chain` (`validate-composition-coverage.jq:1272-1276`), which
+  mechanically selects which components the corpus asserts defensively
+  revalidate the rule across all 54 paths. Running the real algorithm on a
+  `C0 -> R1` Start assignment generates a chain claiming `creation-resolver` and
+  `core-api-request-validator` revalidate a Start postcondition — for an
+  operation with no `CreateSandbox` input. That is a **false coverage claim,
+  generated silently, in the artifact the gates treat as reviewed coverage.**
+
+  Per-gap dispositions are recorded in Task 4 Step 3.
 
 - [ ] **Step 3: Record the Packet E / Packet F disclosure ruling**
 
@@ -249,6 +278,226 @@ shell), `shasum -a 256`, `comm`, `awk`.
 
 ---
 
+### Task 1A: Repair the phase model and its duplicated copies
+
+The phase model is stated in **five** places. Nothing compares them, and three
+have already drifted. Repairing this precedes identifier allocation because
+Packet E is about to assign roughly 185 phase pairs against it, and because
+Packet E is the first packet to inhabit the post-launch region at all.
+
+**Files:**
+
+- Modify: `docs/greenfield/research/invariants/validate-registry.jq`
+- Modify: `docs/greenfield/research/invariants/validate-composition-coverage.jq`
+- Modify: `docs/greenfield/research/invariants/test-registry.sh`
+- Modify: `docs/greenfield/research/CONFIGURATION-LANGUAGE-CORPUS.md`
+- Modify: `docs/greenfield/research/INVARIANT-ENFORCEMENT.md`
+
+- [ ] **Step 1: Collapse the two reachability models into one**
+
+  `phase_paths` (`validate-registry.jq:20-46`) and `phase_edges`
+  (`validate-composition-coverage.jq:1147-1171`) disagree on **four** ordered
+  pairs out of 529, computed exhaustively — the graph admits 233, the paths 231,
+  the enforced intersection 230:
+
+  | Pair | `phase_edges` | `phase_paths` |
+  |---|---|---|
+  | `P0 -> OC0` | ✅ | ❌ |
+  | `P0 -> MS0` | ✅ | ❌ |
+  | `P0 -> S0` | ✅ | ❌ |
+  | `OC0 -> C0` | ❌ | ✅ |
+
+  `OC0 -> C0` is not a harmless over-approximation — it **contradicts locked
+  design text**. `DESIGN.md:117` locks Operator Configuration as
+  `P1 -> OC0/O0`, and `phase_edges` gives `"OC0": ["O0"]`, but
+  `validate-registry.jq:31-33` routes `["P1","OC0"]` into `launch_phases`, which
+  begins at `C0`. One artifact is wrong on the merits.
+
+  Replace `phase_paths` and `phase_reachable` with the `phase_edges` map plus a
+  **visited-set-guarded** transitive closure, making the Packet D graph the
+  single authority. This eliminates the divergence and one copy at once.
+
+  Verified test-safe: `test-registry.sh:160-245` pins ten phase behaviours
+  (`P1->OC0` pass, `P1->MS0` pass, `RW0->RW0` pass, `C0->A1` fail, `L0->L1`
+  pass, `E0->E1` pass, `L0->E0` fail, `F0->C0` pass, `S0->L0` pass, `F0->S0`
+  fail). **None** touches a divergent pair; all ten behave identically under the
+  graph relation. No current registry entry uses any of the four pairs, so the
+  behaviour change is latent, not active.
+
+- [ ] **Step 2: Give `descendants` a visited set**
+
+  `validate-composition-coverage.jq:1179-1184` `descendants` is unguarded
+  recursion. Verified empirically under jq 1.8.1: on a graph containing
+  `L1 -> D0`, `descendants("D0")` terminates with
+  `jq: error: cannot allocate memory` (exit 134).
+
+  The consequence is that the acyclicity assertion **can never fire as a
+  diagnostic**. In the conjunction at `:1458-1489`, conjunct A pins
+  `phase_edges` against a second literal copy of itself in the same file, and
+  conjunct B is the acyclicity check. Because jq's `and` short-circuits, a
+  one-copy edit is caught cleanly by A; a two-copy edit passes A and then
+  exhausts memory inside B — and inside every other `reachable` call site
+  (`:1236, :1249, :1261, :1270, :1308, :1316, :2123, :2539, :2549`). B is a true
+  statement structurally incapable of diagnosing the failure it names.
+
+  Add the visited set. Then add a mutation case proving a two-copy cycle is
+  **reported**, not OOM-killed.
+
+- [ ] **Step 3: Land the editorial phase corrections**
+
+  1. `CONFIGURATION-LANGUAGE-CORPUS.md:66-87` — add the three missing rows
+     `OC0`, `MS0`, `RW0`. The table has 20 rows against a 23-phase vocabulary,
+     and the corpus assigns those three to invariants **15 times** while its own
+     table omits them. This also makes `INVARIANT-ENFORCEMENT.md:279` ("The
+     registry uses the product phases from the executable corpus") false as
+     written.
+  2. `CONFIGURATION-LANGUAGE-CORPUS.md:81` versus
+     `INVARIANT-ENFORCEMENT.md:301` — resolve the `R0` label drift. The corpus
+     says "Runtime launch", the protocol says "Sandbox launch". Under Packet E's
+     locked vocabulary these are **different claims**: the Sandbox aggregate
+     persists across epochs, the runtime does not. "Runtime launch" is correct.
+  3. `CONFIGURATION-LANGUAGE-CORPUS.md:77` — restate `C0` as "Artifact manifest
+     plus the complete resolved creation input for one launch", noting the input
+     may be a `CreateSandbox` request, a decoded serialized resolved-reentry
+     envelope, or durably recorded creation selections replayed by a `Start` or
+     same-Sandbox `Restore`. This documents what `RW0 -> C0` and the
+     `serialized-resolved-reentry` template already do.
+  4. `INVARIANT-ENFORCEMENT.md:318-333` — insert the Task 1 Step 2 normative
+     paragraph and the hard prohibition.
+
+- [ ] **Step 4: Full gate green**
+
+  ```sh
+  docs/greenfield/research/invariants/check-inventory.sh
+  ```
+
+---
+
+### Task 1B: Build the model-coherence gate
+
+This repository deliberately duplicates definitions across independent oracles
+so that no component defines its own correctness. That duplication is correct
+and must **not** be collapsed where it is load-bearing. The defect is that
+almost none of it is mechanically compared, so copies drift silently — and a
+*missing* copy is entirely invisible.
+
+**Files:**
+
+- Create: `docs/greenfield/research/invariants/check-model-coherence.sh`
+- Modify: `docs/greenfield/research/invariants/check-inventory.sh`
+- Modify: `CONTRIBUTING.md`
+
+- [ ] **Step 1: Write the checker**
+
+  Repo harness conventions: `set -euo pipefail`, `mktemp -d` with an EXIT trap,
+  a `compare` helper, a `pass_count`, and a final
+  `echo "model coherence: ${pass_count} checks passed"`. Extraction is the hard
+  part — jq `def` blocks, `mjs` `const` literals, and markdown tables each need
+  their own robust extractor. Normalize to sorted line-oriented text and use
+  `comm`/`diff`, never substring matching.
+
+  Checks, each naming its copies and its exact failure message:
+
+  1. phase reachability closure equality across both models (all 529 pairs);
+  2. phase universe equality across all five copies — `phase_order`, `phase_edges`,
+     the `mjs` edges, the corpus table plus its Packet D addendum, and the
+     mermaid node set;
+  3. phase label equality between the corpus table and the mermaid;
+  4. owner-set equality across the four machine copies (Task 1 Step 1);
+  5. owner label agreement across the three prose tables;
+  6. `placeholder_strings` byte-identity across every validator that defines it,
+     **plus an assertion that every ledger validator defines it** — this is what
+     catches the missing copy rather than a diverging one;
+  7. digest-pin agreement between each validator's internal def and
+     `check-inventory.sh`;
+  8. count-literal mutual consistency across the fourteen pinned locations;
+  9. orphaned valid corpus witnesses (the missing `comm -13` mirror);
+  10. every locked Packet D path is nameable from some `registryPathAliases`
+      value;
+  11. every active-effect classification cell has a declaring `compositionPath`;
+  12. every declared `trustBoundaries` element has covering test evidence.
+
+- [ ] **Step 2: Wire it into the gate**
+
+  Run it **first** in `check-inventory.sh`, before any packet validator: a
+  drifted vocabulary makes every downstream result untrustworthy.
+
+- [ ] **Step 3: Record the authoring discipline**
+
+  Add to `CONTRIBUTING.md` a short checklist for adding an invariant, a
+  vocabulary value, or a phase, naming every copy that must move in lockstep.
+  Preserve the existing note that `check-enforcement-closure.sh` is expected to
+  fail, verbatim.
+
+---
+
+### Task 1C: Land the Tier A coherence fixes
+
+The checker from Task 1B fails on **eight** live defects in the already-reviewed
+packets. Each is either fixed or explicitly accepted with a recorded rationale;
+none may be silenced by weakening its check.
+
+- [ ] **Step 1: A5 — active-effect cells with no declaring composition path**
+
+  **56 (path, invariant) pairs across 29 invariants** are classified `C`/`N`/`S`
+  in `PACKET-D-CASE-CONTRACTS.json` while the invariant declares no
+  `compositionPaths` entry aliasing to that path.
+
+  This is the most consequential finding, and it is a genuine coverage hole
+  rather than a labelling nit: `validate-registry.jq:277` derives per-path
+  evidence obligations **only** from `compositionPaths`, so those 56 pairs carry
+  no test obligation at inventory *or* at Gate 4B closure. Packet D's reviewed
+  matrix asserts an active effect on paths its own registry entries never claim
+  to reach.
+
+  Fix by widening the affected invariants' `compositionPaths` (the classification
+  is the reviewed judgement; the registry declaration is what lags), or by
+  correcting the classification where the active effect was wrong. Record which,
+  per pair.
+
+- [ ] **Step 2: A6 — eight locked paths are unnameable**
+
+  `artifact-semantic-refinement`, `operator-configuration-authoring`,
+  `operator-configuration-refinement`, `managed-service-definition-authoring`,
+  `managed-service-definition-refinement`, `generated-runtime-configuration`,
+  `create-native-extension`, and `corrupted-provider-build-result` are locked
+  Packet D paths that no `registryPathAliases` value targets. No invariant can
+  name them, so no invariant can carry evidence for them.
+
+- [ ] **Step 3: A4 — orphaned valid witness**
+
+  `VAL-011` is defined in the corpus and referenced by no invariant. The
+  registry-to-corpus direction is checked; the mirror never was.
+
+- [ ] **Step 4: A7 — owner labels and transposed counts**
+
+  Four label mismatches across the three prose tables (`service`, `exec`,
+  `runtime`, `live`). Worse, `INVENTORY-REVIEW.md` counts **by owner** while
+  `PACKET-A-RESOURCE-OPERATION-REVIEW.md` counts **by resource**: because
+  surface `live.exec` is `resource=live, owner=exec`, Packet A's true owner
+  counts are live=12/exec=13 while its rows read 13/12. Both tables are
+  internally correct; a cross-reader gets transposed numbers. Add a backticked
+  owner-ID column to both and state each table's axis in its caption.
+
+- [ ] **Step 5: A8 — unevidenced trust boundaries**
+
+  `CMP-009 frontend-evaluation`, `CMP-010 artifact-final-validation`, and
+  `CMP-011 artifact-final-validation` declare a trust boundary that no test
+  lists in `covers`.
+
+- [ ] **Step 6: Full gate green, then checkpoint**
+
+  ```sh
+  docs/greenfield/research/invariants/check-model-coherence.sh
+  docs/greenfield/research/invariants/check-inventory.sh
+  ```
+
+  Both exit 0 before any Packet E identifier is allocated. Re-pin the Packet D
+  digests last, and update `PACKET-D-COMPOSITION-REVIEW.md` to record that its
+  verdicts were reopened for these repairs and what changed.
+
+---
+
 ### Task 2: Partition the obligations and allocate the complete identifier block
 
 **Files:**
@@ -320,14 +569,76 @@ shell), `shasum -a 256`, `comm`, `awk`.
 - [ ] **Step 3: Assign owner, phases, and disposition per entry**
 
   Apply the Task 1 owner ruling. Every `firstSoundPhase` and
-  `rejectionDeadline` must be reachable along one of the 24 explicit
-  `phase_paths` (`validate-registry.jq:20-46`). The traps that matter here:
-  **`L0 -> E0` and `E0 -> L1` both fail** — the live and exec branches never
-  coexist on a single path — and there is no node after `T0`.
+  `rejectionDeadline` must be reachable under the single post-Task-1A
+  reachability relation. The traps that matter: **`L0 -> E0` and `E0 -> L1`
+  both fail** — the live and exec branches never coexist on one path — and
+  `T0` is a sink.
 
-  Legal Packet E deadline ranges: `C0 -> {C0,O0,H0,D0,R0,R1,L0,L1,E0,E1,T0}`,
-  `R1 -> {R1,L0,L1,E0,E1,T0}`, `L0 -> {L0,L1,T0}`, `L1 -> {L1,T0}`,
-  `E0 -> {E0,E1,T0}`, `E1 -> {E1,T0}`, `T0 -> {T0}`.
+  **The partition rule.** Answer these four questions in this order, never any
+  other:
+
+  1. **What facts must exist for this rule to be decided without guessing future
+     inputs?** Match that fact set to a row of the corpus "Observable Product
+     Phases" table. That row **is** `firstSoundPhase`. Do not pick a phase
+     because the operation "passes through" it, because a caller reached it
+     earlier, or because a sibling invariant uses it.
+  2. **Who owns those facts?** That is `owner`.
+  3. **What is the last station on *this same traversal* at which refusing is
+     still a correct product implementation?** That is `rejectionDeadline`.
+  4. **Is the violation committed by a *different operation* than the one whose
+     traversal I am describing?** If yes, **stop** — the obligation is not
+     yours. File it on the offending operation's traversal, at that operation's
+     own first-sound phase, and link the two with a handoff record.
+
+  If two obligations you were about to merge give different answers to (1) **or**
+  (2), they are two entries. Same answer to both, one entry.
+
+  **Per-gap dispositions (binding).**
+
+  *Start on a stopped Sandbox* is **two traversals**. The live request:
+  stopped-proof and epoch-allocation rules at `L0 -> L0` and `L0 -> L1`;
+  prior-epoch fencing at `L1 -> L1`. The launch it authorizes begins a new
+  traversal: manifest re-resolution `C0 -> C0` (`create`), operator re-admission
+  `O0 -> D0` (`operator`), no-reactivation `R0 -> R1`, and the conformance
+  postcondition `R1 -> R1`. Same-Sandbox `RestoreSandbox` takes the identical
+  shape. Note `SNP-002` is correctly placed for its admission half, but its
+  restore *postcondition* half is genuinely uncarried today and must be added as
+  a separate `R1 -> R1` runtime-owned entry — a missing entry, not a missing
+  phase.
+
+  **`firstSoundPhase C0, rejectionDeadline R1` for a Start postcondition is
+  forbidden** — see the Task 1 Step 2 hard prohibition and its generated false
+  chain.
+
+  *Retention and tombstones* split three ways: Delete-traversal proof
+  obligations at `T0 -> T0` (`runtime`); Delete-traversal **admission**
+  obligations at `L0 -> L0` — filing these at `T0` is a real error and must be
+  corrected on sight; and obligations whose subject is a *later, different*
+  operation, which go to that operation's own traversal (a caller deleting an
+  Operation before retention expiry is `L0 -> L0` on the `DeleteOperation`
+  request; a later `Create` reusing an unreleased name is `C0 -> C0`).
+
+  *System-originated Operations* are filed at **exactly the phase their
+  caller-originated twin is filed at**. `origin` is an attribution field on the
+  request, not an information set, and the locked taxonomy states system work
+  "uses the same target, epoch, authority, and proof rules". Reconciliation and
+  adoption resolving an `unknown` are `R1 -> R1` `observed-conformance`;
+  containment-absence proof is `T0 -> T0`; the authority-epoch fence is
+  `D0 -> D0` authoritative with **defensive** hooks at `R0`, `R1`, `L1`, `E1`,
+  `T0` — legal because the reachability constraint binds only `authoritative`
+  hooks.
+
+  Registering at `R1 -> R1` and `T0 -> T0` works **today** with no Packet D
+  template change: the generator and validator always synthesize and append the
+  authority step, so the chain is non-empty and contains the authority. The cost
+  is a degenerate one-step chain recording no defensive revalidation, which
+  Task 10 addresses.
+
+  A remaining decision, on a different axis and not a phase question:
+  `PACKET-D-COMPOSITION-PATHS.json` has no `system-origin` path id, and
+  `reachableOwners` binds owner to path. Decide whether system-origin Operations
+  ride `direct-api` (`reachableOwners: ["create"]` today) or need a 55th path,
+  and record the answer.
 
   Each entry's `disposition` must be justified against the protocol's four
   guarantees. Packet E is dominated by `reject-at-boundary`; use
@@ -709,6 +1020,56 @@ ends fully green; no batch may leave the gate red for the next.
   Confirm `check-enforcement-closure.sh` is still red and that its error volume
   grew by roughly 10.6 lines per new entry. A shrinking error count means an
   entry was wrongly marked closed.
+
+---
+
+### Task 7A: Extend the Packet D contract templates into the post-launch region
+
+Packet E is the first packet to inhabit the post-launch region, and the region
+has no template vocabulary. Verified: `P0`, `R0`, `R1`, `L1`, `E1`, and `T0`
+carry **zero** registry phase uses, zero enforcement hooks, zero contract-template
+boundary steps across all 28 templates, and zero occurrences in the 7,560-cell
+matrix. The deepest launch-side step in any template is `D0`. Independently, all
+54 composition paths terminate at or before driver preparation — not one models
+launch, conformance, live mutation, process launch, teardown, or retention.
+
+Entries at those phases **validate today** and produce a non-empty chain
+containing their authority. But the chain is degenerate: one synthesized step,
+recording no defensive revalidation boundary at all. Since the generated chain
+is what the gates treat as reviewed coverage, leaving it degenerate would make
+Packet E's coverage claim technically true and substantively empty.
+
+**Files:**
+
+- Modify: `docs/greenfield/research/invariants/PACKET-D-CASE-CONTRACTS.json`
+- Modify: `docs/greenfield/research/invariants/validate-composition-coverage.jq`
+- Modify: `docs/greenfield/research/invariants/test-composition-coverage.sh`
+
+- [ ] **Step 1: Add the post-launch components**
+
+  `R0/runtime-launch-committer`, `R1/post-create-conformance-prober`,
+  `L1/live-mutation-committer`, `E1/process-launcher`, and
+  `T0/containment-absence-prober`.
+
+- [ ] **Step 2: Add the templates**
+
+  `launch-conformance` (`R0 > R1`), `live-commit` (`L0 > L1`), `teardown`
+  (`T0`), and a `launch-replay` variant of `create` whose `C0` step is
+  `resolved-reentry-stage-constructor`-shaped rather than `creation-resolver` —
+  so a `Start` never claims `creation-resolver` revalidated it.
+
+- [ ] **Step 3: Accept the scoped Packet D reopening**
+
+  This breaks the pinned template literals at
+  `validate-composition-coverage.jq:495-660`, `:1797-1820`, `:2090-2185` and the
+  `caseContractsSha256` pin, and reopens Packet D. It does **not** touch the
+  phase graph; acyclicity is unaffected. Record the reopening and its scope in
+  `PACKET-D-COMPOSITION-REVIEW.md` rather than letting the digests move silently.
+
+- [ ] **Step 4: Regenerate, re-pin, and confirm chains are no longer degenerate**
+
+  Verify by generating the chain for a representative `R1 -> R1` and `T0 -> T0`
+  entry and confirming each now records a defensive revalidation boundary.
 
 ---
 
@@ -1221,7 +1582,16 @@ ends fully green; no batch may leave the gate red for the next.
 
 ## Plan Self-Review
 
-- **Spec coverage.** Task 1 resolves the four blocking structural decisions that
+- **Coherence repair precedes the walk.** Tasks 1A-1C repair the phase model,
+  build the model-coherence gate, and land eight live defects found in the
+  already-reviewed packets. This ordering is not optional: Packet E is about to
+  assign roughly 185 phase pairs against a model whose two copies disagree on
+  four ordered pairs, author 185 corpus cases against a phase table missing
+  three rows, and add classification cells under a rule that has already
+  produced 56 uncovered active-effect pairs. Fixing after would mean fixing at
+  325-invariant scale instead of 140.
+
+- **Spec coverage.** Task 1 resolves the structural decisions that
   determine roughly half of all owner assignments and the legality of every
   phase pair. Task 2 performs the partition and one-pass identifier allocation
   the protocol requires before implementation may consume a decision record.
