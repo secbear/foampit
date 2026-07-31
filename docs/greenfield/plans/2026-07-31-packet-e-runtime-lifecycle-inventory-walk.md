@@ -102,24 +102,38 @@ shell), `shasum -a 256`, `comm`, `awk`.
   owns Operation acceptance, authority fencing, retention, reconciliation, and
   terminal immutability — the owner of roughly half of Packet E.
 
-  Record the selected option and its rationale:
+  **RULED (2026-07-31): extend the closed set with a ninth owner value for the
+  Core Sandbox API control plane.** `runtime` remains driver/provider-scoped and
+  `service` remains the Managed-Sandbox Service Definition. The ruling is
+  recorded once and applied uniformly; no entry mixes conventions.
 
-  - **Option A (extend):** add a ninth owner value for the Core control plane.
-    Touches `validate-registry.jq:48-58`, the corpus "Locked Owners" table
-    (corpus lines 42-56), `validate-surface-coverage.jq`'s owner enum, and the
-    `INVENTORY-REVIEW.md` owner-distribution table. It does **not** force a
-    `PACKET-D-COMPOSITION-PATHS.json` change unless a path adds the owner to
-    `reachableOwners` — and if no path does, every cell for a Core-owned
-    invariant is mechanically `F` (no-authority: foreign-owner), which is the
-    correct and intended reading for a runtime-service rule on a configuration
-    composition path.
-  - **Option B (reuse):** map Core lifecycle semantics onto `live`, Process
-    semantics onto `exec`, and leave `runtime` driver-scoped. Requires
-    restating the `live` owner label in `INVENTORY-REVIEW.md` and the corpus
-    owners table, and grows `live` from 5 to roughly 90 entries.
+  **Four** machine locations pin the closed 8-owner set and must move in
+  lockstep. This plan authorizes editing all four:
 
-  Whichever is selected, the ruling is recorded once and applied uniformly. Do
-  not mix.
+  | File | Location | Enforced at |
+  |---|---|---|
+  | `validate-registry.jq` | `:48-58` (`def owners`) | `:157-159` |
+  | `validate-surface-coverage.jq` | `:1-5` (`def owners`) | `:56` |
+  | `generate-composition-coverage.mjs` | `:18-27` (`const owners`) | `:94-99` |
+  | `validate-composition-coverage.jq` | `:59-60` (`def owners`) | `:2439` |
+
+  The generator assertion at `mjs:94-99` throws *before* any write, so a stale
+  enum makes regeneration impossible rather than merely red. Verified end to
+  end: one entry carrying an unregistered owner produces `unknown owner: …` from
+  `validate-registry.sh`, `every invariant owner must be in the closed Packet D
+  owner universe` from the generator, and 54 `unknown invariantOwner` errors
+  from the full-scope validator.
+
+  Prose also touches the corpus "Locked Owners" table (corpus lines 42-56) and
+  the `INVENTORY-REVIEW.md` owner-distribution table.
+
+  This does **not** force a `PACKET-D-COMPOSITION-PATHS.json` change unless a
+  path gains the owner in `reachableOwners`. If no path does, every
+  active-effect cell for a Core-owned invariant is mechanically `F` — the
+  correct reading for a runtime-service rule on a configuration composition
+  path. Determine deliberately whether any path *should* gain the owner and
+  record the answer; silence is not a decision. This affects active effects
+  only: `B` is not owner-gated (Tasks 4-7 Step 4).
 
 - [ ] **Step 2: Record the phase-graph ruling**
 
@@ -178,6 +192,43 @@ shell), `shasum -a 256`, `comm`, `awk`.
   not registry entries. Record the list of obligations resolved this way and the
   validator rule each becomes. This is worth roughly 10-15 entries and fixes
   the projected total.
+
+- [ ] **Step 4b: Record the ledger-axis ruling**
+
+  `PACKET-E-OPERATION-TAXONOMY-DESIGN.md:939-960` requires the ledger to close a
+  **16-dimension** Cartesian product, and
+  `PACKET-E-RESULT-ERROR-CONTRACT-DESIGN.md:1379-1401` lists **21** required
+  dimensions. Task 9 encodes two axes with the remainder factored into ordered
+  `valueCases`. That factoring is almost certainly the right engineering choice
+  — both Packet C and Packet D pick exactly two axes — but it is a reduction of
+  a Locked section, and Global Constraints forbid weakening or silently
+  reinterpreting one.
+
+  Critically, these dimension lists sit **outside** the 178 numbered
+  obligations, so Task 2's per-obligation disposition record structurally cannot
+  reach them. They need their own ruling.
+
+  Record, one line per dimension across both lists, exactly one disposition:
+  **ledger axis**, **ordered `valueCase` inside a cell**, **`predicateId`
+  condition**, **carried by a registered invariant** (name it), or **explicitly
+  delegated to Packet F** (with rationale). A dimension named on two sides, or
+  on none, is a defect. This ruling is what makes the factored encoding an
+  equivalent representation rather than a silent narrowing, and it binds
+  Tasks 9, 10, and 13.
+
+- [ ] **Step 4c: Record the token-spelling ruling**
+
+  Record that Packet E's ledgers namespace the locked `unknown` token as
+  `state-unknown` and `outcome-unknown` (see Task 8 Step 2) rather than
+  deviating from the `placeholder_strings` definition shared byte-identically by
+  five existing validators, and that each vocabulary entry carries a
+  `lockedSourceToken` naming its design-record origin.
+
+  Record the alternative considered — making `^UNKNOWN$` case-sensitive in the
+  Packet E validator only — and why it was rejected: it would make one
+  validator's placeholder rule differ from every sibling, and "delete the
+  placeholder rule" must never be the path of least resistance. This ruling
+  binds Tasks 8, 9, and 11.
 
 - [ ] **Step 5: Record the valid-witness convention**
 
@@ -296,11 +347,33 @@ shell), `shasum -a 256`, `comm`, `awk`.
   the whole digest and count chain. Batch these with the new entries; never as a
   separate change.
 
-- [ ] **Step 5: Record the final sizing**
+- [ ] **Step 5: Dispose of the Dynamic-state row obligations**
+
+  `INVENTORY-REVIEW.md:89` assigns to Packet E: acquisition, reservation,
+  rollback, retry, cancellation, mutation, and teardown transitions, and `:93`
+  states that no row may remain `partial` or `unwalked` when Gate 2A closes.
+  Retry, cancellation, mutation, and teardown are covered by the registered
+  families and the Task 9 ledger. Record an explicit disposition for
+  **acquisition**, **reservation**, and **rollback**, including the "dynamic
+  reservation and time-of-check/time-of-use protocol" that all four locked
+  records list as still unlocked. Each is either registered here, becomes a
+  Task 9/10 ledger rule, or is named as an explicit deferral with a destination
+  packet and rationale. An obligation with no disposition is a defect.
+
+  This matters beyond bookkeeping: Task 13 Step 1 rewrites the
+  `INVENTORY-REVIEW.md` span that is currently the obligation's last textual
+  home, so an undisposed obligation would be deleted while the same edit claims
+  Packets A through E reviewed. Packet F's declared scope does not cover
+  reservation or TOCTOU, so silent delegation there is unsupported.
+
+- [ ] **Step 6: Record the final sizing**
 
   State the resulting counts: registry entries added, corpus invalid cases,
   corpus valid cases, resulting `N`, resulting cell count `54 × N`, resulting
-  planned hooks and tests. These numbers drive every literal in Task 3.
+  planned hooks and tests. Also state the **cumulative** registry length and
+  cell count after each of the four batches (`140 + |b1|`, `+ |b2|`, `+ |b3|`,
+  `+ |b4| = N`). Task 3 pins the batch-1 cumulative pair; Tasks 4-7 Step 4b pin
+  the rest. The final `N` is a sizing figure, not a literal to install early.
 
 ---
 
@@ -316,9 +389,11 @@ shell), `shasum -a 256`, `comm`, `awk`.
 
 **Interfaces:**
 
-- Consumes: the Task 2 final counts.
-- Produces: a machinery that fails RED against the current 140-entry registry
-  and will pass once batch 1 lands.
+- Consumes: the Task 2 sizing, and batch 1's allocated identifier list.
+- Produces: machinery that fails RED against the current 140-entry registry and
+  passes once batch 1 lands. Task 3 pins **batch 1's cumulative counts only**
+  (`140 + |batch 1|`, and `54 ×` that). The literals are re-pinned once per
+  batch in Tasks 4-7 Step 4b; they never move directly to the final `N`.
 
 - [ ] **Step 1: Add the failing registration assertion first**
 
@@ -341,7 +416,8 @@ shell), `shasum -a 256`, `comm`, `awk`.
 
 - [ ] **Step 2: Update every hard-coded count literal**
 
-  Thirteen machine locations pin `140` or `7560`. All must move together:
+  Fourteen machine locations pin `140` or `7560`. All must move together, and
+  all to **this batch's cumulative** count, not to the final `N`:
 
   | File | Line | Literal |
   |---|---|---|
@@ -351,8 +427,9 @@ shell), `shasum -a 256`, `comm`, `awk`.
   | `check-inventory.sh` | 139 | `.expectedCellCount == 7560` |
   | `check-inventory.sh` | 140 | selector expansion `== 7560` |
   | `generate-composition-coverage.mjs` | 71-72 | `invariantIds.length === 140` + message |
-  | `generate-composition-coverage.mjs` | 526 | `expectedCellCount === 7560` |
-  | `generate-composition-coverage.mjs` | 532 | unique-cell count `7560` |
+  | `generate-composition-coverage.mjs` | 526-527 | `expectedCellCount === 7560` + message |
+  | `generate-composition-coverage.mjs` | 532 | message naming `7,560` |
+  | `test-composition-coverage.sh` | 301 | the `.[0:139]` boundary slice |
   | `validate-composition-coverage.jq` | 1988 | `test("^[FLIH]{140}$")` |
   | `validate-composition-coverage.jq` | 1997 | `test("^[FLIH]{140}$")` |
   | `validate-composition-coverage.jq` | 2000 | message naming 140 |
@@ -363,11 +440,17 @@ shell), `shasum -a 256`, `comm`, `awk`.
   The generator literals at `mjs:71` and `:526` must be updated **before**
   regeneration or generation throws before writing anything.
 
-- [ ] **Step 3: Re-check the off-by-one mutation fixture**
+  The generator spells the count `7,560` with a comma in its messages, so
+  `grep 7560` will not find `:527` or `:532`. Search both spellings.
 
-  `test-composition-coverage.sh:300` names a fixture case `vector-width-139`.
-  Confirm it still means "N − 1" after the count change, and rename it if the
-  literal name is now misleading. Do not delete the mutation.
+- [ ] **Step 3: Move the off-by-one boundary probe**
+
+  Update the slice literal at `test-composition-coverage.sh:301` from `.[0:139]`
+  to `.[0:<cumulative N − 1>]`, and rename the case at `:300` from
+  `vector-width-139` to match. Renaming alone is not enough: the literal `139`
+  is what encodes "one short", and if it is left behind the mutation still fails
+  as expected while silently ceasing to probe the boundary. Do not delete the
+  mutation.
 
 - [ ] **Step 4: Confirm the machinery is RED for the right reason**
 
@@ -400,8 +483,11 @@ ends fully green; no batch may leave the gate red for the next.
 - Modify: `docs/greenfield/research/invariants/invariants.json`
 - Modify: `docs/greenfield/research/invariants/PACKET-D-CASE-CONTRACTS.json`
 - Modify: `docs/greenfield/research/invariants/PACKET-D-COMPOSITION-COVERAGE.json` (generated)
-- Modify: `docs/greenfield/research/invariants/check-inventory.sh`
-- Modify: `docs/greenfield/research/invariants/validate-composition-coverage.jq`
+- Modify: `docs/greenfield/research/invariants/check-inventory.sh` (count literals **and** digest pins — different lines)
+- Modify: `docs/greenfield/research/invariants/validate-composition-coverage.jq` (count literals **and** digest pins — different lines)
+- Modify: `docs/greenfield/research/invariants/test-registry.sh`
+- Modify: `docs/greenfield/research/invariants/generate-composition-coverage.mjs`
+- Modify: `docs/greenfield/research/invariants/test-composition-coverage.sh`
 
 - [ ] **Step 1: Author the corpus cases**
 
@@ -411,10 +497,13 @@ ends fully green; no batch may leave the gate red for the next.
   witness — **three** hashes.
 
   Place invalid cases inside the topically correct existing `###` family or open
-  a new `### Packet E …` family. Follow the body convention used by all 140
-  current cases, in order: `- Owner:`, `- First-sound phase:`,
-  `- Rejection deadline:`, `- Invariant:`, `- Minimum witness:`,
-  `- Required diagnostic:` (or `- Required result:`). All 140 agree exactly
+  a new `### Packet E …` family. Follow the body convention, in order:
+  `- Owner:`, `- First-sound phase:`, `- Rejection deadline:`, `- Invariant:`,
+  `- Minimum witness:`, `- Required diagnostic:` (or `- Required result:`).
+
+  The first four bullets appear on all 140 current cases; a minimum-witness
+  bullet on 122 and a diagnostic-or-result bullet on 123, with only 99 matching
+  the full six-bullet sequence. New cases carry all six. All 140 agree exactly
   with the registry on owner and both phases; preserve that parity.
 
   Only the headings are machine-checked; the body is convention. Write it
@@ -478,20 +567,60 @@ ends fully green; no batch may leave the gate red for the next.
 
   Classification derivation, which collapses most of the work: all 54 paths
   admit `no-authority`, so for a new invariant with owner `O` on path `P`, if
-  `O ∉ P.reachableOwners` the code is `F` and is always effect-legal. Only paths
-  where `O ∈ P.reachableOwners` — `live` 1, `exec` 1, `framework` 3, `create` 6,
-  `service` 7, `operator` 9, `runtime` 12, `artifact` 27 — plus the four typed
-  request caller paths (`direct-api`, `framework-adapter`, `cli-adapter`,
-  `managed-service`) where `B` is a live option, require judgement.
+  `O ∉ P.reachableOwners` an active effect is illegal and the code defaults to
+  `F`. Only paths where `O ∈ P.reachableOwners` — `live` 1, `exec` 1,
+  `framework` 3, `create` 6, `service` 7, `operator` 9, `runtime` 12,
+  `artifact` 27 — require judgement on the **active-effect** codes (`C`/`N`/`S`).
+
+  Separately, **`B` (boundary-input) is not owner-gated.**
+  `validate-composition-coverage.jq:367-368` excludes `boundary-input` from
+  `active_effect`, and the reachable-owner requirement at `:1933-1940` applies
+  only to active effects. **21** paths admit `boundary-input`, not four. Eleven
+  have validator-pinned exact `B` sets and are derived, not judged. The
+  remaining **six require a deliberate `B`-versus-no-authority ruling for every
+  new invariant, regardless of owner**: `generated-runtime-configuration`,
+  `provider-native-adapter`, `provider-native-operation`,
+  `prebuilt-member-transfer`, `oci-descriptor-transfer`, and
+  `provider-cache-hit` — plus the four typed-request caller paths
+  (`direct-api`, `framework-adapter`, `cli-adapter`, `managed-service`).
+
+  Precedent proves owner is irrelevant here: `direct-api` has
+  `reachableOwners == ["create"]` yet carries `B` for 33 invariants, and
+  `provider-native-operation` has `reachableOwners == ["runtime"]` yet carries
+  `B` for `LIVE-002`/`LIVE-003`/`LIVE-004` — exactly the family batch 2
+  registers. Writing `F` here passes every gate silently **and** discards the
+  forced `fullRevalidation == true` that boundary-input cells carry
+  (`:2632-2637`). That is a silent semantic loss, not a style choice.
 
   Use `L` (same-owner-stage-or-fact-class) rather than `F` where the owner
-  matches the path but the stage does not. The validator checks only effect
-  legality and the pinned sets; the `F`/`L`/`I`/`H` distinction is
-  reviewer-enforced, so choose honestly.
+  matches the path but the stage does not. Outside the pinned groups below, the
+  `F`/`L`/`I`/`H` distinction is reviewer-enforced, so choose honestly.
 
-  Do not join the pinned exact-set groups: `target-lowering` (89),
-  `serialized-resolved-reentry` (107 both sides), and the three
-  provider-construction paths (fixed 9-ID list).
+  **Pinned constraints that are derived, never judged.** Appending a wrong
+  character to any of these fails even when the effect is legal:
+
+  1. `target-lowering` — exact set equality with
+     `packetCTargetRealizationInvariantIds` (89).
+  2. `serialized-resolved-reentry` — hard `== 107` on both sides.
+  3. The three provider-construction paths (`provider-side-construction`,
+     `provider-build-cache`, `corrupted-provider-build-result`) — fixed 9-ID
+     `B` list **and** required to be **byte-identical whole strings**
+     (`:2038-2041`). A single differing character fails with a message naming a
+     *boundary set*, which badly misdescribes the actual violation.
+  4. `built-artifact-load` and `corrupted-manifest` — required to be
+     **byte-identical whole strings** (`:2029-2030`), and registry-derived as
+     portable + `IDT-002` + `MAN-001..006` + `TGT-003` + `NAT-002/003` (89).
+  5. The eight `operator-configuration-*` and `managed-service-definition-*`
+     source paths — exact pinned `C`/`N`/`S` arrays by equality, not subset
+     (`:1966-1981`). The four service ones are live for batch 4.
+  6. `frontend-output`, `frontend-adaptation`, `raw-wire-input`,
+     `schema-migration` — registry-derived as portable + `NAT-002/003` (81).
+  7. `direct-driver-invocation` and `raw-runtime-config-input` — every character
+     must be `F`/`L`/`I`/`H` (`:1997`), and
+     `operator-configuration-native-escape` and
+     `managed-service-definition-native-escape` likewise (`:1988`).
+  8. `conditionalNativeHandleContract.invariantIds` is pinned to exactly
+     `["NAT-002","NAT-003"]` (`:1849`) — no new invariant may ever join it.
 
   Cheap inner loop, no regeneration:
 
@@ -502,9 +631,41 @@ ends fully green; no batch may leave the gate red for the next.
     --arg caseContractsSha256 "$(shasum -a 256 PACKET-D-CASE-CONTRACTS.json | awk '{print $1}')" \
     --arg invariantRegistrySha256 "$(shasum -a 256 invariants.json | awk '{print $1}')" \
     --slurpfile paths PACKET-D-COMPOSITION-PATHS.json \
+    --slurpfile caseContracts PACKET-D-CASE-CONTRACTS.json \
     --slurpfile registry invariants.json \
-    -f validate-composition-coverage.jq PACKET-D-CASE-CONTRACTS.json >/dev/null
+    --slurpfile targetRealization PACKET-C-TARGET-REALIZATION.json \
+    -f validate-composition-coverage.jq PACKET-D-COMPOSITION-COVERAGE.json
   ```
+
+  All four `--slurpfile` bindings are required even in `catalog` scope: jq
+  resolves `$caseContracts` and `$targetRealization` at **compile** time, so
+  omitting either yields `jq: 64 compile errors` before any rule is evaluated.
+  Catalog scope does not read the coverage document's contents, so a stale
+  `PACKET-D-COMPOSITION-COVERAGE.json` is harmless as `.`.
+
+  **Expected mid-batch result: not exit 0.** The validator compares
+  `$invariantRegistrySha256` and `$caseContractsSha256` against its pins at
+  `:1023-1024` and `:1018-1019`, and those are only re-pinned in Step 6. The
+  success criterion for this loop is **"the only remaining lines are the two
+  SHA-256 pin errors"** — errors are accumulated and joined, so genuine
+  classification errors appear alongside them.
+
+- [ ] **Step 4b: Re-pin the count literals to this batch's cumulative `N`**
+
+  Set every location in the Task 3 Step 2 table to this batch's cumulative
+  registry length and `54 ×` that: `test-registry.sh:396`;
+  `check-inventory.sh:131`, `:134`, `:139`, `:140`;
+  `generate-composition-coverage.mjs:71-72`, `:526-527`, `:532`;
+  `validate-composition-coverage.jq:1988`, `:1997`, `:2000`, `:2359`, `:2361`;
+  `test-composition-coverage.sh:301`, `:677-681`, `:686`, `:699`. Also update
+  the identifier assertion added in Task 3 Step 1 to this batch's identifiers.
+
+  This step **must** precede Step 5: `generate-composition-coverage.mjs:71` and
+  `:526` throw before the only `writeFileSync` at `:563`, so a stale literal
+  makes regeneration impossible rather than merely red. The `^[FLIH]{N}$`
+  literals at `validate-composition-coverage.jq:1988` and `:1997` must also
+  precede Step 4's inner loop, or that loop fails on vector width before
+  evaluating any classification.
 
 - [ ] **Step 5: Regenerate the coverage matrix**
 
@@ -583,33 +744,90 @@ ends fully green; no batch may leave the gate red for the next.
     admission: `provisioning/closed`, `running/accepting`, `running/closed`,
     `suspended/closed`, `stopped/closed`, `unknown/closed`. Only `running` may
     be `accepting`.
-  - `processStates` (5): `accepted`, `starting`, `running`, `unknown`,
+  - `processStates` (5): `accepted`, `starting`, `running`, `state-unknown`,
     `terminated`.
   - `processTerminationVariants` (9) — four are stated only in the document
     body, not in any numbered list.
   - `operationStates` (7) and `terminalOutcomes` (4): `succeeded`, `failed`,
-    `cancelled`, `unknown`.
+    `cancelled`, `outcome-unknown`.
   - `requestErrorVariants` — the closed 31-variant union.
+  - `recoveryErrorVariants` — the closed 2-variant `RecoveryError` union
+    (`PACKET-E-RESULT-ERROR-CONTRACT-DESIGN.md:557-570`). It is **not** a subset
+    of `requestErrorVariants`; `:531` states that expired recovery state is not
+    a `RequestError`.
   - `modeContract` — a canonical `mode -> phase -> component` table mirroring
     `validate-target-realization.jq:25-63`. **Lock this before authoring any
     case**; the validator recomputes canonical phase and component per mode, and
     changing it later invalidates every obligation identifier.
 
-  Align names with the existing prototype's `ContractModel`
-  (`prototypes/packet-e-contract-compiler/src/model.ts:17-40`) rather than
-  inventing parallel vocabulary.
+  **Token-collision rule.** The bare token `unknown` may not appear as a value
+  anywhere in a Packet E ledger. Every ledger validator's `placeholder_strings`
+  def matches `^UNKNOWN$` **case-insensitively**
+  (`validate-registry.jq:104-109` and four byte-identical siblings), so a
+  literal `"unknown"` is rejected as placeholder content. Verified: the
+  composite `unknown/closed` and prose containing the word both pass — only a
+  bare value collides, which is why Packets A-D never hit this.
+
+  The locked semantics are preserved by namespacing: `state-unknown`,
+  `outcome-unknown`, and the already-composite `unknown/closed`. This is a
+  spelling change to the ledger encoding only; the locked semantics
+  (`DESIGN.md:326`, `:365`, `:548`) are unchanged. Each vocabulary entry must
+  carry an explicit `lockedSourceToken` field naming the design-record token it
+  encodes, so the correspondence is machine-checkable rather than implicit —
+  namespacing without that field would trade a validator collision for exactly
+  the kind of silent drift this packet exists to eliminate.
+
+  This encoding also has an independent merit: the most-emphasized Packet E
+  distinction is that terminal Operation `unknown` and reconcilable Process
+  `unknown` must never be conflated (IDENTITY #27, LIFECYCLE #26, RESULT #25).
+  Distinct spellings make that distinction structural rather than merely stated.
+
+  Align names with the existing prototype's `OperationContract`
+  (`prototypes/packet-e-contract-compiler/src/model.ts:30-41`) for the record
+  key set, and `src/definition.ts:1-33` for the closed axis values (`CallClass`
+  `:1-5`, `ResultBranch` `:7`, `ResultCarrierKind` `:9-13`, `MatrixCellKind`
+  `:15`, `RecoveryCoordinateKind` `:17-23`), rather than inventing parallel
+  vocabulary. Note `definition.ts` declares **four** call classes against this
+  step's six — reconcile that difference explicitly in the review record; do not
+  silently diverge.
 
 - [ ] **Step 3: Author the operation records**
 
   One record per Core operation with a closed key set: `id`, `callClass`,
   `targetKind`, `owner`, `capabilityGate`, `mutationClass`,
-  `resultCarrierKind`, `allowedRequestErrors[]`, `allowedKnownFailures[]`,
-  `allowedAmbiguities[]`, `recoveryCoordinates[]`, `refinesPacketASurfaces[]`,
-  `refinesPacketBFields[]`, `invariants[]`, `delegatedPackets[]`, `rationale`.
+  `resultCarrierKind`, `allowedRequestErrors[]`, `allowedRecoveryErrors[]`,
+  `allowedKnownFailures[]`, `allowedAmbiguities[]`, `recoveryCoordinates[]`,
+  `refinesPacketASurfaces[]`, `refinesPacketBFields[]`, `invariants[]`,
+  `delegatedPackets[]`, `rationale`.
+
+  `allowedRecoveryErrors` is mandatory and easy to lose: `RecoveryError` is one
+  of the five locked result branches (`DESIGN.md:499-515`), the design record
+  requires a per-method `RecoveryErrorFor<K>` alongside the other three
+  (`:615-638`), and `recoveryCoordinates[]` cannot substitute for it — the
+  prototype's own validator treats them as independent. `unknown_keys` gates
+  reject *extra* keys and are silent on *missing* ones, so nothing downstream
+  would catch the omission.
 
   Coverage is total: the six mandatory driver operations, all reads and
   observations, all Process transport and control commands, and every
-  capability-gated operation. The 13 rejected names must appear nowhere.
+  capability-gated operation.
+
+  None of the **fourteen** names rejected at `DESIGN.md:486-491` — plus `shell`
+  (`PACKET-E-OPERATION-TAXONOMY-DESIGN.md:662`) — may be an operation `id`. The
+  check is scoped to `id` values, not to any string anywhere: `attach`
+  legitimately appears in prose (`DESIGN.md:426-428`).
+
+  **Member partition (required ruling).** `OperationContract` at
+  `PACKET-E-RESULT-ERROR-CONTRACT-DESIGN.md:1350-1373` fixes 22 members that
+  every operation "must declare". Record, one line per member, where each lands:
+  this operation record, the Task 9 per-case key set, an existing registry
+  invariant family, the Task 10 concurrency ledger, or an explicit Packet F
+  delegation. No member may be named on two sides, and none may be unnamed. At
+  minimum state the disposition of `originSet`, `orderedAdmissionChecks`,
+  `successPredicate`, `requiredEvidence`, `forbiddenInference`,
+  `callerRecoveryByOutcome`, `coreResolutionByOutcome`, `idempotencyContract`,
+  `retentionContract`, `concurrencyLane`, and `transportProjection`. RESULT #50
+  and #51 exist to protect exactly these.
 
 - [ ] **Step 4: Close the inherited delegations**
 
@@ -622,6 +840,15 @@ ends fully green; no batch may leave the gate red for the next.
   `runtime.cleanup-errors`) must be named by some operation; the 5 Packet B
   fields delegating `"E"` must be resolved; and the 6 Packet C rules carrying
   those delegations must be discharged.
+
+  Record the open **E → A** dependency explicitly: the file, directory, copy,
+  transfer, endpoint, and port method families are Packet A-owned and their
+  names are not yet closed
+  (`PACKET-E-RESULT-ERROR-CONTRACT-DESIGN.md:1552-1561`), while
+  `:257-259` and the taxonomy record at `:685-687` require them to participate
+  in the concurrency matrix. Carry `delegatedPackets: ["A"]` markers for those
+  families so the ledger states the handoff rather than implying a totality it
+  cannot yet have.
 
 - [ ] **Step 5: Validate structurally before the generator exists**
 
@@ -661,7 +888,9 @@ ends fully green; no batch may leave the gate red for the next.
   Two axes only: operations × lifecycle states. Outcomes, error variants, retry,
   cancellation, and cleanup policies become the ordered `valueCases` list
   *inside* each cell, exactly as Packet C expresses value partitions. Do not
-  attempt the 16-dimension flat product implied by the taxonomy document.
+  attempt the 16-dimension flat product implied by the taxonomy document — the
+  factoring is authorized and bounded by the Task 1 Step 4b ledger-axis ruling,
+  which must already be recorded before this step runs.
 
   The generator reads only sibling JSON, renders
   `JSON.stringify(doc, null, 2) + "\n"`, supports `--check`, and throws a
@@ -682,8 +911,11 @@ ends fully green; no batch may leave the gate red for the next.
 
   Each value case carries `id`, `condition` (`all-values`, `field-present`,
   `field-omitted`, `constraint-satisfied` with `predicateId`, or `otherwise` —
-  `otherwise` last), `cellKind`, `terminalOutcome`, `requestErrorId` (non-null
-  **iff** the cell kind is reject), `nextLifecycleStateId`, `epochRule`,
+  `otherwise` last), `cellKind`, `terminalOutcome` (a `terminalOutcomes` member,
+  never the bare string `unknown`, per the Task 1 Step 4c token ruling),
+  `requestErrorId` (non-null **iff** the cell kind is reject),
+  `recoveryErrorId` (non-null **iff** the cell kind is a recovery branch),
+  `nextLifecycleStateId`, `epochRule`,
   `firstSoundPhase`, `deadline`, `authority`, `steps[]`,
   `postconditionObligationIds[]`, `evidence[]`, the fixed safety quad
   `{failure:"fail-closed", defaults:"explicit-only", warnings:"never-sufficient",
@@ -714,6 +946,12 @@ ends fully green; no batch may leave the gate red for the next.
   absent entry is a specification error, never permission. Consider restricting
   rows and columns to mutating operations to keep the ledger reviewable; record
   the restriction and its justification explicitly if applied.
+
+  Record alongside it the deferral of the Packet A data-plane rows and columns
+  (file, directory, copy, transfer, endpoint, port), which
+  `PACKET-E-RESULT-ERROR-CONTRACT-DESIGN.md:257-259` and the taxonomy record at
+  `:685-687` require to participate but whose names Packet A has not yet closed.
+  A totality claim that silently excludes them is false.
 
 - [ ] **Step 2: Encode the lane model**
 
@@ -770,6 +1008,12 @@ ends fully green; no batch may leave the gate red for the next.
   content, best-effort prose, unknown key, `status: "reviewed"` claimed too
   early, tandem catalog rewrite, and coordinated regeneration.
 
+  Add specifically: an actual uppercase `UNKNOWN` placeholder (must still be
+  rejected, proving the Task 1 Step 4c namespacing did not weaken the guard); an
+  unknown recovery-error variant; a recovery branch relabelled as a reject
+  branch; and a vocabulary entry whose `lockedSourceToken` names a token absent
+  from the design records.
+
   Copy Packet D's two harness patterns: `expect_coordinated_regeneration_failure`
   (copy the generator and inputs to a temp directory, mutate, regenerate, assert
   the semantic validator still rejects) and the
@@ -809,8 +1053,9 @@ ends fully green; no batch may leave the gate red for the next.
   After the Packet D block at `:148` and before the counter section at `:150`:
   `test-operation-contracts.sh`, then
   `node generate-operation-contracts.mjs --check`, then the
-  `jq -e … -f validate-operation-contracts.jq` invocation mirroring the
-  seven-argument shape at `:115-125`, then an inline absolute-count `jq -e`
+  `jq -e … -f validate-operation-contracts.jq` invocation mirroring the argument
+  shape at `:115-125` (four `--arg` plus four `--slurpfile`), extended to the
+  ten bindings Task 11 Step 2 specifies, then an inline absolute-count `jq -e`
   mirroring `:126-148`.
 
 - [ ] **Step 3: Add the Packet E counter block**
@@ -852,14 +1097,30 @@ ends fully green; no batch may leave the gate red for the next.
 
 - [ ] **Step 1: Update `INVENTORY-REVIEW.md`**
 
-  Baseline counts (`:18-32`), the owner-distribution table (from `:38`), the
-  lifecycle-semantics row (`:88`) from `partial` to `reviewed`, the dynamic-state
-  and security rows as the Task 1 Step 3 ruling determines, the Packet D digest
-  quotations (`:221-227`), the closing status (`:230-231`), and the Packet E
-  section (`:233-313`) rewritten from "these foundations do not close Packet E"
-  to the completed review record with its ledger links.
+  Baseline counts (`:18-33` — `:33` is the continuation carrying
+  "complete-contract groups, with 89 focused validator checks"), the
+  owner-distribution table (`:39-48`, which also gains the ninth owner row), the
+  composition-semantics row (`:85`, which restates the 54 × 140 = 7,560 /
+  634-group sentence in nearly the same words as `:32` — updating only one
+  leaves a live contradiction), the lifecycle-semantics row (`:88`) from
+  `partial` to `reviewed`, the dynamic-state row (`:89`) per the Task 2 Step 5
+  disposition, the valid-expressiveness row (`:91`, whose `VAL-001` through
+  `VAL-042` envelope must become the new range — this is the **only** prose
+  location in the repository pinning that bound, and Task 1 Step 5 allocates
+  `VAL-043` onward, so it contradicts the corpus from batch 1 onward), the
+  security row per the Task 1 Step 3 ruling, the digest-bound machine snapshot
+  (`:186-190`), the Packet D digest quotations (`:221-227`), the closing status
+  (`:230-231`), and the Packet E section (`:233-313`) rewritten from "these
+  foundations do not close Packet E" to the completed review record with its
+  ledger links.
 
   The top status line becomes: Packets A through E reviewed; Packet F remains.
+  If the dynamic-state row is left `partial`, the status line must say so rather
+  than claiming Packet E complete.
+
+  Take the widened universe from the `check-inventory.sh` counter lines captured
+  in Tasks 4-7 Step 7. Verify before finishing: `grep -n '140\|7,560\|VAL-042'`
+  on this file returns nothing stale.
 
 - [ ] **Step 2: Update `INVARIANT-ENFORCEMENT.md`**
 
@@ -870,11 +1131,22 @@ ends fully green; no batch may leave the gate red for the next.
 
 - [ ] **Step 3: Update the Packet D records**
 
-  `PACKET-D-COMPOSITION-REVIEW.md` at `:41-43`, `:70-80`, `:271-281` (six review
-  evidence digests, including the validator's own — editing
+  `PACKET-D-COMPOSITION-REVIEW.md` at `:20`, `:41-43` (and `:46` if Task 11
+  Step 4 moved the invalid-witness count), `:70-81` (the effect table — `:81` is
+  the `no-authority:hard-contract-nonwidening` row, and the eight rows must
+  still sum to `54 × N`), `:86`, `:131-135` (five per-path vectors, each of
+  which must still sum to the new vector width), `:271-281` (six review evidence
+  digests, including the validator's own — editing
   `validate-composition-coverage.jq` invalidates its recorded digest),
-  `:283-284`, `:297-298`, `:309-311`; and
-  `PACKET-D-RESEARCH-NOTES.md:87-88`.
+  `:283-289` (the exact effect partition and the structural / hard-contract cell
+  counts), `:297-298`, `:309-312`; and `PACKET-D-RESEARCH-NOTES.md:87-88`.
+
+  Read the new effect partition off the "Gate 2A Packet D effects" counter line
+  captured in Tasks 4-7 Step 7 — do not recompute the old numbers by hand. This
+  step also re-pins the file's six digests, which would otherwise give any
+  stale number fresh authority. No script reads this markdown, so nothing else
+  catches it. Verify before finishing: `grep -n '140\|7,560\|7560\|634'` on this
+  file returns nothing stale.
 
   State plainly that Packet D's matrix was widened by Packet E registration and
   that its reviewed verdicts stand for the paths and classification semantics,
@@ -888,8 +1160,10 @@ ends fully green; no batch may leave the gate red for the next.
 
 - [ ] **Step 5: Write the Packet E decision record**
 
-  `PACKET-E-OPERATION-CONTRACT-REVIEW.md` must state: the four Task 1 rulings
-  and their rationale; the obligation partition summary (178 listed → distinct →
+  `PACKET-E-OPERATION-CONTRACT-REVIEW.md` must state: the Task 1 rulings and
+  their rationale; the per-dimension ledger-axis disposition from Task 1
+  Step 4b; the unresolved Packet A data-plane method-name dependency; the
+  obligation partition summary (178 listed → distinct →
   registered / ledger-rule / witness-extension / delegated); the exact ledger
   digests; the observed validator and harness counts; the inherited A/B/C/D
   delegations discharged; what remains delegated to Packet F; and the explicit
@@ -936,7 +1210,12 @@ ends fully green; no batch may leave the gate red for the next.
   reviewed, packets completed, resources/operations/targets/extensions included,
   intentionally unsupported or future scope, reviewer findings and disposition,
   inventory-validator result, and the count of remaining `partial`/`unwalked`
-  rows. Packet F's rows will still be open; state that explicitly.
+  rows.
+
+  State explicitly which rows remain open and to which packet each is assigned.
+  If the dynamic-state row (`:89`) is still `partial` after Task 2 Step 5, it
+  must be counted and named — a row assigned to Packet E that remains `partial`
+  contradicts a top status line claiming Packet E reviewed.
 
 ---
 
@@ -954,7 +1233,13 @@ ends fully green; no batch may leave the gate red for the next.
   and adversarial review that Packets C and D both required before their
   verdicts were accepted.
 
-- **Known deliberate reduction.** The concurrency ledger may be restricted to
+- **Known deliberate reduction.** The exhaustive ledger encodes two axes
+  (operations × lifecycle states) with the remaining locked dimensions factored
+  into ordered `valueCases`, per-case `predicateId` conditions, registry
+  invariants, or explicit Packet F delegations; the per-dimension disposition is
+  recorded in the Task 1 Step 4b ruling and restated in
+  `PACKET-E-OPERATION-CONTRACT-REVIEW.md`. The concurrency ledger may be
+  restricted to
   mutating operations rather than the full operation × operation product; the
   restriction and its justification must be recorded explicitly if applied.
   Concrete retention durations and reconciliation deadlines are registered as
@@ -970,7 +1255,10 @@ ends fully green; no batch may leave the gate red for the next.
   requires its referenced identifiers to exist. Digest re-pinning follows the
   semantic suite in every batch, never precedes it. The ledger-versus-registry
   ruling is made in Task 1 rather than discovered in Task 8, because it changes
-  the entry count by 10-15 and therefore changes the identifier block.
+  the entry count by 10-15 and therefore changes the identifier block. Count
+  literals are re-pinned once per batch (Step 4b), never once to the final `N`,
+  because the registry length moves four times and every pinned equality is
+  absolute — a single final pinning would make at most one batch green.
 
 - **Type and count consistency.** Every count literal that pins 140 or 7,560 is
   enumerated in Task 3 Step 2 with its file and line. Every derived count — rule
