@@ -1439,8 +1439,35 @@ def expected_driver_contract($id):
     "delegatedPackets": ["E", "F"]
   };
 
+# Byte-identical to the definition carried by every other ledger validator
+# (validate-registry.jq, validate-surface-coverage.jq,
+# validate-artifact-field-review.jq, validate-target-realization.jq,
+# validate-provider-contracts.jq). This validator was the only one without it,
+# which no comparison of the copies that existed could detect.
+#
+# Note for Packet E authors: this matches ^UNKNOWN$ case-insensitively, so the
+# bare token "unknown" is rejected as placeholder content. Packet E's locked
+# vocabulary namespaces it (state-unknown, outcome-unknown) rather than
+# weakening this rule in one validator.
+def placeholder_strings:
+  [
+    .. |
+    strings |
+    select(test("^(TBD|TODO|FIXME)(:|\\b|$)|^UNKNOWN$"; "i"))
+  ];
+
 def path_errors:
   [
+    if ($paths[0] | placeholder_strings | length) == 0
+    then empty
+    else "composition path registry contains placeholder content"
+    end,
+
+    if ($caseContracts[0] | placeholder_strings | length) == 0
+    then empty
+    else "composition case contracts contain placeholder content"
+    end,
+
     if $pathsRegistrySha256 == expected_paths_registry_sha256
     then empty
     else "path registry SHA-256 must equal the independently reviewed validator pin"

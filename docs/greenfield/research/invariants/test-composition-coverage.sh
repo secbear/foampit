@@ -296,6 +296,14 @@ expect_catalog_failure \
   '.reviewedInvariantIds[0:2] |= reverse' \
   'reviewedInvariantIds must equal the exact current registry in order'
 
+# This validator was the only ledger validator carrying no placeholder rule.
+# Its five siblings all reject TBD/TODO/FIXME/UNKNOWN content, so the gap was
+# invisible to any check comparing the copies that existed.
+expect_catalog_failure \
+  "catalog-placeholder-content" \
+  '. + {"probeNote": "TODO: unfinished"}' \
+  'composition case contracts contain placeholder content'
+
 expect_catalog_failure \
   "vector-width-139" \
   '.classificationVectorsByPath["artifact-imports"] |= .[0:139]' \
