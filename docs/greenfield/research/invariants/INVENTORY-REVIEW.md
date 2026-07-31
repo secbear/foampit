@@ -222,7 +222,9 @@ and exact counters. The reviewed snapshot is bound to path
 case-contract
 `955c3dd8c03927be6876c58b2c3c67210f1fc0710ecf5f5ea2a4a2c59bc3f5b0`,
 invariant
-`d798c8fd82ddfe590cc252ce01829a1e4440489b2bd3ca3542c655fcee3284c2`,
+`8901d7f384a8fea6b5c8bec82271b4456b4052b988ba74ff1947adda5a768ee2`
+(reviewed as `d798c8fd…3284c2`; amended by the 2026-07-31 coherence repair
+without changing any classification, path, phase, owner, or effect),
 and coverage
 `16b156ef2d39c10f55f5aedb5abc025385b865e7d92f9a8ccbb2dd4bf635e532`
 SHA-256 values.

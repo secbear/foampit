@@ -272,7 +272,13 @@ conformance tests, and implementation evidence remain planned.
 - Case-contract catalog SHA-256:
   `955c3dd8c03927be6876c58b2c3c67210f1fc0710ecf5f5ea2a4a2c59bc3f5b0`
 - Invariant registry SHA-256:
-  `d798c8fd82ddfe590cc252ce01829a1e4440489b2bd3ca3542c655fcee3284c2`
+  `8901d7f384a8fea6b5c8bec82271b4456b4052b988ba74ff1947adda5a768ee2`
+  (reviewed as `d798c8fd82ddfe590cc252ce01829a1e4440489b2bd3ca3542c655fcee3284c2`;
+  amended by the 2026-07-31 coherence repair, which added the
+  `frontend-evaluation` and `artifact-final-validation` trust boundaries to the
+  `CMP-009`, `CMP-010`, and `CMP-011` wire-corruption test coverage and added
+  `VAL-011` as a valid witness of `SVC-001` and `SVC-002`. No classification,
+  path, phase, owner, or effect changed, so the reviewed verdicts below stand.)
 - Generated coverage SHA-256:
   `16b156ef2d39c10f55f5aedb5abc025385b865e7d92f9a8ccbb2dd4bf635e532`
 - Validator SHA-256:

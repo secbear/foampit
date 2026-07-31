@@ -5660,6 +5660,7 @@
         "SVC-001"
       ],
       "validWitnesses": [
+        "VAL-011",
         "VAL-017"
       ],
       "targets": [
@@ -5760,6 +5761,7 @@
         "SVC-002"
       ],
       "validWitnesses": [
+        "VAL-011",
         "VAL-017"
       ],
       "targets": [
@@ -12844,6 +12846,7 @@
           "case": "CMP-009-corrupted",
           "status": "planned",
           "covers": [
+            "frontend-evaluation",
             "canonical-wire",
             "nix-construction"
           ],
@@ -12955,6 +12958,7 @@
           "case": "CMP-010-corrupted",
           "status": "planned",
           "covers": [
+            "artifact-final-validation",
             "canonical-wire"
           ],
           "targets": [
@@ -13065,6 +13069,7 @@
           "case": "CMP-011-corrupted",
           "status": "planned",
           "covers": [
+            "artifact-final-validation",
             "canonical-wire",
             "nix-construction"
           ],
