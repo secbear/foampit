@@ -227,7 +227,7 @@ is not a target profile.
 Packet D's candidate expands exactly 54 composition paths across all 140
 current invariants, producing 7,560 unique cells in 634 identical
 complete-contract groups. The case catalog pins one total 140-code vector per
-path; 68 historical aliases are compatibility mappings, not the
+path; 76 registry path aliases are invariant-facing names, not the
 classification oracle. Boundary inputs may begin strict validation before a
 fact is complete but preserve the cell's later terminal authority. Structural
 no-authority cells use the exact boundary they name, while hard-contract

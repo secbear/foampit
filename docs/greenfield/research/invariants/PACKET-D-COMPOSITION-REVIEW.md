@@ -41,7 +41,7 @@ here, not a claim that production Gate 4B is closed.
 | Registered invariants | 140 |
 | Exact path × invariant cells | 7,560 |
 | Generated identical-contract rule groups | 634 |
-| Historical registry path aliases mapped | 68 |
+| Registry path aliases mapped | 76 |
 | Frontend/path evidence mappings | 74 |
 | Invalid witnesses with nearby valid controls | 50 |
 | Initial Packet C target profiles preserved | 4 |
@@ -87,7 +87,7 @@ The independent case catalog stores one 140-code classification vector for
 each path. It is a total partition, not a generated owner heuristic. SHA-256
 pins add review friction; they are not semantic proof. The validator therefore
 also owns exact projections for all 54 complete path contracts, 74 normative
-frontend mappings, 68 aliases, and every field of all 28 contract templates.
+frontend mappings, 76 aliases, and every field of all 28 contract templates.
 Coordinated catalog, path, and regenerated-coverage mutations must fail those
 independent semantic anchors even when digest checks are neutralized.
 

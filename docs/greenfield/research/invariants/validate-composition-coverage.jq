@@ -287,13 +287,16 @@ def complete_path_projection($path; $entry):
 def exact_registry_path_aliases:
   {
     "adapter-native-extension": "adapter-native-extension",
+    "artifact-semantic-refinement": "artifact-semantic-refinement",
     "binding-resolution": "direct-api",
     "built-artifact-load": "built-artifact-load",
     "canonical-wire-corruption": "raw-wire-input",
     "cli-adapter": "cli-adapter",
     "core-api": "direct-api",
     "corrupted-manifest": "corrupted-manifest",
+    "corrupted-provider-build-result": "corrupted-provider-build-result",
     "corrupted-resolved-input": "serialized-resolved-reentry",
+    "create-native-extension": "create-native-extension",
     "direct-api": "direct-api",
     "direct-driver-invocation": "direct-driver-invocation",
     "direct-native-nix-value": "direct-native-nix-value",
@@ -304,6 +307,7 @@ def exact_registry_path_aliases:
     "framework-adapter": "framework-adapter",
     "frontend-adaptation": "frontend-adaptation",
     "frontend-output": "frontend-output",
+    "generated-runtime-configuration": "generated-runtime-configuration",
     "generated-unit-inspection": "managed-service",
     "host-path-resolution": "resolved-driver-handoff",
     "host-preflight": "provider-native-operation",
@@ -314,19 +318,23 @@ def exact_registry_path_aliases:
     "live-native-extension": "live-native-extension",
     "live-operation": "live-native-extension",
     "managed-service": "managed-service",
+    "managed-service-definition-authoring": "managed-service-definition-authoring",
     "managed-service-definition-imports": "managed-service-definition-imports",
     "managed-service-definition-native-escape": "managed-service-definition-native-escape",
     "managed-service-definition-precedence": "managed-service-definition-precedence",
+    "managed-service-definition-refinement": "managed-service-definition-refinement",
     "managed-service-reconciliation": "managed-service",
     "member-deduplication": "built-artifact-load",
     "namespaced-extension": "namespaced-extension",
     "native-guest-module": "native-guest-module",
     "native-language-escape": "artifact-native-language-escape",
     "oci-descriptor-transfer": "oci-descriptor-transfer",
-    "operator-policy": "operator-native-extension",
+    "operator-configuration-authoring": "operator-configuration-authoring",
     "operator-configuration-imports": "operator-configuration-imports",
     "operator-configuration-native-escape": "operator-configuration-native-escape",
     "operator-configuration-precedence": "operator-configuration-precedence",
+    "operator-configuration-refinement": "operator-configuration-refinement",
+    "operator-policy": "operator-native-extension",
     "operator-registration": "operator-native-extension",
     "ordinary-authoring": "artifact-ordinary-authoring",
     "placement": "direct-api",
@@ -343,10 +351,10 @@ def exact_registry_path_aliases:
     "resolved-driver-handoff": "resolved-driver-handoff",
     "schema-migration": "schema-migration",
     "secret-delivery": "direct-api",
+    "serialized-resolved-reentry": "serialized-resolved-reentry",
     "service-native-extension": "service-native-extension",
     "snapshot-capture": "live-native-extension",
     "snapshot-restore": "direct-api",
-    "serialized-resolved-reentry": "serialized-resolved-reentry",
     "strongest-override": "artifact-strongest-override",
     "target-lowering": "target-lowering",
     "target-native-extension": "target-native-extension",
@@ -1013,7 +1021,7 @@ def complete_template_projection($template):
   };
 
 def expected_paths_registry_sha256:
-  "488bf76167461b52766dd9fa8a9b1756d084f1ebc08c795315fd2baf2fbab6e0";
+  "65322c7c30f4c75222a36793b8d1b877fa5813df4d1c83f236bb18884c364a65";
 
 def expected_case_contracts_sha256:
   "955c3dd8c03927be6876c58b2c3c67210f1fc0710ecf5f5ea2a4a2c59bc3f5b0";
@@ -1021,7 +1029,7 @@ def expected_case_contracts_sha256:
 # Digest pins detect accidental drift and impose review friction. They do not
 # authorize inputs that fail the semantic relationship checks below.
 def expected_invariant_registry_sha256:
-  "05ee00cb46cf0533337640d6dc5b8eabbe0eb8e9affdc62b5da0b4c6502505f1";
+  "9109aff5f44aeebe9be5cd9c967f06d42cad6f766b6acb89d9510f22c2656917";
 
 def nonempty_string:
   type == "string" and (gsub("^\\s+|\\s+$"; "") | length > 0);
@@ -1597,10 +1605,10 @@ def path_errors:
       else "registryPathAliases has unknown generic path target: \($alias.key) -> \($alias.value)"
       end
     ),
-    if (exact_registry_path_aliases | length) == 68 and
+    if (exact_registry_path_aliases | length) == 76 and
        $paths[0].registryPathAliases == exact_registry_path_aliases
     then empty
-    else "registryPathAliases must equal the exact validator-owned 68-alias mapping"
+    else "registryPathAliases must equal the exact validator-owned 76-alias mapping"
     end,
     (
       $paths[0].paths[] as $path |

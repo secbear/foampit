@@ -840,11 +840,32 @@ ends fully green; no batch may leave the gate red for the next.
   - no string anywhere in the entry may match
     `^(TBD|TODO|FIXME)(:|\b|$)|^UNKNOWN$` case-insensitively.
 
-  Reuse existing `compositionPaths` tokens. The 68-token vocabulary is pinned in
-  three places; introducing a new token forces editing
-  `PACKET-D-COMPOSITION-PATHS.json`, the jq alias literal, the `== 68` count,
-  and two digest pins, and **reopens Packet D** under that file's
-  `reopenPolicy`.
+  Prefer existing `compositionPaths` tokens, but do not treat the vocabulary as
+  frozen. It is **derived**, not declared: `validate-composition-coverage.jq`
+  requires `registryPathAliases` keys to *equal* the set of tokens the registry
+  actually uses, so declaring a token and registering its alias are one decision
+  recorded in two places. Many-to-one aliasing is idiomatic — ten tokens name
+  `direct-api`.
+
+  Minting a token costs editing `PACKET-D-COMPOSITION-PATHS.json`, the jq alias
+  literal, the alias count, and two digest pins. It does **not** reopen Packet D:
+  the `reopenPolicy` scopes reopening to a new composition or extension
+  *facility*, and the review record's own trigger list does not include aliases.
+  An alias adds no facility, path, cell, or rule group — verified by the
+  2026-07-31 mint, after which the generated coverage matrix regenerated
+  byte-identically.
+
+  Two conventions bind new tokens, both established 2026-07-31:
+
+  - **Identity form.** A newly minted token is always `key == value`. Unqualified
+    keys (`imports`, `explicit-override`) are historical records of pre-rename
+    registry usage; minting an unqualified token would fabricate a legacy name
+    and destroy the map's one self-documenting property.
+  - **Canonical declaration.** Where several tokens alias one path, a new
+    declaration uses the identity token, never a legacy collapse token. This is
+    not cosmetic: `planned_test_covers` matches `.covers` on *any* test kind, so
+    a token that is also a `trustBoundaries` value would be discharged for free
+    by the `wire-corruption` test and create no real obligation.
 
 - [ ] **Step 3: Validate the registry and corpus (cheap inner loop, ~1 s)**
 

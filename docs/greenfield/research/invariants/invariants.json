@@ -1330,7 +1330,9 @@
         "driver-preparation"
       ],
       "compositionPaths": [
-        "core-api"
+        "core-api",
+        "create-native-extension",
+        "resolved-driver-handoff"
       ],
       "enforcementHooks": [
         {
@@ -1349,7 +1351,9 @@
           "case": "XRS-001",
           "status": "planned",
           "covers": [
-            "core-api"
+            "core-api",
+            "create-native-extension",
+            "resolved-driver-handoff"
           ],
           "targets": [
             "portable"
@@ -1361,7 +1365,9 @@
           "case": "VAL-002",
           "status": "planned",
           "covers": [
-            "core-api"
+            "core-api",
+            "create-native-extension",
+            "resolved-driver-handoff"
           ],
           "targets": [
             "portable"
@@ -1427,7 +1433,9 @@
         "driver-preparation"
       ],
       "compositionPaths": [
-        "core-api"
+        "core-api",
+        "create-native-extension",
+        "resolved-driver-handoff"
       ],
       "enforcementHooks": [
         {
@@ -1446,7 +1454,9 @@
           "case": "XRS-002",
           "status": "planned",
           "covers": [
-            "core-api"
+            "core-api",
+            "create-native-extension",
+            "resolved-driver-handoff"
           ],
           "targets": [
             "portable"
@@ -1458,7 +1468,9 @@
           "case": "VAL-010",
           "status": "planned",
           "covers": [
-            "core-api"
+            "core-api",
+            "create-native-extension",
+            "resolved-driver-handoff"
           ],
           "targets": [
             "portable"
@@ -1525,7 +1537,9 @@
       ],
       "compositionPaths": [
         "core-api",
-        "binding-resolution"
+        "binding-resolution",
+        "create-native-extension",
+        "resolved-driver-handoff"
       ],
       "enforcementHooks": [
         {
@@ -1545,7 +1559,9 @@
           "status": "planned",
           "covers": [
             "core-api",
-            "binding-resolution"
+            "binding-resolution",
+            "create-native-extension",
+            "resolved-driver-handoff"
           ],
           "targets": [
             "portable"
@@ -1558,7 +1574,9 @@
           "status": "planned",
           "covers": [
             "core-api",
-            "binding-resolution"
+            "binding-resolution",
+            "create-native-extension",
+            "resolved-driver-handoff"
           ],
           "targets": [
             "portable"
@@ -1625,7 +1643,9 @@
       ],
       "compositionPaths": [
         "core-api",
-        "secret-delivery"
+        "secret-delivery",
+        "create-native-extension",
+        "resolved-driver-handoff"
       ],
       "enforcementHooks": [
         {
@@ -1645,7 +1665,9 @@
           "status": "planned",
           "covers": [
             "core-api",
-            "secret-delivery"
+            "secret-delivery",
+            "create-native-extension",
+            "resolved-driver-handoff"
           ],
           "targets": [
             "portable"
@@ -1658,7 +1680,9 @@
           "status": "planned",
           "covers": [
             "core-api",
-            "secret-delivery"
+            "secret-delivery",
+            "create-native-extension",
+            "resolved-driver-handoff"
           ],
           "targets": [
             "portable"
@@ -1825,7 +1849,10 @@
       ],
       "compositionPaths": [
         "core-api",
-        "provider-selection"
+        "provider-selection",
+        "operator-configuration-authoring",
+        "operator-configuration-imports",
+        "resolved-driver-handoff"
       ],
       "enforcementHooks": [
         {
@@ -1845,7 +1872,10 @@
           "status": "planned",
           "covers": [
             "core-api",
-            "provider-selection"
+            "provider-selection",
+            "operator-configuration-authoring",
+            "operator-configuration-imports",
+            "resolved-driver-handoff"
           ],
           "targets": [
             "remote-provider"
@@ -1858,7 +1888,10 @@
           "status": "planned",
           "covers": [
             "core-api",
-            "provider-selection"
+            "provider-selection",
+            "operator-configuration-authoring",
+            "operator-configuration-imports",
+            "resolved-driver-handoff"
           ],
           "targets": [
             "remote-provider"
@@ -2025,7 +2058,9 @@
       ],
       "compositionPaths": [
         "ordinary-authoring",
-        "target-native-extension"
+        "target-native-extension",
+        "operator-configuration-authoring",
+        "operator-configuration-imports"
       ],
       "enforcementHooks": [
         {
@@ -2045,7 +2080,9 @@
           "status": "planned",
           "covers": [
             "ordinary-authoring",
-            "target-native-extension"
+            "target-native-extension",
+            "operator-configuration-authoring",
+            "operator-configuration-imports"
           ],
           "targets": [
             "portable"
@@ -2058,7 +2095,9 @@
           "status": "planned",
           "covers": [
             "ordinary-authoring",
-            "target-native-extension"
+            "target-native-extension",
+            "operator-configuration-authoring",
+            "operator-configuration-imports"
           ],
           "targets": [
             "portable"
@@ -2226,7 +2265,9 @@
       ],
       "compositionPaths": [
         "core-api",
-        "binding-resolution"
+        "binding-resolution",
+        "create-native-extension",
+        "resolved-driver-handoff"
       ],
       "enforcementHooks": [
         {
@@ -2246,7 +2287,9 @@
           "status": "planned",
           "covers": [
             "core-api",
-            "binding-resolution"
+            "binding-resolution",
+            "create-native-extension",
+            "resolved-driver-handoff"
           ],
           "targets": [
             "firecracker"
@@ -2259,7 +2302,9 @@
           "status": "planned",
           "covers": [
             "core-api",
-            "binding-resolution"
+            "binding-resolution",
+            "create-native-extension",
+            "resolved-driver-handoff"
           ],
           "targets": [
             "firecracker"
@@ -3141,7 +3186,9 @@
       ],
       "compositionPaths": [
         "profile-expansion",
-        "explicit-override"
+        "explicit-override",
+        "artifact-semantic-refinement",
+        "strongest-override"
       ],
       "enforcementHooks": [
         {
@@ -3161,7 +3208,9 @@
           "status": "planned",
           "covers": [
             "profile-expansion",
-            "explicit-override"
+            "explicit-override",
+            "artifact-semantic-refinement",
+            "strongest-override"
           ],
           "targets": [
             "portable"
@@ -3174,7 +3223,9 @@
           "status": "planned",
           "covers": [
             "profile-expansion",
-            "explicit-override"
+            "explicit-override",
+            "artifact-semantic-refinement",
+            "strongest-override"
           ],
           "targets": [
             "portable"
@@ -4137,7 +4188,10 @@
       ],
       "compositionPaths": [
         "operator-registration",
-        "core-api"
+        "core-api",
+        "operator-configuration-refinement",
+        "operator-configuration-precedence",
+        "resolved-driver-handoff"
       ],
       "enforcementHooks": [
         {
@@ -4157,7 +4211,10 @@
           "status": "planned",
           "covers": [
             "operator-registration",
-            "core-api"
+            "core-api",
+            "operator-configuration-refinement",
+            "operator-configuration-precedence",
+            "resolved-driver-handoff"
           ],
           "targets": [
             "portable"
@@ -4170,7 +4227,10 @@
           "status": "planned",
           "covers": [
             "operator-registration",
-            "core-api"
+            "core-api",
+            "operator-configuration-refinement",
+            "operator-configuration-precedence",
+            "resolved-driver-handoff"
           ],
           "targets": [
             "portable"
@@ -4238,7 +4298,10 @@
       ],
       "compositionPaths": [
         "operator-policy",
-        "core-api"
+        "core-api",
+        "operator-configuration-refinement",
+        "operator-configuration-precedence",
+        "resolved-driver-handoff"
       ],
       "enforcementHooks": [
         {
@@ -4258,7 +4321,10 @@
           "status": "planned",
           "covers": [
             "operator-policy",
-            "core-api"
+            "core-api",
+            "operator-configuration-refinement",
+            "operator-configuration-precedence",
+            "resolved-driver-handoff"
           ],
           "targets": [
             "portable"
@@ -4271,7 +4337,10 @@
           "status": "planned",
           "covers": [
             "operator-policy",
-            "core-api"
+            "core-api",
+            "operator-configuration-refinement",
+            "operator-configuration-precedence",
+            "resolved-driver-handoff"
           ],
           "targets": [
             "portable"
@@ -4338,7 +4407,8 @@
         "driver-preparation"
       ],
       "compositionPaths": [
-        "host-preflight"
+        "host-preflight",
+        "resolved-driver-handoff"
       ],
       "enforcementHooks": [
         {
@@ -4357,7 +4427,8 @@
           "case": "HOST-001",
           "status": "planned",
           "covers": [
-            "host-preflight"
+            "host-preflight",
+            "resolved-driver-handoff"
           ],
           "targets": [
             "microvm-kvm"
@@ -4369,7 +4440,8 @@
           "case": "VAL-010",
           "status": "planned",
           "covers": [
-            "host-preflight"
+            "host-preflight",
+            "resolved-driver-handoff"
           ],
           "targets": [
             "microvm-kvm"
@@ -4437,7 +4509,9 @@
       ],
       "compositionPaths": [
         "host-preflight",
-        "binding-resolution"
+        "binding-resolution",
+        "create-native-extension",
+        "resolved-driver-handoff"
       ],
       "enforcementHooks": [
         {
@@ -4457,7 +4531,9 @@
           "status": "planned",
           "covers": [
             "host-preflight",
-            "binding-resolution"
+            "binding-resolution",
+            "create-native-extension",
+            "resolved-driver-handoff"
           ],
           "targets": [
             "portable"
@@ -4470,7 +4546,9 @@
           "status": "planned",
           "covers": [
             "host-preflight",
-            "binding-resolution"
+            "binding-resolution",
+            "create-native-extension",
+            "resolved-driver-handoff"
           ],
           "targets": [
             "portable"
@@ -4538,7 +4616,8 @@
       ],
       "compositionPaths": [
         "host-preflight",
-        "provider-selection"
+        "provider-selection",
+        "resolved-driver-handoff"
       ],
       "enforcementHooks": [
         {
@@ -4558,7 +4637,8 @@
           "status": "planned",
           "covers": [
             "host-preflight",
-            "provider-selection"
+            "provider-selection",
+            "resolved-driver-handoff"
           ],
           "targets": [
             "remote-provider"
@@ -4571,7 +4651,8 @@
           "status": "planned",
           "covers": [
             "host-preflight",
-            "provider-selection"
+            "provider-selection",
+            "resolved-driver-handoff"
           ],
           "targets": [
             "remote-provider"
@@ -4638,7 +4719,9 @@
       ],
       "compositionPaths": [
         "target-lowering",
-        "corrupted-resolved-input"
+        "corrupted-resolved-input",
+        "resolved-driver-handoff",
+        "generated-runtime-configuration"
       ],
       "enforcementHooks": [
         {
@@ -4658,7 +4741,9 @@
           "status": "planned",
           "covers": [
             "target-lowering",
-            "corrupted-resolved-input"
+            "corrupted-resolved-input",
+            "resolved-driver-handoff",
+            "generated-runtime-configuration"
           ],
           "targets": [
             "all-enabled-targets"
@@ -4671,7 +4756,9 @@
           "status": "planned",
           "covers": [
             "target-lowering",
-            "corrupted-resolved-input"
+            "corrupted-resolved-input",
+            "resolved-driver-handoff",
+            "generated-runtime-configuration"
           ],
           "targets": [
             "all-enabled-targets"
@@ -5046,7 +5133,9 @@
       "compositionPaths": [
         "direct-api",
         "framework-adapter",
-        "managed-service"
+        "managed-service",
+        "create-native-extension",
+        "resolved-driver-handoff"
       ],
       "enforcementHooks": [
         {
@@ -5067,7 +5156,9 @@
           "covers": [
             "direct-api",
             "framework-adapter",
-            "managed-service"
+            "managed-service",
+            "resolved-driver-handoff",
+            "create-native-extension"
           ],
           "targets": [
             "portable"
@@ -5081,7 +5172,8 @@
           "covers": [
             "direct-api",
             "framework-adapter",
-            "managed-service"
+            "managed-service",
+            "resolved-driver-handoff"
           ],
           "targets": [
             "portable"
@@ -5149,7 +5241,9 @@
       "compositionPaths": [
         "direct-api",
         "framework-adapter",
-        "managed-service"
+        "managed-service",
+        "create-native-extension",
+        "resolved-driver-handoff"
       ],
       "enforcementHooks": [
         {
@@ -5170,7 +5264,9 @@
           "covers": [
             "direct-api",
             "framework-adapter",
-            "managed-service"
+            "managed-service",
+            "resolved-driver-handoff",
+            "create-native-extension"
           ],
           "targets": [
             "portable"
@@ -5184,7 +5280,8 @@
           "covers": [
             "direct-api",
             "framework-adapter",
-            "managed-service"
+            "managed-service",
+            "resolved-driver-handoff"
           ],
           "targets": [
             "portable"
@@ -5252,7 +5349,9 @@
       "compositionPaths": [
         "direct-api",
         "framework-adapter",
-        "managed-service"
+        "managed-service",
+        "create-native-extension",
+        "resolved-driver-handoff"
       ],
       "enforcementHooks": [
         {
@@ -5273,7 +5372,9 @@
           "covers": [
             "direct-api",
             "framework-adapter",
-            "managed-service"
+            "managed-service",
+            "resolved-driver-handoff",
+            "create-native-extension"
           ],
           "targets": [
             "portable"
@@ -5287,7 +5388,8 @@
           "covers": [
             "direct-api",
             "framework-adapter",
-            "managed-service"
+            "managed-service",
+            "resolved-driver-handoff"
           ],
           "targets": [
             "portable"
@@ -5357,7 +5459,9 @@
         "direct-api",
         "framework-adapter",
         "managed-service",
-        "idempotent-retry"
+        "idempotent-retry",
+        "create-native-extension",
+        "resolved-driver-handoff"
       ],
       "enforcementHooks": [
         {
@@ -5379,7 +5483,9 @@
             "direct-api",
             "framework-adapter",
             "managed-service",
-            "idempotent-retry"
+            "idempotent-retry",
+            "resolved-driver-handoff",
+            "create-native-extension"
           ],
           "targets": [
             "portable"
@@ -5394,7 +5500,8 @@
             "direct-api",
             "framework-adapter",
             "managed-service",
-            "idempotent-retry"
+            "idempotent-retry",
+            "resolved-driver-handoff"
           ],
           "targets": [
             "portable"
@@ -5464,7 +5571,9 @@
       "compositionPaths": [
         "direct-api",
         "framework-adapter",
-        "managed-service"
+        "managed-service",
+        "create-native-extension",
+        "resolved-driver-handoff"
       ],
       "enforcementHooks": [
         {
@@ -5485,7 +5594,9 @@
           "covers": [
             "direct-api",
             "framework-adapter",
-            "managed-service"
+            "managed-service",
+            "resolved-driver-handoff",
+            "create-native-extension"
           ],
           "targets": [
             "all-enabled-targets"
@@ -5499,7 +5610,8 @@
           "covers": [
             "direct-api",
             "framework-adapter",
-            "managed-service"
+            "managed-service",
+            "resolved-driver-handoff"
           ],
           "targets": [
             "all-enabled-targets"
@@ -5568,7 +5680,9 @@
       "compositionPaths": [
         "direct-api",
         "framework-adapter",
-        "managed-service"
+        "managed-service",
+        "create-native-extension",
+        "resolved-driver-handoff"
       ],
       "enforcementHooks": [
         {
@@ -5589,7 +5703,9 @@
           "covers": [
             "direct-api",
             "framework-adapter",
-            "managed-service"
+            "managed-service",
+            "resolved-driver-handoff",
+            "create-native-extension"
           ],
           "targets": [
             "portable"
@@ -5603,7 +5719,8 @@
           "covers": [
             "direct-api",
             "framework-adapter",
-            "managed-service"
+            "managed-service",
+            "resolved-driver-handoff"
           ],
           "targets": [
             "portable"
@@ -5671,7 +5788,11 @@
       ],
       "compositionPaths": [
         "managed-service-reconciliation",
-        "service-native-extension"
+        "service-native-extension",
+        "managed-service-definition-authoring",
+        "managed-service-definition-imports",
+        "managed-service-definition-precedence",
+        "managed-service-definition-refinement"
       ],
       "enforcementHooks": [
         {
@@ -5691,7 +5812,11 @@
           "status": "planned",
           "covers": [
             "managed-service-reconciliation",
-            "service-native-extension"
+            "service-native-extension",
+            "managed-service-definition-authoring",
+            "managed-service-definition-imports",
+            "managed-service-definition-precedence",
+            "managed-service-definition-refinement"
           ],
           "targets": [
             "portable"
@@ -5704,7 +5829,11 @@
           "status": "planned",
           "covers": [
             "managed-service-reconciliation",
-            "service-native-extension"
+            "service-native-extension",
+            "managed-service-definition-authoring",
+            "managed-service-definition-imports",
+            "managed-service-definition-precedence",
+            "managed-service-definition-refinement"
           ],
           "targets": [
             "portable"
@@ -9785,7 +9914,9 @@
       "compositionPaths": [
         "imports",
         "profile-expansion",
-        "strongest-override"
+        "strongest-override",
+        "explicit-override",
+        "artifact-semantic-refinement"
       ],
       "enforcementHooks": [
         {
@@ -9806,7 +9937,9 @@
           "covers": [
             "imports",
             "profile-expansion",
-            "strongest-override"
+            "strongest-override",
+            "explicit-override",
+            "artifact-semantic-refinement"
           ],
           "targets": [
             "portable"
@@ -9820,7 +9953,9 @@
           "covers": [
             "imports",
             "profile-expansion",
-            "strongest-override"
+            "strongest-override",
+            "explicit-override",
+            "artifact-semantic-refinement"
           ],
           "targets": [
             "portable"
@@ -11815,7 +11950,8 @@
       "compositionPaths": [
         "native-guest-module",
         "target-native-extension",
-        "typed-nix-handle"
+        "typed-nix-handle",
+        "direct-native-nix-value"
       ],
       "enforcementHooks": [
         {
@@ -11836,7 +11972,8 @@
           "covers": [
             "native-guest-module",
             "target-native-extension",
-            "typed-nix-handle"
+            "typed-nix-handle",
+            "direct-native-nix-value"
           ],
           "targets": [
             "all-enabled-targets"
@@ -11850,7 +11987,8 @@
           "covers": [
             "native-guest-module",
             "target-native-extension",
-            "typed-nix-handle"
+            "typed-nix-handle",
+            "direct-native-nix-value"
           ],
           "targets": [
             "all-enabled-targets"
@@ -11922,7 +12060,9 @@
         "ordinary-authoring",
         "imports",
         "profile-expansion",
-        "strongest-override"
+        "strongest-override",
+        "explicit-override",
+        "artifact-semantic-refinement"
       ],
       "enforcementHooks": [
         {
@@ -11944,7 +12084,9 @@
             "ordinary-authoring",
             "imports",
             "profile-expansion",
-            "strongest-override"
+            "strongest-override",
+            "explicit-override",
+            "artifact-semantic-refinement"
           ],
           "targets": [
             "portable"
@@ -11959,7 +12101,9 @@
             "ordinary-authoring",
             "imports",
             "profile-expansion",
-            "strongest-override"
+            "strongest-override",
+            "explicit-override",
+            "artifact-semantic-refinement"
           ],
           "targets": [
             "portable"
@@ -12249,7 +12393,10 @@
       "compositionPaths": [
         "operator-registration",
         "placement",
-        "driver-selection"
+        "driver-selection",
+        "operator-configuration-refinement",
+        "operator-configuration-precedence",
+        "resolved-driver-handoff"
       ],
       "enforcementHooks": [
         {
@@ -12270,7 +12417,10 @@
           "covers": [
             "operator-registration",
             "placement",
-            "driver-selection"
+            "driver-selection",
+            "operator-configuration-refinement",
+            "operator-configuration-precedence",
+            "resolved-driver-handoff"
           ],
           "targets": [
             "all-enabled-targets"
@@ -12284,7 +12434,10 @@
           "covers": [
             "operator-registration",
             "placement",
-            "driver-selection"
+            "driver-selection",
+            "operator-configuration-refinement",
+            "operator-configuration-precedence",
+            "resolved-driver-handoff"
           ],
           "targets": [
             "all-enabled-targets"
@@ -12358,7 +12511,8 @@
       "compositionPaths": [
         "binding-resolution",
         "host-path-resolution",
-        "driver-preparation"
+        "driver-preparation",
+        "create-native-extension"
       ],
       "enforcementHooks": [
         {
@@ -12379,7 +12533,8 @@
           "covers": [
             "binding-resolution",
             "host-path-resolution",
-            "driver-preparation"
+            "driver-preparation",
+            "create-native-extension"
           ],
           "targets": [
             "all-enabled-targets"
@@ -12393,7 +12548,8 @@
           "covers": [
             "binding-resolution",
             "host-path-resolution",
-            "driver-preparation"
+            "driver-preparation",
+            "create-native-extension"
           ],
           "targets": [
             "all-enabled-targets"
@@ -12579,7 +12735,8 @@
       "compositionPaths": [
         "prebuilt-member-transfer",
         "oci-descriptor-transfer",
-        "provider-cache-hit"
+        "provider-cache-hit",
+        "resolved-driver-handoff"
       ],
       "enforcementHooks": [
         {
@@ -12600,7 +12757,8 @@
           "covers": [
             "prebuilt-member-transfer",
             "oci-descriptor-transfer",
-            "provider-cache-hit"
+            "provider-cache-hit",
+            "resolved-driver-handoff"
           ],
           "targets": [
             "remote-provider"
@@ -12614,7 +12772,8 @@
           "covers": [
             "prebuilt-member-transfer",
             "oci-descriptor-transfer",
-            "provider-cache-hit"
+            "provider-cache-hit",
+            "resolved-driver-handoff"
           ],
           "targets": [
             "remote-provider"
@@ -12689,7 +12848,8 @@
       "compositionPaths": [
         "provider-side-construction",
         "provider-build-cache",
-        "provider-native-adapter"
+        "provider-native-adapter",
+        "corrupted-provider-build-result"
       ],
       "enforcementHooks": [
         {
@@ -12710,7 +12870,8 @@
           "covers": [
             "provider-side-construction",
             "provider-build-cache",
-            "provider-native-adapter"
+            "provider-native-adapter",
+            "corrupted-provider-build-result"
           ],
           "targets": [
             "remote-provider"
@@ -12724,7 +12885,8 @@
           "covers": [
             "provider-side-construction",
             "provider-build-cache",
-            "provider-native-adapter"
+            "provider-native-adapter",
+            "corrupted-provider-build-result"
           ],
           "targets": [
             "remote-provider"
@@ -12911,7 +13073,8 @@
         "profile-expansion",
         "explicit-override",
         "strongest-override",
-        "schema-migration"
+        "schema-migration",
+        "artifact-semantic-refinement"
       ],
       "enforcementHooks": [
         {
@@ -12946,7 +13109,8 @@
           "covers": [
             "profile-expansion",
             "explicit-override",
-            "schema-migration"
+            "schema-migration",
+            "artifact-semantic-refinement"
           ],
           "targets": [
             "portable"
@@ -13022,7 +13186,8 @@
         "namespaced-extension",
         "unsafe-opaque-extension",
         "target-native-extension",
-        "native-guest-module"
+        "native-guest-module",
+        "direct-native-nix-value"
       ],
       "enforcementHooks": [
         {
@@ -13044,7 +13209,8 @@
             "namespaced-extension",
             "unsafe-opaque-extension",
             "target-native-extension",
-            "native-guest-module"
+            "native-guest-module",
+            "direct-native-nix-value"
           ],
           "targets": [
             "all-enabled-targets"
@@ -14343,7 +14509,8 @@
       ],
       "compositionPaths": [
         "resolved-driver-handoff",
-        "serialized-resolved-reentry"
+        "serialized-resolved-reentry",
+        "generated-runtime-configuration"
       ],
       "enforcementHooks": [
         {
@@ -14363,7 +14530,8 @@
           "status": "planned",
           "covers": [
             "resolved-driver-handoff",
-            "serialized-resolved-reentry"
+            "serialized-resolved-reentry",
+            "generated-runtime-configuration"
           ],
           "targets": [
             "all-enabled-targets"
@@ -14376,7 +14544,8 @@
           "status": "planned",
           "covers": [
             "resolved-driver-handoff",
-            "serialized-resolved-reentry"
+            "serialized-resolved-reentry",
+            "generated-runtime-configuration"
           ],
           "targets": [
             "all-enabled-targets"

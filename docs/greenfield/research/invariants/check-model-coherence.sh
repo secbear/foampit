@@ -440,6 +440,33 @@ else
   pass
 fi
 
+# The alias-vocabulary size is pinned in the validator and quoted in four prose
+# documents. Until this check existed the literal sat outside every automated
+# comparison, so the prose copies could drift silently.
+alias_count="$(jq '.registryPathAliases | length' "${paths_doc}")"
+if grep -q "== ${alias_count}" "${script_dir}/validate-composition-coverage.jq" &&
+  grep -q "${alias_count}-alias" "${script_dir}/validate-composition-coverage.jq" &&
+  grep -q "${alias_count}-alias" "${script_dir}/test-composition-coverage.sh"; then
+  pass
+else
+  fail "count-consistency: alias vocabulary size ${alias_count} not pinned in validator and harness" \
+    "expected '== ${alias_count}' and '${alias_count}-alias' in validate-composition-coverage.jq," \
+    "and '${alias_count}-alias' in test-composition-coverage.sh"
+fi
+
+# Every alias target must be a real locked path, and every locked path must be
+# nameable (check 8 above). Together these keep the vocabulary anchored.
+if unknown_targets="$(jq -r --slurpfile p "${paths_doc}" '
+  ([$p[0].paths[].id]) as $ids |
+  [.registryPathAliases | to_entries[] | select(.value | IN($ids[]) | not) |
+   "\(.key) -> \(.value)"] | .[]' "${paths_doc}")" &&
+  [[ -z "${unknown_targets}" ]]; then
+  pass
+else
+  fail "alias-target-unknown: alias points at something that is not a locked path" \
+    "${unknown_targets}"
+fi
+
 for literal_site in \
   "check-inventory.sh:${registry_length}" \
   "check-inventory.sh:${expected_cells}" \

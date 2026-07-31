@@ -217,7 +217,22 @@ expect_coordinated_regeneration_failure \
   "coordinated-alias-reassignment" \
   '.registryPathAliases["binding-resolution"] = "framework-adapter"' \
   '.' \
-  'registryPathAliases must equal the exact validator-owned 68-alias mapping'
+  'registryPathAliases must equal the exact validator-owned 76-alias mapping'
+
+# The eight identity tokens minted in 2026-07-31 name paths that previously no
+# invariant could reach. A wrong target for a NEW token would still satisfy the
+# 76-entry count, so pin two of them against re-pointing specifically.
+expect_coordinated_regeneration_failure \
+  "coordinated-new-token-reassignment-create-native-extension" \
+  '.registryPathAliases["create-native-extension"] = "direct-api"' \
+  '.' \
+  'registryPathAliases must equal the exact validator-owned 76-alias mapping'
+
+expect_coordinated_regeneration_failure \
+  "coordinated-new-token-reassignment-artifact-semantic-refinement" \
+  '.registryPathAliases["artifact-semantic-refinement"] = "artifact-explicit-override"' \
+  '.' \
+  'registryPathAliases must equal the exact validator-owned 76-alias mapping'
 
 expect_coordinated_regeneration_failure \
   "coordinated-frontend-candidate-reassignment" \
