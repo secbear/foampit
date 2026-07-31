@@ -59,7 +59,7 @@ invariant_registry_sha256="$(
 # not a coordinated digest rewrite, remains authoritative.
 expected_composition_paths_sha256="488bf76167461b52766dd9fa8a9b1756d084f1ebc08c795315fd2baf2fbab6e0"
 expected_composition_case_contracts_sha256="955c3dd8c03927be6876c58b2c3c67210f1fc0710ecf5f5ea2a4a2c59bc3f5b0"
-expected_invariant_registry_sha256="8901d7f384a8fea6b5c8bec82271b4456b4052b988ba74ff1947adda5a768ee2"
+expected_invariant_registry_sha256="05ee00cb46cf0533337640d6dc5b8eabbe0eb8e9affdc62b5da0b4c6502505f1"
 
 if [[ "${composition_paths_sha256}" != "${expected_composition_paths_sha256}" ||
       "${composition_case_contracts_sha256}" != "${expected_composition_case_contracts_sha256}" ||

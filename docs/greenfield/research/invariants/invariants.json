@@ -7443,7 +7443,7 @@
       "notes": "Discovered during Gate 2A Packet B; hook and test locations remain planned until implementation tracing."
     },
     {
-    "id": "XRS-009",
+      "id": "XRS-009",
       "title": "Invisible or heuristic profile selection",
       "statement": "Normalization materializes exactly one implicit or explicit profile with pinned name, source, version, digest, and complete expanded semantics; omission selects only the documented product profile and never uses ambient, target, or backend heuristics.",
       "owner": "artifact",
@@ -7456,8 +7456,8 @@
       "invalidWitnesses": [
         "XRS-009"
       ],
-    "validWitnesses": [
-      "VAL-020"
+      "validWitnesses": [
+        "VAL-020"
       ],
       "targets": [
         "portable"
@@ -12882,7 +12882,7 @@
       "notes": "Discovered during Gate 2A Packet D frontend and Nix composition research."
     },
     {
-    "id": "CMP-010",
+      "id": "CMP-010",
       "title": "Composition provenance is incomplete",
       "statement": "Normalized composition provenance records every winning, losing, default, profile, import, override, native, and migration contributor with immutable identity and semantic role while excluding display-only source spans and order from the semantic digest.",
       "owner": "artifact",
@@ -12895,8 +12895,8 @@
       "invalidWitnesses": [
         "CMP-010"
       ],
-    "validWitnesses": [
-      "VAL-037"
+      "validWitnesses": [
+        "VAL-037"
       ],
       "targets": [
         "portable"
@@ -12939,9 +12939,9 @@
           ]
         },
         {
-      "kind": "positive-boundary",
-      "path": "planned/cmp-010/positive-boundary",
-      "case": "VAL-037",
+          "kind": "positive-boundary",
+          "path": "planned/cmp-010/positive-boundary",
+          "case": "VAL-037",
           "status": "planned",
           "covers": [
             "profile-expansion",
@@ -13214,7 +13214,7 @@
     {
       "id": "WIRE-006",
       "title": "Canonical decoding is unbounded or accepts an invalid domain",
-  "statement": "Canonical decoding rejects malformed syntax, trailing bytes, invalid UTF-8, unsupported numeric or Unicode representations, excessive nesting, and oversized input before semantic interpretation; WIRE-001 separately owns duplicate-object-key rejection.",
+      "statement": "Canonical decoding rejects malformed syntax, trailing bytes, invalid UTF-8, unsupported numeric or Unicode representations, excessive nesting, and oversized input before semantic interpretation; WIRE-001 separately owns duplicate-object-key rejection.",
       "owner": "artifact",
       "scope": "v1",
       "status": "specified",
@@ -13225,8 +13225,8 @@
       "invalidWitnesses": [
         "WIRE-006"
       ],
-  "validWitnesses": [
-    "VAL-038"
+      "validWitnesses": [
+        "VAL-038"
       ],
       "targets": [
         "portable"
@@ -13261,9 +13261,9 @@
           ]
         },
         {
-      "kind": "positive-boundary",
-      "path": "planned/wire-006/positive-boundary",
-      "case": "VAL-038",
+          "kind": "positive-boundary",
+          "path": "planned/wire-006/positive-boundary",
+          "case": "VAL-038",
           "status": "planned",
           "covers": [
             "raw-wire-input"
@@ -13431,8 +13431,8 @@
       "invalidWitnesses": [
         "NAT-003"
       ],
-  "validWitnesses": [
-    "VAL-039"
+      "validWitnesses": [
+        "VAL-039"
       ],
       "targets": [
         "all-enabled-targets"
@@ -13474,9 +13474,9 @@
           ]
         },
         {
-      "kind": "positive-boundary",
-      "path": "planned/nat-003/positive-boundary",
-      "case": "VAL-039",
+          "kind": "positive-boundary",
+          "path": "planned/nat-003/positive-boundary",
+          "case": "VAL-039",
           "status": "planned",
           "covers": [
             "typed-nix-handle",

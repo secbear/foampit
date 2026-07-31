@@ -282,10 +282,10 @@ conformance tests, and implementation evidence remain planned.
 - Generated coverage SHA-256:
   `16b156ef2d39c10f55f5aedb5abc025385b865e7d92f9a8ccbb2dd4bf635e532`
 - Validator SHA-256:
-  `7f9777d36527c8aa0ef571cecc435c4254d8072abca7cd962912d2dec780a31a`
+  `34b1c610bdf303860ba6171cedb4c532ea1fa49a9bbaf0bbb4fca7257f9cd82f`
 - Focused harness SHA-256:
-  `fefac4fb2b7bddc263417e39c04793e1afbab157daf71b510c35fc61c21c936e`
-- Focused Packet D validator: 89 cases passed.
+  `33459c40f7935377d32bd0aac69b25e9fe3d6688f1609f6ee42f484de3817e5e`
+- Focused Packet D validator: 90 cases passed.
 - Exact expansion: 54 × 140 = 7,560 unique cells.
 - Exact grouping: 634 complete-contract rules.
 - Exact effect partition: 145 `may-contribute`, 32 `may-narrow`, 54

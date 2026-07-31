@@ -30,7 +30,7 @@ As of 2026-07-24:
   provider transport contracts, introducing 7 invariant cases;
 - Packet D has reviewed 17 composition/trust-boundary invariant cases and its
   exact matrix covers 54 paths × 140 invariants = 7,560 unique cells in 634
-  complete-contract groups, with 89 focused validator checks;
+  complete-contract groups, with 90 focused validator checks;
 - Gate 2A review is open; and
 - Gate 4B correctly fails.
 
@@ -82,7 +82,7 @@ The status labels mean:
 | Single-resource semantics | reviewed for Artifact | Packet B covers profiles, defaults, environment, filesystem, network, resources, identity/security, secrets, lifecycle requirements, outputs, provenance, and targets | Preserve Packet B as Packets C-F refine realization, lifecycle, and disclosure |
 | Cross-resource semantics | reviewed through composition | Packet D owner/effect checks cover distinct Artifact, Operator Configuration, Managed-Service Definition, Create, and runtime branches | Packets E-F must preserve these ownership exclusions while completing lifecycle and disclosure |
 | Cross-target semantics | reviewed for initial targets | Packet C: 81 fields × Bubblewrap, Firecracker, Cloud Hypervisor, and OCI; provider transport remains separate | Packet D-F must preserve the matrix while adding bypass, lifecycle, and evidence detail; every later profile repeats Packet C |
-| Composition semantics | reviewed through Packet D | Packet D: 54 paths × 140 invariants = 7,560 cells; 634 complete-contract groups; 89 focused checks; three clean final verdicts | Packets E/F additions reopen affected composition coordinates |
+| Composition semantics | reviewed through Packet D | Packet D: 54 paths × 140 invariants = 7,560 cells; 634 complete-contract groups; 90 focused checks; three clean final verdicts | Packets E/F additions reopen affected composition coordinates |
 | Escape mechanisms | reviewed through Packet D | resource-qualified native escapes, typed/direct Nix values, unsafe opaque input, raw wire, and five driver trust states | Packet E/F additions reopen the affected path universe |
 | Trust boundaries | reviewed through Packet D | exact 89+30 serialized replay sets, private stage chain, total D0 output, direct/raw rejection, six separate-path handoffs | Packet E must still walk operation-specific API, guest, restore, teardown, and evidence decoding |
 | Lifecycle semantics | partial | Packet E durable Operation/runtime identity, Sandbox/Process state models, typed operation taxonomy, and request/result/error/recovery architecture are locked; exhaustive operation contracts and transition cases remain unregistered | Inventory every legal and illegal transition, operation pair, admission rejection, idempotency/cancellation/recovery outcome, cleanup state, restore/fork/migration contract, Process-control command, and deletion proof |
@@ -214,7 +214,7 @@ For every supported frontend and native extension, walk:
 The output lists both ordinary and strongest supported construction paths for
 each invariant.
 
-The final focused validator passes 89 cases. Independent reviewers
+The final focused validator passes 90 cases. Independent reviewers
 reconstructed all totals and contracts, rejected coordinated mutations after
 neutralizing digest pins, and verified the real Nix/Rust prototype mechanisms
 and exact counters. The reviewed snapshot is bound to path
