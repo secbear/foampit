@@ -5,45 +5,42 @@ def phase_order:
     "L0", "L1", "E0", "E1", "T0"
   ];
 
-def artifact_phases:
-  ["P0", "P1", "A0", "A1", "W0", "N0", "N1"];
-
-def launch_phases:
-  ["C0", "O0", "H0", "D0", "R0", "R1"];
-
-def live_phases:
-  ["L0", "L1", "T0"];
-
-def exec_phases:
-  ["E0", "E1", "T0"];
-
-def phase_paths:
-  [
-    (artifact_phases + launch_phases + live_phases),
-    (artifact_phases + launch_phases + exec_phases),
-    (artifact_phases + launch_phases + ["T0"]),
-    (["F0"] + launch_phases + live_phases),
-    (["F0"] + launch_phases + exec_phases),
-    (["F0"] + launch_phases + ["T0"]),
-    (["F0"] + live_phases),
-    (["F0"] + exec_phases),
-    (["F0", "T0"]),
-    (["P1", "OC0"] + launch_phases + live_phases),
-    (["P1", "OC0"] + launch_phases + exec_phases),
-    (["P1", "OC0"] + launch_phases + ["T0"]),
-    (["P1", "MS0", "S0"] + launch_phases + live_phases),
-    (["P1", "MS0", "S0"] + launch_phases + exec_phases),
-    (["P1", "MS0", "S0"] + launch_phases + ["T0"]),
-    (["RW0"] + launch_phases + live_phases),
-    (["RW0"] + launch_phases + exec_phases),
-    (["RW0"] + launch_phases + ["T0"]),
-    (["S0"] + launch_phases + live_phases),
-    (["S0"] + launch_phases + exec_phases),
-    (["S0"] + launch_phases + ["T0"]),
-    (["S0"] + live_phases),
-    (["S0"] + exec_phases),
-    (["S0", "T0"])
-  ];
+# The product-phase succession graph. This is the single authority for phase
+# reachability and is duplicated verbatim in validate-composition-coverage.jq
+# and generate-composition-coverage.mjs so that no validator depends on
+# another's definition. check-model-coherence.sh compares all three copies.
+#
+# This replaced a hand-enumerated list of 24 linear phase paths, which admitted
+# 231 ordered pairs against this graph's 233 and disagreed on four:
+# P0 -> OC0, P0 -> MS0, and P0 -> S0 were wrongly rejected, and OC0 -> C0 was
+# wrongly accepted. OC0 -> C0 contradicted the locked Operator Configuration
+# branch P1 -> OC0/O0 (DESIGN.md:117): the enumeration routed ["P1","OC0"] into
+# the launch phases, which begin at C0. No registry entry used any of the four.
+def phase_edges:
+  {
+    "P0": ["P1"],
+    "P1": ["A0", "OC0", "MS0"],
+    "A0": ["A1"],
+    "A1": ["W0"],
+    "W0": ["N0"],
+    "N0": ["N1"],
+    "N1": ["C0"],
+    "F0": ["C0", "L0", "E0", "T0"],
+    "OC0": ["O0"],
+    "MS0": ["S0"],
+    "S0": ["C0", "L0", "E0", "T0"],
+    "RW0": ["C0"],
+    "C0": ["O0"],
+    "O0": ["H0"],
+    "H0": ["D0"],
+    "D0": ["R0"],
+    "R0": ["R1"],
+    "R1": ["L0", "E0", "T0"],
+    "L0": ["L1"],
+    "L1": ["T0"],
+    "E0": ["E1"],
+    "E1": ["T0"]
+  };
 
 def owners:
   [
@@ -111,15 +108,32 @@ def placeholder_strings:
 def phase_index($phase):
   phase_order | index($phase);
 
+# Visited-set-guarded transitive closure. The guard is not an optimization:
+# unguarded recursion over a graph containing any cycle exhausts memory instead
+# of reporting, which is how a cycle-detection check can become structurally
+# incapable of diagnosing the failure it names. $seen grows monotonically and is
+# bounded by the node count, so this is total on any graph, cyclic or not.
+def phase_closure($frontier; $seen):
+  if ($frontier | length) == 0
+  then $seen
+  else
+    ($frontier[0]) as $node |
+    ($frontier[1:]) as $rest |
+    if ($seen | index($node)) != null
+    then phase_closure($rest; $seen)
+    else phase_closure(($rest + (phase_edges[$node] // [])); ($seen + [$node]))
+    end
+  end;
+
+def phase_descendants($phase):
+  phase_closure((phase_edges[$phase] // []); []) | unique;
+
 def phase_reachable($from; $to):
-  any(
-    phase_paths[];
-    . as $path |
-    ($path | index($from)) as $from_index |
-    ($path | index($to)) as $to_index |
-    $from_index != null and
-    $to_index != null and
-    $from_index <= $to_index
+  (phase_order | index($from)) != null and
+  (phase_order | index($to)) != null and
+  (
+    $from == $to or
+    (phase_descendants($from) | index($to)) != null
   );
 
 def inv_error($invariant; $message):

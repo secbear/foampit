@@ -298,13 +298,13 @@ flowchart LR
     C0 --> O0["O0 Operator admission"]
     O0 --> H0["H0 Host/provider preflight"]
     H0 --> D0["D0 Driver preparation"]
-    D0 --> R0["R0 Sandbox launch"]
+    D0 --> R0["R0 Runtime launch"]
     R0 --> R1["R1 Post-create conformance"]
     R1 --> L0["L0 Live-operation validation"]
     L0 --> L1["L1 Live-operation mutation"]
     R1 --> E0["E0 Exec validation"]
     E0 --> E1["E1 Process launch"]
-    R1 --> T0["T0 Teardown/final evidence"]
+    R1 --> T0["T0 Teardown and final evidence"]
     L1 --> T0
     E1 --> T0
     F0 --> L0
@@ -335,6 +335,55 @@ invalid even though both happen after launch.
 A structural source representation may reject before the product's first-sound
 semantic phase only when its `unrepresentable` disposition explains the
 exclusion and a downstream corruption test proves defensive enforcement.
+
+### What the phase graph models
+
+The product-phase graph is a validation-order model over a **single traversal**,
+not a runtime-history model. Each node names an **information set** — the facts
+completely available at that station — and each edge names the succession by
+which one information set becomes another within one end-to-end realization of
+one product-owned request or value.
+
+Reachability is therefore a soundness relation over **decidability**, not a
+claim about what may happen next in wall-clock time. Two phases may both occur
+after launch and remain mutually unreachable (`L0 -> E0`), and one operation may
+consult two unconnected information sets in sequence without that sequence being
+an edge. A `firstSoundPhase` names the earliest phase whose information set
+suffices to decide the invariant without guessing future inputs. A
+`rejectionDeadline` names the latest phase at which refusing **the same
+traversal** is still a correct product implementation.
+
+Repetition, re-entry, and succession *between* operations are deliberately
+unrepresentable here. An operation that ends and thereby authorizes, triggers,
+or constrains another — a `StartSandbox` that launches a runtime, a system
+reconciliation that resolves an `unknown`, a later `CreateSandbox` that reuses a
+released name — **begins a new traversal with its own first-sound phase**. The
+dependency between them is recorded as a handoff record, never as a phase edge.
+Runtime history is modeled separately and on a different substrate: the
+monotonically increasing, never-reused runtime epoch over immutable Operation,
+Process, event, and tombstone records.
+
+A phase may therefore be added only when a genuinely new **information set**
+enters the product — typically a new trust boundary decoding a value no existing
+phase can describe — and never to express that an existing information set was
+reached **again**, reached **from a different caller**, or reached **later in
+time**.
+
+**`firstSoundPhase` may never name an ingress or resolution phase that the
+operation being described does not itself traverse.** This is normative, not
+stylistic. The phase pair is the filter input that mechanically selects which
+components the generated coverage asserts defensively revalidate the rule across
+every composition path. Borrowing a phase the operation does not traverse
+therefore emits a false coverage claim — silently, into the artifact the gates
+treat as reviewed coverage.
+
+The reachability relation is defined by one succession graph, duplicated
+verbatim across the registry validator, the composition-coverage validator, and
+the coverage generator so that no validator depends on another's definition.
+`check-model-coherence.sh` compares the copies. Its transitive closure is
+visited-set guarded: unguarded recursion over a cyclic graph exhausts memory
+instead of reporting, which would make cycle detection structurally incapable of
+diagnosing its own subject.
 
 ## Enforcement-Hook Rules
 

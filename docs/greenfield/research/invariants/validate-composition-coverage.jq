@@ -1176,12 +1176,31 @@ def phase_ids:
     phase_edges[][]
   ] | unique;
 
+# Visited-set-guarded transitive closure. The guard is load-bearing, not an
+# optimization. This was previously unguarded recursion, which meant the
+# acyclicity assertion below could never fire as a diagnostic: because jq's
+# `and` short-circuits, a single-copy edit to phase_edges was caught by the
+# literal comparison, while a coordinated two-copy edit passed that comparison
+# and then exhausted memory inside the acyclicity check itself (verified under
+# jq 1.8.1: a graph containing L1 -> D0 aborts with "cannot allocate memory").
+# It was a true statement structurally incapable of diagnosing its own subject.
+# $seen grows monotonically and is bounded by the node count, so the traversal
+# is total on any graph, and a node reachable from itself now appears in its own
+# descendant set — which is exactly what the acyclicity assertion tests for.
+def phase_closure($frontier; $seen):
+  if ($frontier | length) == 0
+  then $seen
+  else
+    ($frontier[0]) as $node |
+    ($frontier[1:]) as $rest |
+    if ($seen | index($node)) != null
+    then phase_closure($rest; $seen)
+    else phase_closure(($rest + (phase_edges[$node] // [])); ($seen + [$node]))
+    end
+  end;
+
 def descendants($phase):
-  [
-    phase_edges[$phase][]? as $next |
-    $next,
-    descendants($next)[]
-  ] | unique;
+  phase_closure((phase_edges[$phase] // []); []) | unique;
 
 def reachable($from; $to):
   (phase_ids | index($from)) != null and

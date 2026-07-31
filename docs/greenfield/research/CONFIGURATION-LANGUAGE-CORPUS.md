@@ -67,6 +67,8 @@ Language-internal terms such as "compile time," "runtime contract," and
 |---|---|---|
 | `P0` | Source parse | Candidate source grammar |
 | `P1` | Source semantics | Candidate static types, contracts, imports, language-level composition |
+| `OC0` | Operator Configuration validation | Complete Operator Configuration source semantics: hosts, drivers, credentials, capacity, admission policy, global ceilings, evidence sinks |
+| `MS0` | Managed-Service Definition validation | Complete Managed-Sandbox Service Definition source semantics before any reconciliation |
 | `A0` | Artifact normalization | Fully expanded profiles/defaults/imports and all Artifact-owned fields |
 | `A1` | Artifact final validation | Complete normalized Artifact plus target-capability declarations and native-extension summaries |
 | `W0` | Canonical-wire validation | Versioned, fully concrete, language-neutral Artifact value |
@@ -74,7 +76,8 @@ Language-internal terms such as "compile time," "runtime contract," and
 | `N1` | Nix build | Derivation builders execute in the Nix sandbox |
 | `F0` | Framework/CLI translation | Framework or CLI request plus adapter-owned state before it becomes a Core Sandbox API operation |
 | `S0` | Managed-service reconciliation | Declarative service state plus observed controller state before it becomes a Core Sandbox API operation |
-| `C0` | Creation resolution | Artifact manifest plus complete `CreateSandbox` input |
+| `RW0` | Serialized resolved reentry | A wholly untrusted serialized resolved-runtime envelope, before any private stage is reconstructed |
+| `C0` | Creation resolution | Artifact manifest plus the complete resolved creation input for one launch |
 | `O0` | Operator admission | Creation request plus operator policy, registered drivers/providers, capacity and placement model |
 | `H0` | Host/provider preflight | Current host/provider capabilities, paths, quota, credentials, KVM/device state |
 | `D0` | Driver preparation | Resolved target-specific runtime value before external mutation/launch |
@@ -85,6 +88,12 @@ Language-internal terms such as "compile time," "runtime contract," and
 | `E0` | Exec validation | Existing Sandbox state and bounds plus one complete `Exec` request |
 | `E1` | Process launch | A validated Process starts inside the existing Sandbox |
 | `T0` | Teardown and final evidence | Termination, cleanup, revocation, output collection, and final evidence |
+
+The `C0` creation input may be a `CreateSandbox` request, a decoded serialized
+resolved-reentry envelope arriving from `RW0`, or the durably recorded creation
+selections replayed by a `StartSandbox` or same-Sandbox `RestoreSandbox`. `C0`
+is the phase at which one launch's resolved input is complete; it does not
+presuppose a `CreateSandbox` request.
 
 These phases form a graph. `F0` and `S0` may feed create, live, Exec, or
 teardown operations. Live and Exec are repeatable sibling branches after `R1`;
