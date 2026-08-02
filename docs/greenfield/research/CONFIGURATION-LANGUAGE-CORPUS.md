@@ -3300,6 +3300,529 @@ boundary.
 - Minimum witness: A SignalProcess Operation commits `succeeded` after the native call times out with no returned driver acceptance evidence.
 - Required diagnostic: identifies `SIG-007`, names `operation.outcome`, `operation.target.processId`, `sandbox.status.runtime.epoch`, and states the remediation without disclosing secret values.
 
+### Packet E adapter, Session, and desired-state boundary
+
+#### `ADP-001` Framework Session used as a Core identity or authority coordinate
+
+- Owner: `framework`
+- First-sound phase: `F0`
+- Rejection deadline: `F0`
+- Invariant: Adapter Session identity stays outside the Core resource model and never appears in a Core request as a target, authority, precondition, or idempotency coordinate.
+- Minimum witness: Send a Core request whose target coordinate is the adapter's Session identifier.
+- Required diagnostic: identifies `ADP-001`, names `framework.session`, `framework.sandboxClient`, and states the remediation without disclosing secret values.
+
+#### `ADP-002` Framework Session resume silently retargets an old runtime or Process handle
+
+- Owner: `framework`
+- First-sound phase: `F0`
+- Rejection deadline: `L0`
+- Invariant: A framework adapter rebinds a Session to a different runtime only explicitly, after determining which of same-epoch attachment, proven same-epoch suspended Process continuity, or replacement from retained state holds, and maps those three results respectively to reattachment, ResumeSandbox, and CreateSandbox or RestoreSandbox against a new epoch.
+- Minimum witness: Resume a Session and reuse its stored Process handle against a Sandbox that has since been restored under a new epoch.
+- Required diagnostic: identifies `ADP-002`, names `framework.session`, `live.operation.expectedRuntimeEpoch`, and states the remediation without disclosing secret values.
+
+#### `ADP-003` Adapter phase presented as authoritative Core state
+
+- Owner: `framework`
+- First-sound phase: `F0`
+- Rejection deadline: `F0`
+- Invariant: A framework adapter presents Sandbox and Process lifecycle state only as the Core's own closed status values read from Core responses, never as an adapter-derived or provider-derived phase.
+- Minimum witness: Display an adapter-derived `warming` phase as the Sandbox's lifecycle state.
+- Required diagnostic: identifies `ADP-003`, names `framework.status`, `sandbox.status.phase`, and states the remediation without disclosing secret values.
+
+#### `ADP-004` Adapter mints or rebinds an idempotency coordinate
+
+- Owner: `framework`
+- First-sound phase: `F0`
+- Rejection deadline: `F0`
+- Invariant: A framework adapter recovers an accepted request only by resending the caller's exact canonical request under its original idempotency key, and never substitutes a new key, a new canonical request, or a reused key for a canonically different intent.
+- Minimum witness: Recover a timed-out creation by resending it under a newly minted idempotency key.
+- Required diagnostic: identifies `ADP-004`, names `framework.idempotencyKey`, `framework.sandboxClient`, and states the remediation without disclosing secret values.
+
+#### `ADP-005` Adapter advertises its own mutation serialization guarantee
+
+- Owner: `framework`
+- First-sound phase: `F0`
+- Rejection deadline: `F0`
+- Invariant: A framework adapter advertises no ordering, exclusion, or serialization guarantee for Core mutations beyond the Core's published operation-pair compatibility and precondition contract.
+- Minimum witness: Advertise that the adapter serializes all mutations on a Sandbox through its own client-side lock.
+- Required diagnostic: identifies `ADP-005`, names `framework.tools`, `framework.sandboxClient`, and states the remediation without disclosing secret values.
+
+#### `ADP-006` Adapter adds a public error variant
+
+- Owner: `framework`
+- First-sound phase: `F0`
+- Rejection deadline: `F0`
+- Invariant: An adapter's caller-visible failure type is exactly the Core's closed public error, known-failure, and ambiguity union projected into the host language, with no added, merged, renamed, or provider-defined semantic variant.
+- Minimum witness: Hand-write an `AdapterBusy` variant into the adapter's public failure type.
+- Required diagnostic: identifies `ADP-006`, names `framework.errors`, and states the remediation without disclosing secret values.
+
+#### `ADP-007` Adapter reinterprets a transport timeout as a Core outcome
+
+- Owner: `framework`
+- First-sound phase: `F0`
+- Rejection deadline: `F0`
+- Invariant: An adapter surfaces a transport timeout, transport cancellation, or connection loss as the transport condition it is, never as a Core Operation failure, a proven Core cancellation, or a Process outcome.
+- Minimum witness: Report a gRPC `DEADLINE_EXCEEDED` on a Stop call as a failed Core Operation.
+- Required diagnostic: identifies `ADP-007`, names `framework.errors`, `framework.transport`, and states the remediation without disclosing secret values.
+
+#### `ADP-008` Adapter collapses Process exit into infrastructure failure
+
+- Owner: `framework`
+- First-sound phase: `F0`
+- Rejection deadline: `F0`
+- Invariant: An adapter reports a Core Process termination arm exactly as the Core published it and never collapses a nonzero exit, signal termination, or deadline outcome into an adapter or infrastructure error.
+- Minimum witness: Raise an adapter infrastructure exception because the executed command exited non-zero.
+- Required diagnostic: identifies `ADP-008`, names `framework.errors`, `process.termination`, and states the remediation without disclosing secret values.
+
+#### `ADP-009` Adapter auto-replays an ambiguous effect
+
+- Owner: `framework`
+- First-sound phase: `F0`
+- Rejection deadline: `F0`
+- Invariant: An adapter never converts a Core ambiguity outcome into a replacement effect, and resolves ambiguity only by surfacing the ambiguity arm to the caller, by Core observation, or by Core idempotent recovery of the same coordinate.
+- Minimum witness: Automatically re-issue an Exec under a new idempotency key after the Core returned an ambiguity arm.
+- Required diagnostic: identifies `ADP-009`, names `framework.retryPolicy`, `operation.outcome`, and states the remediation without disclosing secret values.
+
+#### `ADP-010` Adapter asserts provider fencing or cleanup proof
+
+- Owner: `framework`
+- First-sound phase: `F0`
+- Rejection deadline: `F0`
+- Invariant: An adapter reports fencing, containment absence, and cleanup completion only as the proof the Core published, and never derives, infers, or asserts such proof from provider or adapter observation.
+- Minimum witness: Report cleanup complete because the adapter's provider poll no longer lists the instance.
+- Required diagnostic: identifies `ADP-010`, names `framework.cleanup`, `operation.result.proof`, and states the remediation without disclosing secret values.
+
+#### `ADP-011` Adapter composite presented as one Core Operation
+
+- Owner: `framework`
+- First-sound phase: `F0`
+- Rejection deadline: `F0`
+- Invariant: An adapter convenience composite such as attach or Stop-then-Delete is expressed as the exact declared sequence of named Core operations, surfaces every constituent Operation handle to the caller, and never presents itself as one Core Operation or one Core outcome.
+- Minimum witness: Return a single synthesized Operation handle for an adapter Stop-then-Delete helper.
+- Required diagnostic: identifies `ADP-011`, names `framework.composites`, `operation.id`, and states the remediation without disclosing secret values.
+
+#### `ADP-012` Desired-state reconciler reaches the Core without etag and epoch preconditions or hides its system-originated Operations
+
+- Owner: `service`
+- First-sound phase: `S0`
+- Rejection deadline: `L0`
+- Invariant: A managed desired-state reconciler reaches the Core only by issuing named Core operations under etag and runtime-epoch preconditions, and exposes its system-originated Operations for observation.
+- Minimum witness: Have the reconciler issue a StopSandbox with no etag and no runtime-epoch precondition.
+- Required diagnostic: identifies `ADP-012`, names `service.reconciler`, `operation.target.expectedEtag`, `operation.target.expectedRuntimeEpoch`, and states the remediation without disclosing secret values.
+
+#### `ADP-013` Managed desired-state revision or restart policy carried in a Core request field
+
+- Owner: `service`
+- First-sound phase: `S0`
+- Rejection deadline: `S0`
+- Invariant: A managed layer's desired-state revision and its restart/recreate policy live in the managed layer's own records; no Core request type carries either, so the Core never becomes a perpetual desired-state orchestrator.
+- Minimum witness: Send a CreateSandbox request carrying a `desiredStateRevision` field.
+- Required diagnostic: identifies `ADP-013`, names `service.desiredStateRevision`, `service.restartPolicy`, `request.method`, and states the remediation without disclosing secret values.
+
+#### `ADP-014` Reconciler rewrites a predecessor Operation's terminal result
+
+- Owner: `service`
+- First-sound phase: `S0`
+- Rejection deadline: `L0`
+- Invariant: A reconciler that must correct a completed Core action appends a new linked successor Operation and never rewrites, reopens, or reinterprets a predecessor Operation's committed terminal result.
+- Minimum witness: Rewrite a completed Stop Operation's terminal result to `failed` so the reconciler can retry it in place.
+- Required diagnostic: identifies `ADP-014`, names `service.reconciler`, `operation.result`, `operation.linkedOperationId`, and states the remediation without disclosing secret values.
+
+### Packet E public error, recovery, and transport projection
+
+#### `ERR-001` Creation rejection outside the sealed error registry
+
+- Owner: `core`
+- First-sound phase: `C0`
+- Rejection deadline: `C0`
+- Invariant: Every synchronous rejection of a creation request is exactly one variant of the sealed public `RequestError` or `RecoveryError` registry admitted by that method's generated subset, with no catch-all variant, open string reason, arbitrary metadata reason, or provider-defined code.
+- Minimum witness: Return a creation rejection whose variant is a catch-all carrying a free-text provider reason string.
+- Required diagnostic: identifies `ERR-001`, names `requestError.variant`, `operationContract.allowedRequestErrors`, `operationContract.allowedRecoveryErrors`, and states the remediation without disclosing secret values.
+
+#### `ERR-002` Live rejection outside the sealed error registry
+
+- Owner: `core`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: Every synchronous rejection of a live Sandbox, Snapshot, or Operation request is exactly one variant of the sealed public `RequestError` or `RecoveryError` registry admitted by that method's generated subset, with no catch-all variant, open string reason, arbitrary metadata reason, or provider-defined code.
+- Minimum witness: Emit a live rejection whose variant is registered for a different method and absent from this method's generated subset.
+- Required diagnostic: identifies `ERR-002`, names `requestError.variant`, `operationContract.allowedRequestErrors`, `operationContract.allowedRecoveryErrors`, and states the remediation without disclosing secret values.
+
+#### `ERR-003` Exec or Process-control rejection outside the sealed error registry
+
+- Owner: `core`
+- First-sound phase: `E0`
+- Rejection deadline: `E0`
+- Invariant: Every synchronous rejection of an Exec or sequenced Process-control request is exactly one variant of the sealed public `RequestError` or `RecoveryError` registry admitted by that method's generated subset, with no catch-all variant, open string reason, arbitrary metadata reason, or provider-defined code.
+- Minimum witness: Reject a Process-control request with an Exec-specific open reason string outside the sealed registry.
+- Required diagnostic: identifies `ERR-003`, names `requestError.variant`, `operationContract.allowedRequestErrors`, `operationContract.allowedProcessControlOutcomes`, and states the remediation without disclosing secret values.
+
+#### `ERR-004` Creation rejection payload outside its closed schema
+
+- Owner: `core`
+- First-sound phase: `C0`
+- Rejection deadline: `C0`
+- Invariant: Every creation rejection payload is exactly the emitted variant's closed schema and contains no stack trace, secret or credential, host path, raw provider payload, unbounded native metadata, protected resource existence, unredacted command environment, or arbitrary detail map.
+- Minimum witness: Return a creation rejection whose detail map echoes the host backing path of the failed binding.
+- Required diagnostic: identifies `ERR-004`, names `requestError.details`, `requestError.message`, `operationContract.allowedRequestErrors`, and states the remediation without disclosing secret values.
+
+#### `ERR-005` Live rejection payload outside its closed schema
+
+- Owner: `core`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: Every live-operation rejection payload is exactly the emitted variant's closed schema and contains no stack trace, secret or credential, host path, raw provider payload, unbounded native metadata, protected resource existence, unredacted command environment, or arbitrary detail map.
+- Minimum witness: Return a live rejection whose details field carries the raw provider error document for the failed operation.
+- Required diagnostic: identifies `ERR-005`, names `requestError.details`, `requestError.details.safeTargetRef`, `requestError.message`, and states the remediation without disclosing secret values.
+
+#### `ERR-006` Exec rejection payload outside its closed schema
+
+- Owner: `core`
+- First-sound phase: `E0`
+- Rejection deadline: `E0`
+- Invariant: Every Exec or Process-control rejection payload is exactly the emitted variant's closed schema and contains no stack trace, secret or credential, host path, raw provider payload, unbounded native metadata, protected resource existence, unredacted command environment, or arbitrary detail map.
+- Minimum witness: Return an Exec rejection whose detail map echoes the submitted Process environment.
+- Required diagnostic: identifies `ERR-006`, names `requestError.details`, `requestError.details.limit`, `process.request.env`, and states the remediation without disclosing secret values.
+
+#### `ERR-007` Creation validation or existence disclosure before authorization
+
+- Owner: `core`
+- First-sound phase: `C0`
+- Rejection deadline: `C0`
+- Invariant: A creation request performs only the parsing needed to route and authenticate before authorization at a disclosure-safe scope, and an unauthorized request naming an existing creation target and an authorized request naming an absent one produce observationally equivalent public responses.
+- Minimum witness: Return a distinct `AlreadyExists` rejection to an unauthorized caller who names an existing creation target.
+- Required diagnostic: identifies `ERR-007`, names `operationContract.orderedAdmissionChecks`, `requestError.variant`, `requestError.details.safeName`, and states the remediation without disclosing secret values.
+
+#### `ERR-008` Live validation or existence disclosure before authorization
+
+- Owner: `core`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: A live request performs only the parsing needed to route and authenticate before authorization at a disclosure-safe operation and parent scope, and an unauthorized request against an existing target and an authorized request against an absent target produce observationally equivalent public responses.
+- Minimum witness: Validate a live request body and return a field-level error before authorization runs, revealing that the named Sandbox exists.
+- Required diagnostic: identifies `ERR-008`, names `operationContract.orderedAdmissionChecks`, `requestError.variant`, `requestError.details.safeTargetRef`, and states the remediation without disclosing secret values.
+
+#### `ERR-009` Exec validation or existence disclosure before authorization
+
+- Owner: `core`
+- First-sound phase: `E0`
+- Rejection deadline: `E0`
+- Invariant: An Exec or Process-control request performs only the parsing needed to route and authenticate before authorization at a disclosure-safe operation and parent scope, and an unauthorized request against an existing Sandbox or Process and an authorized request against an absent one produce observationally equivalent public responses.
+- Minimum witness: Return `ProcessNotFound` versus `PermissionDenied` distinguishably to an unauthorized caller probing Process identities.
+- Required diagnostic: identifies `ERR-009`, names `operationContract.orderedAdmissionChecks`, `requestError.variant`, `process.id`, and states the remediation without disclosing secret values.
+
+#### `ERR-010` Creation recovery expressed outside the closed recovery contract
+
+- Owner: `core`
+- First-sound phase: `C0`
+- Rejection deadline: `C0`
+- Invariant: Every creation rejection carries exactly one closed `CallerRecovery` consistent with its variant's semantic domain, and no boolean retryability flag substitutes for it and no `after` or `Retry-After` hint independently authorizes replay of an effect.
+- Minimum witness: Return a creation rejection carrying a `retryable: true` flag instead of its registered `CallerRecovery`.
+- Required diagnostic: identifies `ERR-010`, names `requestError.recovery`, `requestError.variant`, `operationContract.callerRecoveryByOutcome`, and states the remediation without disclosing secret values.
+
+#### `ERR-011` Live recovery expressed outside the closed recovery contract
+
+- Owner: `core`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: Every live-operation rejection carries exactly one closed `CallerRecovery` consistent with its variant's semantic domain, and no boolean retryability flag substitutes for it and no `after` or `Retry-After` hint independently authorizes replay of an effect.
+- Minimum witness: Return a `RecoveryError` for an already-accepted live operation whose recovery instructs the caller to resubmit under a new idempotency key.
+- Required diagnostic: identifies `ERR-011`, names `requestError.recovery`, `recoveryError.priorAcceptance`, `requestError.variant`, and states the remediation without disclosing secret values.
+
+#### `ERR-012` Exec recovery expressed outside the closed recovery contract
+
+- Owner: `core`
+- First-sound phase: `E0`
+- Rejection deadline: `E0`
+- Invariant: Every Exec or Process-control rejection carries exactly one closed `CallerRecovery` consistent with its variant's semantic domain, and no boolean retryability flag substitutes for it and no `after` or `Retry-After` hint independently authorizes replay of a command or a replacement execution.
+- Minimum witness: Return an expired Process-control coordinate with a recovery advising a replacement execution.
+- Required diagnostic: identifies `ERR-012`, names `requestError.recovery`, `recoveryError.priorAcceptance`, `processControlReceipt.coordinate`, and states the remediation without disclosing secret values.
+
+#### `ERR-013` Transport status treated as creation semantics
+
+- Owner: `core`
+- First-sound phase: `C0`
+- Rejection deadline: `C0`
+- Invariant: Canonical HTTP and gRPC status for a creation call is generated from the Core-authored variant and never the reverse, so a transport-local failure never becomes a Core rejection or Core outcome and an accepted result is delivered embedded in its durable handle under a successful transport status even when its terminal outcome is `failed`, `cancelled`, or `unknown`.
+- Minimum witness: Convert a `DEADLINE_EXCEEDED` transport status on a creation call into a Core creation rejection.
+- Required diagnostic: identifies `ERR-013`, names `operationContract.transportProjection`, `requestError.variant`, `operation.outcome`, and states the remediation without disclosing secret values.
+
+#### `ERR-014` Transport status treated as live-operation semantics
+
+- Owner: `core`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: Canonical HTTP and gRPC status for a live call is generated from the Core-authored variant and never the reverse, so transport `UNKNOWN`, `CANCELLED`, `DEADLINE_EXCEEDED`, or `UNAVAILABLE` never becomes the corresponding Operation outcome and retrieving an accepted handle whose terminal outcome is `failed`, `cancelled`, or `unknown` is a successful observation.
+- Minimum witness: Record transport `UNAVAILABLE` on a live call as the Operation's `unknown` terminal outcome.
+- Required diagnostic: identifies `ERR-014`, names `operationContract.transportProjection`, `operation.outcome`, `requestError.variant`, and states the remediation without disclosing secret values.
+
+#### `ERR-015` Transport status treated as Exec semantics
+
+- Owner: `core`
+- First-sound phase: `E0`
+- Rejection deadline: `E0`
+- Invariant: Canonical HTTP and gRPC status for an Exec or Process-control call is generated from the Core-authored variant and never the reverse, so a transport failure never becomes a Core rejection, a Process termination, or a control-command outcome, and an accepted Process or receipt is returned under a successful transport status regardless of its embedded terminal outcome.
+- Minimum witness: Report a client-side connection close during Exec as a Process termination.
+- Required diagnostic: identifies `ERR-015`, names `operationContract.transportProjection`, `process.termination`, `processControlReceipt.state`, and states the remediation without disclosing secret values.
+
+#### `ERR-016` Unrecognized native code extending the public union
+
+- Owner: `runtime`
+- First-sound phase: `D0`
+- Rejection deadline: `D0`
+- Invariant: An unrecognized native provider code, status, or future provider state is retained as protected evidence and mapped conservatively onto an already-registered public variant, and never adds, widens, parameterizes, or passes through a public variant at runtime.
+- Minimum witness: Pass an unrecognized provider status code through as a new public error variant.
+- Required diagnostic: identifies `ERR-016`, names `providerEvidence.nativeCode`, `providerEvidence.decodingAdapterVersion`, `requestError.variant`, and states the remediation without disclosing secret values.
+
+#### `ERR-017` Raw provider evidence escaping redaction or size bounds
+
+- Owner: `runtime`
+- First-sound phase: `D0`
+- Rejection deadline: `D0`
+- Invariant: Decoded provider and driver evidence reaches a public response only as the emitted variant's declared payload plus a bounded opaque evidence identifier, and raw native payloads, unbounded metadata, and unredacted values remain confined to the protected evidence record.
+- Minimum witness: Attach the full unredacted provider stderr to the public rejection details.
+- Required diagnostic: identifies `ERR-017`, names `providerEvidence.payload`, `providerEvidence.evidenceId`, `providerEvidence.redaction`, and states the remediation without disclosing secret values.
+
+### Packet E restore, Fork, and derivation semantics
+
+#### `FRK-001` Restore accepted against a non-stopped Sandbox
+
+- Owner: `live`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: Same-Sandbox RestoreSandbox is admitted only against a stopped Sandbox and only with a Snapshot proven complete and compatible with that Sandbox's pinned Artifact, member, and runtime-profile identity.
+- Minimum witness: Issue same-Sandbox RestoreSandbox against a Sandbox whose runtime is still running.
+- Required diagnostic: identifies `FRK-001`, names `live.restore`, `sandbox.status.runtime.state`, `snapshot.manifest`, and states the remediation without disclosing secret values.
+
+#### `FRK-002` Restored or forked runtime admits execution without a successor Process contract
+
+- Owner: `core`
+- First-sound phase: `R1`
+- Rejection deadline: `R1`
+- Invariant: A restored, restore-as-created, or forked runtime admits execution only through a newly allocated durable Core Process carrying its own identity, provenance, deadline, termination-request handling, containment, stdin ownership, durable output cursors, and terminal-evidence contract.
+- Minimum witness: Restore a runtime whose image resurrects a running command and accept work against it with no Core Process record allocated.
+- Required diagnostic: identifies `FRK-002`, names `sandbox.status.runtime.epoch`, `process.id`, `process.sandboxRuntimeRef`, and states the remediation without disclosing secret values.
+
+#### `FRK-003` Restore launch reactivates the source runtime epoch
+
+- Owner: `core`
+- First-sound phase: `R0`
+- Rejection deadline: `R1`
+- Invariant: A launch against an existing Sandbox -- StartSandbox, same-Sandbox Restore, or restore-as-create -- acts only under the newly allocated runtime epoch and never grants, restores, or re-enables mutation authority to any epoch that preceded it.
+- Minimum witness: Publish a restored runtime that continues to accept mutations under the epoch it held before it was stopped.
+- Required diagnostic: identifies `FRK-003`, names `operation.target.epoch`, `sandbox.status.runtime.epoch`, and states the remediation without disclosing secret values.
+
+#### `FRK-004` Fork child shares source identity, authority, or an unsealed source
+
+- Owner: `core`
+- First-sound phase: `L0`
+- Rejection deadline: `L1`
+- Invariant: Every accepted Fork durably commits, before any capture or child-creation effect, a sealed target naming the exact immutable source Sandbox ID and source runtime epoch together with a newly preallocated child Sandbox ID; the child is a distinct Sandbox whose epoch line begins at 1 under its own mutation authority, sharing no Sandbox identity, Core Process identity, or authority coordinate with its source, and its complete Snapshot-equivalent provenance and ancestry are recorded in that same commit.
+- Minimum witness: Accept a Fork whose child reuses the source Sandbox ID and continues the source's epoch line.
+- Required diagnostic: identifies `FRK-004`, names `operation.target.source.sandboxId`, `operation.target.source.runtimeEpoch`, `operation.target.childSandboxId`, and states the remediation without disclosing secret values.
+
+#### `FRK-005` Migration retains an epoch without an atomic fenced handoff
+
+- Owner: `core`
+- First-sound phase: `L1`
+- Rejection deadline: `L1`
+- Invariant: A migration retains the source runtime epoch only when Core holds proof of every locked handoff requirement and commits a definite terminal outcome for the migration Operation; every other relocation allocates a new epoch.
+- Minimum witness: Commit a migration as succeeded with the epoch retained while the source-fencing proof is absent.
+- Required diagnostic: identifies `FRK-005`, names `operation.target.epoch`, `sandbox.status.runtime`, and states the remediation without disclosing secret values.
+
+#### `FRK-006` Driver reports a migration handoff without its target-side proofs
+
+- Owner: `runtime`
+- First-sound phase: `L1`
+- Rejection deadline: `L1`
+- Invariant: A driver executing a migration handoff returns evidence of compatible source and destination, exclusive target-enforced authority transfer, a fenced or terminated source, uninterrupted Process authority, routing handoff, and explicit disposition of open attachments and external connections, and refuses the transfer when it cannot produce all six.
+- Minimum witness: Return a migration handoff success that omits the routing-handoff proof.
+- Required diagnostic: identifies `FRK-006`, names `driver.migrationEvidence`, `sandbox.status.runtime.epoch`, `operation.target.epoch`, and states the remediation without disclosing secret values.
+
+### Packet E retention, deletion independence, and tombstones
+
+#### `RET-001` Sandbox deletion erasing independently retained records early
+
+- Owner: `core`
+- First-sound phase: `T0`
+- Rejection deadline: `T0`
+- Invariant: A successful Sandbox deletion removes only the live Sandbox aggregate and the live resources covered by that Operation, and every independently retained Operation, Process, output, event, evidence, and Snapshot record remains readable until its own retention contract expires.
+- Minimum witness: Delete a Sandbox and observe that its Process output records become unreadable before their own retention contract expires.
+- Required diagnostic: identifies `RET-001`, names `operation.retentionContract`, `sandbox.deletionScope`, `operation.id`, and states the remediation without disclosing secret values.
+
+#### `RET-002` Delete admitted while a dependent Snapshot is unresolved
+
+- Owner: `live`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: DeleteSandbox is admitted only when every dependent Snapshot has been deleted, exported or mirrored into Core-controlled retention, or otherwise proven independent of the Sandbox aggregate.
+- Minimum witness: Issue DeleteSandbox while one Snapshot of that Sandbox is still stored inside the Sandbox aggregate and holds no independent retention.
+- Required diagnostic: identifies `RET-002`, names `sandbox.dependentSnapshots`, `snapshot.references`, `snapshot.retentionHolds`, and states the remediation without disclosing secret values.
+
+#### `RET-003` Expiration schedule without an explicit instant and action
+
+- Owner: `live`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: A caller-managed Sandbox expiration is either explicit `none` or an exact absolute instant paired with an explicit `stop` or `delete` action, and neither member has a provider-, target-, or service-selected default.
+- Minimum witness: Submit an expiration carrying an absolute instant with no action member and let the target's default action be applied.
+- Required diagnostic: identifies `RET-003`, names `sandbox.expiration`, `sandbox.expiration.at`, `sandbox.expiration.action`, and states the remediation without disclosing secret values.
+
+#### `RET-004` Expiration schedule conflated with a generic TTL
+
+- Owner: `live`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: The caller-managed expiration schedule expresses only an absolute Sandbox expiry instant and its action, and never sets, reads, or stands in for maximum age from creation, idle duration, maximum runtime duration, Snapshot retention, or Operation, Process, event, and output retention.
+- Minimum witness: Set the Sandbox expiration and have the same call also shorten Operation record retention.
+- Required diagnostic: identifies `RET-004`, names `sandbox.expiration.at`, `sandbox.expiration.action`, `sandbox.retentionContract`, and states the remediation without disclosing secret values.
+
+#### `RET-005` Bare duration standing for distinct Artifact time contracts
+
+- Owner: `artifact`
+- First-sound phase: `A0`
+- Rejection deadline: `A1`
+- Invariant: Every Artifact-declared time bound names its exact clock, subject, and enforcement contract, and one bare duration never stands for maximum lifetime, idle timeout, maximum age from creation, maximum runtime duration, or record retention.
+- Minimum witness: Declare one `timeout` duration and rely on it as both the idle timeout and the maximum Sandbox lifetime.
+- Required diagnostic: identifies `RET-005`, names `artifact.lifetime`, `artifact.lifetime.maximum`, `artifact.idle`, and states the remediation without disclosing secret values.
+
+#### `RET-006` Caller deletion of a retained Operation record
+
+- Owner: `live`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: Operation retention is service-enforced and independent of target deletion, and the closed public method surface exposes no caller-facing Operation deletion, purge, or retention-override request.
+- Minimum witness: Call a caller-facing `DeleteOperation` or retention-override method against a retained Operation record.
+- Required diagnostic: identifies `RET-006`, names `operation.retentionContract`, `operation.id`, `requestError.details.method`, and states the remediation without disclosing secret values.
+
+#### `RET-007` Proven deletion without a durable identity tombstone
+
+- Owner: `core`
+- First-sound phase: `T0`
+- Rejection deadline: `T0`
+- Invariant: A Delete Operation reports success only after durably committing a retained tombstone that preserves the Sandbox identity and its audit coordinates so that the identity can never be reused.
+- Minimum witness: Report DeleteSandbox success with the Sandbox identity record removed and no tombstone committed.
+- Required diagnostic: identifies `RET-007`, names `sandbox.tombstone`, `sandbox.id`, `operation.outcome`, and states the remediation without disclosing secret values.
+
+#### `RET-008` Expiry creates a redundant Stop against a proven stopped Sandbox
+
+- Owner: `live`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: A durable expiration trigger creates a system-originated `StopSandbox` Operation only when an extant runtime remains, and creates none when the Sandbox already carries a current durable stopped proof.
+- Minimum witness: Let an expiration trigger create a StopSandbox Operation against a Sandbox that already carries a current durable stopped proof.
+- Required diagnostic: identifies `RET-008`, names `sandbox.expiration.action`, `sandbox.status.runtime.state`, `operation.origin`, and states the remediation without disclosing secret values.
+
+#### `RET-009` Provider-native TTL, auto-stop, or auto-delete left enabled
+
+- Owner: `runtime`
+- First-sound phase: `D0`
+- Rejection deadline: `D0`
+- Invariant: Generated target configuration disables every provider-native TTL, idle-sleep, auto-stop, and auto-delete mechanism, or fences it behind the Core durable expiry sequence.
+- Minimum witness: Emit a generated microVM configuration that leaves the provider's idle auto-stop timer at its default.
+- Required diagnostic: identifies `RET-009`, names `driver.generatedConfiguration.expiry`, `driver.preparedLaunch`, `sandbox.expiration`, and states the remediation without disclosing secret values.
+
+#### `RET-010` Snapshot deleted while an exact reference or retention hold protects it
+
+- Owner: `live`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: `DeleteSnapshot` is admitted only when no exact reference and no retention hold protects the Snapshot, and the refusal names the protecting references.
+- Minimum witness: Issue DeleteSnapshot against a Snapshot that a restore-as-create Sandbox still references exactly.
+- Required diagnostic: identifies `RET-010`, names `live.deleteSnapshot`, `snapshot.references`, `snapshot.retentionHold`, and states the remediation without disclosing secret values.
+
+### Packet E Snapshot resource contract and class integrity
+
+#### `SOP-001` Snapshot identity reused after Snapshot deletion
+
+- Owner: `core`
+- First-sound phase: `L0`
+- Rejection deadline: `L1`
+- Invariant: Every Snapshot ID identifies exactly one retained Snapshot resource and is never allocated again, including after that Snapshot is deleted.
+- Minimum witness: Delete a Snapshot and let the next capture commit the same Snapshot ID.
+- Required diagnostic: identifies `SOP-001`, names `snapshot.id`, `operation.target.snapshotId`, and states the remediation without disclosing secret values.
+
+#### `SOP-002` Snapshot class or source disposition is omitted or provider-selected
+
+- Owner: `live`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: Every snapshot capture request carries one exact resolved Snapshot class identity together with its complete resolved class definition and one explicit source-after-capture disposition of runtimeStatePreserved or stopped.
+- Minimum witness: Issue CreateSnapshot with no Snapshot class member and let the provider pick a class.
+- Required diagnostic: identifies `SOP-002`, names `live.snapshot.class`, `live.snapshot.sourceAfterCapture`, and states the remediation without disclosing secret values.
+
+#### `SOP-003` Filesystem Snapshot class relied on for runtime continuity
+
+- Owner: `live`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: A capture or restore request derives no memory, Process, open-descriptor, clock, network-connection, or device continuity from a Snapshot class whose kind is filesystem.
+- Minimum witness: Request restore with memory and open-descriptor continuity from a Snapshot whose resolved class kind is filesystem.
+- Required diagnostic: identifies `SOP-003`, names `live.snapshot.class.kind`, `live.snapshot.class.componentSet`, and states the remediation without disclosing secret values.
+
+#### `SOP-004` Runtime Snapshot succeeds with incomplete required components
+
+- Owner: `core`
+- First-sound phase: `L1`
+- Rejection deadline: `L1`
+- Invariant: A capture using a runtime Snapshot class terminalizes as succeeded only when every component its class marks required is durable and its compatibility metadata is committed.
+- Minimum witness: Terminalize a runtime-class capture as succeeded with the memory component missing from the Snapshot manifest.
+- Required diagnostic: identifies `SOP-004`, names `operation.result.snapshotId`, `snapshot.manifest.componentSet`, and states the remediation without disclosing secret values.
+
+#### `SOP-005` Capture accepted while a Core Process is nonterminal
+
+- Owner: `live`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: Every v1 snapshot capture and every Fork is admitted only while every Core Process bound to the source runtime epoch is terminal, because v1 Snapshot classes support only coreProcessHandling = rejectNonterminal.
+- Minimum witness: Request CreateSnapshot while one Core Process in the source epoch is still running.
+- Required diagnostic: identifies `SOP-005`, names `live.snapshot.class.coreProcessHandling`, `sandbox.processes`, and states the remediation without disclosing secret values.
+
+#### `SOP-006` Preserved source changes runtime state or epoch across capture
+
+- Owner: `core`
+- First-sound phase: `L1`
+- Rejection deadline: `L1`
+- Invariant: A capture declaring sourceAfterCapture = runtimeStatePreserved, including every Fork, terminalizes as succeeded only when the source Sandbox finishes in its original runtime state under its original runtime epoch, with any temporary quiescence and authority fully restored and attachment or external-connection disruption recorded separately.
+- Minimum witness: Publish a `runtimeStatePreserved` capture as succeeded after the source came back under a newly allocated runtime epoch.
+- Required diagnostic: identifies `SOP-006`, names `operation.result.sourceAfterCapture`, `sandbox.status.runtime.epoch`, and states the remediation without disclosing secret values.
+
+#### `SOP-007` Snapshot omits or overrides its pinned Artifact identity
+
+- Owner: `live`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: Every Snapshot manifest commits the exact source Artifact Set member, runtime-profile identity, and relevant immutable manifest digests resolved for the source runtime, and the capture request never supplies, substitutes, or overrides them.
+- Minimum witness: Submit a CreateSnapshot request that names an Artifact Set member other than the one the source runtime resolved.
+- Required diagnostic: identifies `SOP-007`, names `snapshot.manifest.artifactIdentity`, `snapshot.manifest.runtimeProfile`, and states the remediation without disclosing secret values.
+
+#### `SOP-008` `sourceAfterCapture = stopped` published without the full Stop postcondition
+
+- Owner: `core`
+- First-sound phase: `L1`
+- Rejection deadline: `L1`
+- Invariant: A capture declaring `sourceAfterCapture = stopped` publishes that disposition only after the full Stop postcondition holds for the source: every Process terminal, containment absence proven, and the prior epoch unable to act.
+- Minimum witness: Publish `sourceAfterCapture = stopped` while the source's containment-absence proof is still outstanding.
+- Required diagnostic: identifies `SOP-008`, names `snapshot.sourceAfterCapture`, `sandbox.status.runtime.state`, `driver.containmentProof`, and states the remediation without disclosing secret values.
+
+#### `SOP-009` Snapshot class identity disagrees with its resolved kind, components, or treatments
+
+- Owner: `live`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: A Snapshot's resolved class identity agrees with its declared kind, captured component set, external-storage state, secret treatment, compatibility envelope, quiescence state, device state, portability, and Process handling; any disagreement fails capture admission.
+- Minimum witness: Submit a capture whose class identity is declared `runtime` while its resolved component set contains only filesystem components.
+- Required diagnostic: identifies `SOP-009`, names `snapshot.class`, `snapshot.components`, `snapshot.secretTreatment`, and states the remediation without disclosing secret values.
+
+#### `SOP-010` Driver reports Snapshot capture success without per-component durability evidence
+
+- Owner: `runtime`
+- First-sound phase: `L1`
+- Rejection deadline: `L1`
+- Invariant: A driver reports a runtime Snapshot capture successful only after returning per-component durability and compatibility-metadata evidence for every component the resolved class marks required, and otherwise reports failure naming the exact missing component.
+- Minimum witness: Report a runtime capture successful while returning no durability evidence for the memory component.
+- Required diagnostic: identifies `SOP-010`, names `driver.snapshotComponentEvidence`, `snapshot.components`, `snapshot.class`, and states the remediation without disclosing secret values.
+
 ## Valid Cases
 
 Invalid-state rejection is insufficient if a language makes necessary
@@ -4642,6 +5165,348 @@ same canonical semantic value.
 - The exact target is selected and recorded on the Operation.
 - The driver returns acceptance evidence for the target-specific dispatch.
 - With all three present the Operation commits `succeeded`; with any missing it stays nonterminal or terminalizes `unknown` naming the missing proof.
+
+### `VAL-200` Session identity kept adapter-local
+
+- The adapter keeps a Session record holding its own conversation state plus a SandboxRuntimeRef it resolved from the Core.
+- Every Core request it forms carries explicit Sandbox ID, runtime epoch, Operation ID, Process ID, etag, and idempotency key; none is replaced by or derived from the Session ID.
+- The identical sequence of Core calls can be reproduced by a direct caller who never had a Session at all.
+
+### `VAL-201` Explicit Session rebinding after a resume
+
+- On resume the adapter first determines which of same-epoch attachment, proven same-epoch suspended Process continuity, or replacement from retained state holds.
+- Attachment reattaches to the same epoch, proven continuity issues ResumeSandbox, and replacement issues CreateSandbox or RestoreSandbox and rebinds the Session to the new epoch explicitly.
+- Every resulting Core request carries `expectedRuntimeEpoch`, so a stale handle is refused as a stale runtime rather than silently retargeted.
+
+### `VAL-202` Core status union projected verbatim
+
+- The adapter renders Sandbox and Process lifecycle state using the Core's closed status union exactly as returned in the Core response.
+- An adapter-local label such as `connecting` is shown only alongside, and explicitly marked as, adapter-local presentation.
+- Two different adapters over the same Sandbox display identical Core status values.
+
+### `VAL-203` Original idempotency key reused for recovery
+
+- After a transport failure the adapter resends the caller's byte-identical canonical request under its original idempotency key and receives the same logical result.
+- A genuinely new intent derives a fresh key, and no key is ever reused across canonically different requests.
+- The Core's stored key-to-digest-to-handle binding is unchanged by the recovery attempt.
+
+### `VAL-204` Adapter documents only the Core concurrency contract
+
+- The adapter's registered tools and client documentation state exactly the Core's published operation-pair compatibility and precondition contract, and nothing stronger.
+- Ordering between concurrent mutations comes from etag and runtime-epoch preconditions carried on each Core request, not from an adapter-held lock.
+- Two adapter instances racing on one Sandbox produce the Core's own conflict outcome, which the adapter surfaces unchanged.
+
+### `VAL-205` Generated failure type over the closed Core union
+
+- The adapter's caller-visible failure type is generated from the Core's closed public error, known-failure, and ambiguity union, projected into the host language.
+- Adapter-specific context appears as non-semantic annotation on a generated variant, never as a new, merged, or renamed arm.
+- Regenerating after a registry change adds exactly the registry's new variants and nothing else.
+
+### `VAL-206` Transport condition reported as itself
+
+- A client deadline on a live call is surfaced as a transport condition distinct from every Core result arm.
+- The adapter then retrieves the Operation from the Core and reports its actual committed state.
+- No Core Operation failure, proven Core cancellation, or Process outcome is synthesized from the transport event.
+
+### `VAL-207` Exit codes surfaced as ordinary Process results
+
+- A Process exiting with status 1 is returned as a normal Process result carrying the Core-published termination arm and exit code.
+- Signal termination and deadline outcomes are surfaced as their own arms with the same fidelity.
+- Adapter and infrastructure error types are reserved for adapter and transport conditions only.
+
+### `VAL-208` Ambiguity resolved without a replacement effect
+
+- When the Core returns an ambiguity arm for an Exec, the adapter surfaces that arm to the caller rather than re-running the command.
+- Where recovery is wanted, the adapter resends the same canonical request under the original idempotency key or observes the Operation from the Core.
+- No replacement effect is ever issued under a freshly minted coordinate.
+
+### `VAL-209` Only Core-published proof is reported
+
+- The adapter reports fencing, containment absence, and cleanup completion by quoting the Core Operation's published proof fields.
+- Its own provider observations are displayed, if at all, explicitly labelled as non-authoritative.
+- When the Core publishes no cleanup proof, the adapter reports the absence rather than inferring completion.
+
+### `VAL-210` Composite surfaces every constituent Operation
+
+- The adapter's `attach` helper issues the exact declared sequence of named Core operations and returns every constituent Operation handle.
+- Its Stop-then-Delete helper does the same and is labelled an adapter helper rather than a Core verb.
+- A partial failure leaves the caller holding the handles of the steps that ran plus a distinct result for the step that failed.
+
+### `VAL-211` Precondition-guarded reconciliation
+
+- The reconciler reaches the Core only through named Core operations, each carrying `expectedEtag` and `expectedRuntimeEpoch`.
+- Its system-originated Operations are listed and observable through the same Operation surface as caller-originated ones, with origin recorded.
+- A concurrent caller mutation causes the reconciler's next action to fail its precondition and re-plan rather than overwrite.
+
+### `VAL-212` Desired state confined to the managed layer
+
+- The Managed-Service Definition holds the desired-state revision and the restart/recreate policy in its own records.
+- Core requests carry only Core fields: Artifact reference, target member, bindings, allocations, preconditions, and idempotency key.
+- A revision bump causes the reconciler to issue ordinary named Core operations, and the Core stores no desired state and no restart policy of its own.
+
+### `VAL-213` Correction appended as a linked successor Operation
+
+- A reconciler that must undo a completed Stop appends a new Start Operation linked to the predecessor through `linkedOperationId`.
+- The predecessor's committed terminal result stays byte-identical and stays readable for its full retention.
+- The correction's own outcome is committed on the new Operation, so the audit chain shows both actions in order.
+
+### `VAL-214` Sealed per-method creation rejection
+
+- A creation naming an absent target member is rejected with exactly one variant drawn from the generated CreateSandbox subset of the sealed RequestError registry.
+- The response carries no catch-all variant, no open reason string, no arbitrary metadata reason, and no provider-defined code.
+- Adding a new condition requires extending the sealed registry and regenerating the method subset; the regenerated union still admits only registered variants.
+
+### `VAL-215` Sealed per-method live rejection
+
+- A port operation outside declared network authority is rejected with exactly one variant from that method's generated subset of the sealed registry.
+- A Snapshot request against a missing capability and an Operation request against a stale etag each map to their own registered variants.
+- No live method emits a catch-all variant, an open reason string, or a provider-defined code, whether reached directly or through an adapter.
+
+### `VAL-216` Sealed Exec and Process-control rejection
+
+- An Exec with empty argv and a Process-control call against an expired coordinate each return one variant of the generated Exec subset of the sealed registry.
+- Process-control outcomes are drawn from the declared allowedProcessControlOutcomes set and never from an open reason string.
+- The same conditions yield the same registered variants whether issued directly, through an adapter, or by a managed service.
+
+### `VAL-217` Bounded creation rejection payload
+
+- A creation rejected for an unbindable secret slot returns only the fields declared by that variant's payload schema.
+- Protected context is reachable solely through a bounded opaque evidence identifier that carries no host path, provider payload, or credential value.
+- The message contains no stack trace and no unredacted binding value, and the payload stays inside its declared size bound.
+
+### `VAL-218` Bounded live rejection payload
+
+- A live download naming a secret-slot destination is rejected with only the variant's declared fields plus a safe logical target reference.
+- The payload discloses no secret content, no host backing path, and no raw provider payload.
+- Operator-visible context is retrievable only through the opaque evidence identifier named in the response.
+
+### `VAL-219` Bounded Exec rejection payload
+
+- An Exec rejected for a capability outside the Sandbox bound returns only the variant's declared fields and the violated limit.
+- Neither argv, the Process environment delta, nor native command output is echoed into the public payload.
+- Any protected command context is reachable only through the bounded opaque evidence identifier.
+
+### `VAL-220` Authorize-first creation admission
+
+- The creation request is parsed only far enough to route and authenticate before authorization runs at the parent scope.
+- An unauthorized caller naming an existing creation target and an authorized caller naming an absent one receive observationally equivalent public responses.
+- Binding, target-selection, and allocation validation runs only after authorization succeeds, and its diagnostics never reach an unauthorized caller.
+
+### `VAL-221` Authorize-first live admission
+
+- A live request is authenticated and authorized at the operation and parent scope before any semantic validation of its body.
+- `PermissionDenied` for an existing target and `TargetNotFound` for an absent one are observationally equivalent for an unauthorized caller: same variant, same payload, same timing class.
+- An authorized caller still receives the precise distinguishing variant and its safe target reference.
+
+### `VAL-222` Authorize-first Exec admission
+
+- The Exec request is routed and authenticated, then authorized at the Sandbox and Process scope, before Process existence is resolved.
+- An unauthorized caller naming a live Process and an authorized caller naming an absent Process receive the same public response.
+- Only after authorization succeeds do argv, cwd, environment, and capability checks run and produce their diagnostics.
+
+### `VAL-223` Registered creation recovery instruction
+
+- Each creation rejection carries exactly one `CallerRecovery` registered for its emitted variant and consistent with that variant's semantic domain.
+- A capacity rejection projects a wait-and-retry recovery whose `Retry-After` only times an action the recovery already permits.
+- No creation response carries a boolean retryability flag, and no timing hint appears on a variant whose recovery forbids replay.
+
+### `VAL-224` Registered live recovery instruction
+
+- Each live rejection carries exactly one registered `CallerRecovery` consistent with its variant's semantic domain.
+- A `RecoveryError` over a prior acceptance projects `ObserveHandle` or `OperatorAction` and never authorizes resubmission under a new key.
+- A `Retry-After` hint appears only alongside a recovery that already permits the retry it times.
+
+### `VAL-225` Registered Exec recovery instruction
+
+- Each Exec or Process-control rejection carries exactly one registered `CallerRecovery` for its variant.
+- An expired Process-control coordinate recovers by observation or operator action, never by a new sequence or a replacement execution.
+- No Exec response pairs a wait hint with a recovery that forbids re-running the command.
+
+### `VAL-226` Generated creation transport projection
+
+- The HTTP and gRPC status for a creation response is looked up from the generated projection table keyed by the Core-authored variant.
+- An accepted creation returns its durable Operation handle under a successful transport status even when the Operation's terminal outcome is `failed`.
+- A transport-local failure between client and server produces no Core rejection variant and no Operation record.
+
+### `VAL-227` Generated live transport projection
+
+- Live responses derive their transport status from the Core-authored variant through the generated projection table, never the reverse.
+- Retrieving an accepted Operation handle whose terminal outcome is `cancelled` is a successful observation returned under a successful transport status.
+- Transport `UNKNOWN`, `CANCELLED`, `DEADLINE_EXCEEDED`, and `UNAVAILABLE` never appear as Operation outcomes.
+
+### `VAL-228` Generated Exec transport projection
+
+- An accepted Exec returns the durable Process record under a successful transport status regardless of the Process's embedded termination arm.
+- A Process-control receipt is returned the same way, with its state embedded rather than projected onto the transport status.
+- A closed connection or client deadline is reported as a transport condition and leaves the running Process and its durable record untouched.
+
+### `VAL-229` Conservative mapping of an unrecognized native code
+
+- A provider returns a status the driver's declared decoding version does not recognize.
+- The driver maps it onto an already-registered conservative known-failure variant and records the exact native code only in the protected evidence record.
+- The public union is unchanged: no variant is added, widened, parameterized, or passed through at runtime, and the response names only registered values.
+
+### `VAL-230` Bounded, redacted provider evidence record
+
+- A driver failure produces a large native payload containing host paths and a credential fragment.
+- The protected evidence record stores the bounded, redacted payload and its digest, and the public response carries only the variant's declared fields plus the opaque evidence identifier.
+- Operator retrieval of that identifier returns the redacted record, and the public response stays inside its declared size bound.
+
+### `VAL-231` Restore into a stopped Sandbox from a matching Snapshot
+
+- The Sandbox is stopped and carries a current durable stopped proof before RestoreSandbox is issued.
+- The named Snapshot's manifest is complete and pins the same Artifact Set member, runtime profile, and immutable digests as the Sandbox.
+- The restore is admitted, a new runtime epoch is allocated, and every prior epoch stays fenced.
+
+### `VAL-232` Successor Process contract after restore or fork
+
+- A Sandbox is captured with every Core Process terminal, then restored; the new epoch launches with no acting execution unit.
+- Work resumes through a fresh Exec that allocates a durable Core Process carrying its own identity, provenance, deadline, termination-request handling, containment, stdin ownership, output cursors, and terminal-evidence contract.
+- The post-launch probe finds every acting execution unit bound to a Core Process record in the new epoch before untrusted work is accepted.
+
+### `VAL-233` Restored runtime acts only under its newly allocated epoch
+
+- StartSandbox on a stopped Sandbox allocates an epoch above the monotonic high-water mark and grants mutation authority only to it.
+- Same-Sandbox Restore and restore-as-create behave identically; no prior epoch regains the ability to mutate, exec, or terminate.
+- Requests pinning `expectedRuntimeEpoch` equal to a superseded epoch are refused as stale rather than served.
+
+### `VAL-234` Fork commits a sealed source and a distinct child
+
+- The Fork acceptance commit durably seals the exact immutable source Sandbox ID and source runtime epoch before any capture or child-creation effect runs.
+- The same commit publishes a newly preallocated child Sandbox ID whose epoch line begins at 1 under its own mutation authority.
+- The child shares no Sandbox identity, Core Process identity, or authority coordinate with its source, and its complete Snapshot-equivalent provenance and ancestry are recorded in that commit.
+
+### `VAL-235` Fenced migration handoff retains the source epoch
+
+- The driver returns all six locked handoff proofs, and Core holds every one before deciding the epoch.
+- Core commits a definite terminal outcome for the migration Operation and retains the source runtime epoch unchanged.
+- A second relocation that cannot produce the source-fencing proof is represented as a cold relocation that allocates a new epoch instead.
+
+### `VAL-236` Complete target-side handoff evidence
+
+- The driver returns compatibility of source and destination, exclusive target-enforced authority transfer, a fenced or terminated source, uninterrupted Process authority, routing handoff, and explicit disposition of open attachments and external connections.
+- Core reads all six proofs and only then retains the source runtime epoch.
+- Where the target cannot enforce exclusive authority, the driver refuses the transfer and names the missing proof, and Core represents the relocation as one that allocates a new epoch.
+
+### `VAL-237` Scoped teardown with independently retained records
+
+- A successful DeleteSandbox removes the live Sandbox aggregate and only the live resources its own Operation covers.
+- The Sandbox's Operation, Process, output, event, and evidence records stay readable afterwards until each record's own published retention contract expires.
+- Snapshots already exported or mirrored into Core-controlled retention survive the deletion and remain resolvable by their own identities.
+
+### `VAL-238` Delete issued after every dependent Snapshot is resolved
+
+- Two Snapshots of the Sandbox are deleted and a third is mirrored into Core-controlled retention before DeleteSandbox is issued.
+- Delete admission finds an empty dependency set and admits the request without entering the refusal path.
+- The mirrored Snapshot stays readable after the Sandbox aggregate is gone, under its own retention contract.
+
+### `VAL-239` Explicit absolute expiry paired with a named action
+
+- One SetSandboxExpiration submits explicit `none`, and the Sandbox record afterwards carries no expiry schedule.
+- A second call submits an absolute instant together with an explicit `stop` action; both members are present in the canonical request.
+- No provider, target, or managed-service default fills either member, and the stored schedule reproduces exactly what the caller submitted.
+
+### `VAL-240` Separately declared lifecycle and retention clock families
+
+- The Artifact declares a maximum lifetime and an idle timeout under their own named clocks and subjects.
+- SetSandboxExpiration sets only the absolute expiry instant and its action, leaving both Artifact ceilings untouched.
+- Snapshot, Operation, Process, event, and output retention stay governed by their own published retention contracts and are unchanged by the call.
+
+### `VAL-241` Named clock and subject for every Artifact time bound
+
+- The Artifact declares maximum lifetime, idle timeout, maximum age from creation, maximum runtime duration, and record retention as five separately named bounds, each with its own clock and subject.
+- A consuming profile narrows only the idle timeout and leaves the other four bounds intact and individually attributable.
+- The canonical value carries all five under distinct field identities, and no single duration field stands in for another.
+
+### `VAL-242` Operation retention observed, never deleted
+
+- The closed public method surface over an Operation exposes get, list, and CancelOperation, and no delete, purge, or retention-override verb.
+- After its target Sandbox is deleted, the Operation record stays readable until its published retention expires and then disappears on its own.
+- A caller who wants nonterminal work stopped issues CancelOperation and observes the resulting terminal outcome on the same record.
+
+### `VAL-243` Tombstoned deletion proof
+
+- DeleteSandbox reports success only after the tombstone carrying the Sandbox ID, name, and audit coordinates is durably committed.
+- Resolving the deleted Sandbox ID afterwards returns the tombstone rather than a reusable not-found.
+- A later CreateSandbox proposing the same identity or an unreleased name is refused against that tombstone.
+
+### `VAL-244` Expiry Stop elided against a proven stopped Sandbox
+
+- A Sandbox with a `stop` expiration reaches its instant while a runtime is still extant; the trigger creates exactly one system-originated StopSandbox Operation with its origin recorded as system.
+- A second Sandbox already carries a current durable stopped proof when its instant arrives, so no Stop Operation is created and the existing proof is linked instead.
+- Neither Sandbox publishes a stopping projection it cannot substantiate, and the lifecycle lane is never seized for a no-op.
+
+### `VAL-245` Every native expiry knob explicitly disabled or fenced
+
+- The generated bubblewrap, Firecracker, and remote-provider configurations each emit explicit disabling values for native TTL, idle-sleep, auto-stop, and auto-delete.
+- Where a target cannot disable a native timer, the generated configuration binds it to the Core durable expiry sequence and records the fence in the PreparedLaunch.
+- Every runtime end therefore corresponds to a Core Operation, and the Sandbox's own expiration record remains the sole expiry authority.
+
+### `VAL-246` DeleteSnapshot after references and holds are released
+
+- The Snapshot carries no exact reference from any Sandbox, Operation, or ancestry record and no retention hold.
+- DeleteSnapshot is admitted, the bytes are released, and the identity is tombstoned rather than freed for reuse.
+- A sibling Snapshot that still carries a retention hold is refused, and the refusal names the exact protecting references.
+
+### `VAL-247` Freshly allocated Snapshot identity with retained tombstone
+
+- Two successive captures of the same Sandbox each receive a distinct Snapshot ID, and neither reuses an identity issued earlier.
+- Deleting the first Snapshot releases its stored bytes but retains a tombstone that keeps its ID permanently unallocatable.
+- A later capture succeeds under a new ID, and resolving the deleted ID returns its tombstone rather than the new Snapshot.
+
+### `VAL-248` Explicit resolved Snapshot class and source disposition
+
+- CreateSnapshot names one exact content-addressed Snapshot class identity together with its complete resolved class definition.
+- The request states `sourceAfterCapture = runtimeStatePreserved` explicitly, with no provider-, target-, or service-selected default.
+- A named SDK authoring profile may pick the class for convenience, and the canonical request still carries the exact resolved identity and definition it selected.
+
+### `VAL-249` Runtime class chosen wherever continuity is required
+
+- A capture that must preserve memory, open descriptors, and clock continuity names a runtime Snapshot class whose component set includes them.
+- A separate capture that needs only file contents names a filesystem class and requests no continuity-dependent restore behaviour.
+- Restore from the filesystem Snapshot starts a fresh runtime epoch with newly allocated Processes, and the request says so explicitly.
+
+### `VAL-250` Complete runtime Snapshot terminalization
+
+- A runtime-class capture terminalizes as succeeded only after durability evidence exists for every component the class marks required, including memory, device, and clock state.
+- Compatibility metadata for the source Artifact member and runtime profile is committed with the manifest.
+- The committed manifest's component set equals the class's declared required set, and the Snapshot is readable immediately afterwards.
+
+### `VAL-251` Quiesced source before capture or Fork
+
+- Every Core Process bound to the source Sandbox's current runtime epoch has reached a terminal state before CreateSnapshot is issued.
+- The resolved class declares `coreProcessHandling = rejectNonterminal`, and admission finds no nonterminal Process bound to that epoch.
+- A ForkSandbox against the same quiesced source is admitted under the identical rule and produces a child whose epoch line begins at 1.
+
+### `VAL-252` Preserved source returned to its original epoch
+
+- A capture declaring `runtimeStatePreserved` briefly quiesces the source and restores full runtime authority afterwards.
+- The source finishes in its original runtime state under the same runtime epoch it held before the capture, with no new epoch allocated.
+- Attachment and external-connection disruption caused by the quiescence is recorded as separate evidence rather than folded into the runtime state.
+
+### `VAL-253` Snapshot inherits the source runtime's pinned identity
+
+- The capture request carries no Artifact, member, profile, or digest field of its own.
+- The committed manifest names the exact Artifact Set member, runtime-profile identity, and relevant immutable manifest digests already resolved for the source runtime.
+- A later restore matches on those committed identities; using a different Artifact requires constructing a new Sandbox instead.
+
+### `VAL-254` `stopped` published on the full Stop postcondition
+
+- A capture declaring `sourceAfterCapture = stopped` publishes that disposition only after every Core Process in the source epoch is terminal.
+- The driver's containment-absence proof for the source is held by Core before publication.
+- The prior epoch is fenced and can no longer mutate, exec, or terminate, and the Sandbox's runtime state reads `stopped` with a current durable proof.
+
+### `VAL-255` Self-consistent Snapshot class identity
+
+- The named class identity resolves to a definition whose kind, captured component set, external-storage state, secret treatment, compatibility envelope, quiescence state, device state, portability, and Process handling all agree with what the request describes.
+- Capture admission recomputes the class identity from the resolved definition and finds it identical to the one submitted.
+- A second class in the same Artifact differs in kind and carries its own distinct content-addressed identity.
+
+### `VAL-256` Per-component capture durability evidence
+
+- For every component the resolved class marks required, the driver returns durability evidence together with that component's compatibility metadata.
+- Core commits the Snapshot manifest only once all of it is present, and the Snapshot becomes readable immediately afterwards.
+- When the target cannot durably flush one required component, the driver reports failure naming that exact component and no Snapshot is committed.
 
 ## Composition Authority Matrix
 

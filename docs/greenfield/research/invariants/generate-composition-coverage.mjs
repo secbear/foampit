@@ -69,8 +69,8 @@ assert(
   "Packet D path count must equal the approved 54-path registry",
 );
 assert(
-  invariantIds.length === 297,
-  "Packet D invariant order must contain the exact 297 registry IDs",
+  invariantIds.length === 354,
+  "Packet D invariant order must contain the exact 354 registry IDs",
 );
 assert(
   duplicates(pathIds).length === 0,
@@ -524,13 +524,13 @@ for (const pathId of pathIds) {
 
 const expectedCellCount = pathIds.length * invariantIds.length;
 assert(
-  expectedCellCount === 16038,
-  "Packet D dimensions must expand to exactly 16,038 cells",
+  expectedCellCount === 19116,
+  "Packet D dimensions must expand to exactly 19,116 cells",
 );
 assert(
   expandedCellKeys.length === expectedCellCount &&
     new Set(expandedCellKeys).size === expectedCellCount,
-  "Packet D generation must produce exactly 16,038 unique path/invariant cells",
+  "Packet D generation must produce exactly 19,116 unique path/invariant cells",
 );
 
 const coverage = {

@@ -404,12 +404,12 @@ assert_packet_d_correction_registration() {
           "Packet D correction invariant missing from the registry: \(.)"),
 
         ([
-          "PIO-001","PRC-001","SIG-001"
+          "ADP-001","ERR-001","FRK-001","RET-001","SOP-001"
         ][] | select($ids | index(.) == null) |
-          "Packet E batch 3 invariant missing from the registry: \(.)"),
+          "Packet E batch 4 invariant missing from the registry: \(.)"),
 
-        (if $count == 297 then empty
-         else "registry length is \($count); Packet E batch 2 expects 297 (254 + 43)"
+        (if $count == 354 then empty
+         else "registry length is \($count); Packet E batch 2 expects 354 (297 + 57)"
          end)
       ] | .[]
     ' "${registry}"
