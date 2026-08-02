@@ -2907,6 +2907,399 @@ boundary.
 - Minimum witness: One launch committing `running` after its presence probe timed out.
 - Required diagnostic: identifies `SBX-025`, names `sandbox.status.runtime.state`, `sandbox.status.execution.state`, `sandbox.status.conditions`, and states the remediation without disclosing secret values.
 
+### Packet E Process output streams and sequenced Process control
+
+#### `PIO-001` Output cursor advanced before durable persistence
+
+- Owner: `core`
+- First-sound phase: `E1`
+- Rejection deadline: `E1`
+- Invariant: A durable stdout, stderr, or merged-terminal output cursor advances only after the bytes it covers are durably persisted.
+- Minimum witness: A stdout cursor is published past a byte range whose spool persistence has not yet committed.
+- Required diagnostic: identifies `PIO-001`, names `process.status.output.cursor`, `process.output.persistedThrough`, and states the remediation without disclosing secret values.
+
+#### `PIO-002` Cross-stream ordering promised without an explicitly merged terminal stream
+
+- Owner: `core`
+- First-sound phase: `E1`
+- Rejection deadline: `E1`
+- Invariant: stdout and stderr have independent monotonic cursors that preserve ordering within each stream, and no cross-stream ordering is promised unless the accepted Exec selected a terminal that explicitly merges them.
+- Minimum witness: An Exec that selected no merging terminal publishes a single interleaved cursor covering both stdout and stderr.
+- Required diagnostic: identifies `PIO-002`, names `process.status.output.cursor`, `exec.pty`, and states the remediation without disclosing secret values.
+
+#### `PIO-003` Replayed output chunk without a stable sequence identity
+
+- Owner: `core`
+- First-sound phase: `E1`
+- Rejection deadline: `E1`
+- Invariant: Every output chunk returned after reattachment from a supplied cursor carries a stable sequence identity that lets the caller deduplicate duplicate deliveries.
+- Minimum witness: A chunk redelivered after reattachment carries no sequence identity, so the caller cannot distinguish it from new output.
+- Required diagnostic: identifies `PIO-003`, names `process.status.output.cursor`, `process.output.chunkSequence`, and states the remediation without disclosing secret values.
+
+#### `PIO-004` Accepted Process input replayed
+
+- Owner: `exec`
+- First-sound phase: `E0`
+- Rejection deadline: `E0`
+- Invariant: Accepted Process input is never replayed: no operation over an accepted, sequenced input frame re-submits it.
+- Minimum witness: An accepted, sequenced stdin frame is re-submitted as a new input write and is delivered to the Process a second time.
+- Required diagnostic: identifies `PIO-004`, names `exec.control.sequence`, `process.control.receipt`, and states the remediation without disclosing secret values.
+
+#### `PIO-005` Process termination conflated with output sealing
+
+- Owner: `core`
+- First-sound phase: `E1`
+- Rejection deadline: `E1`
+- Invariant: Process termination and output sealing are independent facts, and end of output is authoritative only after backend exit and output drain are both proven.
+- Minimum witness: A Process's output stream is declared ended at the moment its exit status is committed, discarding still-undrained bytes.
+- Required diagnostic: identifies `PIO-005`, names `process.status.termination`, `process.status.output.sealedAt`, and states the remediation without disclosing secret values.
+
+#### `PIO-006` End of output declared without proven backend exit and drain
+
+- Owner: `runtime`
+- First-sound phase: `E1`
+- Rejection deadline: `E1`
+- Invariant: A driver supplies proven backend exit and output-drain evidence before the Core may seal a Process output stream.
+- Minimum witness: A driver reports end of output because its read returned no data, without observing backend exit or draining the transport.
+- Required diagnostic: identifies `PIO-006`, names `driver.outputDrainEvidence`, `process.status.output.sealedAt`, and states the remediation without disclosing secret values.
+
+#### `PIO-007` Output truncation, limit, or expiry hidden from the caller
+
+- Owner: `core`
+- First-sound phase: `E1`
+- Rejection deadline: `E1`
+- Invariant: Output retention duration, byte limit, and truncation are explicit, and a read from an expired cursor returns the typed output-expired result reporting the earliest retained cursor where partial output remains.
+- Minimum witness: A read from a cursor whose bytes have expired returns fewer bytes with an ordinary success result and no expiry signal.
+- Required diagnostic: identifies `PIO-007`, names `process.status.output.cursor`, `process.output.retention`, `process.output.truncatedAt`, and states the remediation without disclosing secret values.
+
+#### `PIO-008` Process-control command without its exact coordinate
+
+- Owner: `exec`
+- First-sound phase: `E0`
+- Rejection deadline: `E0`
+- Invariant: Every WriteProcessInput, CloseProcessInput, and ResizeProcessTerminal command carries its exact Process ID, Sandbox ID, runtime epoch, writer lease, and monotonically increasing sequence number as part of the command coordinate.
+- Minimum witness: A stdin write is submitted as an ordinary retryable RPC carrying only the Process ID, with no lease or sequence.
+- Required diagnostic: identifies `PIO-008`, names `exec.control.coordinate`, `exec.control.sequence`, `exec.control.writerLeaseId`, and states the remediation without disclosing secret values.
+
+#### `PIO-009` Repeated Process-control sequence enqueues a duplicate command
+
+- Owner: `core`
+- First-sound phase: `E0`
+- Rejection deadline: `E1`
+- Invariant: A retained prior sequence resubmitted with the same canonical command recovers the same durable receipt and never enqueues a second ordered command, regardless of later Process or lease state.
+- Minimum witness: A resubmitted stdin write at an already accepted sequence is enqueued a second time because the lease has since expired.
+- Required diagnostic: identifies `PIO-009`, names `exec.control.sequence`, `process.control.receipt`, and states the remediation without disclosing secret values.
+
+#### `PIO-010` Repeated sequence accepted with different canonical content
+
+- Owner: `core`
+- First-sound phase: `E0`
+- Rejection deadline: `E0`
+- Invariant: A retained prior sequence resubmitted with a different canonical command is refused as a typed Process-control conflict carrying the original and submitted digests, and dispatches no command.
+- Minimum witness: Sequence 12 is resubmitted with different stdin bytes and is accepted as an ordinary write.
+- Required diagnostic: identifies `PIO-010`, names `exec.control.sequence`, `process.control.receipt.canonicalCommandDigest`, and states the remediation without disclosing secret values.
+
+#### `PIO-011` Out-of-order Process-control command accepted
+
+- Owner: `core`
+- First-sound phase: `E0`
+- Rejection deadline: `E0`
+- Invariant: A genuinely new Process-control command is accepted only at the exact next sequence for its live writer lease, and a future sequence leaving a gap is refused with its typed out-of-range result.
+- Minimum witness: A Process-control command at sequence 15 is accepted while the lease's last accepted sequence is 12.
+- Required diagnostic: identifies `PIO-011`, names `exec.control.sequence`, `process.control.lastAcceptedSequence`, and states the remediation without disclosing secret values.
+
+#### `PIO-012` Writer lease controls a different Process or runtime epoch
+
+- Owner: `core`
+- First-sound phase: `E0`
+- Rejection deadline: `E0`
+- Invariant: A writer lease is bound to exactly one Process and runtime epoch and is never retargeted after runtime replacement, Process termination, attachment reconnection, or SDK Session rebinding.
+- Minimum witness: A writer lease issued for a Process in the prior runtime epoch is used to write stdin to a Process in the new epoch.
+- Required diagnostic: identifies `PIO-012`, names `exec.control.writerLeaseId`, `exec.control.coordinate`, `process.sandboxRuntimeRef`, and states the remediation without disclosing secret values.
+
+#### `PIO-013` Input receipt represented as application consumption
+
+- Owner: `core`
+- First-sound phase: `E1`
+- Rejection deadline: `E1`
+- Invariant: A Process-control receipt proves only that Core durably deduplicated and ordered the command and owns its delivery obligation, and never that the process consumed input bytes, that an application reacted to a terminal resize, or that the Process remains alive.
+- Minimum witness: A stdin write receipt is reported as proof that the process consumed the bytes and is still alive.
+- Required diagnostic: identifies `PIO-013`, names `process.control.receipt.state`, `process.control.outcome`, and states the remediation without disclosing secret values.
+
+#### `PIO-014` Terminal resize accepted for a Process without a terminal or after termination
+
+- Owner: `exec`
+- First-sound phase: `E0`
+- Rejection deadline: `E0`
+- Invariant: ResizeProcessTerminal is accepted only for a nonterminal Process whose accepted Exec selected a terminal, and travels the same ordered Process-control stream as input and close.
+- Minimum witness: A ResizeProcessTerminal is accepted for a Process whose accepted Exec selected no terminal.
+- Required diagnostic: identifies `PIO-014`, names `exec.control.resize`, `exec.pty`, `process.status.state`, and states the remediation without disclosing secret values.
+
+#### `PIO-015` Input accepted after CloseProcessInput
+
+- Owner: `core`
+- First-sound phase: `E0`
+- Rejection deadline: `E0`
+- Invariant: CloseProcessInput commits an irreversible ordered close record, after which any later input write for that Process is refused.
+- Minimum witness: A stdin write at sequence 21 is accepted after a CloseProcessInput close record is committed at sequence 20.
+- Required diagnostic: identifies `PIO-015`, names `exec.control.close`, `process.control.log`, and states the remediation without disclosing secret values.
+
+#### `PIO-016` Accepted Process-control command silently lost
+
+- Owner: `core`
+- First-sound phase: `E1`
+- Rejection deadline: `E1`
+- Invariant: Every accepted Process-control command terminalizes as delivered, discarded with a never-delivered proof under an exact Process-terminal rule, failed with a never-delivered proof and quiesced delivery authority, or `unknown` naming its missing proofs, and remains observable through the Process control status or retained evidence.
+- Minimum witness: An accepted stdin write is dropped when its Process terminates and its receipt disappears from the Process control status.
+- Required diagnostic: identifies `PIO-016`, names `process.control.receipt.state`, `process.control.outcome`, and states the remediation without disclosing secret values.
+
+#### `PIO-017` Teardown discards retained output or an accepted Process-control command
+
+- Owner: `core`
+- First-sound phase: `T0`
+- Rejection deadline: `T0`
+- Invariant: Sandbox teardown drains and seals retained Process output and resolves every accepted Process-control command with one of its four declared terminal outcomes; nothing accepted is silently discarded by Stop or Delete.
+- Minimum witness: A Delete completes with an accepted stdin write still unresolved and a retained output spool left unsealed.
+- Required diagnostic: identifies `PIO-017`, names `process.status.output.cursor`, `process.output.sealed`, `process.control.command.outcome`, and states the remediation without disclosing secret values.
+
+#### `PIO-018` More than one live stdin writer lease for one Process
+
+- Owner: `core`
+- First-sound phase: `E0`
+- Rejection deadline: `E0`
+- Invariant: At most one live stdin writer lease exists for a Process at any time, and a Process-control command bearing a lease that is not the current live lease is refused with the typed lease-conflict result.
+- Minimum witness: Two concurrent clients each hold a live stdin writer lease for the same Process and both write to it.
+- Required diagnostic: identifies `PIO-018`, names `exec.control.writerLeaseId`, `process.control.liveLeases`, and states the remediation without disclosing secret values.
+
+#### `PIO-019` Teardown seal declared without driver-supplied backend exit and drain evidence
+
+- Owner: `runtime`
+- First-sound phase: `T0`
+- Rejection deadline: `T0`
+- Invariant: A driver supplies proven backend exit and output-drain evidence for every retained Process stream during Stop or Delete before the Core may seal that stream at teardown.
+- Minimum witness: A Stop driver reports teardown complete and the Core seals a retained stream with no backend-exit or drain evidence supplied for it.
+- Required diagnostic: identifies `PIO-019`, names `driver.outputDrainEvidence`, `process.status.output.sealedAt`, `process.output.sealed`, and states the remediation without disclosing secret values.
+
+### Packet E Process state, termination, and replay
+
+#### `PRC-001` Process terminal outcome mutated
+
+- Owner: `core`
+- First-sound phase: `E1`
+- Rejection deadline: `E1`
+- Invariant: A Process terminal outcome is immutable once committed, and every later signal acknowledgement, reaper observation, or provider event arriving after the outcome commit is retained as evidence rather than applied as a rewrite.
+- Minimum witness: A reaper observation arriving after the terminal outcome commit rewrites `process.status.termination` from `exited(0)` to `signalled`.
+- Required diagnostic: identifies `PRC-001`, names `process.status.termination`, `process.status.state`, and states the remediation without disclosing secret values.
+
+#### `PRC-002` Terminal Operation unknown conflated with reconcilable Process unknown
+
+- Owner: `core`
+- First-sound phase: `E1`
+- Rejection deadline: `E1`
+- Invariant: Process `unknown` is a nonterminal reconcilable observation state drawn from the Process vocabulary, and is never projected as a terminal Operation outcome or treated as replay authorization.
+- Minimum witness: A Process whose state is the reconcilable `unknown` is projected directly into the Operation outcome union as that Operation's terminal `unknown` result.
+- Required diagnostic: identifies `PRC-002`, names `process.status.state`, `operation.outcome`, and states the remediation without disclosing secret values.
+
+#### `PRC-003` Process-targeted Operation outcome terminalizes the Process
+
+- Owner: `core`
+- First-sound phase: `L1`
+- Rejection deadline: `L1`
+- Invariant: A Signal or Terminate Operation's committed terminal outcome describes only that Operation, and never writes a terminal outcome onto the targeted Process record.
+- Minimum witness: A Signal Operation that commits `succeeded` also writes a terminal outcome onto the targeted Process record.
+- Required diagnostic: identifies `PRC-003`, names `operation.outcome`, `operation.target.processId`, `process.status.state`, and states the remediation without disclosing secret values.
+
+#### `PRC-004` Ambiguous Process automatically replaced
+
+- Owner: `core`
+- First-sound phase: `E1`
+- Rejection deadline: `E1`
+- Invariant: An accepted Process whose outcome is unproven is reconciled against its own launch token and is never replaced by a Core- or driver-initiated replacement dispatch.
+- Minimum witness: An accepted Process whose outcome is unproven triggers a Core-initiated replacement dispatch of the same command.
+- Required diagnostic: identifies `PRC-004`, names `process.status.state`, `process.launchToken`, `process.effectIntent`, and states the remediation without disclosing secret values.
+
+#### `PRC-005` Termination arm asserted without its exact native evidence
+
+- Owner: `runtime`
+- First-sound phase: `E1`
+- Rejection deadline: `E1`
+- Invariant: The selected ProcessTermination arm is justified by exactly the native evidence that arm asserts, so a nonzero exit decodes to the exited arm, startFailed proves the command never became running, deadlineExceeded proves the original Process can neither launch nor continue, and lost runtime never decodes to an ordinary exit.
+- Minimum witness: A lost runtime control channel with no wait status is decoded as an ordinary `exited` termination.
+- Required diagnostic: identifies `PRC-005`, names `process.status.termination`, `driver.terminationEvidence`, and states the remediation without disclosing secret values.
+
+#### `PRC-006` Lost runtime carries an invented exit code
+
+- Owner: `core`
+- First-sound phase: `E1`
+- Rejection deadline: `E1`
+- Invariant: The runtimeLost termination arm is a bare variant that carries no exit code, signal, or other execution-outcome payload.
+- Minimum witness: A `runtimeLost` termination is written carrying exit code 0.
+- Required diagnostic: identifies `PRC-006`, names `process.status.termination`, and states the remediation without disclosing secret values.
+
+#### `PRC-007` Teardown leaves a Process nonterminal
+
+- Owner: `core`
+- First-sound phase: `T0`
+- Rejection deadline: `T0`
+- Invariant: A Stop or Delete traversal terminalizes every remaining nonterminal Process of the captured epoch with an exact recorded reason before the Sandbox is published stopped.
+- Minimum witness: A Stop publishes the Sandbox as `stopped` while one captured Process is still `running`.
+- Required diagnostic: identifies `PRC-007`, names `process.status.state`, `process.status.termination`, `sandbox.status.runtime.state`, and states the remediation without disclosing secret values.
+
+#### `PRC-008` Process unknown resolved with a different execution identity or epoch
+
+- Owner: `core`
+- First-sound phase: `E1`
+- Rejection deadline: `E1`
+- Invariant: An unproven Process resolves to running or terminated only by reconciling the same Core launch token and, once learned, the same backend execution identity in the same runtime epoch.
+- Minimum witness: Evidence bearing a backend process identity from a replaced runtime epoch resolves an unproven Process to `terminated`.
+- Required diagnostic: identifies `PRC-008`, names `process.launchToken`, `process.sandboxRuntimeRef`, `driver.nativeExecutionIdentity`, and states the remediation without disclosing secret values.
+
+#### `PRC-009` Authority-epoch advance or fencing used to terminalize a Process
+
+- Owner: `core`
+- First-sound phase: `E1`
+- Rejection deadline: `E1`
+- Invariant: Internal authority-epoch advancement or predecessor fencing removes only the ability to commit Core state; a Process becomes terminal solely on target-side fencing, a verifiable drain boundary, or other proof that it can no longer execute or produce external effects.
+- Minimum witness: Advancing the Sandbox authority epoch immediately writes `fenced` onto every prior-epoch Process with no driver fencing proof.
+- Required diagnostic: identifies `PRC-009`, names `process.status.state`, `process.status.termination`, `sandbox.authorityEpoch`, and states the remediation without disclosing secret values.
+
+#### `PRC-010` Stale running observation retained after its only observer is lost
+
+- Owner: `core`
+- First-sound phase: `E1`
+- Rejection deadline: `E1`
+- Invariant: A Process whose only fresh observer is lost stops being reported as running and is restored to running only from fresh same-epoch evidence.
+- Minimum witness: A Process keeps reporting `running` after its only supervision channel is lost, with no fresh observation behind the report.
+- Required diagnostic: identifies `PRC-010`, names `process.status.state`, `process.observationFreshness`, and states the remediation without disclosing secret values.
+
+#### `PRC-011` Old-epoch Process left nonterminal after runtime replacement
+
+- Owner: `core`
+- First-sound phase: `R1`
+- Rejection deadline: `R1`
+- Invariant: A launch traversal that replaces a runtime terminalizes every nonterminal Process of the replaced epoch with runtimeReplaced, runtimeLost, or fenced before the new epoch is published running.
+- Minimum witness: A replacement launch publishes the new runtime epoch as `running` while one Process of the replaced epoch is still `starting`.
+- Required diagnostic: identifies `PRC-011`, names `process.status.termination`, `sandbox.status.runtime.epoch`, and states the remediation without disclosing secret values.
+
+#### `PRC-012` Suspend terminalizes an accepted but undispatched Process
+
+- Owner: `core`
+- First-sound phase: `L1`
+- Rejection deadline: `L1`
+- Invariant: A continuity-preserving Suspend withholds launch authority from an accepted but externally undispatched Process and leaves it accepted rather than terminalizing it.
+- Minimum witness: A SuspendSandbox operation writes a terminal outcome onto an accepted Process whose launch was never externally dispatched.
+- Required diagnostic: identifies `PRC-012`, names `process.status.state`, `process.launchAuthority`, and states the remediation without disclosing secret values.
+
+#### `PRC-013` Process state transition outside the locked graph
+
+- Owner: `core`
+- First-sound phase: `E1`
+- Rejection deadline: `E1`
+- Invariant: Process state advances only along the locked edges from accepted to starting or terminated, from starting to running, `unknown`, or terminated, from running to `unknown` or terminated, and from `unknown` to running or terminated.
+- Minimum witness: A `terminated` Process is advanced back to `running`.
+- Required diagnostic: identifies `PRC-013`, names `process.status.state`, and states the remediation without disclosing secret values.
+
+#### `PRC-014` Terminated Process carries an open or absent outcome
+
+- Owner: `core`
+- First-sound phase: `E1`
+- Rejection deadline: `E1`
+- Invariant: Every terminated Process carries exactly one arm of the closed ProcessTermination union with that arm's declared payload, and never an absent, open, or provider-defined outcome.
+- Minimum witness: A `terminated` Process is written with a free-form provider reason string and no `ProcessTermination` arm.
+- Required diagnostic: identifies `PRC-014`, names `process.status.termination`, and states the remediation without disclosing secret values.
+
+#### `PRC-015` Replacement, fencing, or Stop causality asserted without target-side proof
+
+- Owner: `core`
+- First-sound phase: `T0`
+- Rejection deadline: `T0`
+- Invariant: The runtimeReplaced, fenced, and stoppedBySandbox termination arms are recorded only after target-side execution fencing or containment absence proves the Process cannot act, and stoppedBySandbox additionally requires proven deliberate Stop causality.
+- Minimum witness: A Stop records `stoppedBySandbox` on a captured Process before any target-side containment-absence proof is returned.
+- Required diagnostic: identifies `PRC-015`, names `process.status.termination`, `driver.containmentAbsenceProof`, and states the remediation without disclosing secret values.
+
+#### `PRC-016` Process observation or wait deadline mutating or terminalizing its target
+
+- Owner: `core`
+- First-sound phase: `E1`
+- Rejection deadline: `E1`
+- Invariant: A `WaitProcess`, `GetProcess`, or `ReadProcessOutput` deadline ends only that observation and never cancels, mutates, terminalizes, or advances the durable state of the observed Process or its output stream.
+- Minimum witness: A `WaitProcess` deadline expiring cancels the observed Process and writes a `deadlineExceeded` termination onto it.
+- Required diagnostic: identifies `PRC-016`, names `observation.deadline`, `process.status.state`, `process.status.output.cursor`, and states the remediation without disclosing secret values.
+
+#### `PRC-017` Teardown rewrites a committed Process terminal outcome
+
+- Owner: `core`
+- First-sound phase: `T0`
+- Rejection deadline: `T0`
+- Invariant: Sandbox teardown retains every late signal acknowledgement, reaper observation, and provider event arriving during Stop or Delete as evidence linked to the Process, and never applies it as a rewrite of a committed Process terminal outcome.
+- Minimum witness: A provider event arriving during Stop rewrites an already committed `exited(0)` Process outcome to `stoppedBySandbox`.
+- Required diagnostic: identifies `PRC-017`, names `process.status.termination`, `process.status.state`, `driver.lateEvidence`, and states the remediation without disclosing secret values.
+
+### Packet E signal and termination dispatch proof
+
+#### `SIG-001` Arbitrary or unadvertised signal accepted
+
+- Owner: `live`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: A SignalProcess request selects exactly one signal from the effective capability's closed advertised set for the targeted Process, Sandbox, and runtime epoch.
+- Minimum witness: A SignalProcess request names a signal absent from `sandbox.capabilities.signals` for the targeted Process and epoch.
+- Required diagnostic: identifies `SIG-001`, names `live.signal.signal`, `sandbox.capabilities.signals`, and states the remediation without disclosing secret values.
+
+#### `SIG-002` Generic signal accepted while the Sandbox is suspended
+
+- Owner: `live`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: A generic SignalProcess request against a suspended Sandbox is admitted only when the target advertises deterministic delivery semantics under suspension, while StopSandbox remains legal.
+- Minimum witness: A generic SignalProcess is admitted against a suspended Sandbox whose target advertises no deterministic suspended-delivery semantics.
+- Required diagnostic: identifies `SIG-002`, names `live.signal`, `sandbox.status.runtime.state`, `sandbox.capabilities.signals`, and states the remediation without disclosing secret values.
+
+#### `SIG-003` Driver reports signal dispatch without invoking the exact target-specific action
+
+- Owner: `runtime`
+- First-sound phase: `L1`
+- Rejection deadline: `L1`
+- Invariant: A driver reports a signal dispatch as accepted only after invoking the exact target-specific signal action and obtaining backend acceptance evidence, never by emulating it with VM power controls, Sandbox deletion, or a coarser containment verb.
+- Minimum witness: A microVM driver reports a signal dispatch as accepted after issuing a VM reset instead of the guest signal action.
+- Required diagnostic: identifies `SIG-003`, names `operation.outcome`, `driver.signalDispatchEvidence`, and states the remediation without disclosing secret values.
+
+#### `SIG-004` Signal dispatch represented as delivery, handling, or exit
+
+- Owner: `core`
+- First-sound phase: `L1`
+- Rejection deadline: `L1`
+- Invariant: A successful SignalProcess Operation asserts only that the exact target-specific dispatch was invoked and accepted, and never that the signal was delivered, handled, obeyed, or that the Process exited.
+- Minimum witness: A successful SignalProcess Operation declares that the signal was delivered and that the Process exited.
+- Required diagnostic: identifies `SIG-004`, names `operation.outcome`, `operation.successPredicate`, `process.status.state`, and states the remediation without disclosing secret values.
+
+#### `SIG-005` Duplicate signal or termination dispatch assumed idempotent
+
+- Owner: `core`
+- First-sound phase: `L1`
+- Rejection deadline: `L1`
+- Invariant: Core coordinates dispatch identities where the target declares support for them, and otherwise durably records the dispatch as possibly at-least-once, never claiming backend deduplication the target does not provide.
+- Minimum witness: A retried TerminateProcess repeats the native call against a target that declares no dispatch-identity support while the Operation claims exactly-once delivery.
+- Required diagnostic: identifies `SIG-005`, names `driver.signalDispatchEvidence`, `operation.effectAttempt`, and states the remediation without disclosing secret values.
+
+#### `SIG-006` Process termination reported before it can no longer act
+
+- Owner: `core`
+- First-sound phase: `L1`
+- Rejection deadline: `L1`
+- Invariant: A TerminateProcess Operation succeeds only when the Process holds an immutable terminal outcome and is proven unable to continue acting, and generic signal dispatch never silently gains wait-for-exit semantics.
+- Minimum witness: A TerminateProcess Operation commits `succeeded` while the targeted Process is still `running`.
+- Required diagnostic: identifies `SIG-006`, names `operation.outcome`, `process.status.state`, `process.status.termination`, and states the remediation without disclosing secret values.
+
+#### `SIG-007` Signal Operation committed `succeeded` without its three-part proof
+
+- Owner: `core`
+- First-sound phase: `L1`
+- Rejection deadline: `L1`
+- Invariant: A `SignalProcess` Operation commits `succeeded` only when the Sandbox ID, Process ID, runtime epoch, and authority were validated, the exact target was selected, and returned driver evidence proves the target-specific dispatch was accepted; any weaker knowledge set leaves the Operation nonterminal or terminalizes it `unknown`.
+- Minimum witness: A SignalProcess Operation commits `succeeded` after the native call times out with no returned driver acceptance evidence.
+- Required diagnostic: identifies `SIG-007`, names `operation.outcome`, `operation.target.processId`, `sandbox.status.runtime.epoch`, and states the remediation without disclosing secret values.
+
 ## Valid Cases
 
 Invalid-state rejection is insufficient if a language makes necessary
@@ -3948,6 +4341,307 @@ same canonical semantic value.
 - A launch whose new epoch cannot be proven present or absent commits `unknown` with execution admission `closed` and a condition naming the missing predicate.
 - The launch evidence is retained for a system-originated reconciliation Operation.
 - A launch proven not to have established a live runtime, with cleanup complete, commits `stopped` instead.
+
+### `VAL-157` Cursor advances strictly behind the persistence commit
+
+- A Process writes 64 KiB to stdout during its execution.
+- The spool durably persists the first 48 KiB and commits exactly that range.
+- `process.status.output.cursor` advances only as far as `process.output.persistedThrough`.
+- The remaining bytes become readable only after their own persistence commit.
+
+### `VAL-158` Per-stream cursors, merged stream only under a merging terminal
+
+- An ordinary Exec publishes independent monotonic cursors for stdout and stderr.
+- Each cursor preserves ordering within its own stream and promises nothing across them.
+- An Exec whose accepted contract selected a merging terminal additionally exposes one merged terminal stream.
+- Callers that need interleaved ordering request that terminal at Exec time.
+
+### `VAL-159` Reattachment from a cursor yields deduplicable chunks
+
+- A reader disconnects and reattaches supplying its last known cursor.
+- Every returned chunk carries the spool's stable sequence identity for its byte range.
+- Chunks the reader already consumed are recognised by identity and discarded.
+- The same identity is returned for the same byte range on every subsequent reattachment.
+
+### `VAL-160` Lost response recovered by coordinate, not by replay
+
+- A WriteProcessInput frame is accepted and receipted at lease A, sequence 7.
+- The caller loses the response to a transport failure.
+- It recovers by reading the retained receipt for lease A and sequence 7.
+- The generated input path offers no operation that re-submits the accepted frame.
+
+### `VAL-161` Exit committed, stream sealed separately after drain
+
+- A Process commits `exited(0)` as its immutable terminal outcome.
+- Bytes still buffered in the transport continue to be drained and appended to the spool.
+- `process.status.output.sealedAt` is written only once backend exit and drain are both proven.
+- A caller reading between the two events sees a terminated Process and an unsealed stream.
+
+### `VAL-162` Driver proves exit and drain before the Core seals
+
+- The bubblewrap driver observes process exit and reads its pipes to EOF.
+- The microVM driver observes guest-agent exit and drains the vsock stream to its last byte.
+- Each supplies `driver.outputDrainEvidence` naming the last byte drained for that spool.
+- The Core seals the stream only on that evidence, never on a quiet read.
+
+### `VAL-163` Explicit retention contract with a typed expiry result
+
+- The spool declares its retention duration and byte limit as part of the output contract.
+- A read from a still-retained cursor returns the full requested range.
+- A read from an expired cursor returns the typed output-expired result naming the earliest retained cursor.
+- Truncation is recorded at `process.output.truncatedAt` rather than silently shortening the stream.
+
+### `VAL-164` Fully coordinated Process-control command
+
+- A WriteProcessInput carries Process ID, Sandbox ID, runtime epoch, writer lease, and sequence 12.
+- A ResizeProcessTerminal and a CloseProcessInput carry the same coordinate shape on the same lease.
+- Every coordinate member is required by the generated `ProcessControlCommand` type.
+- Acceptance commits a durable receipt keyed by that exact coordinate.
+
+### `VAL-165` Retained receipt returned for an exact resubmission
+
+- Sequence 12 on lease A is accepted, ordered, and receipted.
+- The caller times out and resubmits sequence 12 with the identical canonical command.
+- The retained receipt is returned and nothing is enqueued a second time.
+- The same answer is returned even after the Process has terminated or the lease has expired.
+
+### `VAL-166` One sequence, one canonical meaning
+
+- Sequence 12 resubmitted with the exact retained canonical command recovers its receipt.
+- Genuinely new content is submitted at sequence 13 and accepted on its own merits.
+- A real digest mismatch returns the typed Process-control conflict carrying the original and submitted digests.
+- No command is dispatched when that conflict result is returned.
+
+### `VAL-167` Strictly next sequence per live lease
+
+- The lease's last accepted sequence is 12.
+- A genuinely new command is accepted only at sequence 13.
+- A submission at sequence 15 returns the typed out-of-range result and is never ordered.
+- Once 13 and 14 are accepted, 15 becomes acceptable in turn.
+
+### `VAL-168` A new lease for each Process and runtime epoch
+
+- A writer lease is issued bound to exactly one Process ID and one runtime epoch.
+- After a runtime replacement the client acquires a new lease for the new epoch.
+- An SDK Session rebinding acquires a new lease rather than retargeting the existing one.
+- Commands bearing the stale lease are refused before they are ordered.
+
+### `VAL-169` Receipt states ordering and delivery obligation only
+
+- A stdin write receipt states that Core durably deduplicated, ordered, and owns delivery of the frame.
+- It makes no claim that the process read the bytes.
+- A terminal-resize receipt makes no claim that the application redrew or reacted.
+- Callers observe the Process resource separately for evidence of application behaviour or liveness.
+
+### `VAL-170` Resize on a live terminal-backed Process through the ordered stream
+
+- The accepted Exec selected a terminal for the Process.
+- The Process is nonterminal at the time the resize is submitted.
+- The ResizeProcessTerminal travels the same ordered Process-control stream as input and close.
+- Resizes submitted after the Process terminates are refused rather than ordered.
+
+### `VAL-171` Close is final; further input requires a new Exec
+
+- A CloseProcessInput commits an irreversible ordered close record at sequence 20.
+- The Process observes EOF on stdin.
+- Any later input write for that Process is refused before it is ordered.
+- A caller needing further input starts a new Exec with its own control stream.
+
+### `VAL-172` Every accepted command reaches one of four disjoint outcomes
+
+- A delivered write terminalizes as delivered, citing its delivery evidence.
+- A write still outstanding when the Process terminated is discarded with a never-delivered proof under the exact Process-terminal rule.
+- A write whose delivery authority was quiesced fails with a never-delivered proof.
+- A write with neither proof terminalizes `unknown` naming its missing proofs, and every receipt stays observable.
+
+### `VAL-173` Teardown drains, seals, and resolves before completing
+
+- Stop drains the retained output spool for each Process and seals it.
+- Every accepted Process-control command is resolved with one of its four declared terminal outcomes.
+- Receipts and sealed cursors remain readable through retained evidence after teardown.
+- Only then does the teardown traversal complete.
+
+### `VAL-174` Single live lease with explicit takeover
+
+- Exactly one stdin writer lease is live for a Process at any moment.
+- A second client takes the lease over explicitly, which ends the previous lease.
+- Commands bearing the ended lease return the typed lease-conflict result.
+- The surviving lease continues its sequence without a gap.
+
+### `VAL-175` Portable Stop driver reaps, drains, then supplies evidence
+
+- The Stop driver reaps each remaining Process and observes its backend exit.
+- It drains every retained stream to its last byte across the target's transport.
+- It supplies `driver.outputDrainEvidence` for each retained stream at the teardown station.
+- The Core seals each stream only on that evidence, and withholds the seal otherwise.
+
+### `VAL-176` Late reap evidence retained beside a committed outcome
+
+- A Process commits `exited(0)` at the exec outcome station and the record becomes immutable.
+- A reaper observation and a remote-provider event for the same Process arrive afterwards.
+- Both are linked to the Process as retained evidence rather than applied as a write.
+- Every later read of `process.status.termination` still returns `exited(0)`.
+
+### `VAL-177` Nonterminal Process `unknown` beside a terminalized Operation
+
+- An Exec dispatch returns inconclusive driver evidence for its launch.
+- The Exec Operation terminalizes with the Operation-vocabulary `unknown` outcome naming its missing proofs.
+- The Process stays in the Process-vocabulary `unknown` state and remains reconcilable against its own launch token.
+- Neither value is treated as authorization to replay the command.
+
+### `VAL-178` Terminate Operation succeeds while its target terminalizes on Process evidence
+
+- A TerminateProcess Operation commits `succeeded` from its own dispatch and fencing proofs.
+- The targeted Process record terminalizes only when Process-level termination evidence arrives.
+- Both records name the same Process ID and runtime epoch.
+- Reading the Process before that evidence still shows a nonterminal state.
+
+### `VAL-179` Unresolved Process reconciled while a new command stays expressible
+
+- An Exec dispatch loses its response and leaves the Process accepted with an unproven outcome.
+- Core reconciles against the same durable launch token instead of dispatching a replacement.
+- The caller may still submit a genuinely new Exec, which is accepted as its own Process with its own token.
+- The unproven Process resolves only when evidence bearing its own launch token arrives.
+
+### `VAL-180` Native wait status decoded to exactly its justified arm
+
+- A bubblewrap wait status carrying exit code 3 decodes to the `exited` arm carrying 3.
+- A supervisor execution record proving the command never became running decodes to `startFailed`.
+- A lost control channel with no exit observation decodes to `runtimeLost`, never to an ordinary exit.
+- Evidence that justifies no arm leaves the Process unproven rather than selecting a nearest arm.
+
+### `VAL-181` Bare `runtimeLost` arm with native detail in the evidence record
+
+- A driver loses its supervision channel and reports no exit status or signal.
+- The Process terminalizes with the bare `runtimeLost` arm, which declares no payload field.
+- The native transport error text is retained in the protected evidence record linked to the Process.
+- Callers reading `process.status.termination` see the arm with no exit code or signal attached.
+
+### `VAL-182` Every captured Process terminalized before `stopped` is published
+
+- Stop captures the epoch's Process set, then reaps each Process for its outcome.
+- Each remaining nonterminal Process is terminalized with its exact recorded reason.
+- The driver's containment-absence proof is recorded at the same teardown station.
+- Only then does `sandbox.status.runtime.state` publish `stopped`.
+
+### `VAL-183` Reconciliation matched on launch token, execution identity, and epoch
+
+- An unproven Process holds its durable launch token and its bound runtime reference.
+- Driver evidence carrying the same backend execution identity in the same runtime epoch resolves it to `terminated`.
+- Evidence from a replaced epoch is retained as evidence but does not resolve the Process.
+- The committed resolution records which execution identity proved it.
+
+### `VAL-184` Fenced successor handoff
+
+- A successor advances the Sandbox authority epoch, so stale capabilities can no longer commit Core state.
+- Processes of the prior epoch stay unproven while only the internal epoch has advanced.
+- The driver returns target-side execution fencing or a verifiable drain boundary for each such Process.
+- Each Process is then terminalized as `fenced`, citing that proof.
+
+### `VAL-185` Demote on observer loss, restore only on fresh same-epoch evidence
+
+- A Process is reported `running` from a live supervision channel with recorded observation freshness.
+- The channel is lost and no other fresh observer for that Process exists.
+- The Process is demoted to its reconcilable state and stops being reported as running.
+- A reconnected same-epoch observer supplying fresh evidence restores `running`.
+
+### `VAL-186` Replaced epoch drained before the new epoch publishes `running`
+
+- A StartSandbox launch replaces an existing runtime epoch for the same Sandbox.
+- Every nonterminal Process of the replaced epoch is terminalized as `runtimeReplaced`, `runtimeLost`, or `fenced`.
+- Each reason is backed by the replacement's fencing or absence evidence.
+- Only then is the new epoch published as `running`, leaving exactly one live lineage.
+
+### `VAL-187` Suspend withholds launch authority and preserves continuity
+
+- An Exec is accepted but its launch has not yet been externally dispatched.
+- A SuspendSandbox operation withholds the launch-authority grant instead of terminalizing.
+- The Process stays `accepted` with `process.launchAuthority` recorded as withheld.
+- A successful same-epoch Resume regrants authority and the Process starts normally.
+
+### `VAL-188` Full locked traversal including reconciliation
+
+- A Process advances `accepted` to `starting` to `running` along locked edges.
+- A lost observer moves it from `running` to the reconcilable `unknown`.
+- Fresh same-epoch evidence moves it from `unknown` back to `running`, and later to `terminated`.
+- No transition outside the locked edge set is constructible on the generated state machine.
+
+### `VAL-189` Provider-specific detail carried as evidence beside a closed arm
+
+- A remote provider returns its own vendor-specific termination code for a Process.
+- The Process terminalizes with exactly one arm of the closed `ProcessTermination` union and that arm's declared payload.
+- The vendor code is retained in the protected evidence record rather than in the outcome.
+- No terminated Process is constructible with an absent, open, or provider-defined reason field.
+
+### `VAL-190` `stoppedBySandbox` recorded only on proven causality
+
+- A StopSandbox teardown obtains a target-side containment-absence proof from the driver.
+- The Stop causality record links that deliberate teardown to each captured Process.
+- Each such Process terminalizes as `stoppedBySandbox` citing both facts.
+- A Process without such a proof stays unproven instead of taking the arm.
+
+### `VAL-191` Wait deadline expires without touching its target
+
+- A `WaitProcess` call with a five-second deadline expires while the Process is still `running`.
+- The result returns the latest Process record with an explicit condition-met flag set false.
+- `process.status.state` and `process.status.output.cursor` are byte-for-byte unchanged by the expiry.
+- A second observation of the same Process sees exactly the same durable state.
+
+### `VAL-192` Teardown-time late evidence linked, never applied
+
+- A Process committed `exited(0)` before the Stop traversal began.
+- A late signal acknowledgement and a provider event arrive during teardown.
+- Both are linked to the Process through `driver.lateEvidence` as retained evidence.
+- The committed terminal outcome and state are unchanged when teardown completes.
+
+### `VAL-193` Signal chosen from the advertised closed set
+
+- The Sandbox advertises a closed signal set for the resolved target, Process, and runtime epoch.
+- A SignalProcess request selects exactly one member of that set.
+- The request names the Process ID, Sandbox ID, and runtime epoch the set was advertised for.
+- A caller needing an unsupported signal uses TerminateProcess or StopSandbox instead.
+
+### `VAL-194` Resume before signalling, with Stop legal throughout
+
+- A suspended Sandbox refuses a generic SignalProcess when the target advertises no suspended-delivery semantics.
+- A Resume returns the Sandbox to running and the identical signal request is then admitted.
+- StopSandbox remains admissible for the whole suspension.
+- A target that does advertise deterministic delivery under suspension admits the generic signal directly.
+
+### `VAL-195` Exact target-specific signal action with backend acceptance
+
+- The bubblewrap driver signals the exact process in the sandbox PID namespace and records the kernel acceptance.
+- The microVM driver invokes the guest agent's signal action rather than a VM power control.
+- The remote-provider driver calls the provider's process-signal operation and retains its acceptance receipt.
+- A target offering no such action leaves the Operation nonterminal instead of emulating one.
+
+### `VAL-196` Dispatch success plus a separate Process observation
+
+- A SignalProcess Operation commits `succeeded` against its dispatch postcondition alone.
+- The declared success predicate names invocation and backend acceptance, never delivery or handling.
+- The caller reads `process.status.state` separately to learn whether the Process exited.
+- A Process that ignores the signal leaves the Operation successful and the Process running.
+
+### `VAL-197` Coordinated dispatch identity where supported, at-least-once recorded otherwise
+
+- A target that declares native dispatch-identity support receives a coordinated identity and the repeat is deduplicated by the backend.
+- A target that declares no such support has the attempt durably recorded as possibly at-least-once.
+- A retry re-reads the recorded attempt before repeating the native call.
+- The caller can read `operation.effectAttempt` and see which guarantee actually applies.
+
+### `VAL-198` Terminate succeeds on a proven terminal Process
+
+- The driver completes the graceful stage and then the force stage of termination.
+- The Process record holds an immutable terminal outcome together with its inability-to-act proof.
+- Only then does the TerminateProcess Operation commit `succeeded`.
+- A generic SignalProcess in the same Sandbox never silently acquires wait-for-exit semantics.
+
+### `VAL-199` Three-part proof assembled before `succeeded`
+
+- Sandbox ID, Process ID, runtime epoch, and authority are validated at admission.
+- The exact target is selected and recorded on the Operation.
+- The driver returns acceptance evidence for the target-specific dispatch.
+- With all three present the Operation commits `succeeded`; with any missing it stays nonterminal or terminalizes `unknown` naming the missing proof.
 
 ## Composition Authority Matrix
 

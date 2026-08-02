@@ -27833,6 +27833,4827 @@
         "secretSafe": true
       },
       "notes": "Packet E SBX family; discharges LIFECYCLE-18. Traversal: one launch (Create running, Start, or same-Sandbox Restore) traversal, at status publication."
+    },
+    {
+      "id": "PIO-001",
+      "title": "Output cursor advanced before durable persistence",
+      "statement": "A durable stdout, stderr, or merged-terminal output cursor advances only after the bytes it covers are durably persisted.",
+      "owner": "core",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "E1",
+      "rejectionDeadline": "E1",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the decision reads the persistence commit for a byte range against the cursor advance being written; both are Core spool facts and first exist once the Process produces output, at the exec outcome station. Q2: the durable output spool and its cursors are Core durable records. Q3: the exec outcome station is the last correct refusal point, because a published cursor is a promise of replayability that callers immediately rely on. Q4: same traversal as the Process producing the output. Reject-at-boundary: the persistence commit is a Core record.",
+      "invalidWitnesses": [
+        "PIO-001"
+      ],
+      "validWitnesses": [
+        "VAL-157"
+      ],
+      "targets": [
+        "portable"
+      ],
+      "trustBoundaries": [
+        "core-api"
+      ],
+      "compositionPaths": [
+        "direct-api",
+        "framework-adapter",
+        "cli-adapter",
+        "managed-service",
+        "resolved-driver-handoff"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "E1",
+          "component": "process-output-spool-validator",
+          "path": "planned/pio-001/authority",
+          "symbol": "enforce_pio_001",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/pio-001/source-rejection",
+          "case": "PIO-001",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "resolved-driver-handoff"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/pio-001/positive-boundary",
+          "case": "VAL-157",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "resolved-driver-handoff"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/pio-001/wire-corruption",
+          "case": "PIO-001-corrupted",
+          "status": "planned",
+          "covers": [
+            "core-api"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/pio-001/diagnostic",
+          "case": "PIO-001",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "portable"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PIO-001",
+        "primaryPaths": [
+          "process.status.output.cursor",
+          "process.output.persistedThrough"
+        ],
+        "relatedPaths": [],
+        "remediation": "Persist the byte range durably, then advance the cursor that covers it.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PIO family; discharges LIFECYCLE-37, TAXONOMY-12. Traversal: one Exec dispatch and its output stream."
+    },
+    {
+      "id": "PIO-002",
+      "title": "Cross-stream ordering promised without an explicitly merged terminal stream",
+      "statement": "stdout and stderr have independent monotonic cursors that preserve ordering within each stream, and no cross-stream ordering is promised unless the accepted Exec selected a terminal that explicitly merges them.",
+      "owner": "core",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "E1",
+      "rejectionDeadline": "E1",
+      "disposition": "unrepresentable",
+      "rationale": "Q1: the decision reads the accepted Exec's stream contract and the cursor structure being published; both are complete at the exec outcome station. Q2: the stream contract and its cursors are Core durable records. Q3: the exec outcome station is the last correct refusal point, because publishing a single interleaved cursor is what creates the false promise. Q4: same traversal. Unrepresentable because the generated output type exposes per-stream cursors and offers a merged stream only for a Process whose accepted contract selected a merging terminal.",
+      "invalidWitnesses": [
+        "PIO-002"
+      ],
+      "validWitnesses": [
+        "VAL-158"
+      ],
+      "targets": [
+        "portable"
+      ],
+      "trustBoundaries": [
+        "core-api",
+        "process-launch"
+      ],
+      "compositionPaths": [
+        "direct-api",
+        "framework-adapter",
+        "cli-adapter",
+        "managed-service"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "E1",
+          "component": "process-output-spool-validator",
+          "path": "planned/pio-002/authority",
+          "symbol": "enforce_pio_002",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/pio-002/source-rejection",
+          "case": "PIO-002",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/pio-002/positive-boundary",
+          "case": "VAL-158",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/pio-002/wire-corruption",
+          "case": "PIO-002-corrupted",
+          "status": "planned",
+          "covers": [
+            "core-api",
+            "process-launch"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/pio-002/diagnostic",
+          "case": "PIO-002",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "portable"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PIO-002",
+        "primaryPaths": [
+          "process.status.output.cursor",
+          "exec.pty"
+        ],
+        "relatedPaths": [],
+        "remediation": "Read each stream from its own cursor, and request a terminal at Exec when merged ordering is required.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PIO family; discharges LIFECYCLE-38, TAXONOMY-12. Traversal: one Exec dispatch and its output stream."
+    },
+    {
+      "id": "PIO-003",
+      "title": "Replayed output chunk without a stable sequence identity",
+      "statement": "Every output chunk returned after reattachment from a supplied cursor carries a stable sequence identity that lets the caller deduplicate duplicate deliveries.",
+      "owner": "core",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "E1",
+      "rejectionDeadline": "E1",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the decision reads the chunk being emitted and the spool's stable sequence identity for that byte range; both are Core spool facts complete at the exec outcome station. Q2: the durable output spool is a Core durable record. Q3: the exec outcome station is the last correct refusal point, because an emitted chunk without an identity cannot be deduplicated afterwards. Q4: same traversal. Reject-at-boundary: the sequence identity is a Core record fact.",
+      "invalidWitnesses": [
+        "PIO-003"
+      ],
+      "validWitnesses": [
+        "VAL-159"
+      ],
+      "targets": [
+        "portable"
+      ],
+      "trustBoundaries": [
+        "core-api"
+      ],
+      "compositionPaths": [
+        "direct-api",
+        "framework-adapter",
+        "cli-adapter",
+        "managed-service",
+        "resolved-driver-handoff"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "E1",
+          "component": "process-output-spool-validator",
+          "path": "planned/pio-003/authority",
+          "symbol": "enforce_pio_003",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/pio-003/source-rejection",
+          "case": "PIO-003",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "resolved-driver-handoff"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/pio-003/positive-boundary",
+          "case": "VAL-159",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "resolved-driver-handoff"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/pio-003/wire-corruption",
+          "case": "PIO-003-corrupted",
+          "status": "planned",
+          "covers": [
+            "core-api"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/pio-003/diagnostic",
+          "case": "PIO-003",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "portable"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PIO-003",
+        "primaryPaths": [
+          "process.status.output.cursor",
+          "process.output.chunkSequence"
+        ],
+        "relatedPaths": [],
+        "remediation": "Attach the stable sequence identity to every emitted chunk so reattachment duplicates can be discarded by the caller.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PIO family; discharges LIFECYCLE-37, TAXONOMY-12. Traversal: one Exec dispatch and its output stream, at reattachment."
+    },
+    {
+      "id": "PIO-004",
+      "title": "Accepted Process input replayed",
+      "statement": "Accepted Process input is never replayed: no operation over an accepted, sequenced input frame re-submits it.",
+      "owner": "exec",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "E0",
+      "rejectionDeadline": "E0",
+      "disposition": "unrepresentable",
+      "rationale": "Q1: the decision reads the accepted, sequenced Process input frame's durable record and the operation proposed against it; both are complete at the Process-control request station where the resubmission would arrive. Q2: one Process-control request inside an existing Sandbox is the exec request surface; the accepted input-frame record is the consulted fact. Q3: the request station is the last correct refusal point, because a re-submitted input frame is already ordered for a second delivery once accepted. Q4: the separate rule bounding live stdin writer leases to one per Process has its own fact set and is filed at `198`. Unrepresentable because the generated input path offers no replay operation over an accepted, sequenced input frame.",
+      "invalidWitnesses": [
+        "PIO-004"
+      ],
+      "validWitnesses": [
+        "VAL-160"
+      ],
+      "targets": [
+        "portable"
+      ],
+      "trustBoundaries": [
+        "process-launch",
+        "idempotency-store"
+      ],
+      "compositionPaths": [
+        "direct-api",
+        "framework-adapter",
+        "cli-adapter",
+        "managed-service",
+        "exec-native-extension"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "E0",
+          "component": "process-control-validator",
+          "path": "planned/pio-004/authority",
+          "symbol": "enforce_pio_004",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/pio-004/source-rejection",
+          "case": "PIO-004",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "exec-native-extension"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/pio-004/positive-boundary",
+          "case": "VAL-160",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "exec-native-extension"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/pio-004/wire-corruption",
+          "case": "PIO-004-corrupted",
+          "status": "planned",
+          "covers": [
+            "process-launch",
+            "idempotency-store"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/pio-004/diagnostic",
+          "case": "PIO-004",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "portable"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PIO-004",
+        "primaryPaths": [
+          "exec.control.sequence",
+          "process.control.receipt"
+        ],
+        "relatedPaths": [],
+        "remediation": "Recover a lost response by the retained coordinate for the accepted input frame rather than by replaying the input.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PIO family; discharges LIFECYCLE-39. Traversal: one sequenced Process-control command inside an existing Sandbox."
+    },
+    {
+      "id": "PIO-005",
+      "title": "Process termination conflated with output sealing",
+      "statement": "Process termination and output sealing are independent facts, and end of output is authoritative only after backend exit and output drain are both proven.",
+      "owner": "core",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "E1",
+      "rejectionDeadline": "E1",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the decision reads the Process terminal outcome and the output seal record; both are Core durable records first available at the exec outcome station. Q2: the Process record and the output spool are Core-owned. Q3: the exec outcome station is the last correct refusal point, because end of output becomes authoritative the moment the seal is committed there; the Stop and Delete window in which retained output is drained and sealed is covered by `191`. Q4: the driver's obligation to produce backend-exit and drain evidence is a separate runtime-owned entry. Reject-at-boundary: both facts are Core records.",
+      "invalidWitnesses": [
+        "PIO-005"
+      ],
+      "validWitnesses": [
+        "VAL-161"
+      ],
+      "targets": [
+        "portable"
+      ],
+      "trustBoundaries": [
+        "core-api"
+      ],
+      "compositionPaths": [
+        "direct-api",
+        "framework-adapter",
+        "cli-adapter",
+        "managed-service",
+        "resolved-driver-handoff"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "E1",
+          "component": "process-output-spool-validator",
+          "path": "planned/pio-005/authority",
+          "symbol": "enforce_pio_005",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/pio-005/source-rejection",
+          "case": "PIO-005",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "resolved-driver-handoff"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/pio-005/positive-boundary",
+          "case": "VAL-161",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "resolved-driver-handoff"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/pio-005/wire-corruption",
+          "case": "PIO-005-corrupted",
+          "status": "planned",
+          "covers": [
+            "core-api"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/pio-005/diagnostic",
+          "case": "PIO-005",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "portable"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PIO-005",
+        "primaryPaths": [
+          "process.status.termination",
+          "process.status.output.sealedAt"
+        ],
+        "relatedPaths": [],
+        "remediation": "Report termination and output sealing as separate facts and declare end of output only after backend exit and drain are proven.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PIO family; discharges LIFECYCLE-40. Traversal: one Exec dispatch and its output stream."
+    },
+    {
+      "id": "PIO-006",
+      "title": "End of output declared without proven backend exit and drain",
+      "statement": "A driver supplies proven backend exit and output-drain evidence before the Core may seal a Process output stream.",
+      "owner": "runtime",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "E1",
+      "rejectionDeadline": "E1",
+      "disposition": "observed-conformance",
+      "rationale": "Q1: the decision reads the driver's backend exit observation and its drain evidence for the Process's spool; both exist only after the execution ends. Q2: producing and decoding that native evidence is the driver/provider boundary, so runtime owns it; the Core stores the seal but does not observe the backend pipe. Q3: the exec outcome station is the last correct refusal point, because the Core seals the stream there and a seal committed without proven drain cannot be withdrawn afterwards; the driver's obligation over the Stop and Delete drain window is filed as its own runtime-owned teardown entry alongside `191`. Q4: the Core-side independence of termination and sealing is a separate entry under a different owner. Observed-conformance because the evidence is provable only after the effect.",
+      "invalidWitnesses": [
+        "PIO-006"
+      ],
+      "validWitnesses": [
+        "VAL-162"
+      ],
+      "targets": [
+        "all-enabled-targets"
+      ],
+      "trustBoundaries": [
+        "driver-entry",
+        "core-api"
+      ],
+      "compositionPaths": [
+        "resolved-driver-handoff",
+        "generated-runtime-configuration",
+        "provider-native-operation"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "E1",
+          "component": "driver-output-drain-validator",
+          "path": "planned/pio-006/authority",
+          "symbol": "enforce_pio_006",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "runtime-probe",
+          "path": "planned/pio-006/runtime-probe",
+          "case": "PIO-006",
+          "status": "planned",
+          "covers": [
+            "resolved-driver-handoff",
+            "generated-runtime-configuration",
+            "provider-native-operation"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "source-rejection",
+          "path": "planned/pio-006/source-rejection",
+          "case": "PIO-006",
+          "status": "planned",
+          "covers": [
+            "resolved-driver-handoff",
+            "generated-runtime-configuration",
+            "provider-native-operation"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/pio-006/positive-boundary",
+          "case": "VAL-162",
+          "status": "planned",
+          "covers": [
+            "resolved-driver-handoff",
+            "generated-runtime-configuration",
+            "provider-native-operation"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/pio-006/wire-corruption",
+          "case": "PIO-006-corrupted",
+          "status": "planned",
+          "covers": [
+            "driver-entry",
+            "core-api"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/pio-006/diagnostic",
+          "case": "PIO-006",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PIO-006",
+        "primaryPaths": [
+          "driver.outputDrainEvidence",
+          "process.status.output.sealedAt"
+        ],
+        "relatedPaths": [],
+        "remediation": "Observe backend exit and drain the transport fully, then supply that evidence so the Core can seal the stream.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PIO family; discharges LIFECYCLE-40, TAXONOMY-12. Traversal: one Exec dispatch and its output stream."
+    },
+    {
+      "id": "PIO-007",
+      "title": "Output truncation, limit, or expiry hidden from the caller",
+      "statement": "Output retention duration, byte limit, and truncation are explicit, and a read from an expired cursor returns the typed output-expired result reporting the earliest retained cursor where partial output remains.",
+      "owner": "core",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "E1",
+      "rejectionDeadline": "E1",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the decision reads the spool's retention and limit contract, the requested cursor, and the earliest retained cursor; all are Core spool facts complete at the exec outcome station. Q2: the durable output spool and its retention contract are Core durable records. Q3: the exec outcome station is the last correct refusal point, because silently returning fewer bytes destroys the caller's ability to detect the gap. Q4: same traversal. Reject-at-boundary: every consulted fact is a Core record.",
+      "invalidWitnesses": [
+        "PIO-007"
+      ],
+      "validWitnesses": [
+        "VAL-163"
+      ],
+      "targets": [
+        "portable"
+      ],
+      "trustBoundaries": [
+        "core-api"
+      ],
+      "compositionPaths": [
+        "direct-api",
+        "framework-adapter",
+        "cli-adapter",
+        "managed-service"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "E1",
+          "component": "process-output-spool-validator",
+          "path": "planned/pio-007/authority",
+          "symbol": "enforce_pio_007",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/pio-007/source-rejection",
+          "case": "PIO-007",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/pio-007/positive-boundary",
+          "case": "VAL-163",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/pio-007/wire-corruption",
+          "case": "PIO-007-corrupted",
+          "status": "planned",
+          "covers": [
+            "core-api"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/pio-007/diagnostic",
+          "case": "PIO-007",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "portable"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PIO-007",
+        "primaryPaths": [
+          "process.status.output.cursor",
+          "process.output.retention",
+          "process.output.truncatedAt"
+        ],
+        "relatedPaths": [],
+        "remediation": "Return the typed output-expired result with the earliest retained cursor and record truncation explicitly instead of silently shortening the stream.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PIO family; discharges LIFECYCLE-41, TAXONOMY-12. Traversal: one Exec dispatch and its output stream."
+    },
+    {
+      "id": "PIO-008",
+      "title": "Process-control command without its exact coordinate",
+      "statement": "Every WriteProcessInput, CloseProcessInput, and ResizeProcessTerminal command carries its exact Process ID, Sandbox ID, runtime epoch, writer lease, and monotonically increasing sequence number as part of the command coordinate.",
+      "owner": "exec",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "E0",
+      "rejectionDeadline": "E0",
+      "disposition": "unrepresentable",
+      "rationale": "Q1: the decision reads the submitted command's fields against the required coordinate; that is complete at the Process-control request station. Q2: one Process request inside an existing Sandbox is the exec request surface. Q3: the request station is the last correct refusal point, because acceptance commits a receipt keyed by that coordinate. Q4: same traversal. Unrepresentable because the generated ProcessControlCommand type makes every coordinate member required, so an ordinary retryable RPC without a lease or sequence has no construction path.",
+      "invalidWitnesses": [
+        "PIO-008"
+      ],
+      "validWitnesses": [
+        "VAL-164"
+      ],
+      "targets": [
+        "portable"
+      ],
+      "trustBoundaries": [
+        "process-launch"
+      ],
+      "compositionPaths": [
+        "direct-api",
+        "framework-adapter",
+        "cli-adapter",
+        "managed-service",
+        "exec-native-extension"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "E0",
+          "component": "process-control-validator",
+          "path": "planned/pio-008/authority",
+          "symbol": "enforce_pio_008",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/pio-008/source-rejection",
+          "case": "PIO-008",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "exec-native-extension"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/pio-008/positive-boundary",
+          "case": "VAL-164",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "exec-native-extension"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/pio-008/wire-corruption",
+          "case": "PIO-008-corrupted",
+          "status": "planned",
+          "covers": [
+            "process-launch"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/pio-008/diagnostic",
+          "case": "PIO-008",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "portable"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PIO-008",
+        "primaryPaths": [
+          "exec.control.coordinate",
+          "exec.control.sequence",
+          "exec.control.writerLeaseId"
+        ],
+        "relatedPaths": [],
+        "remediation": "Submit the command with its complete Process-control coordinate rather than as an ordinary retryable RPC.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PIO family; discharges RESULT-32, TAXONOMY-12. Traversal: one sequenced Process-control command inside an existing Sandbox."
+    },
+    {
+      "id": "PIO-009",
+      "title": "Repeated Process-control sequence enqueues a duplicate command",
+      "statement": "A retained prior sequence resubmitted with the same canonical command recovers the same durable receipt and never enqueues a second ordered command, regardless of later Process or lease state.",
+      "owner": "core",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "E0",
+      "rejectionDeadline": "E1",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the decision reads the retained receipt for that lease and sequence and the submitted canonical command digest; both are Core durable records complete at the Process-control request station. Q2: the retained receipt and the ordered command log are Core durable records. Q3: the delivery station is the last correct point at which refusing to enqueue is still correct, because after enqueue the duplicate is already ordered for delivery. Q4: same traversal. Reject-at-boundary: retained-coordinate recovery precedes current Process and lease validation and consults only Core records.",
+      "invalidWitnesses": [
+        "PIO-009"
+      ],
+      "validWitnesses": [
+        "VAL-165"
+      ],
+      "targets": [
+        "portable"
+      ],
+      "trustBoundaries": [
+        "idempotency-store",
+        "core-api"
+      ],
+      "compositionPaths": [
+        "direct-api",
+        "framework-adapter",
+        "cli-adapter",
+        "managed-service"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "E1",
+          "component": "process-control-receipt-validator",
+          "path": "planned/pio-009/authority",
+          "symbol": "enforce_pio_009",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/pio-009/source-rejection",
+          "case": "PIO-009",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/pio-009/positive-boundary",
+          "case": "VAL-165",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/pio-009/wire-corruption",
+          "case": "PIO-009-corrupted",
+          "status": "planned",
+          "covers": [
+            "idempotency-store",
+            "core-api"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/pio-009/diagnostic",
+          "case": "PIO-009",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "portable"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PIO-009",
+        "primaryPaths": [
+          "exec.control.sequence",
+          "process.control.receipt"
+        ],
+        "relatedPaths": [],
+        "remediation": "Return the retained receipt for the matching lease, sequence, and canonical command instead of enqueuing the command again.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PIO family; discharges RESULT-33. Traversal: one sequenced Process-control command inside an existing Sandbox, through delivery."
+    },
+    {
+      "id": "PIO-010",
+      "title": "Repeated sequence accepted with different canonical content",
+      "statement": "A retained prior sequence resubmitted with a different canonical command is refused as a typed Process-control conflict carrying the original and submitted digests, and dispatches no command.",
+      "owner": "core",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "E0",
+      "rejectionDeadline": "E0",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the decision reads the retained receipt's canonical digest and the submitted digest; both are complete at the Process-control request station. Q2: the retained receipt is a Core durable record. Q3: the request station is the last correct refusal point, because acceptance would bind one sequence to two meanings. Q4: same traversal. Reject-at-boundary: the comparison is between the request and a Core record.",
+      "invalidWitnesses": [
+        "PIO-010"
+      ],
+      "validWitnesses": [
+        "VAL-166"
+      ],
+      "targets": [
+        "portable"
+      ],
+      "trustBoundaries": [
+        "idempotency-store",
+        "core-api"
+      ],
+      "compositionPaths": [
+        "direct-api",
+        "framework-adapter",
+        "cli-adapter",
+        "managed-service"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "E0",
+          "component": "process-control-validator",
+          "path": "planned/pio-010/authority",
+          "symbol": "enforce_pio_010",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/pio-010/source-rejection",
+          "case": "PIO-010",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/pio-010/positive-boundary",
+          "case": "VAL-166",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/pio-010/wire-corruption",
+          "case": "PIO-010-corrupted",
+          "status": "planned",
+          "covers": [
+            "idempotency-store",
+            "core-api"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/pio-010/diagnostic",
+          "case": "PIO-010",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "portable"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PIO-010",
+        "primaryPaths": [
+          "exec.control.sequence",
+          "process.control.receipt.canonicalCommandDigest"
+        ],
+        "relatedPaths": [],
+        "remediation": "Reuse the exact canonical command for a retained sequence, and allocate the next sequence for genuinely new content.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PIO family; discharges RESULT-34. Traversal: one sequenced Process-control command inside an existing Sandbox."
+    },
+    {
+      "id": "PIO-011",
+      "title": "Out-of-order Process-control command accepted",
+      "statement": "A genuinely new Process-control command is accepted only at the exact next sequence for its live writer lease, and a future sequence leaving a gap is refused with its typed out-of-range result.",
+      "owner": "core",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "E0",
+      "rejectionDeadline": "E0",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the decision reads the lease's last accepted sequence and the submitted sequence; both are Core durable records complete at the Process-control request station. Q2: the ordered control log is a Core durable record. Q3: the request station is the last correct refusal point, because acceptance places the command in the delivery order. Q4: retained-coordinate recovery and digest conflict are separate fact sets filed as their own entries, since only a genuinely new command reaches sequencing. Reject-at-boundary: the ordering state is Core-held.",
+      "invalidWitnesses": [
+        "PIO-011"
+      ],
+      "validWitnesses": [
+        "VAL-167"
+      ],
+      "targets": [
+        "portable"
+      ],
+      "trustBoundaries": [
+        "core-api",
+        "process-launch"
+      ],
+      "compositionPaths": [
+        "direct-api",
+        "framework-adapter",
+        "cli-adapter",
+        "managed-service"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "E0",
+          "component": "process-control-validator",
+          "path": "planned/pio-011/authority",
+          "symbol": "enforce_pio_011",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/pio-011/source-rejection",
+          "case": "PIO-011",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/pio-011/positive-boundary",
+          "case": "VAL-167",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/pio-011/wire-corruption",
+          "case": "PIO-011-corrupted",
+          "status": "planned",
+          "covers": [
+            "core-api",
+            "process-launch"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/pio-011/diagnostic",
+          "case": "PIO-011",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "portable"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PIO-011",
+        "primaryPaths": [
+          "exec.control.sequence",
+          "process.control.lastAcceptedSequence"
+        ],
+        "relatedPaths": [],
+        "remediation": "Submit the exact next sequence for the lease, and resubmit the missing sequence before advancing.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PIO family; discharges RESULT-35. Traversal: one sequenced Process-control command inside an existing Sandbox."
+    },
+    {
+      "id": "PIO-012",
+      "title": "Writer lease controls a different Process or runtime epoch",
+      "statement": "A writer lease is bound to exactly one Process and runtime epoch and is never retargeted after runtime replacement, Process termination, attachment reconnection, or SDK Session rebinding.",
+      "owner": "core",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "E0",
+      "rejectionDeadline": "E0",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the decision reads the lease's bound Process and epoch against the command's target coordinate; both are complete at the Process-control request station. Q2: the writer-lease binding to one Process and runtime epoch is the Core durable record that grants the single-writer lane, so under Criterion O the owner is `core`. Q3: the request station is the last correct refusal point, because acceptance would order a command against the wrong execution. Q4: the adapter's obligation to make Session rebinding explicit is a different owner on the adapter traversal and is filed there. Reject-at-boundary: the lease binding is a Core record compared against the request.",
+      "invalidWitnesses": [
+        "PIO-012"
+      ],
+      "validWitnesses": [
+        "VAL-168"
+      ],
+      "targets": [
+        "portable"
+      ],
+      "trustBoundaries": [
+        "process-launch",
+        "core-api"
+      ],
+      "compositionPaths": [
+        "direct-api",
+        "framework-adapter",
+        "cli-adapter",
+        "managed-service"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "E0",
+          "component": "process-control-validator",
+          "path": "planned/pio-012/authority",
+          "symbol": "enforce_pio_012",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/pio-012/source-rejection",
+          "case": "PIO-012",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/pio-012/positive-boundary",
+          "case": "VAL-168",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/pio-012/wire-corruption",
+          "case": "PIO-012-corrupted",
+          "status": "planned",
+          "covers": [
+            "process-launch",
+            "core-api"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/pio-012/diagnostic",
+          "case": "PIO-012",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "portable"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PIO-012",
+        "primaryPaths": [
+          "exec.control.writerLeaseId",
+          "exec.control.coordinate",
+          "process.sandboxRuntimeRef"
+        ],
+        "relatedPaths": [],
+        "remediation": "Acquire a new writer lease for the new Process and epoch instead of reusing a stale lease.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PIO family; discharges RESULT-36. Traversal: one sequenced Process-control command inside an existing Sandbox."
+    },
+    {
+      "id": "PIO-013",
+      "title": "Input receipt represented as application consumption",
+      "statement": "A Process-control receipt proves only that Core durably deduplicated and ordered the command and owns its delivery obligation, and never that the process consumed input bytes, that an application reacted to a terminal resize, or that the Process remains alive.",
+      "owner": "core",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "E1",
+      "rejectionDeadline": "E1",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the decision reads the receipt's declared meaning against the outcome being reported; both are complete at the exec outcome station where the receipt state is published. Q2: the receipt and its declared semantics are Core durable records. Q3: the exec outcome station is the last correct refusal point, because the published receipt state is what callers act on. Q4: same traversal. Reject-at-boundary: the over-claim is detectable from the receipt contract alone with no further observation.",
+      "invalidWitnesses": [
+        "PIO-013"
+      ],
+      "validWitnesses": [
+        "VAL-169"
+      ],
+      "targets": [
+        "portable"
+      ],
+      "trustBoundaries": [
+        "core-api"
+      ],
+      "compositionPaths": [
+        "direct-api",
+        "framework-adapter",
+        "cli-adapter",
+        "managed-service"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "E1",
+          "component": "process-control-receipt-validator",
+          "path": "planned/pio-013/authority",
+          "symbol": "enforce_pio_013",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/pio-013/source-rejection",
+          "case": "PIO-013",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/pio-013/positive-boundary",
+          "case": "VAL-169",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/pio-013/wire-corruption",
+          "case": "PIO-013-corrupted",
+          "status": "planned",
+          "covers": [
+            "core-api"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/pio-013/diagnostic",
+          "case": "PIO-013",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "portable"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PIO-013",
+        "primaryPaths": [
+          "process.control.receipt.state",
+          "process.control.outcome"
+        ],
+        "relatedPaths": [],
+        "remediation": "Report the receipt against its ordering and delivery meaning and observe the Process resource separately for application behaviour.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PIO family; discharges RESULT-37. Traversal: one sequenced Process-control command inside an existing Sandbox, at receipt publication."
+    },
+    {
+      "id": "PIO-014",
+      "title": "Terminal resize accepted for a Process without a terminal or after termination",
+      "statement": "ResizeProcessTerminal is accepted only for a nonterminal Process whose accepted Exec selected a terminal, and travels the same ordered Process-control stream as input and close.",
+      "owner": "exec",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "E0",
+      "rejectionDeadline": "E0",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the decision reads the accepted Exec's terminal selection and the Process's current state against the resize request; all are Core-held facts complete at the Process-control request station. Q2: the Process request surface inside an existing Sandbox is exec. Q3: the request station is the last correct refusal point, because acceptance places a resize into the control order for an execution that cannot honour it. Q4: same traversal. Reject-at-boundary under Ruling R2: the terminal selection and Process state are Core durable records, not external state.",
+      "invalidWitnesses": [
+        "PIO-014"
+      ],
+      "validWitnesses": [
+        "VAL-170"
+      ],
+      "targets": [
+        "portable"
+      ],
+      "trustBoundaries": [
+        "process-launch"
+      ],
+      "compositionPaths": [
+        "direct-api",
+        "framework-adapter",
+        "cli-adapter",
+        "managed-service",
+        "exec-native-extension"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "E0",
+          "component": "process-control-validator",
+          "path": "planned/pio-014/authority",
+          "symbol": "enforce_pio_014",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/pio-014/source-rejection",
+          "case": "PIO-014",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "exec-native-extension"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/pio-014/positive-boundary",
+          "case": "VAL-170",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "exec-native-extension"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/pio-014/wire-corruption",
+          "case": "PIO-014-corrupted",
+          "status": "planned",
+          "covers": [
+            "process-launch"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/pio-014/diagnostic",
+          "case": "PIO-014",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "portable"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PIO-014",
+        "primaryPaths": [
+          "exec.control.resize",
+          "exec.pty",
+          "process.status.state"
+        ],
+        "relatedPaths": [],
+        "remediation": "Request a terminal at Exec and issue resize only while the Process is nonterminal, through the ordered Process-control stream.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PIO family; discharges TAXONOMY-13, RESULT-38. Traversal: one sequenced Process-control command inside an existing Sandbox."
+    },
+    {
+      "id": "PIO-015",
+      "title": "Input accepted after CloseProcessInput",
+      "statement": "CloseProcessInput commits an irreversible ordered close record, after which any later input write for that Process is refused.",
+      "owner": "core",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "E0",
+      "rejectionDeadline": "E0",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the decision reads the ordered control log for a committed close record and the submitted write; both are Core durable records complete at the Process-control request station. Q2: the ordered control log is a Core durable record. Q3: the request station is the last correct refusal point, because acceptance would order a write after an irreversible close. Q4: same traversal. Reject-at-boundary: the close record is a Core record consulted before acceptance.",
+      "invalidWitnesses": [
+        "PIO-015"
+      ],
+      "validWitnesses": [
+        "VAL-171"
+      ],
+      "targets": [
+        "portable"
+      ],
+      "trustBoundaries": [
+        "core-api",
+        "process-launch"
+      ],
+      "compositionPaths": [
+        "direct-api",
+        "framework-adapter",
+        "cli-adapter",
+        "managed-service"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "E0",
+          "component": "process-control-validator",
+          "path": "planned/pio-015/authority",
+          "symbol": "enforce_pio_015",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/pio-015/source-rejection",
+          "case": "PIO-015",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/pio-015/positive-boundary",
+          "case": "VAL-171",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/pio-015/wire-corruption",
+          "case": "PIO-015-corrupted",
+          "status": "planned",
+          "covers": [
+            "core-api",
+            "process-launch"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/pio-015/diagnostic",
+          "case": "PIO-015",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "portable"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PIO-015",
+        "primaryPaths": [
+          "exec.control.close",
+          "process.control.log"
+        ],
+        "relatedPaths": [],
+        "remediation": "Treat the close as final for that Process and start a new Exec when further input is required.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PIO family; discharges RESULT-39. Traversal: one sequenced Process-control command inside an existing Sandbox."
+    },
+    {
+      "id": "PIO-016",
+      "title": "Accepted Process-control command silently lost",
+      "statement": "Every accepted Process-control command terminalizes as delivered, discarded with a never-delivered proof under an exact Process-terminal rule, failed with a never-delivered proof and quiesced delivery authority, or `unknown` naming its missing proofs, and remains observable through the Process control status or retained evidence.",
+      "owner": "core",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "E1",
+      "rejectionDeadline": "E1",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the decision reads the accepted receipt, the delivery evidence, and the Process-terminal rule that may discard it; all are Core durable records first complete at the exec outcome station. Q2: the receipt and its outcome carrier are Core durable records. Q3: the exec outcome station is the last correct refusal point, because the command's terminal outcome is committed there and a silently dropped receipt cannot be recovered afterwards; the Stop and Delete window in which remaining Processes are terminalized and pending commands resolved is covered by `191`. Q4: same traversal as the command. Reject-at-boundary: the four outcome arms are disjoint and selectable from Core records plus the driver evidence already retained.",
+      "invalidWitnesses": [
+        "PIO-016"
+      ],
+      "validWitnesses": [
+        "VAL-172"
+      ],
+      "targets": [
+        "portable"
+      ],
+      "trustBoundaries": [
+        "core-api"
+      ],
+      "compositionPaths": [
+        "direct-api",
+        "framework-adapter",
+        "cli-adapter",
+        "managed-service",
+        "resolved-driver-handoff"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "E1",
+          "component": "process-control-receipt-validator",
+          "path": "planned/pio-016/authority",
+          "symbol": "enforce_pio_016",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/pio-016/source-rejection",
+          "case": "PIO-016",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "resolved-driver-handoff"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/pio-016/positive-boundary",
+          "case": "VAL-172",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "resolved-driver-handoff"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/pio-016/wire-corruption",
+          "case": "PIO-016-corrupted",
+          "status": "planned",
+          "covers": [
+            "core-api"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/pio-016/diagnostic",
+          "case": "PIO-016",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "portable"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PIO-016",
+        "primaryPaths": [
+          "process.control.receipt.state",
+          "process.control.outcome"
+        ],
+        "relatedPaths": [],
+        "remediation": "Terminalize every accepted command with one of the four disjoint outcomes and keep the receipt observable rather than discarding it silently.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PIO family; discharges RESULT-40. Traversal: one sequenced Process-control command inside an existing Sandbox."
+    },
+    {
+      "id": "PIO-017",
+      "title": "Teardown discards retained output or an accepted Process-control command",
+      "statement": "Sandbox teardown drains and seals retained Process output and resolves every accepted Process-control command with one of its four declared terminal outcomes; nothing accepted is silently discarded by Stop or Delete.",
+      "owner": "core",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "T0",
+      "rejectionDeadline": "T0",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the facts are the retained output spool, the accepted Process-control receipts, and their outcome carriers, all Core durable records on the teardown traversal. Q2: the output spool and the control-command receipts are Core-owned. Q3: T0 is the teardown station and the last point at which a silent discard can be refused. Q4: the offending act belongs to the Stop or Delete traversal. This is the T0 half of `171`, `172`, and `182`, which were borrowing the `E1\u2192T0` edge to reach it (L0.D3).",
+      "invalidWitnesses": [
+        "PIO-017"
+      ],
+      "validWitnesses": [
+        "VAL-173"
+      ],
+      "targets": [
+        "portable"
+      ],
+      "trustBoundaries": [
+        "core-api"
+      ],
+      "compositionPaths": [
+        "direct-api",
+        "framework-adapter",
+        "cli-adapter",
+        "managed-service",
+        "resolved-driver-handoff"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "T0",
+          "component": "sandbox-teardown-validator",
+          "path": "planned/pio-017/authority",
+          "symbol": "enforce_pio_017",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/pio-017/source-rejection",
+          "case": "PIO-017",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "resolved-driver-handoff"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/pio-017/positive-boundary",
+          "case": "VAL-173",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "resolved-driver-handoff"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/pio-017/wire-corruption",
+          "case": "PIO-017-corrupted",
+          "status": "planned",
+          "covers": [
+            "core-api"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/pio-017/diagnostic",
+          "case": "PIO-017",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "portable"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PIO-017",
+        "primaryPaths": [
+          "process.status.output.cursor",
+          "process.output.sealed",
+          "process.control.command.outcome"
+        ],
+        "relatedPaths": [],
+        "remediation": "Drain and seal retained output and resolve every accepted Process-control command with one of its four declared terminal outcomes before completing teardown.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PIO family; discharges LIFECYCLE-40, RESULT-40. Traversal: Sandbox teardown traversal during Stop or Delete, at output seal and Process-control resolution."
+    },
+    {
+      "id": "PIO-018",
+      "title": "More than one live stdin writer lease for one Process",
+      "statement": "At most one live stdin writer lease exists for a Process at any time, and a Process-control command bearing a lease that is not the current live lease is refused with the typed lease-conflict result.",
+      "owner": "core",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "E0",
+      "rejectionDeadline": "E0",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the facts are the Process's current live lease record and the lease the submitted command carries, both Core durable records at the Process-control admission station. Q2: the lease binding is a Core durable record. Q3: E0 is the admission station and the last point at which a conflicting lease can be refused. Q4: the offending act is the Process-control command itself. Split out of `170` (L3.D11), which keeps only the non-replay clause at `unrepresentable`. Note: lease issue, expiry, renewal, transfer, and takeover are open design work; this entry asserts exclusivity as a boundary check, not as a generated type guarantee.",
+      "invalidWitnesses": [
+        "PIO-018"
+      ],
+      "validWitnesses": [
+        "VAL-174"
+      ],
+      "targets": [
+        "portable"
+      ],
+      "trustBoundaries": [
+        "process-launch",
+        "core-api"
+      ],
+      "compositionPaths": [
+        "direct-api",
+        "framework-adapter",
+        "cli-adapter",
+        "managed-service"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "E0",
+          "component": "process-control-validator",
+          "path": "planned/pio-018/authority",
+          "symbol": "enforce_pio_018",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/pio-018/source-rejection",
+          "case": "PIO-018",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/pio-018/positive-boundary",
+          "case": "VAL-174",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/pio-018/wire-corruption",
+          "case": "PIO-018-corrupted",
+          "status": "planned",
+          "covers": [
+            "process-launch",
+            "core-api"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/pio-018/diagnostic",
+          "case": "PIO-018",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "portable"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PIO-018",
+        "primaryPaths": [
+          "exec.control.writerLeaseId",
+          "process.control.liveLeases"
+        ],
+        "relatedPaths": [],
+        "remediation": "Acquire or take over the single live writer lease explicitly, and refuse commands bearing any other lease with the typed lease-conflict result.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PIO family; discharges LIFECYCLE-39. Traversal: one sequenced Process-control command inside an existing Sandbox, at lease validation."
+    },
+    {
+      "id": "PIO-019",
+      "title": "Teardown seal declared without driver-supplied backend exit and drain evidence",
+      "statement": "A driver supplies proven backend exit and output-drain evidence for every retained Process stream during Stop or Delete before the Core may seal that stream at teardown.",
+      "owner": "runtime",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "T0",
+      "rejectionDeadline": "T0",
+      "disposition": "observed-conformance",
+      "rationale": "Q1: the decision reads the driver's backend-exit observation and its drain evidence for each retained spool on the teardown traversal; both exist only after the teardown effect has acted. Q2: producing and decoding that native evidence is the driver/provider boundary, so runtime owns it; the Core stores the teardown seal but does not observe the backend pipe. Q3: T0 is the teardown station and the last point at which withholding the seal is still correct. Q4: the Core-side teardown obligation to drain, seal, and resolve accepted commands is `191` under a different owner; the exec-outcome half of the driver obligation is `152`, whose traversal is narrowed to one Exec dispatch and its output stream. Observed-conformance because the evidence is provable only after the effect. Added because the locked Stop Completion Protocol assigns the reap-drain-seal step to the portable Stop driver, so the driver obligation does not terminate at E1.",
+      "invalidWitnesses": [
+        "PIO-019"
+      ],
+      "validWitnesses": [
+        "VAL-175"
+      ],
+      "targets": [
+        "all-enabled-targets"
+      ],
+      "trustBoundaries": [
+        "driver-entry",
+        "core-api"
+      ],
+      "compositionPaths": [
+        "resolved-driver-handoff",
+        "generated-runtime-configuration",
+        "provider-native-operation"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "T0",
+          "component": "driver-output-drain-validator",
+          "path": "planned/pio-019/authority",
+          "symbol": "enforce_pio_019",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "runtime-probe",
+          "path": "planned/pio-019/runtime-probe",
+          "case": "PIO-019",
+          "status": "planned",
+          "covers": [
+            "resolved-driver-handoff",
+            "generated-runtime-configuration",
+            "provider-native-operation"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "source-rejection",
+          "path": "planned/pio-019/source-rejection",
+          "case": "PIO-019",
+          "status": "planned",
+          "covers": [
+            "resolved-driver-handoff",
+            "generated-runtime-configuration",
+            "provider-native-operation"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/pio-019/positive-boundary",
+          "case": "VAL-175",
+          "status": "planned",
+          "covers": [
+            "resolved-driver-handoff",
+            "generated-runtime-configuration",
+            "provider-native-operation"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/pio-019/wire-corruption",
+          "case": "PIO-019-corrupted",
+          "status": "planned",
+          "covers": [
+            "driver-entry",
+            "core-api"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/pio-019/diagnostic",
+          "case": "PIO-019",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PIO-019",
+        "primaryPaths": [
+          "driver.outputDrainEvidence",
+          "process.status.output.sealedAt",
+          "process.output.sealed"
+        ],
+        "relatedPaths": [],
+        "remediation": "Observe backend exit for every retained Process stream during teardown and drain the transport fully, then supply that evidence so the Core can seal at teardown.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PIO family; discharges LIFECYCLE-40, TAXONOMY-12. Traversal: Sandbox teardown traversal during Stop or Delete, at output drain and seal."
+    },
+    {
+      "id": "PRC-001",
+      "title": "Process terminal outcome mutated",
+      "statement": "A Process terminal outcome is immutable once committed, and every later signal acknowledgement, reaper observation, or provider event arriving after the outcome commit is retained as evidence rather than applied as a rewrite.",
+      "owner": "core",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "E1",
+      "rejectionDeadline": "E1",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the decision reads the existing terminal Process record and the proposed write; both are Core durable records and the protected outcome first exists at the exec outcome station. Q2: durable Process records and terminal outcomes are Core-owned. Q3: E1 is the exec outcome station and the last point on this traversal at which a late acknowledgement, reaper observation, or provider event can be refused as a rewrite; late evidence arriving during Stop or Delete is refused at `190`. Q4: the protected record is a Process outcome, not an Operation outcome, so this stays separate from the Operation immutability entry on the reconciliation traversal. Reject-at-boundary: refusing the rewrite consults two Core records and needs no new observation.",
+      "invalidWitnesses": [
+        "PRC-001"
+      ],
+      "validWitnesses": [
+        "VAL-176"
+      ],
+      "targets": [
+        "all-enabled-targets"
+      ],
+      "trustBoundaries": [
+        "core-api",
+        "process-launch"
+      ],
+      "compositionPaths": [
+        "resolved-driver-handoff",
+        "generated-runtime-configuration",
+        "provider-native-operation"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "E1",
+          "component": "process-outcome-validator",
+          "path": "planned/prc-001/authority",
+          "symbol": "enforce_prc_001",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/prc-001/source-rejection",
+          "case": "PRC-001",
+          "status": "planned",
+          "covers": [
+            "resolved-driver-handoff",
+            "generated-runtime-configuration",
+            "provider-native-operation"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/prc-001/positive-boundary",
+          "case": "VAL-176",
+          "status": "planned",
+          "covers": [
+            "resolved-driver-handoff",
+            "generated-runtime-configuration",
+            "provider-native-operation"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/prc-001/wire-corruption",
+          "case": "PRC-001-corrupted",
+          "status": "planned",
+          "covers": [
+            "core-api",
+            "process-launch"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/prc-001/diagnostic",
+          "case": "PRC-001",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PRC-001",
+        "primaryPaths": [
+          "process.status.termination",
+          "process.status.state"
+        ],
+        "relatedPaths": [],
+        "remediation": "Retain the late observation as evidence linked to the Process and leave the committed terminal outcome unchanged.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PRC family; discharges LIFECYCLE-29, IDENTITY-18. Traversal: one Exec dispatch and its outcome."
+    },
+    {
+      "id": "PRC-002",
+      "title": "Terminal Operation unknown conflated with reconcilable Process unknown",
+      "statement": "Process `unknown` is a nonterminal reconcilable observation state drawn from the Process vocabulary, and is never projected as a terminal Operation outcome or treated as replay authorization.",
+      "owner": "core",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "E1",
+      "rejectionDeadline": "E1",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the decision reads the two closed vocabularies \u2014 the Process state graph and the Operation outcome union \u2014 together with the record being written; the Process vocabulary is only in scope on a traversal holding a Process record, which is the exec branch. Q2: both vocabularies and the record are Core durable-record facts. Q3: the exec outcome station is the last correct refusal point, because the projection is committed there. Q4: filing at the reconciliation station would make launch and reconciliation components assert defensive revalidation of a Process-vocabulary rule they never traverse for exec-originated Processes, which is a false coverage claim; those stations keep only defensive hooks. Reject-at-boundary rather than unrepresentable, because the type-level distinctness of the two unions does not stop a conforming implementation from making this semantic projection error.",
+      "invalidWitnesses": [
+        "PRC-002"
+      ],
+      "validWitnesses": [
+        "VAL-177"
+      ],
+      "targets": [
+        "portable"
+      ],
+      "trustBoundaries": [
+        "core-api"
+      ],
+      "compositionPaths": [
+        "direct-api",
+        "framework-adapter",
+        "cli-adapter",
+        "managed-service",
+        "resolved-driver-handoff"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "E1",
+          "component": "process-outcome-validator",
+          "path": "planned/prc-002/authority",
+          "symbol": "enforce_prc_002",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/prc-002/source-rejection",
+          "case": "PRC-002",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "resolved-driver-handoff"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/prc-002/positive-boundary",
+          "case": "VAL-177",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "resolved-driver-handoff"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/prc-002/wire-corruption",
+          "case": "PRC-002-corrupted",
+          "status": "planned",
+          "covers": [
+            "core-api"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/prc-002/diagnostic",
+          "case": "PRC-002",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "portable"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PRC-002",
+        "primaryPaths": [
+          "process.status.state",
+          "operation.outcome"
+        ],
+        "relatedPaths": [],
+        "remediation": "Keep the Process in its reconcilable state and terminalize only the Operation, then resolve the Process through reconciliation of its own launch token.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PRC family; discharges IDENTITY-27, RESULT-25, LIFECYCLE-26. Traversal: one Exec dispatch and its outcome."
+    },
+    {
+      "id": "PRC-003",
+      "title": "Process-targeted Operation outcome terminalizes the Process",
+      "statement": "A Signal or Terminate Operation's committed terminal outcome describes only that Operation, and never writes a terminal outcome onto the targeted Process record.",
+      "owner": "core",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "L1",
+      "rejectionDeadline": "L1",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the decision reads the Process-targeted Operation's committed outcome against the referenced Process record; both are Core durable records complete at the live operation's outcome station. Q2: Operation and Process records are Core-owned. Q3: the live outcome station is the last correct refusal point, because the Operation's terminalization is what tempts the conflation. Q4: the exec-branch conflation of the two vocabularies is a different fact set and is filed on the exec traversal. Reject-at-boundary: two Core records decide it with no new observation.",
+      "invalidWitnesses": [
+        "PRC-003"
+      ],
+      "validWitnesses": [
+        "VAL-178"
+      ],
+      "targets": [
+        "portable"
+      ],
+      "trustBoundaries": [
+        "core-api",
+        "live-operation"
+      ],
+      "compositionPaths": [
+        "direct-api",
+        "framework-adapter",
+        "cli-adapter",
+        "managed-service",
+        "live-native-extension"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "L1",
+          "component": "live-operation-outcome-validator",
+          "path": "planned/prc-003/authority",
+          "symbol": "enforce_prc_003",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/prc-003/source-rejection",
+          "case": "PRC-003",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "live-native-extension"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/prc-003/positive-boundary",
+          "case": "VAL-178",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "live-native-extension"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/prc-003/wire-corruption",
+          "case": "PRC-003-corrupted",
+          "status": "planned",
+          "covers": [
+            "core-api",
+            "live-operation"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/prc-003/diagnostic",
+          "case": "PRC-003",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "portable"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PRC-003",
+        "primaryPaths": [
+          "operation.outcome",
+          "operation.target.processId",
+          "process.status.state"
+        ],
+        "relatedPaths": [],
+        "remediation": "Terminalize the Operation from its own proof obligations and update the Process only from Process-level termination evidence.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PRC family; discharges LIFECYCLE-23, LIFECYCLE-26. Traversal: one Process-targeted Signal or Terminate operation against an existing Sandbox."
+    },
+    {
+      "id": "PRC-004",
+      "title": "Ambiguous Process automatically replaced",
+      "statement": "An accepted Process whose outcome is unproven is reconciled against its own launch token and is never replaced by a Core- or driver-initiated replacement dispatch.",
+      "owner": "core",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "E1",
+      "rejectionDeadline": "E1",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the decision reads the accepted Process record, its durable launch token and effect intent, and the current knowledge set for that one attempted execution; all exist at the exec outcome station. Q2: the accepted Process record and its effect intent are Core durable records. Q3: the exec outcome station is the last correct refusal point, because the replacement dispatch is the violation. Q4: framing this as an admission gate on a new caller Exec is rejected: it would make a legitimate new command unexpressible while a prior Process is unresolved and destroy the required valid witness, so the rule sits at the outcome station where replacement is chosen; the adapter-side auto-replay prohibition is a different owner filed on the adapter boundary. Reject-at-boundary: the durable intent and knowledge set are Core-held.",
+      "invalidWitnesses": [
+        "PRC-004"
+      ],
+      "validWitnesses": [
+        "VAL-179"
+      ],
+      "targets": [
+        "portable"
+      ],
+      "trustBoundaries": [
+        "core-api",
+        "process-launch"
+      ],
+      "compositionPaths": [
+        "direct-api",
+        "framework-adapter",
+        "cli-adapter",
+        "managed-service",
+        "resolved-driver-handoff"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "E1",
+          "component": "process-outcome-validator",
+          "path": "planned/prc-004/authority",
+          "symbol": "enforce_prc_004",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/prc-004/source-rejection",
+          "case": "PRC-004",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "resolved-driver-handoff"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/prc-004/positive-boundary",
+          "case": "VAL-179",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "resolved-driver-handoff"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/prc-004/wire-corruption",
+          "case": "PRC-004-corrupted",
+          "status": "planned",
+          "covers": [
+            "core-api",
+            "process-launch"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/prc-004/diagnostic",
+          "case": "PRC-004",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "portable"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PRC-004",
+        "primaryPaths": [
+          "process.status.state",
+          "process.launchToken",
+          "process.effectIntent"
+        ],
+        "relatedPaths": [],
+        "remediation": "Reconcile the same launch token and, once learned, the same backend execution identity, and leave the Process unproven rather than dispatching a replacement.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PRC family; discharges IDENTITY-10, LIFECYCLE-25, RESULT-29. Traversal: one Exec dispatch and its outcome."
+    },
+    {
+      "id": "PRC-005",
+      "title": "Termination arm asserted without its exact native evidence",
+      "statement": "The selected ProcessTermination arm is justified by exactly the native evidence that arm asserts, so a nonzero exit decodes to the exited arm, startFailed proves the command never became running, deadlineExceeded proves the original Process can neither launch nor continue, and lost runtime never decodes to an ordinary exit.",
+      "owner": "runtime",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "E1",
+      "rejectionDeadline": "E1",
+      "disposition": "observed-conformance",
+      "rationale": "Q1: the decision reads the observed native termination evidence \u2014 a wait status, a supervisor execution record, a deadline proof, or a lost-runtime signal \u2014 against the closed ProcessTermination union; that evidence exists only once termination is observed. Q2: decoding native evidence into a typed arm is trusted decoding at the driver/provider boundary, which is exactly what runtime denotes; the Core stores the arm but does not decode the native wait status. Q3: the exec outcome station is the last correct refusal point, because the arm is committed there and is thereafter immutable. Q4: same traversal as the Process being decoded. Observed-conformance because the justification is provable only from the observed termination.",
+      "invalidWitnesses": [
+        "PRC-005"
+      ],
+      "validWitnesses": [
+        "VAL-180"
+      ],
+      "targets": [
+        "all-enabled-targets"
+      ],
+      "trustBoundaries": [
+        "driver-entry",
+        "process-launch"
+      ],
+      "compositionPaths": [
+        "resolved-driver-handoff",
+        "generated-runtime-configuration",
+        "provider-native-operation"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "E1",
+          "component": "driver-termination-evidence-decoder",
+          "path": "planned/prc-005/authority",
+          "symbol": "enforce_prc_005",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "runtime-probe",
+          "path": "planned/prc-005/runtime-probe",
+          "case": "PRC-005",
+          "status": "planned",
+          "covers": [
+            "resolved-driver-handoff",
+            "generated-runtime-configuration",
+            "provider-native-operation"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "source-rejection",
+          "path": "planned/prc-005/source-rejection",
+          "case": "PRC-005",
+          "status": "planned",
+          "covers": [
+            "resolved-driver-handoff",
+            "generated-runtime-configuration",
+            "provider-native-operation"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/prc-005/positive-boundary",
+          "case": "VAL-180",
+          "status": "planned",
+          "covers": [
+            "resolved-driver-handoff",
+            "generated-runtime-configuration",
+            "provider-native-operation"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/prc-005/wire-corruption",
+          "case": "PRC-005-corrupted",
+          "status": "planned",
+          "covers": [
+            "driver-entry",
+            "process-launch"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/prc-005/diagnostic",
+          "case": "PRC-005",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PRC-005",
+        "primaryPaths": [
+          "process.status.termination",
+          "driver.terminationEvidence"
+        ],
+        "relatedPaths": [],
+        "remediation": "Decode the exact native termination evidence into its matching arm, and report the Process as unproven when the evidence does not justify any arm.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PRC family; discharges LIFECYCLE-28, RESULT-26, RESULT-27, RESULT-23, RESULT-28. Traversal: one Exec dispatch and its outcome."
+    },
+    {
+      "id": "PRC-006",
+      "title": "Lost runtime carries an invented exit code",
+      "statement": "The runtimeLost termination arm is a bare variant that carries no exit code, signal, or other execution-outcome payload.",
+      "owner": "core",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "E1",
+      "rejectionDeadline": "E1",
+      "disposition": "unrepresentable",
+      "rationale": "Q1: the decision reads only the shape of the ProcessTermination union arm being constructed; that is complete at the exec outcome station. Q2: the terminal Process record and its closed union are Core durable-record facts. Q3: the exec outcome station is the last correct refusal point, because the arm is committed there. Q4: same traversal. Unrepresentable rather than reject-at-boundary: the arm is declared with no payload field, so no supported API can attach an exit code to it; the separate rule that the arm must be justified by lost-runtime evidence is the runtime-owned decoding entry.",
+      "invalidWitnesses": [
+        "PRC-006"
+      ],
+      "validWitnesses": [
+        "VAL-181"
+      ],
+      "targets": [
+        "portable"
+      ],
+      "trustBoundaries": [
+        "core-api"
+      ],
+      "compositionPaths": [
+        "resolved-driver-handoff",
+        "generated-runtime-configuration"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "E1",
+          "component": "process-outcome-validator",
+          "path": "planned/prc-006/authority",
+          "symbol": "enforce_prc_006",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/prc-006/source-rejection",
+          "case": "PRC-006",
+          "status": "planned",
+          "covers": [
+            "resolved-driver-handoff",
+            "generated-runtime-configuration"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/prc-006/positive-boundary",
+          "case": "VAL-181",
+          "status": "planned",
+          "covers": [
+            "resolved-driver-handoff",
+            "generated-runtime-configuration"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/prc-006/wire-corruption",
+          "case": "PRC-006-corrupted",
+          "status": "planned",
+          "covers": [
+            "core-api"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/prc-006/diagnostic",
+          "case": "PRC-006",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "portable"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PRC-006",
+        "primaryPaths": [
+          "process.status.termination"
+        ],
+        "relatedPaths": [],
+        "remediation": "Record runtimeLost as the bare arm and carry any native detail in the protected evidence record instead.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PRC family; discharges RESULT-28, LIFECYCLE-28. Traversal: one Exec dispatch and its outcome."
+    },
+    {
+      "id": "PRC-007",
+      "title": "Teardown leaves a Process nonterminal",
+      "statement": "A Stop or Delete traversal terminalizes every remaining nonterminal Process of the captured epoch with an exact recorded reason before the Sandbox is published stopped.",
+      "owner": "core",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "T0",
+      "rejectionDeadline": "T0",
+      "disposition": "observed-conformance",
+      "rationale": "Q1: the decision reads the captured Process set, each Process's reaped outcome, and the containment-absence proof; those facts exist only at the teardown evidence station. Q2: terminalizing the durable Process records is a Core durable-record act, distinct from the driver's containment-absence proof, which is a separate runtime-owned entry at the same station. Q3: the teardown station is the last correct point to withhold the stopped publication, and there is no later station on this traversal. Q4: same traversal as the Stop or Delete operation being described. Observed-conformance because the reaped outcomes are provable only after teardown observation.",
+      "invalidWitnesses": [
+        "PRC-007"
+      ],
+      "validWitnesses": [
+        "VAL-182"
+      ],
+      "targets": [
+        "all-enabled-targets"
+      ],
+      "trustBoundaries": [
+        "core-api",
+        "process-launch"
+      ],
+      "compositionPaths": [
+        "direct-api",
+        "framework-adapter",
+        "cli-adapter",
+        "managed-service",
+        "resolved-driver-handoff"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "T0",
+          "component": "sandbox-teardown-validator",
+          "path": "planned/prc-007/authority",
+          "symbol": "enforce_prc_007",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "runtime-probe",
+          "path": "planned/prc-007/runtime-probe",
+          "case": "PRC-007",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "resolved-driver-handoff"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "source-rejection",
+          "path": "planned/prc-007/source-rejection",
+          "case": "PRC-007",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "resolved-driver-handoff"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/prc-007/positive-boundary",
+          "case": "VAL-182",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "resolved-driver-handoff"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/prc-007/wire-corruption",
+          "case": "PRC-007-corrupted",
+          "status": "planned",
+          "covers": [
+            "core-api",
+            "process-launch"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/prc-007/diagnostic",
+          "case": "PRC-007",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PRC-007",
+        "primaryPaths": [
+          "process.status.state",
+          "process.status.termination",
+          "sandbox.status.runtime.state"
+        ],
+        "relatedPaths": [],
+        "remediation": "Reap Process outcomes, terminalize every remaining nonterminal Process with its exact reason, and only then publish the Sandbox as stopped.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PRC family; discharges IDENTITY-11, LIFECYCLE-13. Traversal: one Stop or Delete teardown traversal."
+    },
+    {
+      "id": "PRC-008",
+      "title": "Process unknown resolved with a different execution identity or epoch",
+      "statement": "An unproven Process resolves to running or terminated only by reconciling the same Core launch token and, once learned, the same backend execution identity in the same runtime epoch.",
+      "owner": "core",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "E1",
+      "rejectionDeadline": "E1",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the decision reads the Process's durable launch token and bound runtime reference against the identity carried by the incoming evidence; the launch token, request, Process ID, and effect intent are durable before dispatch, so the fact set is complete at the exec outcome station. Q2: the launch token and Process binding are Core durable records. Q3: the exec outcome station is the last correct refusal point, because accepting mismatched evidence commits a false resolution. Q4: same traversal. Reject-at-boundary: the comparison is between the incoming evidence's identity and a Core record.",
+      "invalidWitnesses": [
+        "PRC-008"
+      ],
+      "validWitnesses": [
+        "VAL-183"
+      ],
+      "targets": [
+        "all-enabled-targets"
+      ],
+      "trustBoundaries": [
+        "core-api",
+        "process-launch"
+      ],
+      "compositionPaths": [
+        "resolved-driver-handoff",
+        "generated-runtime-configuration",
+        "provider-native-operation"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "E1",
+          "component": "process-outcome-validator",
+          "path": "planned/prc-008/authority",
+          "symbol": "enforce_prc_008",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/prc-008/source-rejection",
+          "case": "PRC-008",
+          "status": "planned",
+          "covers": [
+            "resolved-driver-handoff",
+            "generated-runtime-configuration",
+            "provider-native-operation"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/prc-008/positive-boundary",
+          "case": "VAL-183",
+          "status": "planned",
+          "covers": [
+            "resolved-driver-handoff",
+            "generated-runtime-configuration",
+            "provider-native-operation"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/prc-008/wire-corruption",
+          "case": "PRC-008-corrupted",
+          "status": "planned",
+          "covers": [
+            "core-api",
+            "process-launch"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/prc-008/diagnostic",
+          "case": "PRC-008",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PRC-008",
+        "primaryPaths": [
+          "process.launchToken",
+          "process.sandboxRuntimeRef",
+          "driver.nativeExecutionIdentity"
+        ],
+        "relatedPaths": [],
+        "remediation": "Reject evidence bearing a different backend execution identity or runtime epoch and keep the Process unproven until matching evidence arrives.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PRC family; discharges LIFECYCLE-27, IDENTITY-10. Traversal: one Exec dispatch and its outcome."
+    },
+    {
+      "id": "PRC-009",
+      "title": "Authority-epoch advance or fencing used to terminalize a Process",
+      "statement": "Internal authority-epoch advancement or predecessor fencing removes only the ability to commit Core state; a Process becomes terminal solely on target-side fencing, a verifiable drain boundary, or other proof that it can no longer execute or produce external effects.",
+      "owner": "core",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "E1",
+      "rejectionDeadline": "E1",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the facts are the advanced authority epoch, the capability's authority epoch, and the driver's fencing proof, read against the Process record at the Process outcome commit. Q2: the protected artefact is the Core Process terminal-outcome commitment, so the owner is `core`. Q3: E1 is the outcome-commit station and the last point at which an unproven terminalization can be refused. Q4: the offending act is the Process outcome commit on the Exec dispatch traversal. Merged from indices 33 and 154 (L1.D14, L2.D10, L3.D6 ref) -- one rule filed twice, on the FEN and PRC indices, for one fact set.",
+      "invalidWitnesses": [
+        "PRC-009"
+      ],
+      "validWitnesses": [
+        "VAL-184"
+      ],
+      "targets": [
+        "all-enabled-targets"
+      ],
+      "trustBoundaries": [
+        "core-api",
+        "driver-entry"
+      ],
+      "compositionPaths": [
+        "direct-api",
+        "framework-adapter",
+        "managed-service",
+        "resolved-driver-handoff"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "E1",
+          "component": "process-outcome-validator",
+          "path": "planned/prc-009/authority",
+          "symbol": "enforce_prc_009",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/prc-009/source-rejection",
+          "case": "PRC-009",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "managed-service",
+            "resolved-driver-handoff"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/prc-009/positive-boundary",
+          "case": "VAL-184",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "managed-service",
+            "resolved-driver-handoff"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/prc-009/wire-corruption",
+          "case": "PRC-009-corrupted",
+          "status": "planned",
+          "covers": [
+            "core-api",
+            "driver-entry"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/prc-009/diagnostic",
+          "case": "PRC-009",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PRC-009",
+        "primaryPaths": [
+          "process.status.state",
+          "process.status.termination",
+          "sandbox.authorityEpoch",
+          "capability.authorityEpoch",
+          "driver.fencingProof"
+        ],
+        "relatedPaths": [],
+        "remediation": "Advance authority to prevent stale commits, but keep the Process unproven until target fencing or a verifiable drain boundary proves it cannot act.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PRC family; discharges LIFECYCLE-30, IDENTITY-11, IDENTITY-21. Traversal: one Exec dispatch and its outcome, at Process outcome commit."
+    },
+    {
+      "id": "PRC-010",
+      "title": "Stale running observation retained after its only observer is lost",
+      "statement": "A Process whose only fresh observer is lost stops being reported as running and is restored to running only from fresh same-epoch evidence.",
+      "owner": "core",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "E1",
+      "rejectionDeadline": "E1",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the decision reads the Process's last observation, the freshness and liveness of the observing channel, and the bound epoch; all are Core-held facts at the exec outcome station. Q2: the Process status record and its evidence freshness are Core durable records. Q3: the exec outcome station is the last correct point to demote the reported state, because a stale running report authorizes callers to act on a Process that may already be gone. Q4: the runtime-side obligation to reconnect the control channel under current authority is a separate Sandbox-state entry. Reject-at-boundary: observer liveness is a Core-held fact, not external state being probed.",
+      "invalidWitnesses": [
+        "PRC-010"
+      ],
+      "validWitnesses": [
+        "VAL-185"
+      ],
+      "targets": [
+        "all-enabled-targets"
+      ],
+      "trustBoundaries": [
+        "core-api"
+      ],
+      "compositionPaths": [
+        "resolved-driver-handoff",
+        "generated-runtime-configuration",
+        "provider-native-operation"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "E1",
+          "component": "process-outcome-validator",
+          "path": "planned/prc-010/authority",
+          "symbol": "enforce_prc_010",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/prc-010/source-rejection",
+          "case": "PRC-010",
+          "status": "planned",
+          "covers": [
+            "resolved-driver-handoff",
+            "generated-runtime-configuration",
+            "provider-native-operation"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/prc-010/positive-boundary",
+          "case": "VAL-185",
+          "status": "planned",
+          "covers": [
+            "resolved-driver-handoff",
+            "generated-runtime-configuration",
+            "provider-native-operation"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/prc-010/wire-corruption",
+          "case": "PRC-010-corrupted",
+          "status": "planned",
+          "covers": [
+            "core-api"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/prc-010/diagnostic",
+          "case": "PRC-010",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PRC-010",
+        "primaryPaths": [
+          "process.status.state",
+          "process.observationFreshness"
+        ],
+        "relatedPaths": [],
+        "remediation": "Demote the Process to its reconcilable state when its only fresh observer is lost, and restore running only from fresh same-epoch evidence.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PRC family; discharges LIFECYCLE-31. Traversal: one Exec dispatch and its outcome."
+    },
+    {
+      "id": "PRC-011",
+      "title": "Old-epoch Process left nonterminal after runtime replacement",
+      "statement": "A launch traversal that replaces a runtime terminalizes every nonterminal Process of the replaced epoch with runtimeReplaced, runtimeLost, or fenced before the new epoch is published running.",
+      "owner": "core",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "R1",
+      "rejectionDeadline": "R1",
+      "disposition": "observed-conformance",
+      "rationale": "Q1: the decision reads the replaced epoch's Process set together with the fencing or absence evidence produced by the replacement; that evidence exists only at the launch result station. Q2: terminalizing durable Process records is a Core durable-record act. Q3: the launch result station is the last correct point to withhold the running publication, because publishing the new epoch while old Processes remain nonterminal leaves two live lineages. Q4: the teardown counterpart is a separate per-station entry on the Stop or Delete traversal, since a combined entry would bind launch components to a teardown pair they do not traverse. Observed-conformance because the fencing evidence is post-launch.",
+      "invalidWitnesses": [
+        "PRC-011"
+      ],
+      "validWitnesses": [
+        "VAL-186"
+      ],
+      "targets": [
+        "all-enabled-targets"
+      ],
+      "trustBoundaries": [
+        "core-api",
+        "process-launch"
+      ],
+      "compositionPaths": [
+        "direct-api",
+        "framework-adapter",
+        "managed-service",
+        "resolved-driver-handoff",
+        "generated-runtime-configuration"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "R1",
+          "component": "runtime-epoch-transition-validator",
+          "path": "planned/prc-011/authority",
+          "symbol": "enforce_prc_011",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "runtime-probe",
+          "path": "planned/prc-011/runtime-probe",
+          "case": "PRC-011",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "managed-service",
+            "resolved-driver-handoff",
+            "generated-runtime-configuration"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "source-rejection",
+          "path": "planned/prc-011/source-rejection",
+          "case": "PRC-011",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "managed-service",
+            "resolved-driver-handoff",
+            "generated-runtime-configuration"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/prc-011/positive-boundary",
+          "case": "VAL-186",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "managed-service",
+            "resolved-driver-handoff",
+            "generated-runtime-configuration"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/prc-011/wire-corruption",
+          "case": "PRC-011-corrupted",
+          "status": "planned",
+          "covers": [
+            "core-api",
+            "process-launch"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/prc-011/diagnostic",
+          "case": "PRC-011",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PRC-011",
+        "primaryPaths": [
+          "process.status.termination",
+          "sandbox.status.runtime.epoch"
+        ],
+        "relatedPaths": [],
+        "remediation": "Terminalize every nonterminal Process of the replaced epoch with its exact reason before publishing the new epoch as running.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PRC family; discharges IDENTITY-11, LIFECYCLE-46. Traversal: one launch traversal that replaces an existing runtime epoch."
+    },
+    {
+      "id": "PRC-012",
+      "title": "Suspend terminalizes an accepted but undispatched Process",
+      "statement": "A continuity-preserving Suspend withholds launch authority from an accepted but externally undispatched Process and leaves it accepted rather than terminalizing it.",
+      "owner": "core",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "L1",
+      "rejectionDeadline": "L1",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the decision reads the Process's accepted state, whether its launch has been externally dispatched, and the operation's continuity-preserving kind; all three are Core durable records available at the live operation's effect station. Q2: launch authority and Process records are Core-owned. Q3: the live effect station is the last correct refusal point, because terminalization is immutable. Q4: the absence-producing counterpart, where Stop revokes authority and terminalizes the undispatched Process, is part of the teardown traversal's obligations. Reject-at-boundary under Ruling R2: no external state is consulted.",
+      "invalidWitnesses": [
+        "PRC-012"
+      ],
+      "validWitnesses": [
+        "VAL-187"
+      ],
+      "targets": [
+        "portable"
+      ],
+      "trustBoundaries": [
+        "core-api",
+        "live-operation"
+      ],
+      "compositionPaths": [
+        "direct-api",
+        "framework-adapter",
+        "cli-adapter",
+        "managed-service",
+        "live-native-extension"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "L1",
+          "component": "live-operation-outcome-validator",
+          "path": "planned/prc-012/authority",
+          "symbol": "enforce_prc_012",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/prc-012/source-rejection",
+          "case": "PRC-012",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "live-native-extension"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/prc-012/positive-boundary",
+          "case": "VAL-187",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "live-native-extension"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/prc-012/wire-corruption",
+          "case": "PRC-012-corrupted",
+          "status": "planned",
+          "covers": [
+            "core-api",
+            "live-operation"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/prc-012/diagnostic",
+          "case": "PRC-012",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "portable"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PRC-012",
+        "primaryPaths": [
+          "process.status.state",
+          "process.launchAuthority"
+        ],
+        "relatedPaths": [],
+        "remediation": "Withhold the launch-authority grant and leave the undispatched Process accepted, so a successful same-epoch Resume can regrant it.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PRC family; discharges LIFECYCLE-09. Traversal: one SuspendSandbox operation against an existing Sandbox."
+    },
+    {
+      "id": "PRC-013",
+      "title": "Process state transition outside the locked graph",
+      "statement": "Process state advances only along the locked edges from accepted to starting or terminated, from starting to running, `unknown`, or terminated, from running to `unknown` or terminated, and from `unknown` to running or terminated.",
+      "owner": "core",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "E1",
+      "rejectionDeadline": "E1",
+      "disposition": "unrepresentable",
+      "rationale": "Q1: the decision reads the current Process state and the proposed successor state; both are complete wherever the Process record is written, and the exec outcome station is the earliest station on this traversal at which a state advance is committed. Q2: the Process state graph is a Core durable-record vocabulary. Q3: the exec outcome station is the last correct refusal point, because the write commits there. Q4: same traversal. Unrepresentable because a generated state machine exposes only the locked edges as constructible transitions.",
+      "invalidWitnesses": [
+        "PRC-013"
+      ],
+      "validWitnesses": [
+        "VAL-188"
+      ],
+      "targets": [
+        "portable"
+      ],
+      "trustBoundaries": [
+        "core-api"
+      ],
+      "compositionPaths": [
+        "direct-api",
+        "framework-adapter",
+        "cli-adapter",
+        "managed-service",
+        "resolved-driver-handoff"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "E1",
+          "component": "process-outcome-validator",
+          "path": "planned/prc-013/authority",
+          "symbol": "enforce_prc_013",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/prc-013/source-rejection",
+          "case": "PRC-013",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "resolved-driver-handoff"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/prc-013/positive-boundary",
+          "case": "VAL-188",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "resolved-driver-handoff"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/prc-013/wire-corruption",
+          "case": "PRC-013-corrupted",
+          "status": "planned",
+          "covers": [
+            "core-api"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/prc-013/diagnostic",
+          "case": "PRC-013",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "portable"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PRC-013",
+        "primaryPaths": [
+          "process.status.state"
+        ],
+        "relatedPaths": [],
+        "remediation": "Advance the Process only along a locked edge, and reconcile rather than reviving a terminated Process.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PRC family; discharges LIFECYCLE-26, IDENTITY-11. Traversal: one Exec dispatch and its outcome."
+    },
+    {
+      "id": "PRC-014",
+      "title": "Terminated Process carries an open or absent outcome",
+      "statement": "Every terminated Process carries exactly one arm of the closed ProcessTermination union with that arm's declared payload, and never an absent, open, or provider-defined outcome.",
+      "owner": "core",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "E1",
+      "rejectionDeadline": "E1",
+      "disposition": "unrepresentable",
+      "rationale": "Q1: the decision reads the terminated Process record's outcome field against the closed union; that is complete at the exec outcome station. Q2: the terminal Process record and its closed union are Core durable-record facts. Q3: the exec outcome station is the last correct refusal point, because the outcome is immutable once committed. Q4: same traversal; the runtime-owned rule about which arm the evidence justifies is filed separately because its fact set is native evidence rather than record shape. Unrepresentable because the generated terminated variant requires exactly one arm of the sealed union and has no open reason field.",
+      "invalidWitnesses": [
+        "PRC-014"
+      ],
+      "validWitnesses": [
+        "VAL-189"
+      ],
+      "targets": [
+        "all-enabled-targets"
+      ],
+      "trustBoundaries": [
+        "core-api"
+      ],
+      "compositionPaths": [
+        "resolved-driver-handoff",
+        "generated-runtime-configuration",
+        "provider-native-operation"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "E1",
+          "component": "process-outcome-validator",
+          "path": "planned/prc-014/authority",
+          "symbol": "enforce_prc_014",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/prc-014/source-rejection",
+          "case": "PRC-014",
+          "status": "planned",
+          "covers": [
+            "resolved-driver-handoff",
+            "generated-runtime-configuration",
+            "provider-native-operation"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/prc-014/positive-boundary",
+          "case": "VAL-189",
+          "status": "planned",
+          "covers": [
+            "resolved-driver-handoff",
+            "generated-runtime-configuration",
+            "provider-native-operation"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/prc-014/wire-corruption",
+          "case": "PRC-014-corrupted",
+          "status": "planned",
+          "covers": [
+            "core-api"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/prc-014/diagnostic",
+          "case": "PRC-014",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PRC-014",
+        "primaryPaths": [
+          "process.status.termination"
+        ],
+        "relatedPaths": [],
+        "remediation": "Commit exactly one closed ProcessTermination arm and keep native codes in the protected evidence record.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PRC family; discharges RESULT-47, RESULT-48, LIFECYCLE-29. Traversal: one Exec dispatch and its outcome."
+    },
+    {
+      "id": "PRC-015",
+      "title": "Replacement, fencing, or Stop causality asserted without target-side proof",
+      "statement": "The runtimeReplaced, fenced, and stoppedBySandbox termination arms are recorded only after target-side execution fencing or containment absence proves the Process cannot act, and stoppedBySandbox additionally requires proven deliberate Stop causality.",
+      "owner": "core",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "T0",
+      "rejectionDeadline": "T0",
+      "disposition": "observed-conformance",
+      "rationale": "Q1: the decision reads the target-side fencing or containment-absence proof and the Stop causality record against the arm being written; that proof exists only at the teardown evidence station. Q2: recording the arm on the durable Process record is a Core act; the driver's production of the absence proof is a separate runtime-owned entry at the same station. Q3: the teardown station is the last correct refusal point, and there is no later station on this traversal. Q4: same traversal as the Stop or Delete operation whose causality is being claimed. Observed-conformance because the fencing and causality facts are provable only from post-effect evidence.",
+      "invalidWitnesses": [
+        "PRC-015"
+      ],
+      "validWitnesses": [
+        "VAL-190"
+      ],
+      "targets": [
+        "all-enabled-targets"
+      ],
+      "trustBoundaries": [
+        "core-api",
+        "driver-entry"
+      ],
+      "compositionPaths": [
+        "direct-api",
+        "framework-adapter",
+        "cli-adapter",
+        "managed-service",
+        "resolved-driver-handoff"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "T0",
+          "component": "sandbox-teardown-validator",
+          "path": "planned/prc-015/authority",
+          "symbol": "enforce_prc_015",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "runtime-probe",
+          "path": "planned/prc-015/runtime-probe",
+          "case": "PRC-015",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "resolved-driver-handoff"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "source-rejection",
+          "path": "planned/prc-015/source-rejection",
+          "case": "PRC-015",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "resolved-driver-handoff"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/prc-015/positive-boundary",
+          "case": "VAL-190",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "resolved-driver-handoff"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/prc-015/wire-corruption",
+          "case": "PRC-015-corrupted",
+          "status": "planned",
+          "covers": [
+            "core-api",
+            "driver-entry"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/prc-015/diagnostic",
+          "case": "PRC-015",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PRC-015",
+        "primaryPaths": [
+          "process.status.termination",
+          "driver.containmentAbsenceProof"
+        ],
+        "relatedPaths": [],
+        "remediation": "Prove target-side fencing or containment absence and deliberate Stop causality before selecting these arms, otherwise leave the Process unproven.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PRC family; discharges LIFECYCLE-36, LIFECYCLE-13. Traversal: one Stop or Delete teardown traversal."
+    },
+    {
+      "id": "PRC-016",
+      "title": "Process observation or wait deadline mutating or terminalizing its target",
+      "statement": "A `WaitProcess`, `GetProcess`, or `ReadProcessOutput` deadline ends only that observation and never cancels, mutates, terminalizes, or advances the durable state of the observed Process or its output stream.",
+      "owner": "core",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "E1",
+      "rejectionDeadline": "E1",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the facts are the observation deadline and the durable Process and output records it observes, both Core durable records at the exec outcome station. Q2: durable Process records and output cursors are Core-owned. Q3: E1 is the last station at which a deadline-driven mutation of the observed Process can be refused. Q4: the offending act is the Process observation itself. Split out of `67` because L0 and E1 are mutually unreachable, so a Process-resource observation can never be revalidated from L0 (L0.D2).",
+      "invalidWitnesses": [
+        "PRC-016"
+      ],
+      "validWitnesses": [
+        "VAL-191"
+      ],
+      "targets": [
+        "portable"
+      ],
+      "trustBoundaries": [
+        "core-api"
+      ],
+      "compositionPaths": [
+        "direct-api",
+        "framework-adapter",
+        "cli-adapter",
+        "managed-service"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "E1",
+          "component": "process-observation-validator",
+          "path": "planned/prc-016/authority",
+          "symbol": "enforce_prc_016",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/prc-016/source-rejection",
+          "case": "PRC-016",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/prc-016/positive-boundary",
+          "case": "VAL-191",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/prc-016/wire-corruption",
+          "case": "PRC-016-corrupted",
+          "status": "planned",
+          "covers": [
+            "core-api"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/prc-016/diagnostic",
+          "case": "PRC-016",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "portable"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PRC-016",
+        "primaryPaths": [
+          "observation.deadline",
+          "process.status.state",
+          "process.status.output.cursor"
+        ],
+        "relatedPaths": [],
+        "remediation": "Return the observation result with the latest Process record and an explicit condition-met flag; leave the observed Process and its output stream unchanged.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PRC family; discharges IDENTITY-17, RESULT-30. Traversal: one Process observation (WaitProcess, GetProcess, ReadProcessOutput) against an existing Process."
+    },
+    {
+      "id": "PRC-017",
+      "title": "Teardown rewrites a committed Process terminal outcome",
+      "statement": "Sandbox teardown retains every late signal acknowledgement, reaper observation, and provider event arriving during Stop or Delete as evidence linked to the Process, and never applies it as a rewrite of a committed Process terminal outcome.",
+      "owner": "core",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "T0",
+      "rejectionDeadline": "T0",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the facts are the committed Process terminal outcome and the late evidence arriving during teardown, both Core durable records on the teardown traversal. Q2: durable Process records and terminal outcomes are Core-owned. Q3: T0 is the teardown station and the last point at which a rewrite can be refused. Q4: the offending act belongs to the Stop or Delete traversal, not to the Exec traversal. This is the T0 half that `146` was borrowing the `E1\u2192T0` edge to reach; cross-operation succession is a handoff record, never a phase edge (L0.D3).",
+      "invalidWitnesses": [
+        "PRC-017"
+      ],
+      "validWitnesses": [
+        "VAL-192"
+      ],
+      "targets": [
+        "all-enabled-targets"
+      ],
+      "trustBoundaries": [
+        "core-api"
+      ],
+      "compositionPaths": [
+        "resolved-driver-handoff",
+        "generated-runtime-configuration",
+        "provider-native-operation"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "T0",
+          "component": "sandbox-teardown-validator",
+          "path": "planned/prc-017/authority",
+          "symbol": "enforce_prc_017",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/prc-017/source-rejection",
+          "case": "PRC-017",
+          "status": "planned",
+          "covers": [
+            "resolved-driver-handoff",
+            "generated-runtime-configuration",
+            "provider-native-operation"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/prc-017/positive-boundary",
+          "case": "VAL-192",
+          "status": "planned",
+          "covers": [
+            "resolved-driver-handoff",
+            "generated-runtime-configuration",
+            "provider-native-operation"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/prc-017/wire-corruption",
+          "case": "PRC-017-corrupted",
+          "status": "planned",
+          "covers": [
+            "core-api"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/prc-017/diagnostic",
+          "case": "PRC-017",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "PRC-017",
+        "primaryPaths": [
+          "process.status.termination",
+          "process.status.state",
+          "driver.lateEvidence"
+        ],
+        "relatedPaths": [],
+        "remediation": "Link late acknowledgements, reaper observations, and provider events to the Process as evidence and leave the committed terminal outcome unchanged.",
+        "secretSafe": true
+      },
+      "notes": "Packet E PRC family; discharges LIFECYCLE-29, IDENTITY-18. Traversal: Sandbox teardown traversal during Stop or Delete, at late-evidence resolution."
+    },
+    {
+      "id": "SIG-001",
+      "title": "Arbitrary or unadvertised signal accepted",
+      "statement": "A SignalProcess request selects exactly one signal from the effective capability's closed advertised set for the targeted Process, Sandbox, and runtime epoch.",
+      "owner": "live",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "L0",
+      "rejectionDeadline": "L0",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the decision reads the requested signal against the resolved effective capability's closed advertised signal set and the target coordinate; all are complete at the live request surface. Q2: admission of one Process-targeted operation against an existing Sandbox is the live request surface. Q3: the live request surface is the last correct refusal point, because acceptance durably commits a signal intent. Q4: the driver-side rule that the dispatch must be the exact target-specific signal action, and not an emulation by VM power controls or Sandbox deletion, is a different owner at the dispatch station and is filed separately. Reject-at-boundary: the advertised set is an immutable capability fact returned with the Sandbox.",
+      "invalidWitnesses": [
+        "SIG-001"
+      ],
+      "validWitnesses": [
+        "VAL-193"
+      ],
+      "targets": [
+        "all-enabled-targets"
+      ],
+      "trustBoundaries": [
+        "live-operation-dispatch"
+      ],
+      "compositionPaths": [
+        "direct-api",
+        "framework-adapter",
+        "cli-adapter",
+        "managed-service",
+        "live-native-extension"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "L0",
+          "component": "live-operation-validator",
+          "path": "planned/sig-001/authority",
+          "symbol": "enforce_sig_001",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/sig-001/source-rejection",
+          "case": "SIG-001",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "live-native-extension"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/sig-001/positive-boundary",
+          "case": "VAL-193",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "live-native-extension"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/sig-001/wire-corruption",
+          "case": "SIG-001-corrupted",
+          "status": "planned",
+          "covers": [
+            "live-operation-dispatch"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/sig-001/diagnostic",
+          "case": "SIG-001",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "SIG-001",
+        "primaryPaths": [
+          "live.signal.signal",
+          "sandbox.capabilities.signals"
+        ],
+        "relatedPaths": [],
+        "remediation": "Select a signal from the advertised set, or use TerminateProcess or StopSandbox when the required signal is unsupported.",
+        "secretSafe": true
+      },
+      "notes": "Packet E SIG family; discharges TAXONOMY-21. Traversal: one SignalProcess request against an existing Sandbox."
+    },
+    {
+      "id": "SIG-002",
+      "title": "Generic signal accepted while the Sandbox is suspended",
+      "statement": "A generic SignalProcess request against a suspended Sandbox is admitted only when the target advertises deterministic delivery semantics under suspension, while StopSandbox remains legal.",
+      "owner": "live",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "L0",
+      "rejectionDeadline": "L0",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the decision reads the current Sandbox runtime state and the target's advertised suspended-delivery capability; both are Core-held facts complete at the live request surface. Q2: admission of one operation against an existing Sandbox is the live request surface. Q3: the live surface is the last correct refusal point, because acceptance commits a signal intent whose delivery semantics under quiescence are undefined. Q4: same traversal as the signal request. Reject-at-boundary under Ruling R2: current runtime state is a Core durable record, not external state being probed.",
+      "invalidWitnesses": [
+        "SIG-002"
+      ],
+      "validWitnesses": [
+        "VAL-194"
+      ],
+      "targets": [
+        "all-enabled-targets"
+      ],
+      "trustBoundaries": [
+        "live-operation-dispatch"
+      ],
+      "compositionPaths": [
+        "direct-api",
+        "framework-adapter",
+        "cli-adapter",
+        "managed-service",
+        "live-native-extension"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "L0",
+          "component": "live-operation-validator",
+          "path": "planned/sig-002/authority",
+          "symbol": "enforce_sig_002",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/sig-002/source-rejection",
+          "case": "SIG-002",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "live-native-extension"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/sig-002/positive-boundary",
+          "case": "VAL-194",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "live-native-extension"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/sig-002/wire-corruption",
+          "case": "SIG-002-corrupted",
+          "status": "planned",
+          "covers": [
+            "live-operation-dispatch"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/sig-002/diagnostic",
+          "case": "SIG-002",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "SIG-002",
+        "primaryPaths": [
+          "live.signal",
+          "sandbox.status.runtime.state",
+          "sandbox.capabilities.signals"
+        ],
+        "relatedPaths": [],
+        "remediation": "Resume the Sandbox before signalling, or use StopSandbox when the target does not advertise deterministic delivery under suspension.",
+        "secretSafe": true
+      },
+      "notes": "Packet E SIG family; discharges LIFECYCLE-34. Traversal: one SignalProcess request against an existing suspended Sandbox."
+    },
+    {
+      "id": "SIG-003",
+      "title": "Driver reports signal dispatch without invoking the exact target-specific action",
+      "statement": "A driver reports a signal dispatch as accepted only after invoking the exact target-specific signal action and obtaining backend acceptance evidence, never by emulating it with VM power controls, Sandbox deletion, or a coarser containment verb.",
+      "owner": "runtime",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "L1",
+      "rejectionDeadline": "L1",
+      "disposition": "observed-conformance",
+      "rationale": "Q1: the decision reads the driver's dispatch evidence \u2014 that the exact target-specific action was invoked and accepted \u2014 which exists only after the dispatch attempt. Q2: producing and decoding that native dispatch evidence is the driver/provider boundary, so runtime owns it; this also excludes emulating a missing signal with VM power controls or Sandbox deletion. Q3: the live operation's outcome station is the last correct point to withhold success. Q4: the separate rule that a successful dispatch is not delivery, handling, or exit reads the result contract alone under a different owner and is filed separately. Observed-conformance because the dispatch evidence is provable only after the effect.",
+      "invalidWitnesses": [
+        "SIG-003"
+      ],
+      "validWitnesses": [
+        "VAL-195"
+      ],
+      "targets": [
+        "all-enabled-targets"
+      ],
+      "trustBoundaries": [
+        "live-operation",
+        "driver-entry"
+      ],
+      "compositionPaths": [
+        "resolved-driver-handoff",
+        "generated-runtime-configuration",
+        "provider-native-operation"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "L1",
+          "component": "driver-dispatch-evidence-validator",
+          "path": "planned/sig-003/authority",
+          "symbol": "enforce_sig_003",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "runtime-probe",
+          "path": "planned/sig-003/runtime-probe",
+          "case": "SIG-003",
+          "status": "planned",
+          "covers": [
+            "resolved-driver-handoff",
+            "generated-runtime-configuration",
+            "provider-native-operation"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "source-rejection",
+          "path": "planned/sig-003/source-rejection",
+          "case": "SIG-003",
+          "status": "planned",
+          "covers": [
+            "resolved-driver-handoff",
+            "generated-runtime-configuration",
+            "provider-native-operation"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/sig-003/positive-boundary",
+          "case": "VAL-195",
+          "status": "planned",
+          "covers": [
+            "resolved-driver-handoff",
+            "generated-runtime-configuration",
+            "provider-native-operation"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/sig-003/wire-corruption",
+          "case": "SIG-003-corrupted",
+          "status": "planned",
+          "covers": [
+            "live-operation",
+            "driver-entry"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/sig-003/diagnostic",
+          "case": "SIG-003",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "SIG-003",
+        "primaryPaths": [
+          "operation.outcome",
+          "driver.signalDispatchEvidence"
+        ],
+        "relatedPaths": [],
+        "remediation": "Prove the exact target-specific dispatch was invoked and accepted before committing success, otherwise leave the Operation nonterminal or terminalize it as `unknown`.",
+        "secretSafe": true
+      },
+      "notes": "Packet E SIG family; discharges LIFECYCLE-32. Traversal: one SignalProcess operation against an existing Sandbox."
+    },
+    {
+      "id": "SIG-004",
+      "title": "Signal dispatch represented as delivery, handling, or exit",
+      "statement": "A successful SignalProcess Operation asserts only that the exact target-specific dispatch was invoked and accepted, and never that the signal was delivered, handled, obeyed, or that the Process exited.",
+      "owner": "core",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "L1",
+      "rejectionDeadline": "L1",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the decision reads the Signal Operation's declared success postcondition against the outcome being committed; both are complete at the live operation's outcome station and no further observation is needed. Q2: the declared success postcondition and the committed terminal outcome are Core durable-record facts. Q3: the live outcome station is the last correct refusal point, because the outcome is immutable once committed. Q4: the driver's obligation to produce the dispatch evidence is a distinct fact set under a different owner and is filed separately. Disposition is reject-at-boundary, not observed-conformance: the over-claim is detectable from the result contract alone.",
+      "invalidWitnesses": [
+        "SIG-004"
+      ],
+      "validWitnesses": [
+        "VAL-196"
+      ],
+      "targets": [
+        "portable"
+      ],
+      "trustBoundaries": [
+        "core-api",
+        "live-operation"
+      ],
+      "compositionPaths": [
+        "direct-api",
+        "framework-adapter",
+        "cli-adapter",
+        "managed-service",
+        "resolved-driver-handoff"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "L1",
+          "component": "live-operation-outcome-validator",
+          "path": "planned/sig-004/authority",
+          "symbol": "enforce_sig_004",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/sig-004/source-rejection",
+          "case": "SIG-004",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "resolved-driver-handoff"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/sig-004/positive-boundary",
+          "case": "VAL-196",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "resolved-driver-handoff"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/sig-004/wire-corruption",
+          "case": "SIG-004-corrupted",
+          "status": "planned",
+          "covers": [
+            "core-api",
+            "live-operation"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/sig-004/diagnostic",
+          "case": "SIG-004",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "portable"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "SIG-004",
+        "primaryPaths": [
+          "operation.outcome",
+          "operation.successPredicate",
+          "process.status.state"
+        ],
+        "relatedPaths": [],
+        "remediation": "Report the Signal Operation against its dispatch postcondition and observe the Process resource separately for delivery or exit.",
+        "secretSafe": true
+      },
+      "notes": "Packet E SIG family; discharges LIFECYCLE-33, TAXONOMY-22. Traversal: one SignalProcess operation against an existing Sandbox."
+    },
+    {
+      "id": "SIG-005",
+      "title": "Duplicate signal or termination dispatch assumed idempotent",
+      "statement": "Core coordinates dispatch identities where the target declares support for them, and otherwise durably records the dispatch as possibly at-least-once, never claiming backend deduplication the target does not provide.",
+      "owner": "core",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "L1",
+      "rejectionDeadline": "L1",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the decision reads Core's durable dispatch record for this Operation -- the recorded dispatch-identity support for the resolved target and the prior effect-attempt entry -- both Core durable records available at the live operation's dispatch station before the repeat. Q2: the durable dispatch record and its possibly-at-least-once annotation are the control plane's own artefacts, so under Criterion O the owner is `core`; the driver-side declaration of native dispatch-identity support is filed at `25` on the driver-entry traversal. Q3: the dispatch station is the last correct refusal point, because the duplicate native call follows immediately. Q4: the general effect-retry rule requiring native idempotency or exact adoption proof is a separate fencing entry at the driver-entry boundary; this is the Signal-specific specialization at a different station under a different fact set. Reject-at-boundary: the recorded support and the prior attempt are both Core durable records at dispatch, so no fresh external observation is needed.",
+      "invalidWitnesses": [
+        "SIG-005"
+      ],
+      "validWitnesses": [
+        "VAL-197"
+      ],
+      "targets": [
+        "all-enabled-targets"
+      ],
+      "trustBoundaries": [
+        "live-operation-dispatch",
+        "idempotency-store"
+      ],
+      "compositionPaths": [
+        "direct-api",
+        "framework-adapter",
+        "cli-adapter",
+        "managed-service",
+        "resolved-driver-handoff"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "L1",
+          "component": "live-operation-dispatch-validator",
+          "path": "planned/sig-005/authority",
+          "symbol": "enforce_sig_005",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/sig-005/source-rejection",
+          "case": "SIG-005",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "resolved-driver-handoff"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/sig-005/positive-boundary",
+          "case": "VAL-197",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "resolved-driver-handoff"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/sig-005/wire-corruption",
+          "case": "SIG-005-corrupted",
+          "status": "planned",
+          "covers": [
+            "live-operation-dispatch",
+            "idempotency-store"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/sig-005/diagnostic",
+          "case": "SIG-005",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "SIG-005",
+        "primaryPaths": [
+          "driver.signalDispatchEvidence",
+          "operation.effectAttempt"
+        ],
+        "relatedPaths": [],
+        "remediation": "Coordinate dispatch identities where the target supports them, otherwise record the dispatch as possibly at-least-once rather than deduplicated.",
+        "secretSafe": true
+      },
+      "notes": "Packet E SIG family; discharges LIFECYCLE-35. Traversal: one SignalProcess or TerminateProcess operation against an existing Sandbox, at dispatch."
+    },
+    {
+      "id": "SIG-006",
+      "title": "Process termination reported before it can no longer act",
+      "statement": "A TerminateProcess Operation succeeds only when the Process holds an immutable terminal outcome and is proven unable to continue acting, and generic signal dispatch never silently gains wait-for-exit semantics.",
+      "owner": "core",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "L1",
+      "rejectionDeadline": "L1",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the decision reads the targeted Process record's terminal outcome and its inability-to-act proof against the Terminate Operation's declared success postcondition; all are Core durable records at the live operation's outcome station. Q2: the Process record, the Operation outcome, and the declared postcondition are Core-owned. Q3: the live outcome station is the last correct refusal point, because the Operation outcome is immutable once committed. Q4: the driver's graceful-then-force staging and its containment evidence are runtime-owned obligations filed separately. Reject-at-boundary: the required Process record state is a Core durable record.",
+      "invalidWitnesses": [
+        "SIG-006"
+      ],
+      "validWitnesses": [
+        "VAL-198"
+      ],
+      "targets": [
+        "portable"
+      ],
+      "trustBoundaries": [
+        "core-api",
+        "live-operation"
+      ],
+      "compositionPaths": [
+        "direct-api",
+        "framework-adapter",
+        "cli-adapter",
+        "managed-service",
+        "resolved-driver-handoff"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "L1",
+          "component": "live-operation-outcome-validator",
+          "path": "planned/sig-006/authority",
+          "symbol": "enforce_sig_006",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/sig-006/source-rejection",
+          "case": "SIG-006",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "resolved-driver-handoff"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/sig-006/positive-boundary",
+          "case": "VAL-198",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "resolved-driver-handoff"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/sig-006/wire-corruption",
+          "case": "SIG-006-corrupted",
+          "status": "planned",
+          "covers": [
+            "core-api",
+            "live-operation"
+          ],
+          "targets": [
+            "portable"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/sig-006/diagnostic",
+          "case": "SIG-006",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "portable"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "SIG-006",
+        "primaryPaths": [
+          "operation.outcome",
+          "process.status.state",
+          "process.status.termination"
+        ],
+        "relatedPaths": [],
+        "remediation": "Complete the graceful and force stages, record the Process terminal outcome with its inability-to-act proof, and only then commit Terminate as succeeded.",
+        "secretSafe": true
+      },
+      "notes": "Packet E SIG family; discharges LIFECYCLE-36, TAXONOMY-11. Traversal: one TerminateProcess operation against an existing Sandbox."
+    },
+    {
+      "id": "SIG-007",
+      "title": "Signal Operation committed `succeeded` without its three-part proof",
+      "statement": "A `SignalProcess` Operation commits `succeeded` only when the Sandbox ID, Process ID, runtime epoch, and authority were validated, the exact target was selected, and returned driver evidence proves the target-specific dispatch was accepted; any weaker knowledge set leaves the Operation nonterminal or terminalizes it `unknown`.",
+      "owner": "core",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "L1",
+      "rejectionDeadline": "L1",
+      "disposition": "observed-conformance",
+      "rationale": "Q1: the facts are the validated coordinates, the selected target, and the driver evidence returned after dispatch; the last exists only after the effect. Q2: terminal-outcome commitment is the control plane's own durable artefact, so the owner is `core`. Q3: L1 is the Operation outcome commit and the last point at which an unproven `succeeded` can be withheld. Q4: the driver's obligation to invoke the exact target-specific action is the other half of the seam, filed at the edited `163` (`runtime`). This completes the two-owner seam L1.D8 declared, mirroring the Suspend precedent (`103` core / `104` runtime).",
+      "invalidWitnesses": [
+        "SIG-007"
+      ],
+      "validWitnesses": [
+        "VAL-199"
+      ],
+      "targets": [
+        "all-enabled-targets"
+      ],
+      "trustBoundaries": [
+        "core-api",
+        "live-operation"
+      ],
+      "compositionPaths": [
+        "direct-api",
+        "framework-adapter",
+        "cli-adapter",
+        "managed-service",
+        "resolved-driver-handoff"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "L1",
+          "component": "live-operation-outcome-validator",
+          "path": "planned/sig-007/authority",
+          "symbol": "enforce_sig_007",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "runtime-probe",
+          "path": "planned/sig-007/runtime-probe",
+          "case": "SIG-007",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "resolved-driver-handoff"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "source-rejection",
+          "path": "planned/sig-007/source-rejection",
+          "case": "SIG-007",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "resolved-driver-handoff"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/sig-007/positive-boundary",
+          "case": "VAL-199",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "resolved-driver-handoff"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "wire-corruption",
+          "path": "planned/sig-007/wire-corruption",
+          "case": "SIG-007-corrupted",
+          "status": "planned",
+          "covers": [
+            "core-api",
+            "live-operation"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/sig-007/diagnostic",
+          "case": "SIG-007",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "SIG-007",
+        "primaryPaths": [
+          "operation.outcome",
+          "operation.target.processId",
+          "sandbox.status.runtime.epoch",
+          "driver.signalDispatchEvidence"
+        ],
+        "relatedPaths": [],
+        "remediation": "Commit `succeeded` only on validated coordinates, exact target selection, and returned driver acceptance evidence; otherwise leave the Operation nonterminal or terminalize it `unknown`.",
+        "secretSafe": true
+      },
+      "notes": "Packet E SIG family; discharges LIFECYCLE-32. Traversal: one SignalProcess operation against an existing Sandbox, at Operation outcome commit."
     }
   ]
 }

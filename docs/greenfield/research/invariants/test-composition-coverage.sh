@@ -320,8 +320,8 @@ expect_catalog_failure \
   'composition case contracts contain placeholder content'
 
 expect_catalog_failure \
-  "vector-width-253" \
-  '.classificationVectorsByPath["artifact-imports"] |= .[0:253]' \
+  "vector-width-296" \
+  '.classificationVectorsByPath["artifact-imports"] |= .[0:296]' \
   'classification vector must classify every reviewed invariant exactly once'
 
 expect_catalog_failure \
@@ -697,16 +697,16 @@ coverage_invariants="$(jq '.invariantIds | length' "${coverage_fixture}")"
 coverage_paths="$(jq '.pathIds | length' "${coverage_fixture}")"
 coverage_cells="$(jq '.expectedCellCount' "${coverage_fixture}")"
 
-if [[ "${coverage_invariants}" != "254" ||
+if [[ "${coverage_invariants}" != "297" ||
       "${coverage_paths}" != "54" ||
-      "${coverage_cells}" != "13716" ]]; then
+      "${coverage_cells}" != "16038" ]]; then
   echo "focused composition catalog validator: ${pass_count} cases passed" >&2
-  echo "FAIL task-4-generated-matrix-boundary: PACKET-D-COMPOSITION-COVERAGE.json remains ${coverage_paths} paths × ${coverage_invariants} invariants = ${coverage_cells} cells; expected 54 × 254 = 13716" >&2
+  echo "FAIL task-4-generated-matrix-boundary: PACKET-D-COMPOSITION-COVERAGE.json remains ${coverage_paths} paths × ${coverage_invariants} invariants = ${coverage_cells} cells; expected 54 × 297 = 16038" >&2
   exit 1
 fi
 
 if ! run_validator "${coverage_fixture}"; then
-  echo "FAIL generated-composition-coverage: current 54 × 254 matrix failed full validation" >&2
+  echo "FAIL generated-composition-coverage: current 54 × 297 matrix failed full validation" >&2
   exit 1
 fi
 pass_count=$((pass_count + 1))
@@ -719,7 +719,7 @@ expect_coverage_failure \
 expect_coverage_failure \
   "coverage-registry-order-diverges" \
   '.invariantIds[0:2] |= reverse' \
-  'coverage invariant IDs must equal the exact 254-ID registry order'
+  'coverage invariant IDs must equal the exact 297-ID registry order'
 
 expect_coverage_failure \
   "coverage-delegated-taxonomy-diverges" \
