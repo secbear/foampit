@@ -2449,6 +2449,464 @@ boundary.
 - Minimum witness: A teardown Operation whose committed terminal outcome is rewritten by a later cleanup reconciliation.
 - Required diagnostic: identifies `PRF-014`, names `operation.outcome`, `operation.revision`, `operation.successorLinks`, and states the remediation without disclosing secret values.
 
+### Packet E execution admission and Process launch authority
+
+#### `ADM-001` Generic, compound, or provider-native verb on the public surface
+
+- Owner: `live`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: The public caller-facing Core lifecycle and control union contains only named, typed, resource-oriented methods with one exact declared postcondition each, and admits no generic action, compound convenience verb, archive or migration verb, or provider-native verb.
+- Minimum witness: One `InvokeAction` or `RestartSandbox` request admitted by the public method union.
+- Required diagnostic: identifies `ADM-001`, names `request.method`, `api.publicMethodUnion`, and states the remediation without disclosing secret values.
+
+#### `ADM-002` Public method admitted without one exact target-independent postcondition
+
+- Owner: `live`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: Every admitted public method declares one exact target-independent success postcondition that capability gating narrows availability of but no target profile, driver, or provider may reinterpret.
+- Minimum witness: One admitted method whose success postcondition is defined only by whichever driver serves it.
+- Required diagnostic: identifies `ADM-002`, names `request.method`, `operationContract.successPredicate`, and states the remediation without disclosing secret values.
+
+#### `ADM-003` Generic Sandbox update method
+
+- Owner: `live`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: Sandbox representation changes use only the two narrow etag-guarded operations UpdateSandboxMetadata and SetSandboxExpiration, and no generic update method spans metadata, expiration, resources, network policy, runtime replacement, and provider tier under one contract.
+- Minimum witness: One `UpdateSandbox` request carrying both a label and a resource allocation.
+- Required diagnostic: identifies `ADM-003`, names `request.method`, `live.update`, and states the remediation without disclosing secret values.
+
+#### `ADM-004` Attach, connect, detach, shell, or session as a Core method
+
+- Owner: `live`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: Attachment, connection, shell, and Session ergonomics remain adapter-owned helpers composed from Sandbox reads, Exec, Process I/O, and the named lifecycle methods, and never become Core methods holding independent lifecycle authority.
+- Minimum witness: One `AttachSandbox` method admitted on the Core surface and holding a lifecycle keepalive.
+- Required diagnostic: identifies `ADM-004`, names `request.method`, `framework.session`, and states the remediation without disclosing secret values.
+
+#### `ADM-005` Delete accepted against a Sandbox without a durable stopped proof
+
+- Owner: `live`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: `DeleteSandbox` is admitted only against a Sandbox holding a current durable stopped proof and never performs a silent compound stop-then-delete; a system-originated expiry Delete is created at exactly the same station under the same proof and is linked to the Stop Operation whose outcome established it.
+- Minimum witness: One `DeleteSandbox` admitted against a `running` Sandbox and silently stopping it first.
+- Required diagnostic: identifies `ADM-005`, names `live.operation`, `sandbox.status.runtime.state`, `sandbox.expiration.action`, and states the remediation without disclosing secret values.
+
+#### `ADM-006` Representation update changes runtime authority, epoch, or policy
+
+- Owner: `live`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: An accepted `UpdateSandboxMetadata` or `SetSandboxExpiration` commits only the Core-owned representation record and its revision, leaving the runtime epoch, mutation authority, resolved Artifact policy, and running workload unchanged.
+- Minimum witness: One metadata update whose commit also changes the resolved network policy.
+- Required diagnostic: identifies `ADM-006`, names `live.metadata`, `live.expiration`, `sandbox.status.runtime.epoch`, and states the remediation without disclosing secret values.
+
+#### `ADM-007` Exec accepted after execution admission closed or an expiry trigger was recorded
+
+- Owner: `exec`
+- First-sound phase: `E0`
+- Rejection deadline: `E0`
+- Invariant: An Exec request is admitted only while the bound Sandbox runtime's execution admission is durably accepting, and is refused with its exact typed reason once a lifecycle operation closes admission or an expiration instant is durably recorded as a system trigger.
+- Minimum witness: One Exec accepted after `StopSandbox` durably closed execution admission.
+- Required diagnostic: identifies `ADM-007`, names `exec.sandboxRuntimeRef`, `sandbox.status.execution.state`, `sandbox.status.execution.reason`, and states the remediation without disclosing secret values.
+
+#### `ADM-008` Exec accepted against a provider-created epoch before Core sequences it
+
+- Owner: `exec`
+- First-sound phase: `E0`
+- Rejection deadline: `E0`
+- Invariant: An Exec is admitted against a runtime that a provider auto-wake, standby recovery, or lazy creation produced only after the Core has durably sequenced that runtime's epoch identity and execution admission.
+- Minimum witness: One Exec admitted against a lazily created provider runtime with no Core epoch record.
+- Required diagnostic: identifies `ADM-008`, names `exec.sandboxRuntimeRef`, `sandbox.status.runtime.epoch`, `operation.origin`, and states the remediation without disclosing secret values.
+
+#### `ADM-009` Process launch dispatched under a revoked launch authority
+
+- Owner: `core`
+- First-sound phase: `E0`
+- Rejection deadline: `E1`
+- Invariant: A Process launch performs its first external dispatch only while its fenced launch-authority grant revalidates as current against the Core durable record.
+- Minimum witness: One accepted Process dispatched externally after a concurrent Stop revoked its launch-authority grant.
+- Required diagnostic: identifies `ADM-009`, names `process.status.state`, `process.launchAuthority`, `sandbox.status.execution.state`, and states the remediation without disclosing secret values.
+
+#### `ADM-010` Process set captured before admission and launch authority close
+
+- Owner: `core`
+- First-sound phase: `L1`
+- Rejection deadline: `L1`
+- Invariant: A quiescing or absence-proving operation durably closes execution admission and revokes new Process launch authority before it snapshots the Process set of the current epoch.
+- Minimum witness: One Stop that snapshots its Process set before the admission-closure record commits.
+- Required diagnostic: identifies `ADM-010`, names `sandbox.status.execution.state`, `operation.capturedProcessSet`, `process.launchAuthority`, and states the remediation without disclosing secret values.
+
+#### `ADM-011` Withheld launch authority regranted outside a succeeded same-epoch Resume
+
+- Owner: `core`
+- First-sound phase: `L1`
+- Rejection deadline: `L1`
+- Invariant: Launch authority withheld by a continuity-preserving Suspend is regranted only after the same-epoch ResumeSandbox Operation succeeds, while the Process's original deadline remains unexpired and no intervening TerminateProcess request exists.
+- Minimum witness: One withheld Process granted launch authority while its Resume Operation was still nonterminal.
+- Required diagnostic: identifies `ADM-011`, names `process.launchAuthority`, `operation.outcome`, `exec.deadline`, and states the remediation without disclosing secret values.
+
+#### `ADM-012` Execution admission accepting on a launch traversal without a proven running epoch
+
+- Owner: `core`
+- First-sound phase: `R1`
+- Rejection deadline: `R1`
+- Invariant: A launch traversal publishes execution admission accepting only for a new runtime epoch proven present and executing under current fenced authority.
+- Minimum witness: One launch publishing admission `accepting` while its new epoch was never observed executing.
+- Required diagnostic: identifies `ADM-012`, names `sandbox.status.execution.state`, `sandbox.status.runtime.state`, `sandbox.status.runtime.epoch`, and states the remediation without disclosing secret values.
+
+#### `ADM-013` Unsupported capability approximated by a driver
+
+- Owner: `runtime`
+- First-sound phase: `D0`
+- Rejection deadline: `D0`
+- Invariant: A driver reports an unsupported capability before any effect-producing work and never approximates it with a different native mechanism.
+- Minimum witness: A driver serving a required memory-continuity suspend with a filesystem-retaining stop.
+- Required diagnostic: identifies `ADM-013`, names `driver.input`, `driver.conformedCapabilities`, and states the remediation without disclosing secret values.
+
+#### `ADM-014` Driver widens, narrows, or downgrades the requested postcondition
+
+- Owner: `runtime`
+- First-sound phase: `D0`
+- Rejection deadline: `D0`
+- Invariant: A driver's native lowering of a Core method establishes exactly the requested postcondition and never a colder, wider, or more destructive fallback.
+- Minimum witness: A driver lowering a requested Suspend to a full stop because pause is unavailable.
+- Required diagnostic: identifies `ADM-014`, names `driver.input`, `driver.nativeStep`, `operation.requestedPostcondition`, and states the remediation without disclosing secret values.
+
+#### `ADM-015` Driver advertises Core Exec without full execution conformance
+
+- Owner: `runtime`
+- First-sound phase: `D0`
+- Rejection deadline: `D0`
+- Invariant: A driver advertises Core Exec only when it proves a targetable execution containment unit covering the Process and its owned descendants, durable output spooling with stable byte cursors and explicit truncation, exact terminal evidence, stdin ownership and close semantics, provable Process termination, and adoption of the same attempted execution after control-plane failure.
+- Minimum witness: A driver advertising Core Exec while its output spool has no stable byte cursor.
+- Required diagnostic: identifies `ADM-015`, names `driver.conformedCapabilities`, `driver.execConformance`, and states the remediation without disclosing secret values.
+
+#### `ADM-016` Artifact asserts a dynamic Core or runtime fact
+
+- Owner: `artifact`
+- First-sound phase: `A1`
+- Rejection deadline: `N0`
+- Invariant: An Artifact Definition declares only frontend-independent static facts and cannot express current Sandbox or Process state, current runtime epoch or etag, resource capacity, provider admission, concurrent Operations, Snapshot retention or reference state, expiration races, provider availability, or evidence freshness.
+- Minimum witness: One Artifact field asserting that the target Sandbox is currently `running`.
+- Required diagnostic: identifies `ADM-016`, names `artifact.definition`, `artifact.targets`, and states the remediation without disclosing secret values.
+
+#### `ADM-017` Start accepted against a Sandbox without a durable stopped proof
+
+- Owner: `live`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: `StartSandbox` is admitted only against a Sandbox holding a current durable stopped proof, and never restarts a runtime that is still present under an unretired epoch.
+- Minimum witness: One `StartSandbox` admitted against a Sandbox whose previous epoch is still unretired.
+- Required diagnostic: identifies `ADM-017`, names `live.operation`, `sandbox.status.runtime.state`, `sandbox.status.runtime.epoch`, and states the remediation without disclosing secret values.
+
+#### `ADM-018` Launch dispatched without operator re-admission of its resolved placement
+
+- Owner: `operator`
+- First-sound phase: `O0`
+- Rejection deadline: `D0`
+- Invariant: A launch is dispatched only after the operator admission plane re-admits its resolved placement, capacity, and tier for the current epoch; a placement admitted for a prior launch never carries forward.
+- Minimum witness: One launch dispatched under the operator admission record granted to the previous epoch's launch.
+- Required diagnostic: identifies `ADM-018`, names `operator.admission.placement`, `operator.admission.capacity`, `operator.admission.tier`, and states the remediation without disclosing secret values.
+
+#### `ADM-019` Statically absent cross-target capability deferred to launch without an explicit target branch
+
+- Owner: `artifact`
+- First-sound phase: `A0`
+- Rejection deadline: `A1`
+- Invariant: A cross-target capability, semantic, or ceiling that is statically absent from an enabled target is rejected during Artifact validation unless the Artifact declares an explicit named target branch for it, and is never deferred to workload launch or runtime discovery.
+- Minimum witness: One Artifact requiring a device only its microVM target provides while its process target is enabled with no branch.
+- Required diagnostic: identifies `ADM-019`, names `artifact.targets`, `artifact.capabilities`, `artifact.targetBranch`, and states the remediation without disclosing secret values.
+
+### Packet E concurrency lanes and operation-pair compatibility
+
+#### `CNC-001` Stale provider event treated as serialization authority
+
+- Owner: `runtime`
+- First-sound phase: `D0`
+- Rejection deadline: `D0`
+- Invariant: A decoded provider, host, or VMM event is retained as non-authoritative evidence and is refused as a state transition whenever the authority epoch it belongs to is no longer current.
+- Minimum witness: One provider event whose authority epoch is one behind the current epoch is decoded and applied as a runtime state transition.
+- Required diagnostic: identifies `CNC-001`, names `driver.evidence.providerEvent`, `driver.evidence.authorityEpoch`, `capability.authorityEpoch`, and states the remediation without disclosing secret values.
+
+#### `CNC-002` Incompatible concurrent lifecycle mutations both receive authority
+
+- Owner: `core`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: At most one nonterminal Operation holds the fenced Sandbox lifecycle-mutation lane, and a request whose ordered operation pair with the lane holder is not an explicitly permitted row of the compatibility ledger is refused with the typed conflict naming that active Operation.
+- Minimum witness: Concurrent `ResumeSandbox` and `StopSandbox` requests both accepted as nonterminal Operations.
+- Required diagnostic: identifies `CNC-002`, names `sandbox.status.lifecycleOperation`, `live.operation.kind`, `operation.conflict.activeOperationId`, and states the remediation without disclosing secret values.
+
+### Packet E runtime policy non-widening and capability rejection
+
+#### `POL-001` Unsupported capability approximated at creation
+
+- Owner: `create`
+- First-sound phase: `C0`
+- Rejection deadline: `C0`
+- Invariant: A creation requiring a capability-gated Core behavior resolves a target profile advertising that exact conformed capability, and an unadvertised capability is rejected rather than approximated by a different mechanism, a weaker guarantee, or a provider default.
+- Minimum witness: A creation requiring memory-continuity suspend resolved onto a profile advertising only filesystem-retaining stop.
+- Required diagnostic: identifies `POL-001`, names `create.requiredCapabilities`, `resolution.effectiveCapabilities`, `create.profile`, and states the remediation without disclosing secret values.
+
+#### `POL-002` Expiration removal widens a policy-owned lifecycle bound
+
+- Owner: `live`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: `SetSandboxExpiration` assigns or removes only the caller-managed schedule, and every Artifact hard ceiling and Managed-Sandbox lifecycle policy in force remains binding after the update.
+- Minimum witness: One expiration removal that leaves the Sandbox with no Artifact lifetime ceiling in force.
+- Required diagnostic: identifies `POL-002`, names `live.setExpiration.expiration`, `sandbox.expiration`, `sandbox.policy.lifecycleCeilings`, and states the remediation without disclosing secret values.
+
+#### `POL-003` Restore widens immutable Artifact policy
+
+- Owner: `live`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: A same-Sandbox `RestoreSandbox` uses the exact immutable environment, filesystem, network, identity, device, secret, and target-profile policy pinned by the Sandbox's Artifact, and never replaces or widens any of them.
+- Minimum witness: One `RestoreSandbox` admitted with a network policy wider than the Artifact's pinned one.
+- Required diagnostic: identifies `POL-003`, names `live.restore`, `sandbox.artifact.policy`, `sandbox.policy.lifecycleCeilings`, and states the remediation without disclosing secret values.
+
+#### `POL-004` Restore-as-create widens immutable Artifact policy
+
+- Owner: `create`
+- First-sound phase: `C0`
+- Rejection deadline: `C0`
+- Invariant: A restore-as-create request selects or refines permitted access within the pinned Artifact's hard policy and never replaces or widens immutable environment, filesystem, network, identity, device, secret, or target-profile policy.
+- Minimum witness: One restore-as-create request adding a device the pinned Artifact does not permit.
+- Required diagnostic: identifies `POL-004`, names `create.restoreFrom`, `artifact.policy`, `create.policySelection`, and states the remediation without disclosing secret values.
+
+### Packet E Sandbox runtime-state truth and status projection
+
+#### `SBX-001` Create request omits its resolved initial runtime selection
+
+- Owner: `create`
+- First-sound phase: `C0`
+- Rejection deadline: `C0`
+- Invariant: Every accepted CreateSandbox request and its Operation record carry the resolved `initialRuntime` value drawn from the closed `running`/`stopped` vocabulary, with no CLI, SDK, named-profile, schema, or provider default applied after acceptance or left invisible in the canonical request.
+- Minimum witness: A CreateSandbox request with `initialRuntime` absent that a CLI or schema default fills in after acceptance.
+- Required diagnostic: identifies `SBX-001`, names `create.initialRuntime`, `operation.request.initialRuntime`, `operation.canonicalRequest`, and states the remediation without disclosing secret values.
+
+#### `SBX-002` Initially stopped creation performs launch effects
+
+- Owner: `core`
+- First-sound phase: `C0`
+- Rejection deadline: `C0`
+- Invariant: A creation whose resolved `initialRuntime` is `stopped` commits a durable Sandbox whose runtime state is `stopped` and never enters `provisioning` or performs a launch effect.
+- Minimum witness: A creation resolved to `stopped` that allocates a runtime epoch or dispatches a driver launch before any Start.
+- Required diagnostic: identifies `SBX-002`, names `create.initialRuntime`, `sandbox.status.runtime.state`, and states the remediation without disclosing secret values.
+
+#### `SBX-003` Caller writes Sandbox runtime, desired state, or a presentation label
+
+- Owner: `live`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: Sandbox `status` -- its `runtime`, `execution`, `lifecycleOperation`, and `conditions` members -- is an output-only projection: no public request type carries a runtime state, a caller-writable desired runtime state, or a verb-derived presentation label as input, so every lifecycle change is an explicit named command and never a reconciled declaration.
+- Minimum witness: One live request type carrying a caller-populated `desiredRuntimeState` or `status` field.
+- Required diagnostic: identifies `SBX-003`, names `live.request`, `request.desiredRuntimeState`, `sandbox.status.runtime.state`, and states the remediation without disclosing secret values.
+
+#### `SBX-004` Verb-derived presentation label stored as Sandbox state
+
+- Owner: `core`
+- First-sound phase: `L1`
+- Rejection deadline: `L1`
+- Invariant: Sandbox runtime state is exactly one of `provisioning`, `running`, `suspended`, `stopped`, or `unknown`; every derived presentation label -- creating, starting, suspending, resuming, stopping, restoring, deleting, snapshotting, migrating -- is recomputed at read time from the durable Operation and that authoritative status, and is never independently stored or used as the serialization oracle.
+- Minimum witness: One Sandbox status record storing `stopping` as its runtime state.
+- Required diagnostic: identifies `SBX-004`, names `sandbox.status.runtime.state`, `sandbox.status.lifecycleOperation`, `operation.kind`, and states the remediation without disclosing secret values.
+
+#### `SBX-005` Execution admission accepting without a proven running epoch
+
+- Owner: `core`
+- First-sound phase: `L1`
+- Rejection deadline: `L1`
+- Invariant: A live operation publishes execution admission `accepting` only for a retained runtime epoch proven present and executing under current fenced authority with runtime state `running`; every other runtime state commits `closed` with a typed reason.
+- Minimum witness: One status commit publishing execution admission `accepting` while runtime state is `provisioning`.
+- Required diagnostic: identifies `SBX-005`, names `sandbox.status.execution.state`, `sandbox.status.execution.reason`, `sandbox.status.runtime.state`, and states the remediation without disclosing secret values.
+
+#### `SBX-006` Suspended reported without proven quiescence and continuity
+
+- Owner: `core`
+- First-sound phase: `L1`
+- Rejection deadline: `L1`
+- Invariant: A `SuspendSandbox` Operation succeeds only when workload execution is proven quiesced, no Process can execute, the current runtime epoch and the capability-required memory and Process continuity are proven retained, and execution admission is committed `closed`.
+- Minimum witness: A Suspend terminalized as succeeded while the driver returned no Process-continuity proof.
+- Required diagnostic: identifies `SBX-006`, names `sandbox.status.runtime.state`, `sandbox.status.runtime.epoch`, `sandbox.status.execution.state`, and states the remediation without disclosing secret values.
+
+#### `SBX-007` Driver reports Suspend or Resume without same-epoch continuity evidence
+
+- Owner: `runtime`
+- First-sound phase: `L1`
+- Rejection deadline: `L1`
+- Invariant: A driver reports a successful Suspend or Resume only by returning target-specific evidence that the identical runtime epoch, its retained memory, and its Process continuity survived the transition.
+- Minimum witness: A driver Suspend report claiming success with no epoch or continuity probe attached.
+- Required diagnostic: identifies `SBX-007`, names `driver.continuityEvidence`, `driver.reportedEpoch`, `sandbox.status.runtime.epoch`, and states the remediation without disclosing secret values.
+
+#### `SBX-008` Cold fallback reported as a successful Resume
+
+- Owner: `core`
+- First-sound phase: `L1`
+- Rejection deadline: `L1`
+- Invariant: A `ResumeSandbox` Operation succeeds only when post-effect evidence proves the retained runtime epoch resumed under exclusive authority with control and conformance re-proven, and an observed cold fallback, replacement instance, or reconstruction terminates that Resume as failed or unresolved rather than as same-epoch continuation.
+- Minimum witness: A Resume reported as succeeded after the provider cold-booted a replacement instance.
+- Required diagnostic: identifies `SBX-008`, names `sandbox.status.runtime.epoch`, `sandbox.status.runtime.state`, `operation.result`, and states the remediation without disclosing secret values.
+
+#### `SBX-009` Running resize hides reboot, replacement, or partial application
+
+- Owner: `core`
+- First-sound phase: `L1`
+- Rejection deadline: `L1`
+- Invariant: A `ResizeSandboxResources` Operation against a `running` Sandbox succeeds only when evidence proves the complete requested allocation was applied atomically in place with the current epoch retained and without reboot, runtime replacement, or Process identity loss.
+- Minimum witness: A running resize reported as succeeded after only the memory dimension was applied.
+- Required diagnostic: identifies `SBX-009`, names `live.resize.allocation`, `sandbox.status.runtime.epoch`, `sandbox.resources.applied`, and states the remediation without disclosing secret values.
+
+#### `SBX-010` Stopped resize claims current provider capacity
+
+- Owner: `core`
+- First-sound phase: `L1`
+- Rejection deadline: `L1`
+- Invariant: A `ResizeSandboxResources` Operation against a `stopped` Sandbox commits the validated concrete allocation for the next Start only, allocating no runtime epoch and claiming no current provider capacity.
+- Minimum witness: A stopped resize whose success record reports reserved provider capacity.
+- Required diagnostic: identifies `SBX-010`, names `live.resize.allocation`, `sandbox.status.runtime.state`, `sandbox.resources.nextRuntimeAllocation`, and states the remediation without disclosing secret values.
+
+#### `SBX-011` Stop lowered to a destructive provider delete
+
+- Owner: `runtime`
+- First-sound phase: `L1`
+- Rejection deadline: `L1`
+- Invariant: A driver lowering `StopSandbox` uses only native steps that end the current runtime epoch and establish containment absence for it, leaving the logical Sandbox and its retained state intact, and never substitutes a provider delete, destroy, permanent kill, or other destructive removal.
+- Minimum witness: A driver serving one `StopSandbox` by issuing the provider's delete-instance call.
+- Required diagnostic: identifies `SBX-011`, names `driver.loweredOperation`, `driver.nativeStep`, `operation.requestedPostcondition`, and states the remediation without disclosing secret values.
+
+#### `SBX-012` Unprovable runtime state approximated as stopped or running
+
+- Owner: `core`
+- First-sound phase: `L1`
+- Rejection deadline: `L1`
+- Invariant: When runtime presence or absence, claimed-epoch continuity, exclusive effect authority, containment emptiness, or external-effect liveness cannot be safely established, the committed Sandbox runtime state is `unknown` with execution admission `closed`.
+- Minimum witness: One lifecycle mutation committing `stopped` while containment emptiness was never proven.
+- Required diagnostic: identifies `SBX-012`, names `sandbox.status.runtime.state`, `sandbox.status.execution.state`, `sandbox.status.conditions`, and states the remediation without disclosing secret values.
+
+#### `SBX-013` Provider or adapter phase mapped to Core runtime state
+
+- Owner: `runtime`
+- First-sound phase: `D0`
+- Rejection deadline: `D0`
+- Invariant: A decoded provider, host, or VMM lifecycle phase, status enum, or handle state is retained as non-authoritative evidence and is never mapped by name onto a Core Sandbox runtime state.
+- Minimum witness: A driver mapping the provider phase named `running` directly onto Core runtime state `running`.
+- Required diagnostic: identifies `SBX-013`, names `driver.providerStatus`, `driver.decodedEvidence`, `sandbox.status.runtime.state`, and states the remediation without disclosing secret values.
+
+#### `SBX-014` Launch succeeds before control, conformance, and admission are proven
+
+- Owner: `core`
+- First-sound phase: `R1`
+- Rejection deadline: `R1`
+- Invariant: A Create-running, Start, or same-Sandbox Restore Operation succeeds only when the new runtime epoch is observed present and executing and its declared control, conformance, and `accepting` execution-admission postconditions are each proven.
+- Minimum witness: A Start reported as succeeded with the runtime observed present but the control-attachment probe never run.
+- Required diagnostic: identifies `SBX-014`, names `sandbox.status.runtime.state`, `sandbox.status.execution.state`, `sandbox.status.conditions`, and states the remediation without disclosing secret values.
+
+#### `SBX-015` Driver claims launch success without its declared probes
+
+- Owner: `runtime`
+- First-sound phase: `R1`
+- Rejection deadline: `R1`
+- Invariant: A launch driver reports success only after executing its declared control-attachment, conformance, and execution-admission probes against the exact new runtime epoch and returning their evidence.
+- Minimum witness: A driver launch report claiming success while its declared execution-admission probe was skipped.
+- Required diagnostic: identifies `SBX-015`, names `driver.launchProbes`, `driver.conformanceEvidence`, `sandbox.status.runtime.epoch`, and states the remediation without disclosing secret values.
+
+#### `SBX-016` Provider acknowledgement treated as the required Core postcondition
+
+- Owner: `runtime`
+- First-sound phase: `R1`
+- Rejection deadline: `R1`
+- Invariant: Backend acceptance checkpoints such as OCI `created`, containerd task registration, VMM configuration, guest-agent handshake, or provider request acknowledgement are decoded evidence only, and each Core postcondition is proven by the evidence its own contract names.
+- Minimum witness: A driver discharging the `running` postcondition with a provider request acknowledgement alone.
+- Required diagnostic: identifies `SBX-016`, names `driver.providerAcknowledgement`, `driver.launchEvidence`, `operation.result`, and states the remediation without disclosing secret values.
+
+#### `SBX-017` Provider-driven expiry relabeled a successful Core Stop or Delete
+
+- Owner: `core`
+- First-sound phase: `R1`
+- Rejection deadline: `R1`
+- Invariant: An unpreventable provider expiry, idle stop, or reclamation is recorded as an uncontrolled provider-loss event requiring reconciliation, never retrospectively as a successful Core Stop or Delete.
+- Minimum witness: A provider reclamation recorded by backdating a successful `StopSandbox` result.
+- Required diagnostic: identifies `SBX-017`, names `sandbox.status.runtime.state`, `sandbox.status.conditions`, `operation.origin`, and states the remediation without disclosing secret values.
+
+#### `SBX-018` Provider auto-wake runtime left unsequenced
+
+- Owner: `core`
+- First-sound phase: `R1`
+- Rejection deadline: `R1`
+- Invariant: A provider-created replacement runtime observed without a Core lifecycle request is durably sequenced as a new runtime epoch with its identity and execution-admission records committed.
+- Minimum witness: One Exec admitted against a provider auto-woken runtime that carries no Core epoch record.
+- Required diagnostic: identifies `SBX-018`, names `sandbox.status.runtime.epoch`, `sandbox.status.execution.state`, `operation.origin`, and states the remediation without disclosing secret values.
+
+#### `SBX-019` Stopped published without a containment-absence proof
+
+- Owner: `runtime`
+- First-sound phase: `T0`
+- Rejection deadline: `T0`
+- Invariant: A driver publishes `stopped` only after proving its containment-specific absence boundary, such as cgroup emptiness for process targets or host VMM absence for VM targets, and never from a guest shutdown acknowledgement, power-down request, provider stop acknowledgement, or initial-child exit.
+- Minimum witness: A driver publishing `stopped` from a bubblewrap initial-child exit status.
+- Required diagnostic: identifies `SBX-019`, names `driver.containmentProof`, `sandbox.status.runtime.state`, `driver.decodedEvidence`, and states the remediation without disclosing secret values.
+
+#### `SBX-020` Stop grace deadline treated as an absence proof
+
+- Owner: `core`
+- First-sound phase: `T0`
+- Rejection deadline: `T0`
+- Invariant: A Stop that cannot prove containment absence commits Sandbox runtime state `unknown` and retains its evidence, and the grace deadline alone never establishes absence.
+- Minimum witness: A Stop committing `stopped` because the grace deadline elapsed.
+- Required diagnostic: identifies `SBX-020`, names `sandbox.status.runtime.state`, `sandbox.status.conditions`, `driver.containmentProof`, and states the remediation without disclosing secret values.
+
+#### `SBX-021` Delete succeeds with incomplete cleanup or a possibly live orphan
+
+- Owner: `core`
+- First-sound phase: `T0`
+- Rejection deadline: `T0`
+- Invariant: A `DeleteSandbox` Operation succeeds only when the live Sandbox aggregate and every Core-owned live resource covered by that Operation are proven absent and the cleanup proof is durable.
+- Minimum witness: A Delete reported as succeeded with cleanup pending for one covered resource.
+- Required diagnostic: identifies `SBX-021`, names `operation.result`, `sandbox.cleanup.proof`, `sandbox.tombstone`, and states the remediation without disclosing secret values.
+
+#### `SBX-022` Start-authorized launch reuses a stale resolved manifest
+
+- Owner: `create`
+- First-sound phase: `C0`
+- Rejection deadline: `C0`
+- Invariant: The launch a Start authorizes re-resolves the Sandbox's Artifact, member, and runtime-profile manifest at the launch stage and refuses to launch from a stale or absent resolution.
+- Minimum witness: One Start-authorized launch served from the manifest resolution produced at creation.
+- Required diagnostic: identifies `SBX-022`, names `create.resolvedManifest`, `sandbox.artifact.resolvedManifest`, `sandbox.runtimeProfile`, and states the remediation without disclosing secret values.
+
+#### `SBX-023` Suspend or Resume accepted without the paired same-epoch continuity capability
+
+- Owner: `live`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: `SuspendSandbox` and `ResumeSandbox` are admitted only against a runtime whose conformed target advertises the paired same-epoch suspend-and-resume continuity capability; a target advertising one without the other admits neither.
+- Minimum witness: One `SuspendSandbox` admitted against a target advertising suspend but no same-epoch resume.
+- Required diagnostic: identifies `SBX-023`, names `live.operation`, `sandbox.capabilities.suspendResume`, `sandbox.status.runtime.state`, and states the remediation without disclosing secret values.
+
+#### `SBX-024` Verb-derived presentation label stored as Sandbox state on a launch traversal
+
+- Owner: `core`
+- First-sound phase: `R1`
+- Rejection deadline: `R1`
+- Invariant: On a launch traversal, Sandbox runtime state is exactly one of `provisioning`, `running`, `suspended`, `stopped`, or `unknown`; every derived launch presentation label -- creating, starting, restoring -- is recomputed at read time from the durable Operation and that authoritative status, and is never independently stored or used as the serialization oracle.
+- Minimum witness: One launch status record storing `creating` as its runtime state.
+- Required diagnostic: identifies `SBX-024`, names `sandbox.status.runtime.state`, `sandbox.status.lifecycleOperation`, `operation.kind`, and states the remediation without disclosing secret values.
+
+#### `SBX-025` Unprovable launch runtime state approximated as stopped or running
+
+- Owner: `core`
+- First-sound phase: `R1`
+- Rejection deadline: `R1`
+- Invariant: When a launch traversal cannot safely establish runtime presence or absence, claimed-epoch continuity, exclusive effect authority, containment emptiness, or external-effect liveness, the committed Sandbox runtime state is `unknown` with execution admission `closed`.
+- Minimum witness: One launch committing `running` after its presence probe timed out.
+- Required diagnostic: identifies `SBX-025`, names `sandbox.status.runtime.state`, `sandbox.status.execution.state`, `sandbox.status.conditions`, and states the remediation without disclosing secret values.
+
 ## Valid Cases
 
 Invalid-state rejection is insufficient if a language makes necessary
@@ -3190,6 +3648,306 @@ same canonical semantic value.
 - A teardown Operation's committed terminal outcome and payload become immutable at commit.
 - A cleanup reconciliation that later proves target absence appends a linked successor Operation referencing the unchanged predecessor.
 - Residual obligations are discharged on the successor record, leaving the predecessor's outcome and revision untouched.
+
+### `VAL-107` Precise named methods on the public union
+
+- Restart intent is expressed as observed `StopSandbox` then `StartSandbox`, each with its own Operation and epoch consequences.
+- Kill intent is expressed as `SignalProcess` or `TerminateProcess`, and teardown as `StopSandbox` then `DeleteSandbox`.
+- Every admitted method is named, typed, and resource-oriented with one declared postcondition; an SDK composite helper may still issue exactly these calls.
+
+### `VAL-108` One exact postcondition per method
+
+- `SuspendSandbox` declares the single postcondition `suspended` with execution admission `closed`, identical on every target.
+- Capability gating removes the method from unsupported targets rather than letting them reinterpret its meaning.
+- The generated operation contract carries a success predicate for every method in the union.
+
+### `VAL-109` Two narrow etag-guarded representation updates
+
+- `UpdateSandboxMetadata` changes labels and correlation metadata under an etag precondition.
+- `SetSandboxExpiration` changes the caller-managed schedule under the same guard.
+- Resources, network policy, runtime replacement, and provider tier are reached only through their own operations with their own authorization, capability, and epoch contracts.
+
+### `VAL-110` Adapter-owned attachment over Core primitives
+
+- An SDK Session object is composed from Sandbox reads, `Exec`, Process I/O streams, and the named lifecycle methods.
+- Rebinding after a control-plane failure is the adapter's explicit responsibility and consumes no Core lifecycle authority.
+- The Core method union contains no attach, connect, detach, shell, or session arm.
+
+### `VAL-111` Delete against a proven stopped Sandbox
+
+- A caller observes `StopSandbox` succeed, then issues `DeleteSandbox` against the durable stopped proof it established.
+- An expiry-triggered Delete is created at the same admission station under the same proof and links the Stop Operation id that produced it.
+- A Delete against a `running`, `suspended`, or `unknown` Sandbox is refused with its typed reason and performs no stop.
+
+### `VAL-112` Representation update touching only the Core record
+
+- An accepted `UpdateSandboxMetadata` commits new labels and a new etag while the runtime epoch is unchanged.
+- The running workload, the resolved Artifact policy, and the lifecycle lane are untouched by the update.
+- `SetSandboxExpiration` behaves identically for the caller-managed schedule.
+
+### `VAL-113` Exec admitted only while admission is accepting
+
+- An Exec submitted while execution admission is durably `accepting` is accepted and belongs to the current epoch's Process set.
+- An Exec submitted after a Stop closes admission receives the typed admission-closed reason naming the closing operation.
+- An Exec submitted after an expiration instant is durably recorded as a system trigger receives the same typed refusal.
+
+### `VAL-114` Exec against a Core-sequenced epoch
+
+- A provider standby recovery is observed, sequenced by the Core as the next epoch, and its execution-admission record committed.
+- Only then is an Exec bound to that epoch admitted.
+- An Exec naming a runtime with no Core epoch record is refused with the typed unsequenced-runtime reason.
+
+### `VAL-115` Fenced launch authority revalidated at dispatch
+
+- An accepted Process revalidates its fenced launch-authority grant against the Core durable record immediately before its first external dispatch, and dispatches.
+- A grant revoked by a concurrent Stop between acceptance and dispatch terminalizes the Process with the revocation reason and produces no external effect.
+- A grant withheld by a Suspend leaves the Process accepted and undispatched until a successful same-epoch Resume.
+
+### `VAL-116` Close, revoke, then capture
+
+- A Stop commits the admission-closure record, then the launch-authority revocation record, then snapshots the Process set of the current epoch.
+- Any Exec arriving after the closure record is refused on its own traversal and can never join the captured set.
+- A Suspend follows the same ordering, withholding rather than revoking launch authority.
+
+### `VAL-117` Regrant only after a succeeded same-epoch Resume
+
+- A Process left accepted and undispatched by a Suspend regains launch authority once the same-epoch Resume Operation commits success.
+- Its original deadline still applies, and an expired deadline terminalizes it instead of regranting.
+- A termination request received while suspended terminalizes the Process and no regrant occurs.
+
+### `VAL-118` Launch publishes accepting only for a proven epoch
+
+- A Start publishes `running` with admission `accepting` only after the new epoch is observed present and executing under current fenced authority.
+- A launch whose presence evidence is incomplete publishes `provisioning` or `unknown` with admission `closed`.
+- Exec admission against the new epoch begins exactly when that status record commits.
+
+### `VAL-119` Driver returns typed capability-unsupported
+
+- A driver receiving a validated PreparedLaunch stage that requires same-epoch suspend compares it against its declared conformed capability set.
+- An unsupported requirement produces the typed capability-unsupported result before any effect-producing work.
+- No alternative native mechanism with a weaker guarantee is substituted.
+
+### `VAL-120` Lowering that establishes exactly the requested postcondition
+
+- Each native step in the lowering declares its own postcondition and effect class, and their composition equals the requested postcondition.
+- A driver with no step sequence producing that postcondition returns unsupported before any effect.
+- No colder, wider, or more destructive fallback is selected when the exact lowering is unavailable.
+
+### `VAL-121` Exec advertised only with full execution conformance
+
+- The driver declares evidence for a targetable containment unit covering the Process and its owned descendants, durable output spooling with stable byte cursors and explicit truncation, exact terminal evidence, stdin ownership and close semantics, provable termination, and post-failure adoption.
+- A microVM target satisfies this with a Core-managed in-guest supervisor and a durable host-side spool.
+- A target unable to prove adoption after control-plane failure advertises no Core Exec, and the Core admits no Exec against it.
+
+### `VAL-122` Artifact limited to declarative static facts
+
+- An Artifact declares required capabilities, hard ceilings, slot contracts, and supported target profiles, all frontend-independent and time-invariant.
+- A workload needing a specific runtime epoch or free capacity expresses it as a runtime precondition on the Core operation instead.
+- The built manifest carries no current Sandbox, Process, Operation, provider-availability, or evidence-freshness assertion.
+
+### `VAL-123` Start against a proven stopped Sandbox
+
+- A caller observes `StopSandbox` succeed and its epoch retire, then issues `StartSandbox`, which allocates the next epoch.
+- A `StartSandbox` against a `running`, `suspended`, `provisioning`, or `unknown` Sandbox is refused with its typed reason.
+- The stopped proof consulted is the Sandbox's current durable record, not a cached earlier observation.
+
+### `VAL-124` Placement re-admitted for the current epoch
+
+- Before dispatch, the operator admission plane re-admits the resolved placement, capacity, and tier against the current epoch and records that admission.
+- A second Start of the same Sandbox re-admits rather than reusing the admission granted to the first launch.
+- A placement whose capacity is no longer admissible fails the launch before any driver effect.
+
+### `VAL-125` Explicit named target branch for an absent capability
+
+- An Artifact enabling both a process target and a microVM target declares a named target branch for a capability only the microVM target provides.
+- Each branch is inspectable in the expanded value and reflected in that target's member identity.
+- Artifact validation fails when an enabled target lacks the capability and no branch names it, instead of deferring the discovery to launch.
+
+### `VAL-126` Epoch-fenced provider event admitted as evidence
+
+- A driver decodes a provider stop event carrying authority epoch 4 while the Sandbox's current authority epoch is 4, and the event is admitted as the transition it evidences.
+- The same event redelivered after epoch 5 becomes current is retained as non-authoritative evidence and produces no state transition.
+- The retained evidence stays readable for reconciliation and carries no secret or host-identity material.
+
+### `VAL-127` Serialized lifecycle lane with a typed conflict
+
+- A `SuspendSandbox` holding the lane causes a concurrent `StopSandbox` to receive a typed conflict naming the active Operation id.
+- An ordered pair the compatibility ledger explicitly permits, such as a cancel request against the lane holder, is admitted.
+- Exactly one nonterminal Operation is referenced by the Sandbox's lifecycle-operation field at any time.
+
+### `VAL-128` Creation resolves an advertising profile
+
+- A creation requiring same-epoch suspend and resume resolves a member and runtime profile advertising that exact conformed capability.
+- A creation requiring a capability no enabled profile advertises is rejected at creation with the required and effective capability sets both named.
+- No weaker mechanism, provider default, or approximate substitute is selected on the caller's behalf.
+
+### `VAL-129` Expiration cleared without widening policy
+
+- `SetSandboxExpiration` with an explicit removal clears the caller-managed schedule and returns the committed representation.
+- The Artifact hard lifetime ceiling and the Managed-Sandbox lifecycle policy remain present and binding in that committed record.
+- A later assigned instant is still validated against the unchanged ceiling.
+
+### `VAL-130` Restore under the pinned Artifact policy
+
+- A same-Sandbox `RestoreSandbox` selects retained state whose compatibility is proven against the Sandbox's pinned Artifact.
+- Environment, filesystem, network, identity, device, secret, and target-profile policy are taken from that Artifact unchanged.
+- Different policy requires creating a new Sandbox from a different Artifact rather than a restore.
+
+### `VAL-131` Restore-as-create refining within pinned policy
+
+- A restore-as-create selects an advertised target profile and narrows allocations within the pinned Artifact's bounds.
+- It binds required slots with concrete values but replaces no immutable policy dimension.
+- The source Sandbox's disposition is unchanged, and the new Sandbox begins at epoch 1 or, if stopped, with no epoch.
+
+### `VAL-132` Explicit resolved initialRuntime in the canonical request
+
+- A CLI invocation, an SDK call, and a managed-service reconciliation each resolve `running` or `stopped` in their own layer and submit that exact value.
+- The accepted Operation record and the canonical request both carry the resolved value, so replaying the canonical request applies no further default.
+- A named runtime profile preferring `stopped` records the selection and its source instead of applying it after acceptance.
+
+### `VAL-133` Stopped creation commits without a launch effect
+
+- A creation with resolved `initialRuntime = stopped` commits a durable Sandbox whose runtime state is `stopped` and whose execution admission is `closed`.
+- No runtime epoch is allocated and no driver, host, or provider is invoked for the creation.
+- A subsequent explicit `StartSandbox` allocates epoch 1 and performs the first launch.
+
+### `VAL-134` Named commands with output-only status
+
+- A caller issues `StopSandbox` and then reads `status.runtime.state`, `status.execution.state`, and `status.lifecycleOperation` as observations.
+- No public request type offers a runtime state, desired state, or presentation-label field for a caller to populate.
+- A Managed-Sandbox Service expresses stable desired state in its own definition while issuing only the same named Core operations.
+
+### `VAL-135` Presentation labels derived at read time
+
+- A Suspend in flight stores runtime state `running` plus the nonterminal Operation reference, and the word `suspending` is computed when the Sandbox is read.
+- Serialization decisions consult the durable lane and the authoritative runtime state, never the derived word.
+- Changing only the presentation vocabulary changes no durable record and no Artifact or Sandbox identity.
+
+### `VAL-136` Admission closed for every non-running state
+
+- A Sandbox whose current epoch is proven present and executing under current fenced authority commits `running` with execution admission `accepting`.
+- The same Sandbox during a lifecycle mutation commits `closed` with the typed reason `lifecycle-mutation` while still `running`.
+- `provisioning`, `suspended`, `stopped`, and `unknown` each commit `closed` with their own typed reason.
+
+### `VAL-137` Evidenced suspend with retained continuity
+
+- The driver returns quiescence evidence, the retained epoch identity, and the capability-required memory and Process continuity proofs.
+- The Core commits `suspended` with execution admission `closed` and terminalizes the Suspend as succeeded.
+- A target able only to stop and retain a filesystem never advertises the capability, so no Suspend is admitted against it.
+
+### `VAL-138` Driver returns target-native continuity probes
+
+- A microVM driver returns the VMM pause acknowledgement, the retained memory-region identity, and the unchanged guest Process table for the same epoch.
+- A process-target driver unable to prove Process continuity reports the Suspend as failed rather than as succeeded.
+- Every probe result is attached to the report as decoded evidence rather than summarized as a single boolean.
+
+### `VAL-139` Cold fallback terminalized as a failed Resume
+
+- A Resume whose post-effect evidence proves the retained epoch resumed under exclusive authority with control and conformance re-proven is terminalized as succeeded.
+- A Resume that observes a replacement instance is terminalized as failed with the observation retained and the Sandbox left `unknown` or `stopped` as proven.
+- Recovery from that failure is an explicitly authorized `StartSandbox` that consumes a new epoch.
+
+### `VAL-140` Atomic in-place resize on a running Sandbox
+
+- The complete requested allocation is applied in one step, the epoch observed after the effect equals the epoch observed before it, and the Process identity set is unchanged.
+- The applied-resource evidence matches the request exactly, with no dimension left at its previous value.
+- A target that can only resize by reboot terminalizes the Operation as failed and names the required Stop, stopped resize, and Start sequence.
+
+### `VAL-141` Stopped resize records the next-Start allocation
+
+- The validated allocation is committed as the Sandbox's next-runtime allocation while its runtime state stays `stopped`.
+- No runtime epoch is allocated and no provider capacity is reserved or claimed by the resize.
+- The following `StartSandbox` consumes that allocation and is the first point at which capacity is actually requested.
+
+### `VAL-142` Stop lowered to close, revoke, drain, terminate, prove
+
+- A process-target driver lowers Stop to admission close, launch-authority revocation, `cgroup.kill`, and a `populated=0` observation, leaving the logical Sandbox and its retained filesystem intact.
+- A microVM driver lowers Stop to guest shutdown request, VMM termination, and host absence observation, without deleting the provider instance.
+- A target profile whose only native stop is a destructive delete is rejected rather than used to serve Stop.
+
+### `VAL-143` Unresolvable state committed as unknown
+
+- A Stop whose containment proof is unavailable commits runtime state `unknown` with execution admission `closed` and a condition naming the missing predicate.
+- The gathered evidence is retained for a system-originated reconciliation Operation that may later prove `running`, `suspended`, or `stopped`.
+- The terminal result of the original Operation is never rewritten by that reconciliation.
+
+### `VAL-144` Provider phase kept as decoded evidence
+
+- A driver decodes a containerd task status of `RUNNING` and records it under `driver.providerStatus` without writing `sandbox.status.runtime.state`.
+- Core runtime state is derived only from the postcondition proofs the Core contract names for that operation.
+- A provider enum value the driver does not recognize is retained verbatim as evidence and never coerced onto a Core state.
+
+### `VAL-145` Launch success gated on every declared probe
+
+- A Create-running launch publishes success only after the new epoch is observed present and executing, control attachment is proven, the conformance suite passed, and admission is `accepting`.
+- A launch whose conformance probe is unavailable is terminalized as failed or unresolved, with the epoch already consumed.
+- The same gating applies unchanged to `StartSandbox` and same-Sandbox Restore.
+
+### `VAL-146` Driver runs and returns its declared probe set
+
+- The driver's declared probe set for the resolved runtime profile is executed against the exact new epoch and each result is returned with the report.
+- An unavailable probe produces a failure report naming that probe, not a success report with the probe omitted.
+- Probe results are attached as decoded evidence that the Core terminalization consumes directly.
+
+### `VAL-147` Backend acknowledgements kept as evidence
+
+- OCI `created`, containerd task registration, and VMM configuration acknowledgements are recorded as provider acknowledgements on the report.
+- The `running` postcondition is proven by the evidence its own contract names, and the acknowledgements are reported alongside it rather than in place of it.
+- A driver whose target offers only the acknowledgement reports the postcondition as unproven.
+
+### `VAL-148` Provider loss recorded as its own event
+
+- An observed provider idle-stop is written as an uncontrolled provider-loss event whose Operation origin is system.
+- A reconciliation Operation obtains fenced evidence and commits the proven runtime state, or terminalizes as `unknown`.
+- No Stop or Delete Operation is credited retrospectively and no caller-visible Operation changes its terminal result.
+
+### `VAL-149` Auto-wake sequenced as a new epoch
+
+- An observed provider-created replacement runtime is proven discontinuous from the prior epoch and durably sequenced as the next epoch.
+- Execution admission is opened only after that epoch identity record commits.
+- An Exec submitted between the observation and the sequencing receives the typed admission-closed reason.
+
+### `VAL-150` Containment absence proven per target
+
+- A process target proves absence with `cgroup.kill` followed by `cgroup.events` reporting `populated=0`, not with the initial child's exit status.
+- A VM target proves absence by observing guest and VMM termination and host containment, not by the ACPI acknowledgement.
+- Only after that proof does the driver publish `stopped`.
+
+### `VAL-151` Grace expiry commits unknown with retained evidence
+
+- A Stop whose driver returned a containment-absence proof before the grace deadline commits `stopped`.
+- A Stop whose grace deadline elapses without that proof commits `unknown`, keeps admission `closed`, and retains the partial evidence.
+- No successor authority is granted over the Sandbox while the state is `unknown`.
+
+### `VAL-152` Delete succeeds on a durable cleanup proof
+
+- Every Core-owned live resource covered by the Delete is proven absent and the cleanup proof is committed durably before success is published.
+- The Sandbox leaves the live collection, a retained tombstone prevents ID reuse, and the Delete Operation stays readable for its own retention period.
+- A Delete whose orphan disposition cannot be proven is terminalized as failed or unresolved with the cleanup obligation retained.
+
+### `VAL-153` Manifest re-resolved at the launch stage
+
+- A Start authorizes a launch that re-resolves the Sandbox's Artifact, member, and runtime-profile manifest before any driver preparation.
+- The re-resolution reproduces the pinned semantic and built identities, so an unchanged Artifact yields an identical resolution.
+- A launch whose resolution is absent or older than the Sandbox's current Artifact references is refused rather than served from the stale copy.
+
+### `VAL-154` Suspend and Resume gated on the paired capability
+
+- A conformed microVM profile advertising both same-epoch suspend and same-epoch resume admits both operations.
+- A target advertising only one half admits neither, and the refusal names the missing half.
+- A caller on such a target uses `StopSandbox` and `StartSandbox`, accepting the new epoch that implies.
+
+### `VAL-155` Launch labels derived at read time
+
+- A Create-running launch commits runtime state `provisioning` plus the nonterminal `CreateSandbox` Operation, and the word `creating` is computed on read.
+- `starting` and `restoring` are computed the same way from the Operation kind and the authoritative status.
+- The generated status type offers no field in which such a label could be stored.
+
+### `VAL-156` Unresolvable launch committed as unknown
+
+- A launch whose new epoch cannot be proven present or absent commits `unknown` with execution admission `closed` and a condition naming the missing predicate.
+- The launch evidence is retained for a system-originated reconciliation Operation.
+- A launch proven not to have established a live runtime, with cleanup complete, commits `stopped` instead.
 
 ## Composition Authority Matrix
 

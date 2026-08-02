@@ -58,8 +58,8 @@ invariant_registry_sha256="$(
 # These pins detect drift and force explicit review. Semantic validation below,
 # not a coordinated digest rewrite, remains authoritative.
 expected_composition_paths_sha256="65322c7c30f4c75222a36793b8d1b877fa5813df4d1c83f236bb18884c364a65"
-expected_composition_case_contracts_sha256="1232fed356ce3e0be6ca7e1b9c410532d7f107bd1302af5ddfb34b4750fb2715"
-expected_invariant_registry_sha256="9440109a3fd0920c759231daa170db8cac9f5037962ea50d74703a6cd64c7283"
+expected_composition_case_contracts_sha256="572a74c93d3b5e007cc06315689be0d175bf06cb68005b9b3355e22bb4d25ab9"
+expected_invariant_registry_sha256="ade0b30c08d274fa2de863081f81f3e14aaa571cac26ed47652d618bff35cc3a"
 
 if [[ "${composition_paths_sha256}" != "${expected_composition_paths_sha256}" ||
       "${composition_case_contracts_sha256}" != "${expected_composition_case_contracts_sha256}" ||
@@ -132,16 +132,16 @@ jq -e \
   --slurpfile paths "${composition_paths}" \
   --slurpfile contracts "${composition_case_contracts}" \
   '
-    ($registry[0].invariants | length) == 204 and
+    ($registry[0].invariants | length) == 254 and
     $paths[0].reviewedPathCount == 54 and
     ($paths[0].paths | length) == 54 and
-    ($contracts[0].reviewedInvariantIds | length) == 204 and
+    ($contracts[0].reviewedInvariantIds | length) == 254 and
     ($contracts[0].entries | length) == 54 and
     (.status == "candidate") and
     (.invariantIds == [$registry[0].invariants[].id]) and
     (.pathIds == [$paths[0].paths[].id]) and
-    .expectedCellCount == 11016 and
-    ([.rules[].selector.invariantIds[]] | length) == 11016 and
+    .expectedCellCount == 13716 and
+    ([.rules[].selector.invariantIds[]] | length) == 13716 and
     .delegatedConcernTaxonomy == $contracts[0].delegatedConcernTaxonomy and
     .resolvedReentryReplay ==
       $contracts[0].serializedResolvedReentryReplaySets and
