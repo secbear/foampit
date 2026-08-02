@@ -1,0 +1,3390 @@
+{
+  "registryVersion": 1,
+  "packet": "E",
+  "status": "candidate",
+  "textAuthority": "reviewVersion 1, packet \"E\", status \"candidate\". Only the closed structured control fields of this record and the stable obligation identifiers they reference are normative. Prose, rationale strings, and descriptions are explanatory and carry no authority: where they disagree with a closed structured field, the structured field wins. Packet E has not closed, so this record says \"candidate\" and must never be reported as \"reviewed\"; nothing here provides coverage until the registration batches land. Every vocabulary entry that renames a design-record token carries `lockedSourceToken` naming its exact design-record spelling, so the Packet E namespacing is a machine-checkable correspondence rather than silent drift. The modeContract table is locked first and is recomputed by the validator; it may not be edited after obligation identifiers are minted.",
+  "callClasses": [
+    {
+      "id": "durable-operation-mutation",
+      "description": "Durably accepts one Sandbox or Snapshot lifecycle mutation and returns its Operation. Covers CreateSandbox, StartSandbox, StopSandbox, DeleteSandbox, TerminateProcess, capability-gated SignalProcess, SuspendSandbox, ResumeSandbox, ResizeSandboxResources, CreateSnapshot, DeleteSnapshot, RestoreSandbox, ForkSandbox, and any closed system-originated reconciliation, adoption, fencing, quarantine, cleanup, or expiry operation represented on the public wire. An implementation that completes immediately still returns an already-terminal Operation rather than another synchronous contract.",
+      "resultCarrierKind": "durable-operation"
+    },
+    {
+      "id": "durable-process-mutation",
+      "description": "Exec durably accepts one execution and returns a durable, epoch-bound Process. The Process is the idempotency, observation, control, termination, and stream handle for that accepted execution.",
+      "resultCarrierKind": "durable-process"
+    },
+    {
+      "id": "observation",
+      "description": "Read-only synchronous observation that creates no acceptance commit and no mutation handle. Covers GetSandbox, ListSandboxes, WaitSandbox, GetOperation, ListOperations, WaitOperation, GetProcess, ListProcesses, WaitProcess, GetSnapshot, ListSnapshots, WaitSnapshot if later admitted, ReadProcessOutput, and immutable capability and manifest observations returned with their owning resources. An observation timeout ends only that observation and never cancels or terminalizes the observed resource.",
+      "resultCarrierKind": "observation-result"
+    },
+    {
+      "id": "atomic-core-record-update",
+      "description": "Updates a Core-owned representation rather than an external runtime, committing the representation change, the idempotency binding, and the recoverable response together. Covers UpdateSandboxMetadata and SetSandboxExpiration. There is no handle and no dispatch intent; a retry with the same canonical request and idempotency key recovers the committed response and must not apply the update again.",
+      "resultCarrierKind": "committed-core-record-result"
+    },
+    {
+      "id": "existing-handle-intent",
+      "description": "Records monotonic cancel_requested intent on an existing Operation and returns an observation of that same Operation. CancelOperation is the locked member; it allocates no Operation-of-Operation. Repeated requests are monotonic and idempotent, and the original Operation remains the only outcome authority.",
+      "resultCarrierKind": "existing-operation-observation"
+    },
+    {
+      "id": "sequenced-process-control",
+      "description": "Ordered, durably deduplicated command within an exact Process control coordinate bound to Process, Sandbox, runtime epoch, writer lease, and monotonically increasing sequence. Covers WriteProcessInput, CloseProcessInput, and ResizeProcessTerminal. These do not create one Operation per interactive command; a receipt proves Core admission, deduplication, and ordering, not application consumption.",
+      "resultCarrierKind": "durable-process-control-receipt"
+    }
+  ],
+  "lifecycleStates": [
+    {
+      "id": "provisioning/closed",
+      "sandboxStatus": "provisioning",
+      "executionAdmission": "closed",
+      "description": "A new epoch is durably allocated but its usable runtime postcondition is not proven. Used for initial launch, cold Start, and same-Sandbox restore. Execution admission is always closed."
+    },
+    {
+      "id": "running/accepting",
+      "sandboxStatus": "running",
+      "executionAdmission": "accepting",
+      "description": "The exact epoch is observed executing under current fenced authority and a new Exec request may pass Sandbox lifecycle admission. This is the only composite in which admission may be accepting. Running does not imply accepting, and accepting implies neither application readiness nor a launch-authority grant, which is validated separately immediately before first external dispatch."
+    },
+    {
+      "id": "running/closed",
+      "sandboxStatus": "running",
+      "executionAdmission": "closed",
+      "description": "The exact epoch is observed executing under current fenced authority, but Core rejects a new Exec before launch with a typed reason. Used during lifecycle serialization, control-path loss, expiry closure before Stop, and the pre-quiescence phase of Stop or Suspend."
+    },
+    {
+      "id": "suspended/closed",
+      "sandboxStatus": "suspended",
+      "executionAdmission": "closed",
+      "description": "Proven quiescence with same-epoch memory and Process continuity. Launch authority is withheld while undispatched accepted Processes are preserved; only a successful same-epoch Resume may regrant it. Execution admission is always closed."
+    },
+    {
+      "id": "stopped/closed",
+      "sandboxStatus": "stopped",
+      "executionAdmission": "closed",
+      "description": "Proof that no Process-bearing runtime from the prior epoch can continue acting. Deletion is not a live runtime state; DeleteSandbox requires this composite. Execution admission is always closed."
+    },
+    {
+      "id": "unknown/closed",
+      "sandboxStatus": "status-unknown",
+      "executionAdmission": "closed",
+      "description": "The mandatory result when presence, absence, continuity, containment, or exclusive authority cannot be proven. Execution admission is always closed. This composite id is safe under the ledger placeholder rule because it is not a bare ^UNKNOWN$ match, so it stays exactly as locked and needs no namespacing.",
+      "lockedSourceRef": "PACKET-E-LIFECYCLE-STATE-DESIGN.md#sandbox-runtime-states/unknown"
+    }
+  ],
+  "processStates": [
+    {
+      "id": "accepted",
+      "terminal": false,
+      "description": "The canonical Exec request is durably bound to its Process ID and exact Sandbox runtime, but launch work has not begun. An absence-producing Stop terminalizes an undispatched accepted Process; a continuity-preserving Suspend leaves it accepted with launch authority withheld.",
+      "lockedSourceRef": "PACKET-E-LIFECYCLE-STATE-DESIGN.md#process-states/accepted"
+    },
+    {
+      "id": "starting",
+      "terminal": false,
+      "description": "Launch intent has been durably recorded and external launch may be in progress.",
+      "lockedSourceRef": "PACKET-E-LIFECYCLE-STATE-DESIGN.md#process-states/starting"
+    },
+    {
+      "id": "running",
+      "terminal": false,
+      "description": "The exact execution is proven instantiated and nonterminal in its bound epoch. It need not be scheduled on a CPU at this instant; while its Sandbox is suspended the Process remains running but Sandbox-level quiescence prevents it from executing.",
+      "lockedSourceRef": "PACKET-E-LIFECYCLE-STATE-DESIGN.md#process-states/running"
+    },
+    {
+      "id": "state-unknown",
+      "terminal": false,
+      "description": "Launch or execution outcome cannot currently be proven. This is a reconcilable, nonterminal observation state of the same accepted execution and is never replay authorization; it may resolve to running or terminated only by reconciling the same Core launch token and, once known, the same backend execution identity in the same runtime epoch. Namespaced from the locked token `unknown` because every ledger validator rejects ^UNKNOWN$ case-insensitively as placeholder content.",
+      "lockedSourceRef": "PACKET-E-LIFECYCLE-STATE-DESIGN.md#process-states/unknown-state"
+    },
+    {
+      "id": "terminated",
+      "terminal": true,
+      "description": "The Process has an immutable terminal outcome drawn from the closed nine-variant ProcessTermination union. Process terminality, output sealing, and retained-stream expiry are separate facts.",
+      "lockedSourceRef": "PACKET-E-LIFECYCLE-STATE-DESIGN.md#process-states/terminated"
+    }
+  ],
+  "processTerminationVariants": [
+    {
+      "id": "exited",
+      "description": "Ordinary exit carrying exitCode. Nonzero command exit remains `exited` and is never reclassified as infrastructure failure."
+    },
+    {
+      "id": "signaled",
+      "description": "Termination by signal, carrying the exact signal. Payload: { signal }."
+    },
+    {
+      "id": "startFailed",
+      "description": "Proof that the command never became a running Process. Payload spelled { error } in PACKET-E-LIFECYCLE-STATE-DESIGN.md and { failure } in PACKET-E-RESULT-ERROR-CONTRACT-DESIGN.md; the exact result schema and error taxonomy remain API work."
+    },
+    {
+      "id": "deadlineExceeded",
+      "description": "Used only when the original Process deadline won and Core proved the Process can no longer launch or continue. Request or observation timeout alone never establishes it."
+    },
+    {
+      "id": "terminatedByRequest",
+      "description": "A Process-control termination won but no more specific observed signal outcome applies."
+    },
+    {
+      "id": "runtimeLost",
+      "description": "Runtime loss. It contains and does not invent an exit code."
+    },
+    {
+      "id": "runtimeReplaced",
+      "description": "Deliberate epoch replacement, assertable only after target-side execution fencing or containment absence proves the old Process cannot act."
+    },
+    {
+      "id": "fenced",
+      "description": "Proven target-side execution fencing, not merely rejection of stale Core commits. Internal authorityEpoch advancement by itself cannot terminalize a Process."
+    },
+    {
+      "id": "stoppedBySandbox",
+      "description": "Deliberate Sandbox Stop causality, usable only when that causality is proven."
+    }
+  ],
+  "operationStates": [
+    {
+      "id": "accepted",
+      "terminal": false,
+      "description": "The mutation is durably accepted with its exact effect intent bound before dispatch. Entry state of the locked Operation graph; may advance to running or directly to cancel_requested."
+    },
+    {
+      "id": "running",
+      "terminal": false,
+      "description": "The accepted mutation is in progress. May advance to succeeded, failed, unknown, or cancel_requested."
+    },
+    {
+      "id": "cancel_requested",
+      "terminal": false,
+      "description": "Monotonic cancellation intent is durably recorded on the existing Operation by the existing-handle-intent call class. Reachable from accepted or running. Cancellation is a request, not a fact; an unresolved cancel_requested permits no terminal result other than unknown."
+    },
+    {
+      "id": "succeeded",
+      "terminal": true,
+      "description": "Terminal outcome. Every possibility remaining under Core's evidence satisfies the exact method-specific success postcondition and cancellation is exactly notRequested or proven lost."
+    },
+    {
+      "id": "failed",
+      "terminal": true,
+      "description": "Terminal outcome. No remaining possibility satisfies the success postcondition, cancellation is notRequested or proven lost, every possibility has mutationAuthority = quiesced, and all residual effects are known. A known quiesced partial residual may create independently observable cleanup debt without disturbing this outcome."
+    },
+    {
+      "id": "cancelled",
+      "terminal": true,
+      "description": "Terminal outcome. Cancellation is proven won, the requested postcondition was not established, every possibility has mutationAuthority = quiesced, and residual effects are known. Receiving a cancellation request, sending a native cancellation call, or observing a transport cancellation is insufficient."
+    },
+    {
+      "id": "outcome-unknown",
+      "terminal": true,
+      "description": "Terminal outcome for the locked source token `unknown`. Core cannot prove the requested postcondition, the effect outcome, or the exclusion of acting authority. It is immutable terminal history: linked reconciliation or cleanup uses successor Operations and never rewrites the predecessor to success or failure, and it is never conflated with the reconcilable nonterminal Process state-unknown. Namespaced because every ledger validator rejects ^UNKNOWN$ case-insensitively as placeholder content."
+    }
+  ],
+  "terminalOutcomes": [
+    {
+      "id": "succeeded",
+      "proofRequired": "Every possibility remaining under Core's evidence satisfies the exact method-specific success postcondition P, and cancellation is exactly notRequested or proven lost.",
+      "description": "Succeeded<ResultFor<K>>. Success requires the exact postcondition; no weaker provider acknowledgement substitutes.",
+      "lockedSourceRef": "PACKET-E-RESULT-ERROR-CONTRACT-DESIGN.md#terminal-outcomes/succeeded"
+    },
+    {
+      "id": "failed",
+      "proofRequired": "No remaining possibility satisfies P, cancellation is notRequested or proven lost, every remaining possibility has mutationAuthority = quiesced, and all residual effects are known.",
+      "description": "Failed<KnownFailureFor<K>>. Failure requires exclusion of unfenced acting authority. Known cleanup debt may not hide possibly acting authority under failed.",
+      "lockedSourceRef": "PACKET-E-RESULT-ERROR-CONTRACT-DESIGN.md#terminal-outcomes/failed"
+    },
+    {
+      "id": "cancelled",
+      "proofRequired": "No remaining possibility satisfies P, cancellation is proven won, every remaining possibility has mutationAuthority = quiesced, and residual effects are known.",
+      "description": "Cancelled<CancellationProofFor<K>>. Cancellation requires exclusion of unfenced acting authority; a transport cancellation code never establishes it.",
+      "lockedSourceRef": "PACKET-E-RESULT-ERROR-CONTRACT-DESIGN.md#terminal-outcomes/cancelled"
+    },
+    {
+      "id": "outcome-unknown",
+      "proofRequired": "Any remaining effect or authority ambiguity: an unknown partial effect, a possibly acting mutation authority, or an unresolved cancellation = requested. Every other nonempty knowledge set yields this outcome when a terminal result must be committed.",
+      "description": "Unknown<AmbiguityFor<K>>. Immutable terminal Operation outcome; linked reconciliation or cleanup never rewrites it, and it never authorizes automatic Exec replay or blind successor effect. Namespaced from the locked token `unknown` for the ledger ^UNKNOWN$ placeholder rejection.",
+      "lockedSourceRef": "PACKET-E-RESULT-ERROR-CONTRACT-DESIGN.md#terminal-outcomes/unknown-outcome"
+    }
+  ],
+  "requestErrorVariants": [
+    {
+      "id": "MalformedRequest",
+      "description": "Malformed request structure. Payload { violations }. Never collapsed with semantically invalid content."
+    },
+    {
+      "id": "InvalidArgument",
+      "description": "Semantically invalid content in a structurally well-formed request. Payload { violations }."
+    },
+    {
+      "id": "Unauthenticated",
+      "description": "No proven caller identity. No payload. Never collapsed with unauthorized."
+    },
+    {
+      "id": "PermissionDenied",
+      "description": "Authenticated but unauthorized. No payload. Carries no resource-existence disclosure; authorization precedes detailed validation and existence disclosure."
+    },
+    {
+      "id": "TargetNotFound",
+      "description": "Authorized absence of the tagged target. Payload { targetKind, safeTargetRef? }. Distinct from unauthorized existence."
+    },
+    {
+      "id": "OutputCursorExpired",
+      "description": "Stale observation cursor. Payload { earliestCursor, sealedAt? }. Distinct from an absent target."
+    },
+    {
+      "id": "NameConflict",
+      "description": "Human Sandbox name already in use. Payload { safeName? }. Distinct from idempotency conflict."
+    },
+    {
+      "id": "IdempotencyConflict",
+      "description": "Same idempotency key reused with a different canonical semantic request. Payload { originalDigest, submittedDigest }."
+    },
+    {
+      "id": "StaleRevision",
+      "description": "Stale representation revision under optimistic concurrency. Payload { expected, current }. Distinct from stale runtime epoch."
+    },
+    {
+      "id": "StaleRuntime",
+      "description": "Reference to a runtime epoch that is not the exact expected epoch. Payload { sandboxId, expectedEpoch, currentEpoch? }. Never silently applied to the current runtime and never advises replay against the stale epoch."
+    },
+    {
+      "id": "InvalidState",
+      "description": "Invalid lifecycle state for the requested method. Payload { required, observed }. Distinct from an incompatible concurrent operation."
+    },
+    {
+      "id": "AdmissionClosed",
+      "description": "Execution admission is closed, so a new Exec is rejected before launch. Payload { reason }. Distinct from service unavailable."
+    },
+    {
+      "id": "ConcurrentOperation",
+      "description": "An incompatible concurrent Operation holds the conflicting lane. Payload { conflictingOperationId, relation }."
+    },
+    {
+      "id": "DependencyNotFound",
+      "description": "A required dependency does not exist. Payload { safeDependencyRef? }. Distinct from an unavailable dependency."
+    },
+    {
+      "id": "DependencyUnavailable",
+      "description": "A required dependency exists but is unavailable. Payload { safeDependencyRef? }."
+    },
+    {
+      "id": "ReferenceProtected",
+      "description": "A retention reference protects the target from the requested change. Payload { references }. Distinct from an administrative hold."
+    },
+    {
+      "id": "RetentionHold",
+      "description": "An administrative hold blocks the requested change. Payload { holds }."
+    },
+    {
+      "id": "MethodUnavailable",
+      "description": "The method itself is unavailable on this surface. Payload { method }. Distinct from capability incompatibility and from dynamically unavailable capacity."
+    },
+    {
+      "id": "CapabilityUnsupported",
+      "description": "Target or profile capability incompatibility. Payload { capabilityId, profileId? }."
+    },
+    {
+      "id": "ArtifactIncompatible",
+      "description": "Artifact incompatibility with the target. Payload { compatibility }. Distinct from an immutable policy mismatch."
+    },
+    {
+      "id": "PolicyMismatch",
+      "description": "Immutable policy mismatch at an exact policy coordinate. Payload { policyCoordinate }."
+    },
+    {
+      "id": "RateLimited",
+      "description": "Short-term rate limiting. Payload { retryAfter? }. Never collapsed with account quota or global capacity."
+    },
+    {
+      "id": "QuotaExceeded",
+      "description": "Hard account quota exhaustion. Payload { subject, metric, resetAt? }."
+    },
+    {
+      "id": "CapacityUnavailable",
+      "description": "Dynamically unavailable placement capacity. Payload { placement?, retryAfter? }. Distinct from quota and from rate limiting."
+    },
+    {
+      "id": "ServiceUnavailable",
+      "description": "The service cannot currently accept the request. Payload { retryAfter? }. Distinct from execution admission closed."
+    },
+    {
+      "id": "ProcessControlConflict",
+      "description": "Retained Process-control replay at an equal sequence with conflicting content. Payload { sequence, originalDigest, submittedDigest }."
+    },
+    {
+      "id": "SequenceOutOfRange",
+      "description": "Future sequence gap or otherwise out-of-range Process-control sequence. Payload { expected, submitted }. Distinct from a conflicting replay and from an expired replay."
+    },
+    {
+      "id": "StaleWriterLease",
+      "description": "The submitted Process-control writer lease is no longer current. Payload { writerLeaseId }."
+    },
+    {
+      "id": "ProcessInputLimitExceeded",
+      "description": "Process input exceeds its declared bound. Payload { limit, current }."
+    },
+    {
+      "id": "InternalInvariantViolation",
+      "description": "Internal invariant failure. Payload { evidenceId }. Distinct from evidence or data corruption."
+    },
+    {
+      "id": "EvidenceCorrupt",
+      "description": "Evidence or data corruption. Payload { evidenceId }."
+    }
+  ],
+  "recoveryErrorVariants": [
+    {
+      "id": "IdempotencyRecordExpired",
+      "description": "The submitted idempotency coordinate is outside its guaranteed recovery window. Payload { key, recoveryWindowEndedAt, priorAcceptance: PriorAcceptanceEvidence<IdempotentAcceptedResultReference> } where prior acceptance is Unknown | ProvenWithoutRetainedResult | ProvenWithRetainedResult { acceptedResult } and the retained reference is OperationResult { operationId } | ProcessResult { processId } | CoreRecordResult { resource, resultingRevision, committedResponseDigest }. Caller recovery is ObserveHandle when the retained accepted result is an Operation or Process and otherwise OperatorAction; it never authorizes resubmission with a new key. Projects to HTTP 410 and gRPC FAILED_PRECONDITION plus its exact typed reason, never to a fresh RequestError reason."
+    },
+    {
+      "id": "ProcessControlRecordExpired",
+      "description": "The submitted Process-control coordinate is outside its guaranteed recovery window. Payload { writerLeaseId, sequence, recoveryWindowEndedAt, priorAcceptance: PriorAcceptanceEvidence<ProcessControlAcceptedResultReference> } where the retained reference is { processId, writerLeaseId, sequence }. It never authorizes resubmission with a new sequence. Projects to HTTP 410 and gRPC FAILED_PRECONDITION plus its exact typed reason."
+    }
+  ],
+  "modeContract": [
+    {
+      "mode": "preserved-no-emission",
+      "phase": "N1",
+      "component": "target-member-builder"
+    },
+    {
+      "mode": "manifest-only",
+      "phase": "N1",
+      "component": "target-member-builder"
+    },
+    {
+      "mode": "built-content",
+      "phase": "N1",
+      "component": "target-member-builder"
+    },
+    {
+      "mode": "build-rejection",
+      "phase": "A1",
+      "component": "artifact-final-validator"
+    },
+    {
+      "mode": "build-rejection",
+      "phase": "N1",
+      "component": "target-member-builder"
+    },
+    {
+      "mode": "create-binding",
+      "phase": "C0",
+      "component": "creation-resolver"
+    },
+    {
+      "mode": "operator-binding",
+      "phase": "O0",
+      "component": "operator-resolver"
+    },
+    {
+      "mode": "host-preflight",
+      "phase": "H0",
+      "component": "operator-preflight"
+    },
+    {
+      "mode": "driver-preparation",
+      "phase": "D0",
+      "component": "target-driver"
+    },
+    {
+      "mode": "post-start-probe",
+      "phase": "R1",
+      "component": "target-conformance-probe"
+    }
+  ],
+  "introducedInvariants": [
+    "ADM-001",
+    "ADM-002",
+    "ADM-003",
+    "ADM-004",
+    "ADM-005",
+    "ADM-006",
+    "ADM-007",
+    "ADM-008",
+    "ADM-009",
+    "ADM-010",
+    "ADM-011",
+    "ADM-012",
+    "ADM-013",
+    "ADM-014",
+    "ADM-015",
+    "ADM-017",
+    "ADM-018",
+    "ADP-001",
+    "ADP-002",
+    "ADP-003",
+    "ADP-007",
+    "ADP-008",
+    "ADP-009",
+    "ADP-011",
+    "ADP-012",
+    "ADP-014",
+    "CNC-002",
+    "ERR-001",
+    "ERR-002",
+    "ERR-003",
+    "ERR-004",
+    "ERR-005",
+    "ERR-006",
+    "ERR-007",
+    "ERR-008",
+    "ERR-009",
+    "ERR-010",
+    "ERR-011",
+    "ERR-012",
+    "ERR-013",
+    "ERR-014",
+    "ERR-015",
+    "ERR-016",
+    "ERR-017",
+    "FEN-001",
+    "FEN-002",
+    "FEN-004",
+    "FEN-006",
+    "FEN-007",
+    "FRK-001",
+    "FRK-002",
+    "FRK-003",
+    "FRK-004",
+    "FRK-005",
+    "IDE-001",
+    "IDE-002",
+    "IDE-003",
+    "IDE-004",
+    "IDE-005",
+    "IDE-006",
+    "IDE-007",
+    "IDE-008",
+    "IDE-009",
+    "IDE-010",
+    "IDE-011",
+    "IDE-012",
+    "IDE-013",
+    "IDE-014",
+    "IDE-015",
+    "IDE-016",
+    "IDE-017",
+    "IDE-018",
+    "IDE-019",
+    "IDE-020",
+    "OPA-001",
+    "OPA-002",
+    "OPA-003",
+    "OPA-004",
+    "OPA-005",
+    "OPA-006",
+    "OPA-007",
+    "OPA-008",
+    "OPA-009",
+    "OPA-010",
+    "OPA-011",
+    "OPA-012",
+    "OPA-013",
+    "OPA-014",
+    "OPA-015",
+    "OPA-016",
+    "OPA-017",
+    "OPA-018",
+    "OPA-019",
+    "OPA-020",
+    "OPA-021",
+    "OPA-022",
+    "OPA-023",
+    "PIO-001",
+    "PIO-002",
+    "PIO-003",
+    "PIO-004",
+    "PIO-005",
+    "PIO-006",
+    "PIO-007",
+    "PIO-008",
+    "PIO-009",
+    "PIO-010",
+    "PIO-011",
+    "PIO-012",
+    "PIO-013",
+    "PIO-014",
+    "PIO-015",
+    "PIO-016",
+    "PIO-017",
+    "PIO-018",
+    "PIO-019",
+    "POL-001",
+    "POL-002",
+    "POL-003",
+    "POL-004",
+    "PRC-001",
+    "PRC-002",
+    "PRC-003",
+    "PRC-004",
+    "PRC-005",
+    "PRC-006",
+    "PRC-007",
+    "PRC-008",
+    "PRC-009",
+    "PRC-010",
+    "PRC-011",
+    "PRC-012",
+    "PRC-013",
+    "PRC-014",
+    "PRC-015",
+    "PRC-016",
+    "PRC-017",
+    "PRF-001",
+    "PRF-002",
+    "PRF-003",
+    "PRF-004",
+    "PRF-005",
+    "PRF-006",
+    "PRF-007",
+    "PRF-008",
+    "PRF-009",
+    "PRF-010",
+    "PRF-011",
+    "PRF-012",
+    "PRF-013",
+    "PRF-014",
+    "RET-001",
+    "RET-002",
+    "RET-003",
+    "RET-004",
+    "RET-006",
+    "RET-007",
+    "RET-008",
+    "RET-009",
+    "RET-010",
+    "SBX-001",
+    "SBX-002",
+    "SBX-003",
+    "SBX-004",
+    "SBX-005",
+    "SBX-006",
+    "SBX-007",
+    "SBX-008",
+    "SBX-009",
+    "SBX-010",
+    "SBX-011",
+    "SBX-012",
+    "SBX-013",
+    "SBX-014",
+    "SBX-015",
+    "SBX-016",
+    "SBX-017",
+    "SBX-018",
+    "SBX-019",
+    "SBX-020",
+    "SBX-021",
+    "SBX-022",
+    "SBX-023",
+    "SBX-024",
+    "SBX-025",
+    "SIG-001",
+    "SIG-002",
+    "SIG-003",
+    "SIG-004",
+    "SIG-005",
+    "SIG-006",
+    "SIG-007",
+    "SOP-001",
+    "SOP-002",
+    "SOP-003",
+    "SOP-004",
+    "SOP-005",
+    "SOP-006",
+    "SOP-007",
+    "SOP-008",
+    "SOP-009",
+    "SOP-010"
+  ],
+  "operations": [
+    {
+      "id": "CancelOperation",
+      "callClass": "existing-handle-intent",
+      "targetKind": "operation",
+      "owner": "core",
+      "capabilityGate": "none",
+      "mutationClass": "monotonic-intent",
+      "resultCarrierKind": "existing-operation-observation",
+      "allowedRequestErrors": [
+        "MalformedRequest",
+        "InvalidArgument",
+        "Unauthenticated",
+        "PermissionDenied",
+        "TargetNotFound",
+        "InvalidState",
+        "RateLimited",
+        "ServiceUnavailable",
+        "InternalInvariantViolation",
+        "EvidenceCorrupt"
+      ],
+      "allowedRecoveryErrors": [],
+      "allowedKnownFailures": [],
+      "allowedAmbiguities": [],
+      "recoveryCoordinates": [
+        "existing-operation-record:{operationId,resultingOperationRevision}"
+      ],
+      "refinesPacketASurfaces": [
+        "exec.signal-cancellation",
+        "operator.retry-health",
+        "runtime.cleanup-errors"
+      ],
+      "refinesPacketBFields": [],
+      "invariants": [
+        "OPA-017",
+        "PRF-005",
+        "PRF-013",
+        "PRC-002",
+        "PRC-003",
+        "RET-006",
+        "ADM-001",
+        "ERR-002",
+        "ERR-005",
+        "ERR-008",
+        "ERR-011",
+        "ERR-014",
+        "ADP-007",
+        "ADP-011",
+        "ADP-014"
+      ],
+      "delegatedPackets": [],
+      "rationale": "The sole member of the existing-handle-intent class. It commits an ExistingOperationIntentCommit on the EXISTING Operation and allocates no Operation-of-Operation (OPA-017), so resultCarrierKind is existing-operation-observation and allowedKnownFailures and allowedAmbiguities are structurally empty \u2014 the target Operation remains the sole outcome authority and carries its own failure and ambiguity subsets. THIS RECORD IS THE PROOF THAT recoveryCoordinates CANNOT SUBSTITUTE FOR allowedRecoveryErrors: recoveryCoordinates is NON-EMPTY (the existing Operation record plus its resultingOperationRevision is the class-specific recovery coordinate, and a retry or observation returns the same Operation) while allowedRecoveryErrors is EMPTY, and the emptiness is proven, not dropped \u2014 the locked ExistingOperationIntentCommit carries no idempotencyCoordinate and no Process-control coordinate, and the closed RecoveryError union contains exactly IdempotencyRecordExpired and ProcessControlRecordExpired, so neither variant is reachable. Once the Operation's own retention lapses, the correct rejection is TargetNotFound (a RequestError), never a RecoveryError. InvalidState is admissible because the locked Operation graph reaches cancel_requested only from accepted or running, so a request against an already-terminal Operation is a typed state rejection carrying {required, observed}. Cancellation is a request, not a fact: an unresolved cancel_requested permits no terminal result other than `outcome-unknown`, and terminal `cancelled` needs proven-won cancellation with quiesced mutation authority. PRF-005 and PRF-013 keep an already-committed terminal outcome immutable against this call; ADP-014 keeps a reconciler from doing the same by another route. PRC-003 is cited for the Process-targeted case: cancelling a Signal or Terminate Operation describes only that Operation and never writes a terminal outcome onto the Process record. ADP-011 forbids an adapter presenting a cancel-then-observe composite as one Core Operation, ADP-007 forbids treating a transport CANCELLED as a proven Core cancellation, and RET-006 records that there is no caller-facing Operation deletion for which cancel could be mistaken.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "CloseProcessInput",
+      "callClass": "sequenced-process-control",
+      "targetKind": "process-control-coordinate",
+      "owner": "exec",
+      "capabilityGate": "interactive-exec-conformance",
+      "mutationClass": "ordered-process-control-record",
+      "resultCarrierKind": "durable-process-control-receipt",
+      "allowedRequestErrors": [
+        "MalformedRequest",
+        "InvalidArgument",
+        "Unauthenticated",
+        "PermissionDenied",
+        "TargetNotFound",
+        "StaleRuntime",
+        "InvalidState",
+        "ProcessControlConflict",
+        "SequenceOutOfRange",
+        "StaleWriterLease",
+        "RateLimited",
+        "ServiceUnavailable",
+        "InternalInvariantViolation",
+        "EvidenceCorrupt"
+      ],
+      "allowedRecoveryErrors": [
+        "ProcessControlRecordExpired"
+      ],
+      "allowedKnownFailures": [
+        "RuntimeControlFailed",
+        "ProviderRejected",
+        "InternalFailure",
+        "IntegrityFailure"
+      ],
+      "allowedAmbiguities": [
+        "DispatchOutcomeUnknown",
+        "ProcessLivenessUnknown",
+        "RuntimeContinuityUnknown",
+        "EvidenceIntegrityUnknown"
+      ],
+      "recoveryCoordinates": [
+        "process-control-coordinate"
+      ],
+      "refinesPacketASurfaces": [
+        "exec.stdio-mode",
+        "live.attach-shell",
+        "framework.session-reuse"
+      ],
+      "refinesPacketBFields": [
+        "artifact.lifecycleRequirements.optionalOperations"
+      ],
+      "invariants": [
+        "PIO-008",
+        "PIO-009",
+        "PIO-010",
+        "PIO-011",
+        "PIO-012",
+        "PIO-013",
+        "PIO-015",
+        "PIO-016",
+        "PIO-017",
+        "PIO-018",
+        "IDE-008",
+        "IDE-020",
+        "ERR-003",
+        "ERR-006",
+        "ERR-009",
+        "ERR-012",
+        "ERR-015",
+        "ADM-004",
+        "ADM-015",
+        "ADP-001",
+        "ADP-002"
+      ],
+      "delegatedPackets": [],
+      "rationale": "CloseProcessInput shares the ProcessControlCoordinate, the ordered stream, the receipt carrier, and the entire replay taxonomy of WriteProcessInput, and differs from it in exactly two auditable ways. FIRST DIFFERENCE: ProcessInputLimitExceeded { limit, current } is EXCLUDED. Close carries no bytes, so no declared input bound can be exceeded; admitting that variant here would be an extra-variant schema error, which the locked contract treats as seriously as a missing one. SECOND DIFFERENCE: PIO-004 is not cited, because it governs the replay of accepted input frames rather than the close record; PIO-015 is cited from the opposite side -- here it is the invariant this method ESTABLISHES (the irreversible ordered close record) rather than the one it is rejected by. Everything else is identical by construction and deliberately so: allowedRecoveryErrors is ProcessControlRecordExpired and NEVER IdempotencyRecordExpired, because this class commits a receipt under a lease and sequence and has no idempotency key; IdempotencyConflict is therefore excluded and ProcessControlConflict takes its place; and recoveryCoordinates [process-control-coordinate] names where the recovery state lives without substituting for the RecoveryError field. The four-way replay outcome is preserved intact -- equal content at a retained sequence recovers the same receipt and is not an error (PIO-009), different content is ProcessControlConflict (PIO-010), an expired retained sequence is the RecoveryError, and a gapped future sequence is SequenceOutOfRange (PIO-011) -- with StaleWriterLease separate again for a lease that is not the current live lease or was retargeted across runtime replacement, termination, reattachment, or Session rebinding (PIO-012, PIO-018). InvalidState covers a Process whose accepted stream contract has no input stream and a second close after the irreversible record. ConcurrentOperation is excluded because ordering is by lease and sequence, not by the fenced lifecycle lane. MethodUnavailable and CapabilityUnsupported are excluded because the interactive-exec-conformance gate is discharged at Exec acceptance -- a Process with no input stream cannot be created against a target lacking interactive conformance. AdmissionClosed, NameConflict, StaleRevision, OutputCursorExpired, QuotaExceeded, CapacityUnavailable, ReferenceProtected, RetentionHold, ArtifactIncompatible, PolicyMismatch, and both Dependency variants are structurally inapplicable. InvalidArgument is retained even though the command has no payload, because the coordinate fields themselves can be semantically invalid in a structurally well-formed request; MalformedRequest stays distinct for structural violations. allowedKnownFailures and allowedAmbiguities hang off the receipt's terminal `failed` and `unknown` arms per PIO-016, never off an Operation, and PIO-013 keeps the receipt from meaning that the application observed EOF. PIO-017 is cited because Sandbox teardown must resolve an accepted close command with one of its four declared terminal outcomes rather than discarding it. delegatedPackets is empty. The id is not among the fifteen rejected names.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "CreateSandbox",
+      "callClass": "durable-operation-mutation",
+      "targetKind": "sandbox",
+      "owner": "create",
+      "capabilityGate": "none",
+      "mutationClass": "creation-with-resolved-initial-runtime",
+      "resultCarrierKind": "durable-operation",
+      "allowedRequestErrors": [
+        "MalformedRequest",
+        "InvalidArgument",
+        "Unauthenticated",
+        "PermissionDenied",
+        "NameConflict",
+        "IdempotencyConflict",
+        "DependencyNotFound",
+        "DependencyUnavailable",
+        "CapabilityUnsupported",
+        "ArtifactIncompatible",
+        "PolicyMismatch",
+        "RateLimited",
+        "QuotaExceeded",
+        "CapacityUnavailable",
+        "ServiceUnavailable",
+        "InternalInvariantViolation",
+        "EvidenceCorrupt"
+      ],
+      "allowedRecoveryErrors": [
+        "IdempotencyRecordExpired"
+      ],
+      "allowedKnownFailures": [
+        "ArtifactMaterializationFailed",
+        "CapacityUnavailable",
+        "RuntimeProvisioningFailed",
+        "RuntimeReadinessFailed",
+        "RuntimeControlFailed",
+        "ConformanceFailed",
+        "RestoreFailed",
+        "ProviderRejected",
+        "DependencyFailed",
+        "CleanupIncomplete",
+        "InternalFailure",
+        "IntegrityFailure"
+      ],
+      "allowedAmbiguities": [
+        "DispatchOutcomeUnknown",
+        "ExternalIdentityUnknown",
+        "RuntimePresenceUnknown",
+        "EffectCompletionUnknown",
+        "CleanupAuthorityUnknown",
+        "EvidenceIntegrityUnknown"
+      ],
+      "recoveryCoordinates": [
+        "IdempotencyCoordinate{authenticatedScope, method=CreateSandbox, key}",
+        "IdempotentAcceptedResultReference.OperationResult{operationId} retained for the published recovery window",
+        "acceptance tombstone plus key-age rule covering the entire published recovery window, so an expired coordinate yields RecoveryError rather than a second creation"
+      ],
+      "refinesPacketASurfaces": [
+        "create.mount-volume-snapshot-data",
+        "create.timeouts-lifetime-idle",
+        "create.restore-source",
+        "artifact.lifetime-maximum",
+        "service.lifecycle-policy",
+        "operator.retry-health",
+        "framework.session-reuse"
+      ],
+      "refinesPacketBFields": [
+        "artifact.lifecycleRequirements.maximumLifetimeEnforcement",
+        "artifact.lifecycleRequirements.optionalOperations",
+        "artifact.lifecycleRequirements.snapshot"
+      ],
+      "invariants": [
+        "IDE-001",
+        "IDE-002",
+        "IDE-003",
+        "IDE-017",
+        "OPA-001",
+        "OPA-004",
+        "OPA-007",
+        "OPA-013",
+        "OPA-020",
+        "OPA-023",
+        "SBX-001",
+        "SBX-002",
+        "SBX-014",
+        "SBX-015",
+        "SBX-016",
+        "SBX-024",
+        "SBX-025",
+        "ADM-012",
+        "ADM-018",
+        "POL-001",
+        "POL-004",
+        "PRF-001",
+        "PRF-005",
+        "PRF-008",
+        "PRF-009",
+        "PRF-012",
+        "ERR-001",
+        "ERR-004",
+        "ERR-007",
+        "ERR-010",
+        "ERR-013",
+        "RET-009",
+        "FEN-004",
+        "FRK-002",
+        "FRK-003",
+        "FEN-001"
+      ],
+      "delegatedPackets": [],
+      "rationale": "Create is the C0 acceptance station: it allocates the Sandbox ID durably before any effect-producing work (IDE-001, IDE-011 target sealing) and records either the epoch-1 allocation or an explicit absence of any epoch (IDE-002). The canonical request always carries the resolved initialRuntime (SBX-001); initially-stopped Create performs no launch effects (SBX-002) and therefore exercises only the artifact/dependency branch of allowedKnownFailures, while initially-running Create additionally traverses the launch stations governed by SBX-014/015/016 and terminalized under PRF-001. The per-method subsets are the union over both branches, as the class contract requires one ResultFor<K> per method, not per branch. TargetNotFound is deliberately absent: Create has no pre-existing tagged target, so an absent Artifact or Snapshot source is DependencyNotFound, which preserves the locked missing-dependency versus unavailable-dependency and authorized-absence distinctions. StaleRuntime is absent because IDE-017 makes a runtime epoch unrepresentable as Create input. MethodUnavailable is absent because Create is required of every conforming execution driver, so an implementation that cannot offer it is non-conforming rather than surface-limited; CapabilityUnsupported remains admissible for the restore-as-create Snapshot branch and for POL-001 capability approximation. allowedRecoveryErrors is IdempotencyRecordExpired only: Create has an idempotency recovery coordinate but no Process-control coordinate, so ProcessControlRecordExpired is provably inapplicable rather than omitted, and recoveryCoordinates names where the state lives without substituting for the branch. RuntimeContinuityUnknown and ProcessLivenessUnknown are excluded because epoch 1 has no predecessor to have continuity with and no Core Process exists at acceptance. FRK-002 and FRK-003 are carried for the restore-as-create branch, which must not reactivate a source epoch and must not admit execution without a successor-Process contract; POL-004 blocks that branch from widening immutable Artifact policy. The ambiguity family is transcribed from a locked list the source introduces with 'such as', so this subset is candidate-complete and must be re-proven against the closed missing-proof extraction before Packet E closes.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "CreateSnapshot",
+      "callClass": "durable-operation-mutation",
+      "targetKind": "sandbox",
+      "owner": "live",
+      "capabilityGate": "snapshot",
+      "mutationClass": "retained-state-creation",
+      "resultCarrierKind": "durable-operation",
+      "allowedRequestErrors": [
+        "MalformedRequest",
+        "InvalidArgument",
+        "Unauthenticated",
+        "PermissionDenied",
+        "TargetNotFound",
+        "IdempotencyConflict",
+        "StaleRevision",
+        "StaleRuntime",
+        "InvalidState",
+        "ConcurrentOperation",
+        "DependencyUnavailable",
+        "MethodUnavailable",
+        "CapabilityUnsupported",
+        "ArtifactIncompatible",
+        "RateLimited",
+        "QuotaExceeded",
+        "ServiceUnavailable",
+        "InternalInvariantViolation",
+        "EvidenceCorrupt"
+      ],
+      "allowedRecoveryErrors": [
+        "IdempotencyRecordExpired"
+      ],
+      "allowedKnownFailures": [
+        "SnapshotCaptureFailed",
+        "SnapshotVerificationFailed",
+        "RuntimeControlFailed",
+        "TerminationFailed",
+        "CapacityUnavailable",
+        "ProviderRejected",
+        "DependencyFailed",
+        "CleanupIncomplete",
+        "InternalFailure",
+        "IntegrityFailure"
+      ],
+      "allowedAmbiguities": [
+        "DispatchOutcomeUnknown",
+        "ExternalIdentityUnknown",
+        "SnapshotCompletenessUnknown",
+        "RuntimeContinuityUnknown",
+        "RuntimePresenceUnknown",
+        "EffectCompletionUnknown",
+        "CleanupAuthorityUnknown",
+        "EvidenceIntegrityUnknown"
+      ],
+      "recoveryCoordinates": [
+        "idempotency-coordinate:{authenticatedScope,method,key}",
+        "operation-handle:{operationId}"
+      ],
+      "refinesPacketASurfaces": [
+        "live.snapshot-restore-fork",
+        "create.mount-volume-snapshot-data",
+        "framework.snapshot-reconnect"
+      ],
+      "refinesPacketBFields": [
+        "artifact.lifecycleRequirements.snapshot",
+        "artifact.lifecycleRequirements.optionalOperations",
+        "artifact.workspace.runtimeTransferExclusion",
+        "artifact.outputs.runtimeCollection"
+      ],
+      "invariants": [
+        "SOP-001",
+        "SOP-002",
+        "SOP-003",
+        "SOP-004",
+        "SOP-005",
+        "SOP-006",
+        "SOP-007",
+        "SOP-008",
+        "SOP-009",
+        "SOP-010",
+        "IDE-011",
+        "OPA-002",
+        "OPA-005",
+        "OPA-010",
+        "OPA-014",
+        "OPA-021",
+        "PRF-002",
+        "PRF-010",
+        "ADM-002",
+        "ADM-013",
+        "ADM-014",
+        "CNC-002",
+        "FEN-006",
+        "SBX-019",
+        "SBX-020",
+        "ERR-002",
+        "ERR-005",
+        "ERR-008",
+        "ERR-011",
+        "ERR-014",
+        "FEN-001"
+      ],
+      "delegatedPackets": [],
+      "rationale": "targetKind is `sandbox`, not `snapshot`: capture uses a SandboxOperationTarget against an exact source runtime, and the Snapshot is the RESULT (snapshotId, sourceSandboxId, sourceRuntimeEpoch, sourceAfterCapture), not the mutation target. IDE-011 requires that sealed target to be fully resolved at acceptance, which is what makes StaleRuntime (expectedRuntimeEpoch) and StaleRevision (expectedEtag) both admissible here \u2014 both coordinates are sealed by the Sandbox target variant. SOP-002 forces one exact resolved snapshotClass identity WITH its complete resolved definition plus one explicit sourceAfterCapture disposition, so an omitted or provider-selected value is InvalidArgument before acceptance, never a default. The capability gate is the Snapshot capability; CapabilityUnsupported covers target/profile incompatibility while MethodUnavailable covers a surface that does not expose the method at all, and the locked required distinctions forbid collapsing them. ArtifactIncompatible is admissible because the class, its kind, and the Artifact's declared Snapshot requirements must match before acceptance. mutationClass is retained-state-creation, but note it also carries the SELECTED SOURCE POSTCONDITION: with sourceAfterCapture=runtimeStatePreserved, SOP-006 requires the source to finish in its original runtime state under its original epoch, which is why RuntimeContinuityUnknown is an admitted ambiguity; with sourceAfterCapture=stopped, SOP-008 requires the FULL Stop postcondition and SBX-019/SBX-020 require a containment-absence proof that a grace deadline alone never establishes, which is why TerminationFailed is an admitted known failure and RuntimePresenceUnknown an admitted ambiguity. SOP-005 rejects capture while any Core Process bound to the source epoch is nonterminal (v1 classes support only coreProcessHandling = rejectNonterminal) \u2014 that is InvalidState, decided at admission. SOP-004 and SOP-010 gate `succeeded` on per-component durability and committed compatibility metadata, so SnapshotCompletenessUnknown is the ambiguity arm when that evidence is missing and FEN-006 forbids a provider acknowledgement standing in for it. PRF-002 confines terminalization to proven evidence and PRF-010 forbids an `outcome-unknown` capture authorizing a repeated or compensating effect. allowedRecoveryErrors is populated with IdempotencyRecordExpired because the NewEffectIntent commit binds an idempotency coordinate (OPA-010/OPA-014); ProcessControlRecordExpired is not reachable. NOTE: allowedAmbiguities draws from the missing-proof family that the locked record introduces with 'such as', so this subset is candidate and needs the closed extraction before Packet E closes.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "DeleteSandbox",
+      "callClass": "durable-operation-mutation",
+      "targetKind": "sandbox",
+      "owner": "live",
+      "capabilityGate": "none",
+      "mutationClass": "destructive-teardown",
+      "resultCarrierKind": "durable-operation",
+      "allowedRequestErrors": [
+        "MalformedRequest",
+        "InvalidArgument",
+        "Unauthenticated",
+        "PermissionDenied",
+        "TargetNotFound",
+        "IdempotencyConflict",
+        "StaleRevision",
+        "InvalidState",
+        "ConcurrentOperation",
+        "ReferenceProtected",
+        "RetentionHold",
+        "RateLimited",
+        "ServiceUnavailable",
+        "InternalInvariantViolation",
+        "EvidenceCorrupt"
+      ],
+      "allowedRecoveryErrors": [
+        "IdempotencyRecordExpired"
+      ],
+      "allowedKnownFailures": [
+        "TerminationFailed",
+        "CleanupIncomplete",
+        "RuntimeControlFailed",
+        "ProviderRejected",
+        "DependencyFailed",
+        "InternalFailure",
+        "IntegrityFailure"
+      ],
+      "allowedAmbiguities": [
+        "DispatchOutcomeUnknown",
+        "RuntimePresenceUnknown",
+        "ProcessLivenessUnknown",
+        "EffectCompletionUnknown",
+        "CleanupAuthorityUnknown",
+        "EvidenceIntegrityUnknown"
+      ],
+      "recoveryCoordinates": [
+        "IdempotencyCoordinate{authenticatedScope, method=DeleteSandbox, key}",
+        "IdempotentAcceptedResultReference.OperationResult{operationId} retained for the published recovery window",
+        "durable identity tombstone required by RET-007, which outlives the deleted aggregate and prevents Sandbox ID or name reissue"
+      ],
+      "refinesPacketASurfaces": [
+        "live.stop-terminate-delete-signal",
+        "runtime.cleanup-errors",
+        "operator.cleanup-reconciliation",
+        "framework.cleanup",
+        "service.lifecycle-policy",
+        "framework.session-reuse"
+      ],
+      "refinesPacketBFields": [
+        "artifact.outputs.runtimeCollection",
+        "artifact.workspace.runtimeTransferExclusion",
+        "artifact.lifecycleRequirements.maximumLifetimeEnforcement"
+      ],
+      "invariants": [
+        "ADM-005",
+        "SBX-021",
+        "SBX-017",
+        "SBX-004",
+        "SBX-012",
+        "SBX-003",
+        "RET-001",
+        "RET-002",
+        "RET-007",
+        "ADM-010",
+        "ADM-001",
+        "ADM-002",
+        "PRC-007",
+        "PRC-015",
+        "PRC-017",
+        "PIO-017",
+        "PIO-019",
+        "PRF-004",
+        "PRF-006",
+        "PRF-011",
+        "PRF-014",
+        "OPA-002",
+        "OPA-005",
+        "OPA-008",
+        "OPA-010",
+        "OPA-012",
+        "OPA-014",
+        "OPA-016",
+        "OPA-021",
+        "ERR-002",
+        "ERR-005",
+        "ERR-008",
+        "ERR-011",
+        "ERR-014",
+        "CNC-002",
+        "IDE-006",
+        "IDE-008",
+        "IDE-011",
+        "FEN-001"
+      ],
+      "delegatedPackets": [],
+      "rationale": "Delete requires the stopped/closed composite and never silently stops (ADM-005), so InvalidState{required: stopped, observed} is the exact rejection and StaleRuntime is inadmissible: a Sandbox that satisfies the precondition has no live epoch to be stale against. ReferenceProtected and RetentionHold are the two locked, non-collapsible protections -- RET-002 rejects Delete while a dependent Snapshot is unresolved, which projects to ReferenceProtected{references}, while an administrative hold projects to RetentionHold{holds}; the required-distinctions list forbids merging them. RET-001 keeps independently retained records (Operations, Snapshots, output) alive past aggregate deletion, and RET-007 requires a durable identity tombstone so that IDE-001 identity non-reuse survives the delete. SBX-021 is the outcome gate: succeeded requires complete cleanup and no possibly-live orphan, so an incomplete or unprovable cleanup is CleanupIncomplete only when the residual is proven quiesced and enumerated, and is otherwise outcome-unknown carrying CleanupAuthorityUnknown. PIO-017 and PIO-019 apply because teardown must not discard retained output or accepted Process-control commands and must not declare an output seal without driver-supplied exit and drain evidence -- this is what makes artifact.outputs.runtimeCollection and artifact.workspace.runtimeTransferExclusion the Packet B fields Delete refines. QuotaExceeded and CapacityUnavailable are excluded because deletion allocates nothing.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "DeleteSnapshot",
+      "callClass": "durable-operation-mutation",
+      "targetKind": "snapshot",
+      "owner": "live",
+      "capabilityGate": "snapshot",
+      "mutationClass": "retained-state-deletion",
+      "resultCarrierKind": "durable-operation",
+      "allowedRequestErrors": [
+        "MalformedRequest",
+        "InvalidArgument",
+        "Unauthenticated",
+        "PermissionDenied",
+        "TargetNotFound",
+        "IdempotencyConflict",
+        "InvalidState",
+        "ConcurrentOperation",
+        "ReferenceProtected",
+        "RetentionHold",
+        "DependencyUnavailable",
+        "MethodUnavailable",
+        "CapabilityUnsupported",
+        "RateLimited",
+        "ServiceUnavailable",
+        "InternalInvariantViolation",
+        "EvidenceCorrupt"
+      ],
+      "allowedRecoveryErrors": [
+        "IdempotencyRecordExpired"
+      ],
+      "allowedKnownFailures": [
+        "ProviderRejected",
+        "DependencyFailed",
+        "CleanupIncomplete",
+        "InternalFailure",
+        "IntegrityFailure"
+      ],
+      "allowedAmbiguities": [
+        "DispatchOutcomeUnknown",
+        "ExternalIdentityUnknown",
+        "EffectCompletionUnknown",
+        "CleanupAuthorityUnknown",
+        "EvidenceIntegrityUnknown"
+      ],
+      "recoveryCoordinates": [
+        "idempotency-coordinate:{authenticatedScope,method,key}",
+        "operation-handle:{operationId}"
+      ],
+      "refinesPacketASurfaces": [
+        "live.snapshot-restore-fork",
+        "framework.cleanup",
+        "operator.cleanup-reconciliation",
+        "runtime.cleanup-errors"
+      ],
+      "refinesPacketBFields": [
+        "artifact.lifecycleRequirements.snapshot",
+        "artifact.workspace.runtimeTransferExclusion"
+      ],
+      "invariants": [
+        "RET-010",
+        "RET-001",
+        "SOP-001",
+        "IDE-009",
+        "IDE-010",
+        "IDE-011",
+        "OPA-002",
+        "OPA-005",
+        "OPA-010",
+        "OPA-014",
+        "OPA-021",
+        "PRF-004",
+        "PRF-006",
+        "PRF-011",
+        "PRF-014",
+        "CNC-002",
+        "ADM-002",
+        "ERR-002",
+        "ERR-005",
+        "ERR-008",
+        "ERR-011",
+        "ERR-014",
+        "FEN-001"
+      ],
+      "delegatedPackets": [],
+      "rationale": "The only Snapshot-targeted durable mutation. StaleRevision and StaleRuntime are BOTH excluded, and that exclusion is machine-derivable rather than a judgement call: the locked SnapshotOperationTarget seals exactly { snapshotId } with no expectedEtag and no expectedRuntimeEpoch, and IDE-011 requires an accepted Operation to record exactly the tagged target variant its kind requires \u2014 so there is no freshness coordinate for either variant to guard. ReferenceProtected and RetentionHold are both admitted and must never be collapsed: RET-010 requires admission only when no exact reference AND no retention hold protects the Snapshot, and requires the refusal to NAME the protecting references, which is exactly the ReferenceProtected { references } and RetentionHold { holds } payload split. IDE-010 is the target-resolution rule: a Snapshot ID that no longer resolves returns TargetNotFound and is never resolved to a different Snapshot with an equal manifest digest, and SOP-001 guarantees the ID is never reallocated after deletion so a repeated delete is stably TargetNotFound rather than a silent re-delete of a successor. This is a teardown traversal, so the teardown proof family governs: PRF-004 confines terminalization to a proven evidence predicate and otherwise commits `outcome-unknown`; PRF-011 forbids an `outcome-unknown` or residual-obligation `failed` delete from authorizing assumed-complete cleanup, identity release or a successor destructive effect \u2014 which is why CleanupAuthorityUnknown is an admitted ambiguity and CleanupIncomplete an admitted known failure; PRF-006 forbids recording a compensating effect as rollback; PRF-014 keeps the terminal result immutable on later cleanup reconciliation. RET-001 is cited from the other direction: Snapshot bytes are independently retained records that a Sandbox delete must not erase, so DeleteSnapshot is the only path that removes them. A fast local deletion still returns an already-terminal Operation rather than a synchronous non-Operation result.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "Exec",
+      "callClass": "durable-process-mutation",
+      "targetKind": "sandbox-runtime-ref",
+      "owner": "exec",
+      "capabilityGate": "core-exec-conformance",
+      "mutationClass": "external-execution-launch",
+      "resultCarrierKind": "durable-process",
+      "allowedRequestErrors": [
+        "MalformedRequest",
+        "InvalidArgument",
+        "Unauthenticated",
+        "PermissionDenied",
+        "TargetNotFound",
+        "IdempotencyConflict",
+        "StaleRuntime",
+        "InvalidState",
+        "AdmissionClosed",
+        "DependencyNotFound",
+        "DependencyUnavailable",
+        "MethodUnavailable",
+        "CapabilityUnsupported",
+        "PolicyMismatch",
+        "RateLimited",
+        "QuotaExceeded",
+        "CapacityUnavailable",
+        "ServiceUnavailable",
+        "InternalInvariantViolation",
+        "EvidenceCorrupt"
+      ],
+      "allowedRecoveryErrors": [
+        "IdempotencyRecordExpired"
+      ],
+      "allowedKnownFailures": [
+        "RuntimeControlFailed",
+        "ProviderRejected",
+        "DependencyFailed",
+        "CapacityUnavailable",
+        "InternalFailure",
+        "IntegrityFailure"
+      ],
+      "allowedAmbiguities": [
+        "DispatchOutcomeUnknown",
+        "ExternalIdentityUnknown",
+        "RuntimePresenceUnknown",
+        "RuntimeContinuityUnknown",
+        "ProcessLivenessUnknown",
+        "EvidenceIntegrityUnknown"
+      ],
+      "recoveryCoordinates": [
+        "idempotency-coordinate"
+      ],
+      "refinesPacketASurfaces": [
+        "exec.stdio-mode",
+        "exec.signal-cancellation",
+        "artifact.lifetime-maximum",
+        "live.attach-shell"
+      ],
+      "refinesPacketBFields": [
+        "artifact.lifecycleRequirements.maximumLifetimeEnforcement",
+        "artifact.lifecycleRequirements.optionalOperations"
+      ],
+      "invariants": [
+        "IDE-005",
+        "IDE-007",
+        "IDE-015",
+        "IDE-016",
+        "IDE-020",
+        "OPA-003",
+        "OPA-006",
+        "OPA-009",
+        "OPA-011",
+        "OPA-012",
+        "OPA-015",
+        "OPA-022",
+        "ADM-007",
+        "ADM-008",
+        "ADM-009",
+        "ADM-013",
+        "ADM-014",
+        "ADM-015",
+        "ERR-003",
+        "ERR-006",
+        "ERR-009",
+        "ERR-012",
+        "ERR-015",
+        "PRF-003",
+        "PRF-008",
+        "PRC-004",
+        "PRC-008",
+        "PRC-013",
+        "SBX-005",
+        "FEN-001"
+      ],
+      "delegatedPackets": [],
+      "rationale": "Exec is the sole member of durable-process-mutation, so its resultCarrierKind is durable-process and it can never return an Operation; a target that completes instantly still returns an already-terminal Process, not another contract. targetKind is sandbox-runtime-ref rather than an OperationTarget variant because Exec is the one effectful method whose exact target is the SandboxRuntimeRef value (sandboxId + epoch), not a sealed Operation target (IDE-005, IDE-011 is therefore NOT cited). EXCLUSIONS, each proven rather than omitted. StaleRevision is inapplicable: Exec carries no representation revision and its only freshness precondition is the expected runtime epoch, which IDE-008 keeps in a domain an etag neither satisfies nor is satisfied by; the stale case is StaleRuntime (IDE-007). ConcurrentOperation is inapplicable: the locked Stop-versus-Exec serialization point is the durable execution-admission close (ADM-010), which yields AdmissionClosed with its typed reason, and concurrent Exec into the same current epoch is explicitly permitted, so Exec never contends for the fenced Sandbox lifecycle lane that CNC-002 governs. NameConflict, OutputCursorExpired, ReferenceProtected, RetentionHold, ArtifactIncompatible, and all four Process-control variants (ProcessControlConflict, SequenceOutOfRange, StaleWriterLease, ProcessInputLimitExceeded) are inapplicable: Exec allocates no name, carries no cursor, is protected by no retention reference, resolved Artifact compatibility at Create, and holds no writer lease or sequence. PolicyMismatch rather than InvalidArgument carries the immutable-ceiling violations (Process deadline beyond the Artifact maximum-lifetime ceiling, cwd outside the Sandbox namespace, identity or privilege widening); InvalidArgument carries semantically invalid content in a well-formed request such as empty argv. Both MethodUnavailable and CapabilityUnsupported are reachable and are NOT collapsed: MethodUnavailable is a Core surface that does not expose Exec, CapabilityUnsupported is a target profile that does not prove ADM-015 Core Exec conformance or that lacks the requested PTY/stdio mode. DependencyNotFound and DependencyUnavailable cover request-referenced secret or protected-channel material only; a failed guest supervisor is not a dependency error but a durable admission closure (AdmissionClosed { reason }) per the locked crash matrix. allowedRecoveryErrors is IdempotencyRecordExpired and NOTHING ELSE: Exec is bound to an IdempotencyCoordinate (OPA-011, OPA-015) and holds no ProcessControlCoordinate, so ProcessControlRecordExpired is unreachable here. The field is populated, not dropped: RecoveryError is locked result branch 2 and recoveryCoordinates [idempotency-coordinate] names where recovery state lives, not which RecoveryError variants are admissible. allowedKnownFailures names what a startFailed ProcessTermination may carry, since Exec's accepted result is a Process rather than an Operation; nonzero command exit is `exited` and is never any KnownFailure (PRC-005, ADP-008). allowedAmbiguities is carried by the RECONCILABLE NONTERMINAL Process state-unknown (PRF-003, PRC-004, PRC-008), never by the immutable terminal operation outcome-unknown; PRC-002 lists that conflation as a rejected pattern, and the Packet E namespacing makes the two ids non-interchangeable in the ledger. ExternalIdentityUnknown is load-bearing and Exec-specific: the backend execution identity is assigned only by the external launch effect, so when neither the Core launch token nor exact adoption can identify the one attempted execution the Process stays unknown and Core never dispatches a replacement. delegatedPackets is empty: Exec is a closed Packet E method name and belongs to none of the Packet A-owned file, directory, copy, transfer, endpoint, or port families. The id is not among the fifteen rejected names; note that `Shell` is Exec with a terminal and shell argv and mints no id, and `attach` here appears only in the refined surface name live.attach-shell, which is a Packet A surface id and not an operation id. AMBIGUITY-VOCABULARY CAVEAT: the missing-proof variant family is introduced in the locked record with \"such as\", so this subset is a candidate until that family gets its own closure pass.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "ForkSandbox",
+      "callClass": "durable-operation-mutation",
+      "targetKind": "fork",
+      "owner": "live",
+      "capabilityGate": "fork",
+      "mutationClass": "sandbox-creating",
+      "resultCarrierKind": "durable-operation",
+      "allowedRequestErrors": [
+        "MalformedRequest",
+        "InvalidArgument",
+        "Unauthenticated",
+        "PermissionDenied",
+        "TargetNotFound",
+        "IdempotencyConflict",
+        "StaleRevision",
+        "StaleRuntime",
+        "InvalidState",
+        "ConcurrentOperation",
+        "DependencyUnavailable",
+        "MethodUnavailable",
+        "CapabilityUnsupported",
+        "ArtifactIncompatible",
+        "RateLimited",
+        "QuotaExceeded",
+        "CapacityUnavailable",
+        "ServiceUnavailable",
+        "InternalInvariantViolation",
+        "EvidenceCorrupt"
+      ],
+      "allowedRecoveryErrors": [
+        "IdempotencyRecordExpired"
+      ],
+      "allowedKnownFailures": [
+        "SnapshotCaptureFailed",
+        "SnapshotVerificationFailed",
+        "ArtifactMaterializationFailed",
+        "RuntimeProvisioningFailed",
+        "RuntimeReadinessFailed",
+        "RuntimeControlFailed",
+        "ConformanceFailed",
+        "CapacityUnavailable",
+        "ProviderRejected",
+        "DependencyFailed",
+        "CleanupIncomplete",
+        "InternalFailure",
+        "IntegrityFailure"
+      ],
+      "allowedAmbiguities": [
+        "DispatchOutcomeUnknown",
+        "ExternalIdentityUnknown",
+        "RuntimePresenceUnknown",
+        "RuntimeContinuityUnknown",
+        "SnapshotCompletenessUnknown",
+        "EffectCompletionUnknown",
+        "CleanupAuthorityUnknown",
+        "EvidenceIntegrityUnknown"
+      ],
+      "recoveryCoordinates": [
+        "idempotency-coordinate:{authenticatedScope,method,key}",
+        "operation-handle:{operationId}"
+      ],
+      "refinesPacketASurfaces": [
+        "live.snapshot-restore-fork",
+        "framework.session-reuse",
+        "create.mount-volume-snapshot-data",
+        "live.start"
+      ],
+      "refinesPacketBFields": [
+        "artifact.lifecycleRequirements.snapshot",
+        "artifact.lifecycleRequirements.optionalOperations",
+        "artifact.lifecycleRequirements.maximumLifetimeEnforcement",
+        "artifact.workspace.runtimeTransferExclusion"
+      ],
+      "invariants": [
+        "FRK-004",
+        "FRK-002",
+        "SOP-003",
+        "SOP-005",
+        "SOP-006",
+        "SOP-010",
+        "IDE-001",
+        "IDE-011",
+        "IDE-013",
+        "IDE-014",
+        "SBX-014",
+        "SBX-015",
+        "ADM-012",
+        "FEN-002",
+        "PRF-001",
+        "PRF-002",
+        "PRF-009",
+        "OPA-002",
+        "OPA-005",
+        "OPA-010",
+        "OPA-014",
+        "OPA-020",
+        "CNC-002",
+        "ADM-002",
+        "ADM-013",
+        "ADM-014",
+        "ERR-002",
+        "ERR-005",
+        "ERR-008",
+        "ERR-011",
+        "ERR-014",
+        "FEN-001"
+      ],
+      "delegatedPackets": [],
+      "rationale": "The only operation in the group whose targetKind is the sealed TWO-RESOURCE ForkOperationTarget { source { sandboxId, runtimeEpoch }, childSandboxId }; it is not a Sandbox target and must not be recorded as one. FRK-004 requires that sealed target \u2014 exact immutable source Sandbox ID, source runtime epoch, and a newly PREALLOCATED child Sandbox ID \u2014 to be durably committed BEFORE any capture or child-creation effect, which is what makes StaleRuntime admissible (the source epoch is a sealed coordinate) alongside StaleRevision (the source etag). IDE-001 gives the child a Sandbox ID that identifies exactly one lifetime and is never reallocated. NameConflict is deliberately EXCLUDED and the exclusion is reasoned, not an omission: the locked Fork contract carries no caller-supplied child name (the child ID is Core-preallocated) and IDE-003 scopes name-reservation checking to Create; if a later revision admits a caller-supplied child name, NameConflict and IDE-003 must be added to this record. Fork is a composite in its lowering but ONE atomic Operation on the wire: Core may internally lower it to capture plus child creation while preserving the sealed target, so both legs' obligations govern \u2014 SOP-005 rejects Fork while any Core Process bound to the source epoch is nonterminal, SOP-006 explicitly includes every Fork in the runtimeStatePreserved requirement that the source finish in its original runtime state under its original epoch (hence RuntimeContinuityUnknown as an ambiguity arm and SnapshotCaptureFailed among the known failures), SOP-010 requires per-component durability evidence, and the child leg is a launch at epoch 1 governed by SBX-014, SBX-015, ADM-012, PRF-001 and FEN-002. FRK-002 fixes that the child admits execution only through newly allocated durable Core Processes; it shares no Process identity or mutation authority with the source. An SDK CreateSnapshot-then-CreateSandbox(source=snapshot) convenience is NOT a ForkSandbox Operation and mints no record here. IDE-014 requires the explicit attachment outcome for the source, whose external-connection disruption is reported separately from its preserved runtime state. ArtifactIncompatible is admitted because the capture leg must satisfy the Artifact's declared Snapshot requirements. OPA-020 is cited for the launch leg's pre-dispatch recovery classification.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "GetOperation",
+      "callClass": "observation",
+      "targetKind": "operation",
+      "owner": "core",
+      "capabilityGate": "none",
+      "mutationClass": "none",
+      "resultCarrierKind": "observation-result",
+      "allowedRequestErrors": [
+        "MalformedRequest",
+        "InvalidArgument",
+        "Unauthenticated",
+        "PermissionDenied",
+        "TargetNotFound",
+        "RateLimited",
+        "ServiceUnavailable",
+        "InternalInvariantViolation",
+        "EvidenceCorrupt"
+      ],
+      "allowedRecoveryErrors": [],
+      "allowedKnownFailures": [],
+      "allowedAmbiguities": [],
+      "recoveryCoordinates": [],
+      "refinesPacketASurfaces": [
+        "operator.retry-health",
+        "runtime.cleanup-errors",
+        "framework.cleanup"
+      ],
+      "refinesPacketBFields": [],
+      "invariants": [
+        "PRF-007",
+        "PRF-005",
+        "PRF-013",
+        "PRF-014",
+        "PRC-002",
+        "OPA-016",
+        "RET-001",
+        "RET-006",
+        "ERR-002",
+        "ERR-005",
+        "ERR-008",
+        "ERR-011",
+        "ERR-014",
+        "ADP-007",
+        "ADP-009",
+        "ADP-012",
+        "ADP-014"
+      ],
+      "delegatedPackets": [],
+      "rationale": "Reading a failed, cancelled or outcome-unknown Operation is a SUCCESSFUL observation; the terminal outcome stays embedded in the Operation resource and is never re-projected as a transport or request error. This is the single most misread contract in the group, so the invariant set makes it mechanical: PRF-005 makes a committed terminal outcome and payload immutable, PRF-013 and PRF-014 extend that immutability across the live-mutation and teardown reconciliation traversals, and ADP-014 forbids a reconciler from rewriting or reinterpreting a predecessor. OPA-016 forbids treating an observed terminal failure as authorization to replay, and ADP-009 forbids an adapter converting an observed ambiguity arm into a replacement effect. PRC-002 is cited to keep the two namespaced tokens apart at the read surface: the Operation's terminal `outcome-unknown` (locked source token `unknown`) is immutable history, while a Process's `state-unknown` (same locked source token) is a reconcilable nonterminal observation; the ledger must never unify them. ADP-012 requires system-originated Operations to remain observable here rather than hidden. RET-001 and RET-006 fix retention: the Operation record survives target deletion independently, and there is no caller-facing Operation deletion, so a still-retained Operation is readable after its Sandbox is gone and an expired one is TargetNotFound. allowedRecoveryErrors is proven-empty (no acceptance commit, no recovery coordinate); note this is not the same claim as recoveryCoordinates being empty, and the two fields are not substitutable.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "GetProcess",
+      "callClass": "observation",
+      "targetKind": "process",
+      "owner": "core",
+      "capabilityGate": "none",
+      "mutationClass": "none",
+      "resultCarrierKind": "observation-result",
+      "allowedRequestErrors": [
+        "MalformedRequest",
+        "InvalidArgument",
+        "Unauthenticated",
+        "PermissionDenied",
+        "TargetNotFound",
+        "RateLimited",
+        "ServiceUnavailable",
+        "InternalInvariantViolation",
+        "EvidenceCorrupt"
+      ],
+      "allowedRecoveryErrors": [],
+      "allowedKnownFailures": [],
+      "allowedAmbiguities": [],
+      "recoveryCoordinates": [],
+      "refinesPacketASurfaces": [
+        "exec.stdio-mode",
+        "exec.signal-cancellation"
+      ],
+      "refinesPacketBFields": [
+        "artifact.lifecycleRequirements.maximumLifetimeEnforcement"
+      ],
+      "invariants": [
+        "PRC-016",
+        "PRC-001",
+        "PRC-002",
+        "PRC-010",
+        "PRC-013",
+        "PRC-014",
+        "IDE-015",
+        "PIO-005",
+        "ADP-003",
+        "ADP-008",
+        "PRC-006"
+      ],
+      "delegatedPackets": [],
+      "rationale": "Process-resource observation. The ERR family cited here is the Exec/Process-control set (ERR-003, ERR-006, ERR-009, ERR-012, ERR-015) rather than the live set, because PRC-016 files Process-resource observation at station E1 on the exec traversal, and E1 and L0 are mutually unreachable. FLAGGED GAP for the closing pass: ERR-002 enumerates 'live Sandbox, Snapshot, or Operation' and ERR-003 enumerates 'Exec or sequenced Process-control', so neither enumeration literally names a Process OBSERVATION; the station filing of PRC-016 is the only thing that resolves it, and the sealed-registry entry should be widened or a sibling minted before Packet E closes. The observation is bounded by the locked Process vocabulary: PRC-013 confines transitions to the locked graph, PRC-014 requires every terminated Process to carry exactly one arm of the closed nine-variant ProcessTermination union with its declared payload, PRC-001 makes that outcome immutable against later signal acknowledgements or provider events, and PRC-010 stops a Process being reported running once its only fresh observer is lost. PRC-002 keeps the reconcilable nonterminal `state-unknown` (locked source token `unknown`) from being projected as the immutable terminal Operation `outcome-unknown`. PIO-005 keeps termination and output sealing independent, so a terminal Process does not imply a sealed stream. IDE-015 fixes the permanent Process-to-Sandbox-and-epoch binding this read resolves against. ADP-008 forbids collapsing a nonzero `exited` into infrastructure failure. allowedRecoveryErrors is proven-empty; ReadProcessOutput's OutputCursorExpired belongs to the Process I/O group, not here. Process observation is neither an Exec nor a sequenced Process-control command, so the Exec/Process-control ERR arm is deliberately NOT cited. A Process/Operation observation ERR arm must be registered before Packet E closes; until then this gap is stated rather than papered over, matching ReadProcessOutput.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "GetSandbox",
+      "callClass": "observation",
+      "targetKind": "sandbox",
+      "owner": "core",
+      "capabilityGate": "none",
+      "mutationClass": "none",
+      "resultCarrierKind": "observation-result",
+      "allowedRequestErrors": [
+        "MalformedRequest",
+        "InvalidArgument",
+        "Unauthenticated",
+        "PermissionDenied",
+        "TargetNotFound",
+        "RateLimited",
+        "ServiceUnavailable",
+        "InternalInvariantViolation",
+        "EvidenceCorrupt"
+      ],
+      "allowedRecoveryErrors": [],
+      "allowedKnownFailures": [],
+      "allowedAmbiguities": [],
+      "recoveryCoordinates": [],
+      "refinesPacketASurfaces": [
+        "service.lifecycle-policy",
+        "service.dependencies-probes",
+        "operator.retry-health"
+      ],
+      "refinesPacketBFields": [
+        "artifact.lifecycleRequirements.maximumLifetimeEnforcement",
+        "artifact.lifecycleRequirements.optionalOperations"
+      ],
+      "invariants": [
+        "PRF-007",
+        "SBX-003",
+        "SBX-004",
+        "SBX-005",
+        "SBX-012",
+        "SBX-013",
+        "IDE-014",
+        "ERR-002",
+        "ERR-005",
+        "ERR-008",
+        "ERR-011",
+        "ERR-014",
+        "ADP-003",
+        "ADP-007"
+      ],
+      "delegatedPackets": [],
+      "rationale": "Read-only synchronous observation of one Sandbox aggregate; creates no acceptance commit and no mutation handle, so allowedKnownFailures, allowedAmbiguities and recoveryCoordinates are all structurally empty rather than unpopulated. allowedRecoveryErrors is empty as a PROVEN property, not an omission: the closed RecoveryError union has exactly IdempotencyRecordExpired and ProcessControlRecordExpired, and an observation commits neither an idempotency coordinate nor a Process-control coordinate, so it has no historical recovery coordinate that can fall outside a recovery window. TargetNotFound is admissible because the target is a single tagged Sandbox; ERR-008 forces authorization to precede existence disclosure, so unauthorized existence never leaks through it. QuotaExceeded is excluded: quota is a countable-resource contract, and short-term read throttling is exactly RateLimited under the locked quota-versus-rate-limit distinction. MethodUnavailable and CapabilityUnsupported are excluded because Sandbox reads are portable across every conforming driver. The returned status projection is governed rather than free: SBX-004 confines runtime state to the five locked values and forbids verb-derived presentation labels, SBX-005 permits execution admission `accepting` only for a proven running epoch under current fenced authority, SBX-012 requires the composite `unknown/closed` when presence, continuity, containment or exclusive authority cannot be proven, SBX-013 forbids mapping a decoded provider phase onto Core state, and SBX-003 makes status output-only so no request field writes it. PRF-007 is the load-bearing observation rule: this call's deadline ends only the observation and never cancels, mutates, terminalizes or advances the observed record. ADP-007 keeps a transport timeout a transport condition. Under the Packet E textAuthority this record is candidate, not reviewed, and this prose carries no authority against the structured fields above.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "GetSnapshot",
+      "callClass": "observation",
+      "targetKind": "snapshot",
+      "owner": "core",
+      "capabilityGate": "none",
+      "mutationClass": "none",
+      "resultCarrierKind": "observation-result",
+      "allowedRequestErrors": [
+        "MalformedRequest",
+        "InvalidArgument",
+        "Unauthenticated",
+        "PermissionDenied",
+        "TargetNotFound",
+        "RateLimited",
+        "ServiceUnavailable",
+        "InternalInvariantViolation",
+        "EvidenceCorrupt"
+      ],
+      "allowedRecoveryErrors": [],
+      "allowedKnownFailures": [],
+      "allowedAmbiguities": [],
+      "recoveryCoordinates": [],
+      "refinesPacketASurfaces": [
+        "live.snapshot-restore-fork",
+        "framework.snapshot-reconnect",
+        "create.mount-volume-snapshot-data"
+      ],
+      "refinesPacketBFields": [
+        "artifact.lifecycleRequirements.snapshot"
+      ],
+      "invariants": [
+        "PRF-007",
+        "SOP-001",
+        "SOP-003",
+        "SOP-007",
+        "SOP-009",
+        "IDE-009",
+        "IDE-010",
+        "RET-001",
+        "ERR-002",
+        "ERR-005",
+        "ERR-008",
+        "ERR-011",
+        "ERR-014"
+      ],
+      "delegatedPackets": [],
+      "rationale": "Immutable retained-state observation. IDE-009 and IDE-010 are the two governing identity rules and both are read-surface rules: the target is identified by Snapshot ID only, the manifestDigest resolves no resource, and a Snapshot ID that no longer resolves returns TargetNotFound rather than being retargeted to a different Snapshot with an equal digest or equivalent content. SOP-001 guarantees the ID is never reallocated, including after deletion, so TargetNotFound is stable rather than racy. The projected manifest is constrained: SOP-009 requires the resolved class identity to agree with the declared kind, component set, external-storage state, secret treatment, compatibility envelope, quiescence state, device state, portability and Process handling; SOP-007 requires the pinned source Artifact Set member and runtime-profile identity to be present; SOP-003 forbids a reader deriving memory, Process, descriptor, clock, connection or device continuity from a filesystem-kind class. RET-001 is why this read outlives its source: a successful Sandbox deletion removes only the live aggregate, and independently retained records survive. Note WaitSnapshot is deliberately NOT registered \u2014 the locked record states it is not added, and if it is later admitted it must use the same observation rule. allowedRecoveryErrors is proven-empty.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "ListOperations",
+      "callClass": "observation",
+      "targetKind": "operation-collection",
+      "owner": "core",
+      "capabilityGate": "none",
+      "mutationClass": "none",
+      "resultCarrierKind": "observation-result",
+      "allowedRequestErrors": [
+        "MalformedRequest",
+        "InvalidArgument",
+        "Unauthenticated",
+        "PermissionDenied",
+        "RateLimited",
+        "ServiceUnavailable",
+        "InternalInvariantViolation",
+        "EvidenceCorrupt"
+      ],
+      "allowedRecoveryErrors": [],
+      "allowedKnownFailures": [],
+      "allowedAmbiguities": [],
+      "recoveryCoordinates": [],
+      "refinesPacketASurfaces": [
+        "operator.retry-health",
+        "operator.cleanup-reconciliation",
+        "runtime.cleanup-errors"
+      ],
+      "refinesPacketBFields": [],
+      "invariants": [
+        "PRF-007",
+        "PRF-005",
+        "RET-001",
+        "RET-006",
+        "ERR-002",
+        "ERR-005",
+        "ERR-008",
+        "ERR-011",
+        "ERR-014",
+        "ADP-012",
+        "ADP-014"
+      ],
+      "delegatedPackets": [],
+      "rationale": "Scope-level collection observation over retained Operation records. No TargetNotFound, for the same reason as ListSandboxes: an authorized listing with no matches is an empty page, and absence of a row is never proof of absence of a resource. ADP-012 is the governing obligation for this surface specifically \u2014 a desired-state reconciler must not hide its system-originated Operations from the caller's listing, which is what makes ListOperations the operator-visible audit surface that operator.cleanup-reconciliation and runtime.cleanup-errors depend on. RET-006 fixes that retention is service-enforced and independent of target deletion and that no caller-facing purge or retention-override request exists, so a listing cannot be pruned by the caller. PRF-005 and ADP-014 keep every listed terminal outcome immutable; a linked successor Operation appears as its own row rather than as a rewrite. refinesPacketBFields is empty because the Operation record carries no Artifact-derived field: an honest empty, not an unpopulated one.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "ListProcesses",
+      "callClass": "observation",
+      "targetKind": "process-collection",
+      "owner": "core",
+      "capabilityGate": "none",
+      "mutationClass": "none",
+      "resultCarrierKind": "observation-result",
+      "allowedRequestErrors": [
+        "MalformedRequest",
+        "InvalidArgument",
+        "Unauthenticated",
+        "PermissionDenied",
+        "TargetNotFound",
+        "StaleRuntime",
+        "RateLimited",
+        "ServiceUnavailable",
+        "InternalInvariantViolation",
+        "EvidenceCorrupt"
+      ],
+      "allowedRecoveryErrors": [],
+      "allowedKnownFailures": [],
+      "allowedAmbiguities": [],
+      "recoveryCoordinates": [],
+      "refinesPacketASurfaces": [
+        "exec.stdio-mode",
+        "exec.signal-cancellation"
+      ],
+      "refinesPacketBFields": [
+        "artifact.lifecycleRequirements.maximumLifetimeEnforcement"
+      ],
+      "invariants": [
+        "PRC-016",
+        "PRC-002",
+        "PRC-010",
+        "PRC-013",
+        "PRC-014",
+        "IDE-015",
+        "IDE-006",
+        "ADP-003",
+        "PRC-006"
+      ],
+      "delegatedPackets": [],
+      "rationale": "This is the one listing in the group that DOES admit TargetNotFound, and the asymmetry is derived rather than stylistic: IDE-015 permanently binds every Process to exactly one Sandbox ID and runtime epoch, so a Process listing is necessarily scoped by a Sandbox and that scoping resource can be absent. For the same reason it is the one observation in the group that admits StaleRuntime: when the request carries an epoch scope that is not the current epoch, IDE-006 requires a typed stale-runtime result naming the requested Sandbox and expected epoch, and forbids silently retargeting the listing at the current runtime. TargetNotFound here refers to the scoping Sandbox only; an existing Sandbox with no Processes returns an empty page. Every listed element is bound by the same locked Process graph and termination union as GetProcess. allowedRecoveryErrors is proven-empty. Process observation is neither an Exec nor a sequenced Process-control command, so the Exec/Process-control ERR arm is deliberately NOT cited. A Process/Operation observation ERR arm must be registered before Packet E closes; until then this gap is stated rather than papered over, matching ReadProcessOutput.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "ListSandboxes",
+      "callClass": "observation",
+      "targetKind": "sandbox-collection",
+      "owner": "core",
+      "capabilityGate": "none",
+      "mutationClass": "none",
+      "resultCarrierKind": "observation-result",
+      "allowedRequestErrors": [
+        "MalformedRequest",
+        "InvalidArgument",
+        "Unauthenticated",
+        "PermissionDenied",
+        "RateLimited",
+        "ServiceUnavailable",
+        "InternalInvariantViolation",
+        "EvidenceCorrupt"
+      ],
+      "allowedRecoveryErrors": [],
+      "allowedKnownFailures": [],
+      "allowedAmbiguities": [],
+      "recoveryCoordinates": [],
+      "refinesPacketASurfaces": [
+        "service.lifecycle-policy",
+        "service.dependencies-probes",
+        "operator.retry-health"
+      ],
+      "refinesPacketBFields": [
+        "artifact.lifecycleRequirements.optionalOperations"
+      ],
+      "invariants": [
+        "PRF-007",
+        "SBX-003",
+        "SBX-004",
+        "SBX-005",
+        "SBX-012",
+        "SBX-013",
+        "ERR-002",
+        "ERR-005",
+        "ERR-008",
+        "ERR-011",
+        "ERR-014",
+        "ADP-003"
+      ],
+      "delegatedPackets": [],
+      "rationale": "Scope-level collection observation. targetKind is `sandbox-collection` rather than `sandbox` because the distinction is semantically load-bearing, not cosmetic: a listing has no single tagged target, so TargetNotFound is NOT admissible \u2014 an authorized listing that matches nothing returns an empty page, and treating emptiness as absence would violate the locked forbidden inference that missing observation is not target absence. That is why this record's allowedRequestErrors differ from GetSandbox by exactly one variant. The listing is scoped by authenticated scope, so authorization (ERR-008) is the only gate and no parent resource can be missing. OutputCursorExpired is excluded: its payload is stream-specific ({earliestCursor, sealedAt?}) and belongs to ReadProcessOutput, not to pagination. Every projected element is constrained by the same SBX status rules as GetSandbox. allowedRecoveryErrors empty is proven by the same argument as GetSandbox: no acceptance commit, therefore no historical recovery coordinate, therefore neither closed RecoveryError variant is reachable.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "ListSnapshots",
+      "callClass": "observation",
+      "targetKind": "snapshot-collection",
+      "owner": "core",
+      "capabilityGate": "none",
+      "mutationClass": "none",
+      "resultCarrierKind": "observation-result",
+      "allowedRequestErrors": [
+        "MalformedRequest",
+        "InvalidArgument",
+        "Unauthenticated",
+        "PermissionDenied",
+        "RateLimited",
+        "ServiceUnavailable",
+        "InternalInvariantViolation",
+        "EvidenceCorrupt"
+      ],
+      "allowedRecoveryErrors": [],
+      "allowedKnownFailures": [],
+      "allowedAmbiguities": [],
+      "recoveryCoordinates": [],
+      "refinesPacketASurfaces": [
+        "live.snapshot-restore-fork",
+        "framework.snapshot-reconnect",
+        "create.mount-volume-snapshot-data"
+      ],
+      "refinesPacketBFields": [
+        "artifact.lifecycleRequirements.snapshot"
+      ],
+      "invariants": [
+        "PRF-007",
+        "SOP-001",
+        "SOP-009",
+        "IDE-009",
+        "IDE-010",
+        "RET-001",
+        "ERR-002",
+        "ERR-005",
+        "ERR-008",
+        "ERR-011",
+        "ERR-014"
+      ],
+      "delegatedPackets": [],
+      "rationale": "Scope-level collection observation over retained Snapshot resources. No TargetNotFound: an authorized listing with no matches is an empty page. IDE-009 is cited because a listing must not accept a manifestDigest as a resolving filter coordinate \u2014 the digest is an integrity and deduplication coordinate and two distinct Snapshot resources may legitimately carry equal manifests, so digest-keyed listing would silently unify resources. SOP-001 makes each listed ID a permanently distinct resource identity. RET-001 keeps listings correct after source Sandbox deletion, which is exactly what framework.snapshot-reconnect depends on. allowedRecoveryErrors is proven-empty by the closed two-variant union.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "ReadProcessOutput",
+      "callClass": "observation",
+      "targetKind": "process-output-stream",
+      "owner": "exec",
+      "capabilityGate": "core-exec-conformance",
+      "mutationClass": "read-only",
+      "resultCarrierKind": "observation-result",
+      "allowedRequestErrors": [
+        "MalformedRequest",
+        "InvalidArgument",
+        "Unauthenticated",
+        "PermissionDenied",
+        "TargetNotFound",
+        "OutputCursorExpired",
+        "RateLimited",
+        "ServiceUnavailable",
+        "InternalInvariantViolation",
+        "EvidenceCorrupt"
+      ],
+      "allowedRecoveryErrors": [],
+      "allowedKnownFailures": [],
+      "allowedAmbiguities": [],
+      "recoveryCoordinates": [],
+      "refinesPacketASurfaces": [
+        "exec.stdio-mode",
+        "live.attach-shell",
+        "framework.snapshot-reconnect"
+      ],
+      "refinesPacketBFields": [
+        "artifact.outputs.runtimeCollection",
+        "artifact.workspace.runtimeTransferExclusion"
+      ],
+      "invariants": [
+        "PIO-001",
+        "PIO-002",
+        "PIO-003",
+        "PIO-005",
+        "PIO-006",
+        "PIO-007",
+        "PIO-017",
+        "PIO-019",
+        "PRC-016",
+        "PRF-007",
+        "RET-001",
+        "IDE-008",
+        "IDE-020",
+        "ADM-015",
+        "ADP-003",
+        "ADP-007",
+        "ERR-016",
+        "ERR-017"
+      ],
+      "delegatedPackets": [],
+      "rationale": "ReadProcessOutput is the only observation in the Process group, so it creates no acceptance commit, no mutation handle, and no durable result, and its resultCarrierKind is observation-result. PRC-016 names this method explicitly: a read deadline ends only that observation and never cancels, mutates, terminalizes, or advances the observed Process or its output stream; PRF-007 is the general form. THE THREE EMPTY ARRAYS ARE PROVEN PROPERTIES, NOT OMISSIONS -- this is the record where dropping allowedRecoveryErrors would be invisible, so the proof is stated. (1) allowedRecoveryErrors is empty because the locked contract permits RecoveryErrorFor<K> to be the empty type exactly for a method whose contract has no historical recovery coordinate, and an observation has none: it commits no idempotency binding and no Process-control receipt, so neither IdempotencyRecordExpired nor ProcessControlRecordExpired is reachable. recoveryCoordinates is empty for the same reason and is NOT a substitute for the field. The near-miss to guard against is the output cursor: it is an observation position, not a recovery coordinate (IDE-008, IDE-020), and its expiry is therefore the RequestError OutputCursorExpired { earliestCursor, sealedAt? } and never a RecoveryError. That distinction is load-bearing -- RecoveryError exists because a historical coordinate may already have produced an effect, whereas an expired read cursor proves a read that dispatched nothing at all. (2) allowedKnownFailures is empty because KnownFailure is the outcome envelope of an ACCEPTED mutation and an observation has no acceptance commit. (3) allowedAmbiguities is empty because AmbiguityFor<K> is the payload of the terminal Unknown branch of a durable Operation, and an observation commits no terminal outcome. The observed Process may itself be in the reconcilable nonterminal Process state-unknown and its stream may be unsealed, but those are FIELDS OF THE OBSERVED RESOURCE reported in the result, not ambiguity variants of the read; conflating them would violate PRC-002. FURTHER EXCLUSIONS: StaleRuntime is inapplicable because output retention is independent of Sandbox deletion and of the runtime epoch (RET-001), so retained replay continues to be readable and a read must never be refused for naming a superseded epoch. InvalidState is inapplicable because stream selection is not a lifecycle-state fact: selecting stderr on a Process whose accepted Exec merged the streams into a terminal is semantically invalid content, hence InvalidArgument (PIO-002). MethodUnavailable and CapabilityUnsupported are inapplicable because ADM-015 makes durable output spooling with stable byte cursors a named component of Core Exec conformance, so a Process cannot exist on a surface that cannot serve this read; the residual case is TargetNotFound, which PIO-007 keeps distinct from an expired cursor. IdempotencyConflict, ConcurrentOperation, QuotaExceeded, CapacityUnavailable, and the four Process-control variants are inapplicable for the same structural reasons. REGISTRY GAP FLAGGED: the ERR family partitions the sealed-registry, disclosure, recovery, and transport arms into creation (ERR-001/004/007/010/013), live \"Sandbox, Snapshot, or Operation\" (ERR-002/005/008/011/014), and \"Exec or sequenced Process-control\" (ERR-003/006/009/012/015). A Process OBSERVATION is in none of those three, so no ERR arm currently governs ReadProcessOutput's rejection registry, payload schema, authorization-before-disclosure ordering, or transport projection. This record does not paper over that by citing ERR-003, whose statement is explicitly limited to Exec and sequenced Process-control; it cites only the method-independent runtime arms ERR-016 and ERR-017. An ERR arm covering Process and Operation observations must be registered before Packet E closes. refinesPacketBFields cites artifact.outputs.runtimeCollection for the retention, timing, and eligibility half only -- the archive/patch format, export destination, and transfer mechanics named in that field are Packet A transfer-family concerns and are NOT closed by this record; delegatedPackets stays empty because ReadProcessOutput is itself a closed Packet E method name and is not a member of the deferred file, directory, copy, transfer, endpoint, or port families, so marking it [\"A\"] would misstate what the marker means. The id is not among the fifteen rejected names.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "ResizeProcessTerminal",
+      "callClass": "sequenced-process-control",
+      "targetKind": "process-control-coordinate",
+      "owner": "exec",
+      "capabilityGate": "process-terminal",
+      "mutationClass": "ordered-process-control-record",
+      "resultCarrierKind": "durable-process-control-receipt",
+      "allowedRequestErrors": [
+        "MalformedRequest",
+        "InvalidArgument",
+        "Unauthenticated",
+        "PermissionDenied",
+        "TargetNotFound",
+        "StaleRuntime",
+        "InvalidState",
+        "ProcessControlConflict",
+        "SequenceOutOfRange",
+        "StaleWriterLease",
+        "RateLimited",
+        "ServiceUnavailable",
+        "InternalInvariantViolation",
+        "EvidenceCorrupt"
+      ],
+      "allowedRecoveryErrors": [
+        "ProcessControlRecordExpired"
+      ],
+      "allowedKnownFailures": [
+        "RuntimeControlFailed",
+        "ProviderRejected",
+        "InternalFailure",
+        "IntegrityFailure"
+      ],
+      "allowedAmbiguities": [
+        "DispatchOutcomeUnknown",
+        "ProcessLivenessUnknown",
+        "RuntimeContinuityUnknown",
+        "EvidenceIntegrityUnknown"
+      ],
+      "recoveryCoordinates": [
+        "process-control-coordinate"
+      ],
+      "refinesPacketASurfaces": [
+        "exec.stdio-mode",
+        "live.attach-shell",
+        "framework.session-reuse"
+      ],
+      "refinesPacketBFields": [
+        "artifact.lifecycleRequirements.optionalOperations"
+      ],
+      "invariants": [
+        "PIO-008",
+        "PIO-009",
+        "PIO-010",
+        "PIO-011",
+        "PIO-012",
+        "PIO-013",
+        "PIO-014",
+        "PIO-016",
+        "PIO-017",
+        "PIO-018",
+        "IDE-008",
+        "IDE-020",
+        "ERR-003",
+        "ERR-006",
+        "ERR-009",
+        "ERR-012",
+        "ERR-015",
+        "ADM-004",
+        "ADM-015",
+        "ADP-001",
+        "ADP-002"
+      ],
+      "delegatedPackets": [],
+      "rationale": "ResizeProcessTerminal is the third sequenced Process-control command and travels the SAME ordered stream as input and close, because the relation of a terminal resize to later interactive input is semantically visible (PIO-014). It is therefore not a special case: allowedRecoveryErrors is ProcessControlRecordExpired and NEVER IdempotencyRecordExpired, IdempotencyConflict is excluded in favour of ProcessControlConflict, and recoveryCoordinates is the ProcessControlCoordinate rather than an idempotency coordinate. ProcessInputLimitExceeded is excluded as it is for CloseProcessInput -- a resize carries rows and columns, not input bytes. THE NAME TRAP: this is NOT ResizeSandboxResources, and live.resize-ttl is deliberately absent from refinesPacketASurfaces even though \"resize\" appears in both. Disk growth, CPU hotplug, memory hotplug, accelerator changes, and provider tier changes are Sandbox resource-resize capability members returning durable Operations; this method mints no Operation at all. capabilityGate is process-terminal, the PTY capability named explicitly in artifact.lifecycleRequirements.optionalOperations, which is why that Packet B field is the one refined. The gate is DISCHARGED AT EXEC and re-checked at control admission as a state condition, not as a capability rejection: an Exec requesting a terminal against a target with no conformed PTY support is refused at Exec, so no terminal-bearing Process exists, and PIO-014's residual condition -- accepted only for a NONTERMINAL Process whose accepted Exec selected a terminal -- surfaces as InvalidState { required, observed }. That is why MethodUnavailable and CapabilityUnsupported are both excluded here while SignalProcess, whose capability is independent of Exec, admits both. InvalidArgument carries out-of-domain rows and columns in a structurally well-formed request and stays distinct from MalformedRequest. The replay taxonomy is preserved unchanged: equal content at a retained sequence recovers the same receipt (PIO-009), different content is ProcessControlConflict (PIO-010), an expired retained sequence is the RecoveryError, a gapped future sequence is SequenceOutOfRange (PIO-011), and a lease that is not the current live lease is StaleWriterLease (PIO-012, PIO-018 -- which covers any Process-control command, resize included, not only writes). ConcurrentOperation is excluded because ordering is by lease and sequence. PIO-013 is decisive for this method in particular: the receipt never proves that an application reacted to the terminal resize, so a delivered receipt must not be presented as a completed reflow. AdmissionClosed, NameConflict, StaleRevision, OutputCursorExpired, QuotaExceeded, CapacityUnavailable, ReferenceProtected, RetentionHold, ArtifactIncompatible, PolicyMismatch, and both Dependency variants are structurally inapplicable. allowedKnownFailures and allowedAmbiguities attach to the receipt's terminal `failed` and `unknown` arms (PIO-016), and PIO-017 requires teardown to resolve an accepted resize rather than discard it. Terminal-resize coalescing remains open Process-control work in the locked record, so any future coalescing rule must not weaken PIO-009's one-receipt-per-sequence guarantee. delegatedPackets is empty. The id is not among the fifteen rejected names.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "ResizeSandboxResources",
+      "callClass": "durable-operation-mutation",
+      "targetKind": "sandbox",
+      "owner": "live",
+      "capabilityGate": "sandbox.resource-resize (typed by resource family; disk growth, CPU hotplug, memory hotplug, accelerator change and provider tier change are separate capability members)",
+      "mutationClass": "same-epoch-in-place-or-next-runtime-allocation",
+      "resultCarrierKind": "durable-operation",
+      "allowedRequestErrors": [
+        "MalformedRequest",
+        "InvalidArgument",
+        "Unauthenticated",
+        "PermissionDenied",
+        "TargetNotFound",
+        "IdempotencyConflict",
+        "StaleRevision",
+        "StaleRuntime",
+        "InvalidState",
+        "ConcurrentOperation",
+        "MethodUnavailable",
+        "CapabilityUnsupported",
+        "PolicyMismatch",
+        "RateLimited",
+        "QuotaExceeded",
+        "CapacityUnavailable",
+        "ServiceUnavailable",
+        "InternalInvariantViolation",
+        "EvidenceCorrupt"
+      ],
+      "allowedRecoveryErrors": [
+        "IdempotencyRecordExpired"
+      ],
+      "allowedKnownFailures": [
+        "ResourceResizeFailed",
+        "CapacityUnavailable",
+        "RuntimeControlFailed",
+        "ProviderRejected",
+        "DependencyFailed",
+        "CleanupIncomplete",
+        "InternalFailure",
+        "IntegrityFailure"
+      ],
+      "allowedAmbiguities": [
+        "DispatchOutcomeUnknown",
+        "EffectCompletionUnknown",
+        "RuntimeContinuityUnknown",
+        "RuntimePresenceUnknown",
+        "EvidenceIntegrityUnknown"
+      ],
+      "recoveryCoordinates": [
+        "IdempotencyCoordinate{authenticatedScope, method=ResizeSandboxResources, key}",
+        "IdempotentAcceptedResultReference.OperationResult{operationId} retained for the published recovery window",
+        "acceptance tombstone plus key-age rule; the running branch binds the exact retained {sandboxId, runtimeEpoch} and the stopped branch binds the next-runtime allocation record, so the two branches can never recover each other"
+      ],
+      "refinesPacketASurfaces": [
+        "live.resize-ttl"
+      ],
+      "refinesPacketBFields": [
+        "artifact.lifecycleRequirements.optionalOperations"
+      ],
+      "invariants": [
+        "SBX-009",
+        "SBX-010",
+        "SBX-004",
+        "SBX-005",
+        "SBX-012",
+        "SBX-003",
+        "ADM-001",
+        "ADM-002",
+        "ADM-003",
+        "IDE-013",
+        "IDE-018",
+        "IDE-006",
+        "IDE-008",
+        "IDE-011",
+        "PRF-002",
+        "PRF-010",
+        "PRF-013",
+        "OPA-002",
+        "OPA-005",
+        "OPA-008",
+        "OPA-010",
+        "OPA-012",
+        "OPA-014",
+        "OPA-016",
+        "OPA-021",
+        "ERR-002",
+        "ERR-005",
+        "ERR-008",
+        "ERR-011",
+        "ERR-014",
+        "CNC-002",
+        "FEN-001"
+      ],
+      "delegatedPackets": [],
+      "rationale": "Resize has two state-specific postconditions under one method contract. Against running it must apply atomically in place with no reboot, no runtime replacement and no Process identity loss, retaining the current epoch (SBX-009); against stopped it commits the validated concrete allocation for the next Start, allocates no epoch and claims no current provider capacity (SBX-010). Partial provider application is never success, so ResourceResizeFailed{resourceFamily, cause} is admissible only with proof that the postcondition cannot later be established; an unknown partial application is outcome-unknown carrying EffectCompletionUnknown. The two rejection paths are deliberately distinct and both admissible: CapabilityUnsupported when the profile lacks the in-place running member for that resource family (the locked instruction that callers explicitly Stop, resize the stopped next-runtime allocation, and Start a new epoch), and InvalidState when the Sandbox composite admits no resize at all, for example provisioning/closed or suspended/closed. IDE-013 is cited defensively: because a conforming Resize must not replace the runtime, any result that would need to report a previous and resulting epoch is by construction a violation rather than a legal reporting shape. ADM-003 is cited because resize is exactly the family an implementation is tempted to fold into a generic Sandbox update; the taxonomy keeps live resource resize as its own capability and its own Operation. QuotaExceeded and CapacityUnavailable are admissible at L0 for the growing branch, unlike on Stop and Delete. The capability is typed by resource family, so the gate token here is a family root and the closed per-family capabilityId set remains open work.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "RestoreSandbox",
+      "callClass": "durable-operation-mutation",
+      "targetKind": "sandbox",
+      "owner": "live",
+      "capabilityGate": "restore-same-sandbox",
+      "mutationClass": "runtime-epoch-allocating",
+      "resultCarrierKind": "durable-operation",
+      "allowedRequestErrors": [
+        "MalformedRequest",
+        "InvalidArgument",
+        "Unauthenticated",
+        "PermissionDenied",
+        "TargetNotFound",
+        "IdempotencyConflict",
+        "StaleRevision",
+        "InvalidState",
+        "ConcurrentOperation",
+        "DependencyNotFound",
+        "DependencyUnavailable",
+        "MethodUnavailable",
+        "CapabilityUnsupported",
+        "ArtifactIncompatible",
+        "PolicyMismatch",
+        "RateLimited",
+        "QuotaExceeded",
+        "CapacityUnavailable",
+        "ServiceUnavailable",
+        "InternalInvariantViolation",
+        "EvidenceCorrupt"
+      ],
+      "allowedRecoveryErrors": [
+        "IdempotencyRecordExpired"
+      ],
+      "allowedKnownFailures": [
+        "RestoreFailed",
+        "SnapshotVerificationFailed",
+        "ArtifactMaterializationFailed",
+        "RuntimeProvisioningFailed",
+        "RuntimeReadinessFailed",
+        "RuntimeControlFailed",
+        "ConformanceFailed",
+        "CapacityUnavailable",
+        "ProviderRejected",
+        "DependencyFailed",
+        "CleanupIncomplete",
+        "InternalFailure",
+        "IntegrityFailure"
+      ],
+      "allowedAmbiguities": [
+        "DispatchOutcomeUnknown",
+        "ExternalIdentityUnknown",
+        "RuntimePresenceUnknown",
+        "RuntimeContinuityUnknown",
+        "SnapshotCompletenessUnknown",
+        "EffectCompletionUnknown",
+        "CleanupAuthorityUnknown",
+        "EvidenceIntegrityUnknown"
+      ],
+      "recoveryCoordinates": [
+        "idempotency-coordinate:{authenticatedScope,method,key}",
+        "operation-handle:{operationId}"
+      ],
+      "refinesPacketASurfaces": [
+        "live.snapshot-restore-fork",
+        "create.restore-source",
+        "create.mount-volume-snapshot-data",
+        "framework.snapshot-reconnect",
+        "live.start"
+      ],
+      "refinesPacketBFields": [
+        "artifact.lifecycleRequirements.snapshot",
+        "artifact.lifecycleRequirements.optionalOperations",
+        "artifact.lifecycleRequirements.maximumLifetimeEnforcement",
+        "artifact.workspace.runtimeTransferExclusion"
+      ],
+      "invariants": [
+        "FRK-001",
+        "FRK-002",
+        "FRK-003",
+        "POL-003",
+        "SOP-003",
+        "IDE-004",
+        "IDE-011",
+        "IDE-013",
+        "IDE-014",
+        "SBX-014",
+        "SBX-015",
+        "SBX-025",
+        "ADM-012",
+        "FEN-002",
+        "PRF-001",
+        "PRF-009",
+        "OPA-002",
+        "OPA-005",
+        "OPA-010",
+        "OPA-014",
+        "OPA-020",
+        "CNC-002",
+        "ADM-002",
+        "ADM-013",
+        "ADM-014",
+        "ERR-002",
+        "ERR-005",
+        "ERR-008",
+        "ERR-011",
+        "ERR-014",
+        "FEN-001"
+      ],
+      "delegatedPackets": [],
+      "rationale": "Same-Sandbox restore: the target is the same stable Sandbox, it must already be stopped, and Core allocates a NEW runtime epoch before restore effects. mutationClass is runtime-epoch-allocating and the operation is a launch traversal in its effect leg, which is why the launch proof family is cited: SBX-014 explicitly names same-Sandbox Restore and gates `succeeded` on the new epoch being observed present and executing with declared control, conformance and `accepting` admission proven; SBX-015 requires the driver to have actually run its declared probes against the exact new epoch; ADM-012 permits publishing admission `accepting` only for a new epoch proven present under current fenced authority; PRF-001 confines terminalization to proven evidence and SBX-025 requires the committed `unknown/closed` composite when it is not; PRF-009 forbids an `outcome-unknown` launch authorizing relaunch, replacement or adoption without an independently proven fencing boundary, and FEN-002 supplies that fencing/drain requirement. FRK-003 is the anti-reactivation rule: the launch acts only under the newly allocated epoch and never re-enables the source epoch's mutation authority; IDE-004 makes the epoch strictly increasing and never reused, and IDE-013 requires the result to record both the previous epoch (or its explicit absence) and the resulting epoch. FRK-002 is why no Process identity survives: a restored runtime admits execution only through a newly allocated durable Core Process, and v1 Snapshot classes contain no nonterminal Process to resurrect. StaleRuntime is deliberately EXCLUDED: FRK-001 requires a stopped Sandbox, so there is no current runtime epoch for an expectedRuntimeEpoch to disagree with \u2014 the state precondition is InvalidState { required, observed } and the representation precondition is StaleRevision. DependencyNotFound and DependencyUnavailable are admitted for the Snapshot source and its store, and must not be collapsed with TargetNotFound, which refers to the Sandbox target. ArtifactIncompatible covers a Snapshot that is not compatible with the Sandbox's pinned Artifact, member and runtime-profile identity (FRK-001), while PolicyMismatch covers POL-003: restore uses the exact immutable environment, filesystem, network, identity, device, secret and target-profile policy and never widens it. SOP-003 forbids deriving memory or Process continuity from a filesystem-kind class. This is NOT Rollback and NOT Resume \u2014 both are rejected names/semantics; the record mints neither. IDE-014 requires the explicit attachment outcome, which never substitutes for runtime continuity. OPA-020 is cited rather than OPA-021 because the effect leg is a launch traversal.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "ResumeSandbox",
+      "callClass": "durable-operation-mutation",
+      "targetKind": "sandbox",
+      "owner": "live",
+      "capabilityGate": "sandbox.suspend-resume (paired same-epoch Process-continuity capability; one shared gate token with SuspendSandbox)",
+      "mutationClass": "same-epoch-reactivation",
+      "resultCarrierKind": "durable-operation",
+      "allowedRequestErrors": [
+        "MalformedRequest",
+        "InvalidArgument",
+        "Unauthenticated",
+        "PermissionDenied",
+        "TargetNotFound",
+        "IdempotencyConflict",
+        "StaleRevision",
+        "StaleRuntime",
+        "InvalidState",
+        "ConcurrentOperation",
+        "MethodUnavailable",
+        "CapabilityUnsupported",
+        "RateLimited",
+        "ServiceUnavailable",
+        "InternalInvariantViolation",
+        "EvidenceCorrupt"
+      ],
+      "allowedRecoveryErrors": [
+        "IdempotencyRecordExpired"
+      ],
+      "allowedKnownFailures": [
+        "RuntimeControlFailed",
+        "RuntimeReadinessFailed",
+        "ConformanceFailed",
+        "CapacityUnavailable",
+        "ProviderRejected",
+        "DependencyFailed",
+        "CleanupIncomplete",
+        "InternalFailure",
+        "IntegrityFailure"
+      ],
+      "allowedAmbiguities": [
+        "DispatchOutcomeUnknown",
+        "RuntimeContinuityUnknown",
+        "RuntimePresenceUnknown",
+        "ProcessLivenessUnknown",
+        "EffectCompletionUnknown",
+        "EvidenceIntegrityUnknown"
+      ],
+      "recoveryCoordinates": [
+        "IdempotencyCoordinate{authenticatedScope, method=ResumeSandbox, key}",
+        "IdempotentAcceptedResultReference.OperationResult{operationId} retained for the published recovery window",
+        "acceptance tombstone plus key-age rule bound to the exact {sandboxId, runtimeEpoch} the Resume must retain, so an expired coordinate can never be recovered as a cold Start"
+      ],
+      "refinesPacketASurfaces": [
+        "live.pause-resume",
+        "framework.snapshot-reconnect",
+        "framework.session-reuse",
+        "service.dependencies-probes"
+      ],
+      "refinesPacketBFields": [
+        "artifact.lifecycleRequirements.optionalOperations"
+      ],
+      "invariants": [
+        "SBX-008",
+        "SBX-007",
+        "SBX-023",
+        "SBX-004",
+        "SBX-005",
+        "SBX-012",
+        "SBX-003",
+        "ADM-011",
+        "ADM-001",
+        "ADM-002",
+        "FEN-002",
+        "IDE-014",
+        "IDE-006",
+        "IDE-008",
+        "IDE-011",
+        "IDE-018",
+        "PRF-002",
+        "PRF-010",
+        "PRF-013",
+        "OPA-002",
+        "OPA-005",
+        "OPA-008",
+        "OPA-010",
+        "OPA-012",
+        "OPA-014",
+        "OPA-016",
+        "OPA-021",
+        "ERR-002",
+        "ERR-005",
+        "ERR-008",
+        "ERR-011",
+        "ERR-014",
+        "CNC-002",
+        "FEN-001"
+      ],
+      "delegatedPackets": [],
+      "rationale": "Resume retains the current epoch and re-proves control, conformance and exclusive authority, which is why RuntimeReadinessFailed and ConformanceFailed are admissible here but not on Suspend, and why FEN-002 (no successor effect authority without fencing or drain proof) is cited. SBX-008 is the central prohibition: cold fallback, filesystem-only recreation, Snapshot restore, lazy creation behind a connect call, auto-wake, restart after runtime loss, and a provider handle reconnecting to a replacement instance are none of them Resume -- those outcomes belong to StartSandbox, RestoreSandbox or CreateSandbox(source = snapshot) and allocate a new epoch. This is also why SBX-005 rather than ADM-012 governs the admission-accepting postcondition: Resume is not a launch traversal, so admission becomes accepting on the retained epoch and the launch-traversal form of the rule would file the obligation at the wrong station. ADM-011 is the pair to PRC-012 on Suspend: launch authority withheld from preserved accepted Processes may be regranted only by a succeeded same-epoch Resume, never by any other path. CapacityUnavailable appears as an accepted known failure but not as a request error, because reactivation capacity is discovered after acceptance during dispatch rather than at L0 admission. MethodUnavailable and CapabilityUnsupported are both admissible and remain distinct. The capabilityGate token is shared verbatim with SuspendSandbox to make SBX-023 pairing machine-checkable; the closed capabilityId registry is still open work.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "SetSandboxExpiration",
+      "callClass": "atomic-core-record-update",
+      "targetKind": "sandbox",
+      "owner": "live",
+      "capabilityGate": "none",
+      "mutationClass": "core-record-representation-update",
+      "resultCarrierKind": "committed-core-record-result",
+      "allowedRequestErrors": [
+        "MalformedRequest",
+        "InvalidArgument",
+        "Unauthenticated",
+        "PermissionDenied",
+        "TargetNotFound",
+        "IdempotencyConflict",
+        "StaleRevision",
+        "PolicyMismatch",
+        "MethodUnavailable",
+        "RateLimited",
+        "ServiceUnavailable",
+        "InternalInvariantViolation",
+        "EvidenceCorrupt"
+      ],
+      "allowedRecoveryErrors": [
+        "IdempotencyRecordExpired"
+      ],
+      "allowedKnownFailures": [],
+      "allowedAmbiguities": [],
+      "recoveryCoordinates": [
+        "IdempotencyCoordinate{authenticatedScope, method=SetSandboxExpiration, key}",
+        "IdempotentAcceptedResultReference.CoreRecordResult{resource, resultingRevision, committedResponseDigest} -- the retained reference is a committed response, not a handle, so its CallerRecovery is OperatorAction rather than ObserveHandle",
+        "acceptance tombstone plus key-age rule covering the published recovery window with no gap against result retention"
+      ],
+      "refinesPacketASurfaces": [
+        "live.resize-ttl",
+        "create.timeouts-lifetime-idle",
+        "artifact.lifetime-maximum",
+        "service.lifecycle-policy"
+      ],
+      "refinesPacketBFields": [
+        "artifact.lifecycleRequirements.maximumLifetimeEnforcement"
+      ],
+      "invariants": [
+        "RET-003",
+        "RET-004",
+        "RET-008",
+        "RET-009",
+        "POL-002",
+        "ADM-006",
+        "ADM-003",
+        "ADM-001",
+        "ADM-002",
+        "OPA-018",
+        "OPA-019",
+        "OPA-008",
+        "OPA-012",
+        "OPA-014",
+        "IDE-019",
+        "IDE-018",
+        "IDE-008",
+        "SBX-003",
+        "SBX-017",
+        "ERR-002",
+        "ERR-005",
+        "ERR-008",
+        "ERR-011",
+        "ERR-014",
+        "FEN-001"
+      ],
+      "delegatedPackets": [],
+      "rationale": "CORRECTION TO THE GROUP FRAMING: the group heading lists SetSandboxExpiration as capability-gated, but the locked taxonomy places it under 'Portable control-plane updates' -- it is portable, not capability-gated, and DESIGN.md's capability-gated list contains only SignalProcess, the Suspend/Resume pair, ResizeSandboxResources, CreateSnapshot/DeleteSnapshot, RestoreSandbox and ForkSandbox. capabilityGate is therefore 'none'. This is an atomic Core-record update: the representation change, the idempotency binding and the recoverable response commit together, there is no handle and no dispatch intent (OPA-018, OPA-019), and no durable Operation is allocated. Consequently allowedKnownFailures and allowedAmbiguities are empty as a PROVEN property of the call class -- there is no accepted-outcome envelope for a known failure to inhabit and no dispatch for a proof to be missing -- not as an omission. allowedRecoveryErrors is emphatically NOT empty: the method owns a historical idempotency coordinate whose retained form is CoreRecordResult, so IdempotencyRecordExpired is mandatory, and recoveryCoordinates naming where that state lives cannot substitute for it. RET-003 requires an explicit instant and action with no provider-selected default; RET-004 forbids conflating the schedule with a generic TTL, which is why the six distinct time facts stay separate; POL-002 blocks expiration = none from widening a policy-owned bound, projecting to PolicyMismatch{policyCoordinate} alongside the Artifact hard ceiling. RET-008, RET-009 and SBX-017 are carried because this method arms the expiry sequence: admission closes atomically, a redundant Stop is skipped against a proven stopped Sandbox, a linked Delete is created only after stopped is durably proven, provider-native TTL/auto-stop/auto-delete must be disabled or fenced, and an unpreventable provider expiry is a loss event that is never relabeled a successful Core Stop or Delete. ConcurrentOperation and InvalidState are excluded: this update holds no lifecycle concurrency lane and is legal in every composite, so optimistic concurrency is StaleRevision{expected, current} alone. MethodUnavailable IS admissible, because an implementation whose storage cannot provide the atomic result/idempotency commit must fail closed and not expose the method, and must never substitute a durable Operation as a fallback result shape.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "SignalProcess",
+      "callClass": "durable-operation-mutation",
+      "targetKind": "process-operation-target",
+      "owner": "live",
+      "capabilityGate": "process-signal-set",
+      "mutationClass": "external-process-signal-dispatch",
+      "resultCarrierKind": "durable-operation",
+      "allowedRequestErrors": [
+        "MalformedRequest",
+        "InvalidArgument",
+        "Unauthenticated",
+        "PermissionDenied",
+        "TargetNotFound",
+        "IdempotencyConflict",
+        "StaleRuntime",
+        "InvalidState",
+        "ConcurrentOperation",
+        "MethodUnavailable",
+        "CapabilityUnsupported",
+        "RateLimited",
+        "ServiceUnavailable",
+        "InternalInvariantViolation",
+        "EvidenceCorrupt"
+      ],
+      "allowedRecoveryErrors": [
+        "IdempotencyRecordExpired"
+      ],
+      "allowedKnownFailures": [
+        "RuntimeControlFailed",
+        "ProviderRejected",
+        "InternalFailure",
+        "IntegrityFailure"
+      ],
+      "allowedAmbiguities": [
+        "DispatchOutcomeUnknown",
+        "ProcessLivenessUnknown",
+        "RuntimePresenceUnknown",
+        "EvidenceIntegrityUnknown"
+      ],
+      "recoveryCoordinates": [
+        "idempotency-coordinate"
+      ],
+      "refinesPacketASurfaces": [
+        "live.stop-terminate-delete-signal",
+        "exec.signal-cancellation"
+      ],
+      "refinesPacketBFields": [
+        "artifact.lifecycleRequirements.optionalOperations"
+      ],
+      "invariants": [
+        "SIG-001",
+        "SIG-002",
+        "SIG-003",
+        "SIG-004",
+        "SIG-005",
+        "SIG-007",
+        "PRC-001",
+        "PRC-003",
+        "PRC-013",
+        "IDE-006",
+        "IDE-011",
+        "IDE-012",
+        "OPA-002",
+        "OPA-005",
+        "OPA-008",
+        "OPA-010",
+        "OPA-014",
+        "OPA-021",
+        "PRF-002",
+        "PRF-005",
+        "PRF-010",
+        "PRF-013",
+        "ERR-002",
+        "ERR-005",
+        "ERR-008",
+        "ERR-011",
+        "ERR-014",
+        "CNC-002",
+        "ADM-002",
+        "ADM-013",
+        "ADM-014",
+        "FEN-006",
+        "ADP-009",
+        "FEN-001"
+      ],
+      "delegatedPackets": [],
+      "rationale": "SignalProcess is a capability-gated durable Operation mutation over the sealed ProcessOperationTarget. Its capabilityGate, process-signal-set, is INDEPENDENT of Core Exec conformance -- the locked taxonomy lists TerminateProcess among the methods every conforming execution driver must support and lists SignalProcess separately among the capability-gated methods -- so unlike TerminateProcess this record admits both MethodUnavailable (the surface does not expose the method) and CapabilityUnsupported (the target profile lacks the capability, or the requested signal is outside the effective capability's closed advertised set, SIG-001). Those two are NOT collapsed with each other, and neither is collapsed with InvalidArgument, which carries a structurally well-formed request whose signal field is semantically invalid. ADM-013 forbids approximating the missing capability with VM power controls or Sandbox deletion, so a rejection is mandatory rather than a fallback. InvalidState carries SIG-002: a generic signal against a suspended Sandbox is admitted only where the target advertises deterministic delivery semantics under suspension, while StopSandbox stays legal. TerminationFailed is deliberately WITHHELD from allowedKnownFailures and ProcessLivenessUnknown is deliberately KEPT in allowedAmbiguities, which together encode SIG-004 and SIG-006: success asserts only that the exact target-specific dispatch was invoked and accepted, never delivery, handling, obedience, or exit, and generic signal dispatch never silently gains wait-for-exit semantics. SIG-007's three-part proof (identity and authority validated, exact target selected, driver evidence of accepted dispatch) is what separates succeeded from outcome-unknown; any weaker knowledge set leaves the Operation nonterminal or terminalizes it unknown, and PRC-003 forbids that Operation outcome from writing a terminal outcome onto the Process record. SIG-005 is cited because where the target declares no dispatch-identity support Core records the dispatch as possibly at-least-once rather than claiming backend deduplication -- which is why a retry is recovered through the idempotency coordinate (OPA-010) and never re-dispatched. EXCLUSIONS: QuotaExceeded, CapacityUnavailable, NameConflict, StaleRevision, AdmissionClosed, ReferenceProtected, RetentionHold, ArtifactIncompatible, PolicyMismatch, OutputCursorExpired, and the four Process-control variants are all inapplicable for the same structural reasons as TerminateProcess -- signalling consumes no capacity or quota, allocates no name, carries no revision, cursor, writer lease, or sequence, and is not gated by execution admission. allowedRecoveryErrors is IdempotencyRecordExpired only; ProcessControlRecordExpired is unreachable because SignalProcess is a durable Operation with an idempotency key, not a sequenced control command. refinesPacketBFields cites artifact.lifecycleRequirements.optionalOperations because SignalProcess is exactly a versioned optional lifecycle capability the Artifact may require, and the field's own rationale reserves the operation semantics to Packet E. owner is live, matching the live-owned Packet A surface that names the signal operation. delegatedPackets is empty. The id is not among the fifteen rejected names.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "StartSandbox",
+      "callClass": "durable-operation-mutation",
+      "targetKind": "sandbox",
+      "owner": "live",
+      "capabilityGate": "none",
+      "mutationClass": "new-epoch-launch",
+      "resultCarrierKind": "durable-operation",
+      "allowedRequestErrors": [
+        "MalformedRequest",
+        "InvalidArgument",
+        "Unauthenticated",
+        "PermissionDenied",
+        "TargetNotFound",
+        "IdempotencyConflict",
+        "StaleRevision",
+        "InvalidState",
+        "ConcurrentOperation",
+        "DependencyNotFound",
+        "DependencyUnavailable",
+        "CapabilityUnsupported",
+        "ArtifactIncompatible",
+        "PolicyMismatch",
+        "RateLimited",
+        "QuotaExceeded",
+        "CapacityUnavailable",
+        "ServiceUnavailable",
+        "InternalInvariantViolation",
+        "EvidenceCorrupt"
+      ],
+      "allowedRecoveryErrors": [
+        "IdempotencyRecordExpired"
+      ],
+      "allowedKnownFailures": [
+        "ArtifactMaterializationFailed",
+        "CapacityUnavailable",
+        "RuntimeProvisioningFailed",
+        "RuntimeReadinessFailed",
+        "RuntimeControlFailed",
+        "ConformanceFailed",
+        "ProviderRejected",
+        "DependencyFailed",
+        "CleanupIncomplete",
+        "InternalFailure",
+        "IntegrityFailure"
+      ],
+      "allowedAmbiguities": [
+        "DispatchOutcomeUnknown",
+        "ExternalIdentityUnknown",
+        "RuntimePresenceUnknown",
+        "ProcessLivenessUnknown",
+        "EffectCompletionUnknown",
+        "CleanupAuthorityUnknown",
+        "EvidenceIntegrityUnknown"
+      ],
+      "recoveryCoordinates": [
+        "IdempotencyCoordinate{authenticatedScope, method=StartSandbox, key}",
+        "IdempotentAcceptedResultReference.OperationResult{operationId} retained for the published recovery window",
+        "acceptance tombstone plus key-age rule; an accepted Start replayed after the Sandbox is already running recovers the original Operation instead of being rejected as an invalid new Start"
+      ],
+      "refinesPacketASurfaces": [
+        "live.start",
+        "service.lifecycle-policy",
+        "service.dependencies-probes",
+        "operator.retry-health",
+        "artifact.lifetime-maximum"
+      ],
+      "refinesPacketBFields": [
+        "artifact.lifecycleRequirements.maximumLifetimeEnforcement",
+        "artifact.lifecycleRequirements.optionalOperations"
+      ],
+      "invariants": [
+        "ADM-017",
+        "ADM-012",
+        "ADM-018",
+        "ADM-001",
+        "ADM-002",
+        "FEN-007",
+        "FEN-002",
+        "FEN-004",
+        "SBX-022",
+        "SBX-014",
+        "SBX-015",
+        "SBX-016",
+        "SBX-024",
+        "SBX-025",
+        "SBX-003",
+        "IDE-004",
+        "IDE-006",
+        "IDE-008",
+        "IDE-011",
+        "IDE-013",
+        "FRK-003",
+        "PRC-011",
+        "PRF-001",
+        "PRF-005",
+        "PRF-008",
+        "PRF-009",
+        "PRF-012",
+        "OPA-002",
+        "OPA-005",
+        "OPA-008",
+        "OPA-010",
+        "OPA-012",
+        "OPA-014",
+        "OPA-016",
+        "OPA-020",
+        "OPA-021",
+        "ERR-002",
+        "ERR-005",
+        "ERR-008",
+        "ERR-011",
+        "ERR-014",
+        "CNC-002",
+        "RET-009",
+        "FEN-001",
+        "PRC-006"
+      ],
+      "delegatedPackets": [],
+      "rationale": "Start is a live-surface request (L0 admission) that becomes a launch traversal terminalizing at R1, so it is governed by both the live-admission OPA/ERR/CNC families and the launch-specific SBX-014/024/025, ADM-012, ADM-018 and PRF-001/005/008/009/012 set. The locked partition is deliberate: SBX-024 and SBX-025 are the launch-traversal forms of the presentation-label and unprovable-state rules and are cited instead of SBX-004/SBX-012, and ADM-012 is the launch form of SBX-005, so the ledger never double-files one obligation at two stations. ADM-017 requires a durable stopped proof, which is why InvalidState{required, observed} is admissible while StaleRuntime is not: a stopped Sandbox has no current epoch to be stale against, and freshness is carried by expectedEtag under StaleRevision. FEN-007 and PRC-011 are load-bearing and easy to miss: Start must fence the prior runtime epoch before authorizing the launch and must not leave old-epoch Processes nonterminal, which is why ProcessLivenessUnknown is admissible here but not on Create. SBX-022 forbids reusing a stale resolved manifest, which is what makes ArtifactMaterializationFailed and ArtifactIncompatible reachable on Start rather than Create-only. IDE-004 covers epoch reuse for the Start/Restore/Fork allocation path, and IDE-013 forbids a runtime-replacing result that omits its previous or resulting epoch. allowedRecoveryErrors is IdempotencyRecordExpired only; ProcessControlRecordExpired is proven inapplicable because Start holds no writer-lease/sequence coordinate. MethodUnavailable is absent for the same conformance reason as Create.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "StopSandbox",
+      "callClass": "durable-operation-mutation",
+      "targetKind": "sandbox",
+      "owner": "live",
+      "capabilityGate": "none",
+      "mutationClass": "absence-proving-teardown",
+      "resultCarrierKind": "durable-operation",
+      "allowedRequestErrors": [
+        "MalformedRequest",
+        "InvalidArgument",
+        "Unauthenticated",
+        "PermissionDenied",
+        "TargetNotFound",
+        "IdempotencyConflict",
+        "StaleRevision",
+        "StaleRuntime",
+        "InvalidState",
+        "ConcurrentOperation",
+        "RateLimited",
+        "ServiceUnavailable",
+        "InternalInvariantViolation",
+        "EvidenceCorrupt"
+      ],
+      "allowedRecoveryErrors": [
+        "IdempotencyRecordExpired"
+      ],
+      "allowedKnownFailures": [
+        "RuntimeControlFailed",
+        "TerminationFailed",
+        "CleanupIncomplete",
+        "ProviderRejected",
+        "DependencyFailed",
+        "InternalFailure",
+        "IntegrityFailure"
+      ],
+      "allowedAmbiguities": [
+        "DispatchOutcomeUnknown",
+        "RuntimePresenceUnknown",
+        "ProcessLivenessUnknown",
+        "EffectCompletionUnknown",
+        "CleanupAuthorityUnknown",
+        "EvidenceIntegrityUnknown"
+      ],
+      "recoveryCoordinates": [
+        "IdempotencyCoordinate{authenticatedScope, method=StopSandbox, key}",
+        "IdempotentAcceptedResultReference.OperationResult{operationId} retained for the published recovery window",
+        "acceptance tombstone plus key-age rule; system-originated expiry Stops bind their own coordinate and are linked as predecessor Operations rather than replayed"
+      ],
+      "refinesPacketASurfaces": [
+        "live.stop-terminate-delete-signal",
+        "service.lifecycle-policy",
+        "runtime.cleanup-errors",
+        "operator.cleanup-reconciliation",
+        "framework.cleanup"
+      ],
+      "refinesPacketBFields": [
+        "artifact.lifecycleRequirements.maximumLifetimeEnforcement",
+        "artifact.outputs.runtimeCollection",
+        "artifact.workspace.runtimeTransferExclusion"
+      ],
+      "invariants": [
+        "SBX-011",
+        "SBX-019",
+        "SBX-020",
+        "SBX-017",
+        "SBX-004",
+        "SBX-005",
+        "SBX-012",
+        "SBX-003",
+        "ADM-010",
+        "ADM-001",
+        "ADM-002",
+        "PRC-007",
+        "PRC-015",
+        "PRC-017",
+        "PIO-017",
+        "PIO-019",
+        "PRF-004",
+        "PRF-006",
+        "PRF-011",
+        "PRF-014",
+        "RET-008",
+        "OPA-002",
+        "OPA-005",
+        "OPA-008",
+        "OPA-010",
+        "OPA-012",
+        "OPA-014",
+        "OPA-016",
+        "OPA-021",
+        "ERR-002",
+        "ERR-005",
+        "ERR-008",
+        "ERR-011",
+        "ERR-014",
+        "CNC-002",
+        "IDE-006",
+        "IDE-008",
+        "IDE-011",
+        "FEN-001",
+        "PRC-006"
+      ],
+      "delegatedPackets": [],
+      "rationale": "Stop is the absence-proving teardown traversal terminalizing at T0, so it takes the teardown forms PRF-004/006/011/014 rather than the launch or ordinary-live forms. Its postcondition is three-part -- admission and launch authority closed, every Process terminal, runtime containment absence proven -- which is why PRC-007, PIO-017 and PIO-019 are cited alongside SBX-019: the seal, the drain evidence and the retained Process-control commands are part of the postcondition, not incidental cleanup. SBX-020 is the trap this record exists to close: a grace deadline expiring is not an absence proof, so a Stop whose containment absence cannot be shown must terminalize outcome-unknown with RuntimePresenceUnknown or CleanupAuthorityUnknown rather than failed. SBX-011 forbids a driver lowering Stop to a destructive provider delete, which is the reason DeleteSandbox is a separate record with its own stopped precondition. RET-008 and SBX-017 cover the system-originated expiry-trigger origin: expiry must skip a redundant Stop against a proven stopped Sandbox and must never relabel a provider-driven expiry as a successful Core Stop. StaleRuntime is admissible here, unlike on Start, because a caller may pin expectedRuntimeEpoch on an extant runtime and IDE-006 forbids silently retargeting a stale reference. QuotaExceeded and CapacityUnavailable are excluded because teardown consumes no allocation. CleanupIncomplete is admissible only under the locked failed proof: a known quiesced partial residual with enumerated obligations; a residual whose authority may still act is outcome-unknown, never failed.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "SuspendSandbox",
+      "callClass": "durable-operation-mutation",
+      "targetKind": "sandbox",
+      "owner": "live",
+      "capabilityGate": "sandbox.suspend-resume (paired same-epoch Process-continuity capability; one shared gate token with ResumeSandbox)",
+      "mutationClass": "same-epoch-quiescing",
+      "resultCarrierKind": "durable-operation",
+      "allowedRequestErrors": [
+        "MalformedRequest",
+        "InvalidArgument",
+        "Unauthenticated",
+        "PermissionDenied",
+        "TargetNotFound",
+        "IdempotencyConflict",
+        "StaleRevision",
+        "StaleRuntime",
+        "InvalidState",
+        "ConcurrentOperation",
+        "MethodUnavailable",
+        "CapabilityUnsupported",
+        "RateLimited",
+        "ServiceUnavailable",
+        "InternalInvariantViolation",
+        "EvidenceCorrupt"
+      ],
+      "allowedRecoveryErrors": [
+        "IdempotencyRecordExpired"
+      ],
+      "allowedKnownFailures": [
+        "RuntimeControlFailed",
+        "ProviderRejected",
+        "DependencyFailed",
+        "CleanupIncomplete",
+        "InternalFailure",
+        "IntegrityFailure"
+      ],
+      "allowedAmbiguities": [
+        "DispatchOutcomeUnknown",
+        "RuntimeContinuityUnknown",
+        "RuntimePresenceUnknown",
+        "ProcessLivenessUnknown",
+        "EffectCompletionUnknown",
+        "EvidenceIntegrityUnknown"
+      ],
+      "recoveryCoordinates": [
+        "IdempotencyCoordinate{authenticatedScope, method=SuspendSandbox, key}",
+        "IdempotentAcceptedResultReference.OperationResult{operationId} retained for the published recovery window",
+        "acceptance tombstone plus key-age rule bound to the exact {sandboxId, runtimeEpoch} the Suspend retains"
+      ],
+      "refinesPacketASurfaces": [
+        "live.pause-resume",
+        "framework.snapshot-reconnect"
+      ],
+      "refinesPacketBFields": [
+        "artifact.lifecycleRequirements.optionalOperations"
+      ],
+      "invariants": [
+        "SBX-006",
+        "SBX-007",
+        "SBX-023",
+        "SBX-004",
+        "SBX-005",
+        "SBX-012",
+        "SBX-003",
+        "PRC-012",
+        "ADM-010",
+        "ADM-001",
+        "ADM-002",
+        "IDE-014",
+        "IDE-006",
+        "IDE-008",
+        "IDE-011",
+        "IDE-018",
+        "PRF-002",
+        "PRF-010",
+        "PRF-013",
+        "OPA-002",
+        "OPA-005",
+        "OPA-008",
+        "OPA-010",
+        "OPA-012",
+        "OPA-014",
+        "OPA-016",
+        "OPA-021",
+        "ERR-002",
+        "ERR-005",
+        "ERR-008",
+        "ERR-011",
+        "ERR-014",
+        "CNC-002",
+        "FEN-001"
+      ],
+      "delegatedPackets": [],
+      "rationale": "Suspend retains the current epoch, so it is an ordinary live mutation terminalizing at L1 (PRF-002/010/013), not a launch or teardown traversal. Its success requires proven quiescence plus same-epoch Process continuity (SBX-006, SBX-007), and SBX-023 makes the capability strictly paired: Suspend may not be admitted without Resume, which is why Suspend and Resume carry one shared capabilityGate token rather than two. PRC-012 is the subtle case the vocabulary already anticipates: a continuity-preserving Suspend leaves an accepted-but-undispatched Process in state accepted with launch authority withheld, and must never terminalize it -- that is the difference between Suspend and the absence-producing Stop, and it is why ADM-010 (capture the Process set before admission and launch authority close) is cited here. IDE-014 forbids conflating attachment continuity with runtime continuity: an attachment may legitimately need to reconnect after a valid same-epoch Resume. RuntimeContinuityUnknown is admissible here and not on Create precisely because continuity is the proof at stake. Both MethodUnavailable and CapabilityUnsupported are admissible and are not interchangeable: MethodUnavailable{method} means this surface does not expose the method at all, CapabilityUnsupported{capabilityId, profileId?} means the target profile is incompatible; the required-distinctions list forbids collapsing them. The evidence model explicitly permits a proven failed Suspend to leave the Sandbox running, so failed here asserts only that the suspend attempt is quiesced, never that the workload stopped. The capabilityGate string is descriptive: the closed capabilityId registry is unresolved Packet C/E work, so this token must be re-bound before Packet E closes.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "TerminateProcess",
+      "callClass": "durable-operation-mutation",
+      "targetKind": "process-operation-target",
+      "owner": "live",
+      "capabilityGate": "core-exec-conformance",
+      "mutationClass": "external-process-termination",
+      "resultCarrierKind": "durable-operation",
+      "allowedRequestErrors": [
+        "MalformedRequest",
+        "InvalidArgument",
+        "Unauthenticated",
+        "PermissionDenied",
+        "TargetNotFound",
+        "IdempotencyConflict",
+        "StaleRuntime",
+        "InvalidState",
+        "ConcurrentOperation",
+        "RateLimited",
+        "ServiceUnavailable",
+        "InternalInvariantViolation",
+        "EvidenceCorrupt"
+      ],
+      "allowedRecoveryErrors": [
+        "IdempotencyRecordExpired"
+      ],
+      "allowedKnownFailures": [
+        "TerminationFailed",
+        "RuntimeControlFailed",
+        "ProviderRejected",
+        "InternalFailure",
+        "IntegrityFailure"
+      ],
+      "allowedAmbiguities": [
+        "DispatchOutcomeUnknown",
+        "ProcessLivenessUnknown",
+        "RuntimePresenceUnknown",
+        "RuntimeContinuityUnknown",
+        "EffectCompletionUnknown",
+        "EvidenceIntegrityUnknown"
+      ],
+      "recoveryCoordinates": [
+        "idempotency-coordinate"
+      ],
+      "refinesPacketASurfaces": [
+        "live.stop-terminate-delete-signal",
+        "exec.signal-cancellation",
+        "framework.cleanup",
+        "runtime.cleanup-errors"
+      ],
+      "refinesPacketBFields": [
+        "artifact.lifecycleRequirements.maximumLifetimeEnforcement"
+      ],
+      "invariants": [
+        "SIG-005",
+        "SIG-006",
+        "PRC-001",
+        "PRC-003",
+        "PRC-005",
+        "PRC-009",
+        "PRC-013",
+        "PRC-014",
+        "PRC-015",
+        "IDE-006",
+        "IDE-011",
+        "IDE-012",
+        "OPA-005",
+        "OPA-008",
+        "OPA-010",
+        "OPA-014",
+        "OPA-016",
+        "OPA-021",
+        "PRF-002",
+        "PRF-005",
+        "PRF-010",
+        "PRF-013",
+        "ERR-002",
+        "ERR-005",
+        "ERR-008",
+        "ERR-011",
+        "ERR-014",
+        "CNC-002",
+        "ADM-014",
+        "FEN-006",
+        "ADP-009",
+        "FEN-001",
+        "PRC-006"
+      ],
+      "delegatedPackets": [],
+      "rationale": "TerminateProcess is a durable Operation mutation over the sealed ProcessOperationTarget { processId, sandboxId, runtimeEpoch }, so resultCarrierKind is durable-operation and IDE-011/IDE-012 bind that target through every retry, adoption, and reconciliation. capabilityGate is core-exec-conformance but is DISCHARGED AT EXEC: ADM-015 makes provable Process termination a named component of Core Exec conformance, so a target that cannot terminate cannot have admitted the Exec that created the Process. That is why MethodUnavailable and CapabilityUnsupported are both proven inapplicable here rather than merely omitted -- a Process cannot exist on a surface that lacks the method, and the residual case is TargetNotFound. This is the deliberate contrast with SignalProcess, whose capability is independent of Exec and which therefore does admit both variants. InvalidState is admitted for the Sandbox-composite precondition (for example a suspended Sandbox whose target advertises no deterministic termination semantics), NOT for an already-terminated Process: TerminateProcess is the convergent Process-targeted Operation and a Process already holding an immutable terminal outcome it cannot act past already satisfies the SIG-006 success postcondition, so a repeat converges to succeeded rather than rejecting. ConcurrentOperation IS admitted because the locked concurrency table gives Stop ownership of force escalation, so a Terminate whose ordered pair with the lifecycle-lane holder is not a permitted row is refused with the typed conflict naming that active Operation (CNC-002). QuotaExceeded, CapacityUnavailable, NameConflict, StaleRevision, AdmissionClosed, ReferenceProtected, RetentionHold, ArtifactIncompatible, PolicyMismatch, OutputCursorExpired, and all four Process-control variants are inapplicable: termination consumes no new placement capacity or account quota, allocates no name, carries no representation revision or cursor, is not gated by execution admission (which gates new Exec only), and holds no writer lease or sequence. allowedRecoveryErrors is IdempotencyRecordExpired and never ProcessControlRecordExpired; OPA-014 makes an expired live-mutation coordinate return a recovery error with tagged prior-acceptance evidence and never a new accepted mutation, and PRF-010 forbids the terminalized-unknown case from authorizing a replacement kill. TerminationFailed is admitted here and deliberately WITHHELD from SignalProcess, because only Terminate promises the exit postcondition. EffectCompletionUnknown and CleanupAuthorityUnknown are distinguished: the former is admitted (the effect may be incomplete), the latter is withheld because Terminate discharges no cleanup obligation -- that belongs to Stop and Delete under PRF-011. REGISTRY GAP FLAGGED, not silently reconciled: OPA-002's acceptance-proof arm enumerates \"live Sandbox, Process-signal, Snapshot, or Fork mutation\" and does not name Process termination, so this record cites the live-mutation arms that do cover it (OPA-005, OPA-008, OPA-010, OPA-014, OPA-016, OPA-021) and PRF-002, which explicitly says \"Process-targeted mutation Operation\". OPA-002 is cited on SignalProcess, where its wording is exact. If Terminate is intended to be inside OPA-002, that statement needs a wording amendment before Packet E closes. owner is live because the Packet A operation surface naming this method, live.stop-terminate-delete-signal, is live-owned. delegatedPackets is empty: no Packet A-owned method family is involved. The id is not among the fifteen rejected names -- note that KillSandbox and Destroy are rejected, so no `kill` or `destroy` id may be minted as a synonym for this contract.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "UpdateSandboxMetadata",
+      "callClass": "atomic-core-record-update",
+      "targetKind": "sandbox",
+      "owner": "live",
+      "capabilityGate": "none",
+      "mutationClass": "core-record-representation-update",
+      "resultCarrierKind": "committed-core-record-result",
+      "allowedRequestErrors": [
+        "MalformedRequest",
+        "InvalidArgument",
+        "Unauthenticated",
+        "PermissionDenied",
+        "TargetNotFound",
+        "IdempotencyConflict",
+        "StaleRevision",
+        "MethodUnavailable",
+        "RateLimited",
+        "ServiceUnavailable",
+        "InternalInvariantViolation",
+        "EvidenceCorrupt"
+      ],
+      "allowedRecoveryErrors": [
+        "IdempotencyRecordExpired"
+      ],
+      "allowedKnownFailures": [],
+      "allowedAmbiguities": [],
+      "recoveryCoordinates": [
+        "IdempotencyCoordinate{authenticatedScope, method=UpdateSandboxMetadata, key}",
+        "IdempotentAcceptedResultReference.CoreRecordResult{resource, resultingRevision, committedResponseDigest} -- equal replay returns the committed response even if later updates occurred, and never reapplies the update",
+        "acceptance tombstone plus key-age rule covering the published recovery window with no gap against result retention"
+      ],
+      "refinesPacketASurfaces": [],
+      "refinesPacketBFields": [],
+      "invariants": [
+        "ADM-003",
+        "ADM-006",
+        "ADM-001",
+        "ADM-002",
+        "OPA-018",
+        "OPA-019",
+        "OPA-008",
+        "OPA-012",
+        "OPA-014",
+        "IDE-019",
+        "IDE-018",
+        "IDE-008",
+        "SBX-003",
+        "ERR-002",
+        "ERR-005",
+        "ERR-008",
+        "ERR-011",
+        "ERR-014",
+        "FEN-001"
+      ],
+      "delegatedPackets": [],
+      "rationale": "CORRECTION TO THE GROUP FRAMING: like SetSandboxExpiration, this is listed as capability-gated in the group heading but the locked taxonomy places it under 'Portable control-plane updates'; capabilityGate is 'none'. REJECTED-NAME NOTE: 'generic Update' is one of the fourteen rejected names, but UpdateSandboxMetadata is explicitly legal -- the ban is an id-value check against a bare generic update verb, and ADM-003 is cited here precisely to keep this method from drifting into the generic UpdateSandbox it replaces. Scope is limited to labels and explicitly non-authoritative correlation metadata under etag: ADM-006 forbids the update from changing runtime authority, epoch or policy, IDE-018 forbids a live request writing a runtime epoch, IDE-019 makes Sandbox.name immutable after Create (reserved to that Sandbox until Delete, avoiding hidden release, historical-alias reservation and rename races), and SBX-003 forbids a caller writing runtime state, desired state or a presentation label through it. Network policy, mounts, workspace materialization, devices, secrets, runtime profile, image, kernel and immutable environment are not metadata and cannot move through this method. allowedKnownFailures and allowedAmbiguities are empty as a proven property of the atomic Core-record update class, while allowedRecoveryErrors remains mandatory and non-empty because the method owns an idempotency coordinate retained as CoreRecordResult. ConcurrentOperation and InvalidState are excluded for the same reason as SetSandboxExpiration: no lifecycle lane is held and every composite admits the update, so StaleRevision is the sole concurrency rejection. refinesPacketASurfaces and refinesPacketBFields are DELIBERATELY EMPTY and are a stated absence rather than an unfilled slot: none of the twenty Packet A surfaces delegating to E and none of the five Packet B fields delegating to E covers label or correlation-metadata update. Forcing a citation here would manufacture coverage the ledger does not have; if a metadata surface is later admitted to Packet A, this record must be revisited.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "WaitOperation",
+      "callClass": "observation",
+      "targetKind": "operation",
+      "owner": "core",
+      "capabilityGate": "none",
+      "mutationClass": "none",
+      "resultCarrierKind": "observation-result",
+      "allowedRequestErrors": [
+        "MalformedRequest",
+        "InvalidArgument",
+        "Unauthenticated",
+        "PermissionDenied",
+        "TargetNotFound",
+        "RateLimited",
+        "ServiceUnavailable",
+        "InternalInvariantViolation",
+        "EvidenceCorrupt"
+      ],
+      "allowedRecoveryErrors": [],
+      "allowedKnownFailures": [],
+      "allowedAmbiguities": [],
+      "recoveryCoordinates": [],
+      "refinesPacketASurfaces": [
+        "operator.retry-health",
+        "runtime.cleanup-errors",
+        "framework.cleanup"
+      ],
+      "refinesPacketBFields": [],
+      "invariants": [
+        "PRF-007",
+        "PRF-005",
+        "PRF-013",
+        "PRC-002",
+        "OPA-016",
+        "ERR-002",
+        "ERR-005",
+        "ERR-008",
+        "ERR-011",
+        "ERR-014",
+        "ADP-007",
+        "ADP-009"
+      ],
+      "delegatedPackets": [],
+      "rationale": "Returns a wait result containing the latest Operation and whether the requested observation condition was met. Three rejections are explicitly NOT reachable and their absence is the point of this record: the deadline does not become transport DEADLINE_EXCEEDED semantics (ERR-014), it does not record cancel_requested on the observed Operation (PRF-007 \u2014 an observation deadline never requests cancellation), and it does not terminalize the Operation. An adapter must surface the transport condition as itself (ADP-007) and must not resolve an observed ambiguity by replaying (ADP-009). OPA-016 blocks the common misuse where a wait that lands on a terminal failure is treated as authority for a fresh attempt: a genuinely new attempt needs a new idempotency key plus operation-specific authority. allowedRecoveryErrors is proven-empty by the closed two-variant RecoveryError union: this call commits no idempotency coordinate and no Process-control coordinate.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "WaitProcess",
+      "callClass": "observation",
+      "targetKind": "process",
+      "owner": "core",
+      "capabilityGate": "none",
+      "mutationClass": "none",
+      "resultCarrierKind": "observation-result",
+      "allowedRequestErrors": [
+        "MalformedRequest",
+        "InvalidArgument",
+        "Unauthenticated",
+        "PermissionDenied",
+        "TargetNotFound",
+        "RateLimited",
+        "ServiceUnavailable",
+        "InternalInvariantViolation",
+        "EvidenceCorrupt"
+      ],
+      "allowedRecoveryErrors": [],
+      "allowedKnownFailures": [],
+      "allowedAmbiguities": [],
+      "recoveryCoordinates": [],
+      "refinesPacketASurfaces": [
+        "exec.signal-cancellation",
+        "exec.stdio-mode"
+      ],
+      "refinesPacketBFields": [
+        "artifact.lifecycleRequirements.maximumLifetimeEnforcement"
+      ],
+      "invariants": [
+        "PRC-016",
+        "PRC-001",
+        "PRC-002",
+        "PRC-010",
+        "PRC-011",
+        "PRC-013",
+        "PRC-014",
+        "PIO-005",
+        "ADP-007",
+        "ADP-008",
+        "PRC-006"
+      ],
+      "delegatedPackets": [],
+      "rationale": "PRC-016 is the exact governing rule and names this method: a WaitProcess deadline ends only that observation and never cancels, mutates, terminalizes or advances the observed Process or its output stream. This is the distinction the locked record insists on \u2014 an observation timeout is not a `deadlineExceeded` termination arm, which is reserved for the case where the original Process deadline won and Core proved the Process can no longer launch or continue. ADP-007 blocks the adapter-side version of the same error. PRC-011 is cited because a wait that spans a runtime replacement must observe the old-epoch Process terminalized with runtimeReplaced, runtimeLost or fenced BEFORE the new epoch is published running, rather than being left nonterminal. PIO-005 keeps the wait's terminal Process observation independent of output sealing and retained-stream expiry. refinesPacketBFields cites the maximum-lifetime relation because that Packet B field explicitly delegates Process deadline enforcement to Packet E, and a wait is where a caller observes the deadline resolving. allowedRecoveryErrors is proven-empty. Process observation is neither an Exec nor a sequenced Process-control command, so the Exec/Process-control ERR arm is deliberately NOT cited. A Process/Operation observation ERR arm must be registered before Packet E closes; until then this gap is stated rather than papered over, matching ReadProcessOutput.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "WaitSandbox",
+      "callClass": "observation",
+      "targetKind": "sandbox",
+      "owner": "core",
+      "capabilityGate": "none",
+      "mutationClass": "none",
+      "resultCarrierKind": "observation-result",
+      "allowedRequestErrors": [
+        "MalformedRequest",
+        "InvalidArgument",
+        "Unauthenticated",
+        "PermissionDenied",
+        "TargetNotFound",
+        "RateLimited",
+        "ServiceUnavailable",
+        "InternalInvariantViolation",
+        "EvidenceCorrupt"
+      ],
+      "allowedRecoveryErrors": [],
+      "allowedKnownFailures": [],
+      "allowedAmbiguities": [],
+      "recoveryCoordinates": [],
+      "refinesPacketASurfaces": [
+        "service.dependencies-probes",
+        "service.lifecycle-policy",
+        "operator.retry-health"
+      ],
+      "refinesPacketBFields": [
+        "artifact.lifecycleRequirements.maximumLifetimeEnforcement",
+        "artifact.lifecycleRequirements.optionalOperations"
+      ],
+      "invariants": [
+        "PRF-007",
+        "SBX-003",
+        "SBX-004",
+        "SBX-005",
+        "SBX-012",
+        "SBX-013",
+        "SBX-025",
+        "ERR-002",
+        "ERR-005",
+        "ERR-008",
+        "ERR-011",
+        "ERR-014",
+        "ADP-003",
+        "ADP-007"
+      ],
+      "delegatedPackets": [],
+      "rationale": "Observational wait with an observation deadline. It returns the latest Sandbox plus whether the requested observation condition was met; expiry of the deadline is a normal successful observation result, never a rejection. PRF-007 is the governing rule: the wait deadline ends only this observation and never cancels, mutates, terminalizes, requests cancellation of, or advances the observed Sandbox. ERR-014 forbids the reverse projection that would turn transport DEADLINE_EXCEEDED into product semantics, and ADP-007 forbids an adapter from re-presenting the transport condition as a Core outcome. SBX-025 is cited because a wait spanning a launch traversal must be shown the committed `unknown/closed` composite rather than an approximation whenever presence, continuity, containment or authority cannot be established. No streaming-watch variant is registered here; the taxonomy permits a later watch projection only with semantics no stronger than repeated Get or Wait. allowedRecoveryErrors is proven-empty: observations create no acceptance commit and therefore no recovery coordinate.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "WriteProcessInput",
+      "callClass": "sequenced-process-control",
+      "targetKind": "process-control-coordinate",
+      "owner": "exec",
+      "capabilityGate": "interactive-exec-conformance",
+      "mutationClass": "ordered-process-control-record",
+      "resultCarrierKind": "durable-process-control-receipt",
+      "allowedRequestErrors": [
+        "MalformedRequest",
+        "InvalidArgument",
+        "Unauthenticated",
+        "PermissionDenied",
+        "TargetNotFound",
+        "StaleRuntime",
+        "InvalidState",
+        "ProcessControlConflict",
+        "SequenceOutOfRange",
+        "StaleWriterLease",
+        "ProcessInputLimitExceeded",
+        "RateLimited",
+        "ServiceUnavailable",
+        "InternalInvariantViolation",
+        "EvidenceCorrupt"
+      ],
+      "allowedRecoveryErrors": [
+        "ProcessControlRecordExpired"
+      ],
+      "allowedKnownFailures": [
+        "RuntimeControlFailed",
+        "ProviderRejected",
+        "InternalFailure",
+        "IntegrityFailure"
+      ],
+      "allowedAmbiguities": [
+        "DispatchOutcomeUnknown",
+        "ProcessLivenessUnknown",
+        "RuntimeContinuityUnknown",
+        "EvidenceIntegrityUnknown"
+      ],
+      "recoveryCoordinates": [
+        "process-control-coordinate"
+      ],
+      "refinesPacketASurfaces": [
+        "exec.stdio-mode",
+        "live.attach-shell",
+        "framework.session-reuse"
+      ],
+      "refinesPacketBFields": [
+        "artifact.lifecycleRequirements.optionalOperations"
+      ],
+      "invariants": [
+        "PIO-004",
+        "PIO-008",
+        "PIO-009",
+        "PIO-010",
+        "PIO-011",
+        "PIO-012",
+        "PIO-013",
+        "PIO-015",
+        "PIO-016",
+        "PIO-017",
+        "PIO-018",
+        "IDE-008",
+        "IDE-020",
+        "ERR-003",
+        "ERR-006",
+        "ERR-009",
+        "ERR-012",
+        "ERR-015",
+        "ADM-004",
+        "ADM-015",
+        "ADP-001",
+        "ADP-002"
+      ],
+      "delegatedPackets": [],
+      "rationale": "WriteProcessInput is a sequenced Process-control command, so it mints no Operation per interactive write and its resultCarrierKind is durable-process-control-receipt. THE DECISIVE FIELD IS allowedRecoveryErrors: it is ProcessControlRecordExpired and NEVER IdempotencyRecordExpired. A Process-control receipt commit has no idempotency key and no new handle; its recovery coordinate is the lease, sequence, and canonical command digest, so an expired prior sequence is ProcessControlRecordExpired { writerLeaseId, sequence, recoveryWindowEndedAt, priorAcceptance } and never authorizes resubmission with a new sequence. Correspondingly IdempotencyConflict is EXCLUDED from allowedRequestErrors and its role is taken by ProcessControlConflict { sequence, originalDigest, submittedDigest } (PIO-010). That pair of substitutions is the whole reason this call class exists and is the easiest place in the ledger to import the wrong variant. recoveryCoordinates [process-control-coordinate] names the ProcessControlCoordinate { processId, sandboxId, runtimeEpoch, writerLeaseId, sequence } of PIO-008; it does not substitute for allowedRecoveryErrors. THE THREE-WAY REPLAY DISTINCTION IS PRESERVED AND NOT COLLAPSED: a retained sequence with equal canonical content recovers the same receipt and is not an error at all (PIO-009); a retained sequence with different content is ProcessControlConflict (PIO-010); an expired retained sequence is the RecoveryError (never a fresh RequestError reason); and a future sequence leaving a gap is SequenceOutOfRange { expected, submitted } (PIO-011). StaleWriterLease { writerLeaseId } is separate again and carries PIO-012 and PIO-018 -- a lease that is not the current live lease, or that was retargeted after runtime replacement, Process termination, attachment reconnection, or SDK Session rebinding. ConcurrentOperation is EXCLUDED precisely because lease and sequence, not the fenced Sandbox lifecycle lane, are how this method serializes; using ConcurrentOperation here would collapse a control-stream conflict into a lifecycle conflict. InvalidState carries PIO-015 (a write after the irreversible CloseProcessInput record) and the Process whose accepted stream contract permits no input. MethodUnavailable and CapabilityUnsupported are EXCLUDED because the interactive-exec-conformance gate is discharged at Exec acceptance: an Exec requesting stdin against a target that does not advertise full interactive Exec conformance is refused at Exec, so no input-bearing Process exists to write to, and the residual per-Process condition is InvalidState. AdmissionClosed is inapplicable -- execution admission gates new Exec, not control commands over an already-accepted Process. NameConflict, StaleRevision, OutputCursorExpired, QuotaExceeded, CapacityUnavailable, ReferenceProtected, RetentionHold, ArtifactIncompatible, PolicyMismatch, and DependencyNotFound/DependencyUnavailable are all structurally inapplicable. allowedKnownFailures and allowedAmbiguities are carried by the RECEIPT's terminal state, not by an Operation: the locked ProcessControlOutcome disjoins delivered, discarded, failed, and unknown, so a KnownFailure appears inside `failed { failure, neverDeliveredProof, deliveryAuthority = quiesced }` and an ambiguity inside `unknown { missingProofs }` (PIO-016). RuntimeContinuityUnknown is included specifically for delivery evidence across guest-supervisor restart, which the locked record lists as open Process-control work. PIO-013 is cited because the receipt proves Core admission, deduplication, and ordering only -- never that the process consumed the bytes, and never that the Process is still alive. PIO-004 is cited because accepted input is never replayed, and PIO-017 because teardown must resolve every accepted command rather than silently discarding it. ADP-001, ADP-002, and ADM-004 are cited because an SDK attach() or Session is client state composed from this method and must never appear as a Core target, authority, precondition, or idempotency coordinate -- which is also why framework.session-reuse is among the refined Packet A surfaces. live.resize-ttl is DELIBERATELY NOT refined by any member of this group. delegatedPackets is empty. The id is not among the fifteen rejected names -- note that Attach, Detach, Connect, and Session are rejected, so none of them may be minted as an id for a composite over this method.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "adopt",
+      "callClass": "durable-operation-mutation",
+      "targetKind": "sandbox-runtime",
+      "owner": "core",
+      "capabilityGate": "system-origin-only",
+      "mutationClass": "system-originated",
+      "resultCarrierKind": "durable-operation",
+      "allowedRequestErrors": [],
+      "allowedRecoveryErrors": [
+        "IdempotencyRecordExpired"
+      ],
+      "allowedKnownFailures": [],
+      "allowedAmbiguities": [],
+      "recoveryCoordinates": [
+        "system-origin-trigger-record"
+      ],
+      "refinesPacketASurfaces": [
+        "runtime.cleanup-errors",
+        "operator.cleanup-reconciliation"
+      ],
+      "refinesPacketBFields": [],
+      "invariants": [
+        "FEN-001",
+        "SBX-018",
+        "ADP-012",
+        "OPA-016",
+        "PRF-014"
+      ],
+      "delegatedPackets": [],
+      "rationale": "Sequences a provider-created replacement runtime observed without a Core lifecycle request as a new durable runtime epoch with identity and execution-admission records committed.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "cleanup",
+      "callClass": "durable-operation-mutation",
+      "targetKind": "sandbox-runtime",
+      "owner": "core",
+      "capabilityGate": "system-origin-only",
+      "mutationClass": "system-originated",
+      "resultCarrierKind": "durable-operation",
+      "allowedRequestErrors": [],
+      "allowedRecoveryErrors": [
+        "IdempotencyRecordExpired"
+      ],
+      "allowedKnownFailures": [],
+      "allowedAmbiguities": [],
+      "recoveryCoordinates": [
+        "system-origin-trigger-record"
+      ],
+      "refinesPacketASurfaces": [
+        "runtime.cleanup-errors",
+        "operator.cleanup-reconciliation"
+      ],
+      "refinesPacketBFields": [],
+      "invariants": [
+        "FEN-001",
+        "ADP-012",
+        "RET-006",
+        "PRF-014"
+      ],
+      "delegatedPackets": [],
+      "rationale": "Performs orphan adoption and containment-absence work after a lost or replaced runtime, recording its own durable outcome rather than rewriting an earlier terminal Operation.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "deferred.migration",
+      "callClass": "deferred-contract",
+      "targetKind": "deferred",
+      "owner": "core",
+      "capabilityGate": "deferred-public-migration",
+      "mutationClass": "system-originated",
+      "resultCarrierKind": "deferred-contract",
+      "allowedRequestErrors": [],
+      "allowedRecoveryErrors": [
+        "IdempotencyRecordExpired"
+      ],
+      "allowedKnownFailures": [],
+      "allowedAmbiguities": [],
+      "recoveryCoordinates": [
+        "system-origin-trigger-record"
+      ],
+      "refinesPacketASurfaces": [
+        "runtime.cleanup-errors",
+        "operator.cleanup-reconciliation"
+      ],
+      "refinesPacketBFields": [],
+      "invariants": [
+        "FRK-005"
+      ],
+      "delegatedPackets": [
+        "E-future"
+      ],
+      "rationale": "Public Migration is a rejected v1 name. FRK-005 governs epoch retention under a future public migration contract, which requires exclusive target-enforced handoff and proven Process continuity. Recorded so the invariant's zero method coverage is a stated absence, not a hole.",
+      "coverageStatus": "not-yet-generated"
+    },
+    {
+      "id": "deferred.packet-a.content-transfer-family",
+      "callClass": "deferred-to-packet-a",
+      "targetKind": "sandbox",
+      "owner": "live",
+      "capabilityGate": "deferred-to-packet-a",
+      "mutationClass": "deferred-to-packet-a",
+      "resultCarrierKind": "deferred-to-packet-a",
+      "allowedRequestErrors": [],
+      "allowedRecoveryErrors": [],
+      "allowedKnownFailures": [],
+      "allowedAmbiguities": [],
+      "recoveryCoordinates": [],
+      "refinesPacketASurfaces": [],
+      "refinesPacketBFields": [
+        "artifact.workspace.runtimeTransferExclusion",
+        "artifact.outputs.runtimeCollection"
+      ],
+      "invariants": [
+        "ADM-001",
+        "ADM-002",
+        "OPA-002",
+        "OPA-005",
+        "PRF-002",
+        "ERR-002",
+        "ERR-005",
+        "ERR-011",
+        "ERR-014"
+      ],
+      "delegatedPackets": [
+        "A"
+      ],
+      "rationale": "E-TO-A DEFERRAL MARKER, NOT A METHOD, covering the copy and transfer method families. As with the filesystem marker, EVERY EMPTY ARRAY MEANS 'NOT YET GENERATED', NOT 'PROVEN EMPTY', and this record provides no coverage. The id is deliberately `deferred.packet-a.content-transfer-family`: `Copy` is one of the fifteen rejected id values (the fourteen at DESIGN.md:486-491 plus `shell`), and the deferred copy family overlaps 'generic Copy' directly, so this marker must never be allowed to mint a bare `copy` id when Packet A closes the names. callClass and resultCarrierKind are recorded as the CANDIDATE classification only \u2014 a content transfer that produces an external effect would commit a NewEffectIntent and return a durable Operation, which is why OPA-002, OPA-005 and PRF-002 are cited as the acceptance and terminalization rules that would then govern \u2014 but the locked record states each deferred family must still receive one of the six call classes or a separately reviewed class, so this assignment is not closed and must not be treated as a decision. mutationClass carries the sentinel `deferred-to-packet-a` because the effect class is genuinely undetermined: a transfer may be a durable retained-content mutation, a Core-record commit, or a separately reviewed streaming class. refinesPacketASurfaces is empty by direction (E defers to A, it does not refine an E-delegated A surface). The two Packet B fields are cited because they are the exact delegation that lands here: artifact.workspace.runtimeTransferExclusion forbids synchronization, writeback, retention, capture, export and snapshot timing from becoming workspace fields and assigns those live retention and result-transfer operations to Packet E; artifact.outputs.runtimeCollection separates Artifact-declared output eligibility from a selected strict collection request and assigns the collection operation to Packet E. The endpoint and port families are also A-deferred but are networking rather than observation or retained state and belong to a different group's markers.",
+      "coverageStatus": "not-yet-generated"
+    },
+    {
+      "id": "deferred.packet-a.filesystem-observation-family",
+      "callClass": "deferred-to-packet-a",
+      "targetKind": "sandbox",
+      "owner": "live",
+      "capabilityGate": "deferred-to-packet-a",
+      "mutationClass": "none",
+      "resultCarrierKind": "deferred-to-packet-a",
+      "allowedRequestErrors": [],
+      "allowedRecoveryErrors": [],
+      "allowedKnownFailures": [],
+      "allowedAmbiguities": [],
+      "recoveryCoordinates": [],
+      "refinesPacketASurfaces": [],
+      "refinesPacketBFields": [
+        "artifact.workspace.runtimeTransferExclusion",
+        "artifact.outputs.runtimeCollection"
+      ],
+      "invariants": [
+        "ADM-001",
+        "ADM-002",
+        "ERR-002",
+        "ERR-005",
+        "ERR-011",
+        "ERR-014"
+      ],
+      "delegatedPackets": [
+        "A"
+      ],
+      "rationale": "E-TO-A DEFERRAL MARKER, NOT A METHOD. The file and directory method families are Packet A-owned and their names are not yet closed, so this record mints NO operation id that could be mistaken for a method: the id is a namespaced deferral coordinate. It exists so the observation ledger states the handoff rather than implying a totality it cannot have. READ EVERY EMPTY ARRAY HERE AS 'NOT YET GENERATED', NOT AS 'PROVEN EMPTY' \u2014 this is the opposite of the empty allowedRecoveryErrors on the real observation records above, which are proven empty by the closed two-variant RecoveryError union. No RequestErrorFor<K>, RecoveryErrorFor<K>, KnownFailureFor<K> or AmbiguityFor<K> subset can be generated before the family's method names and request schemas close, so this record provides NO coverage. callClass is recorded as `observation` and resultCarrierKind as `observation-result` because a read-only file or directory listing creates no acceptance commit and no mutation handle; the locked record nevertheless requires each deferred family to receive one of the six call classes or a separately reviewed class before the Core API closes, so even this classification is candidate. capabilityGate carries the sentinel `deferred-to-packet-a` rather than `none`, so a validator cannot mistake an unresolved gate for a proven-portable one. refinesPacketASurfaces is empty by direction: Packet E defers TO Packet A here rather than refining an E-delegated A surface. The two Packet B fields ARE cited because they delegate in the opposite direction \u2014 artifact.workspace.runtimeTransferExclusion assigns live retention and result-transfer operations to Packet E, and artifact.outputs.runtimeCollection assigns collection operations to Packet E, so this family is the exact point where that delegation meets an unclosed Packet A name. Note the rejected-name interaction: no id in this family may be minted as a bare `copy` or a generic `Update`.",
+      "coverageStatus": "not-yet-generated"
+    },
+    {
+      "id": "deferred.packet-a.network-endpoint-family",
+      "callClass": "deferred-to-packet-a",
+      "targetKind": "deferred",
+      "owner": "core",
+      "capabilityGate": "deferred-to-packet-a",
+      "mutationClass": "system-originated",
+      "resultCarrierKind": "deferred-to-packet-a",
+      "allowedRequestErrors": [],
+      "allowedRecoveryErrors": [
+        "IdempotencyRecordExpired"
+      ],
+      "allowedKnownFailures": [],
+      "allowedAmbiguities": [],
+      "recoveryCoordinates": [
+        "system-origin-trigger-record"
+      ],
+      "refinesPacketASurfaces": [
+        "runtime.cleanup-errors",
+        "operator.cleanup-reconciliation"
+      ],
+      "refinesPacketBFields": [],
+      "invariants": [],
+      "delegatedPackets": [
+        "A"
+      ],
+      "rationale": "The endpoint and port method families are Packet A-owned and their names are not yet closed. Registered so the ledger's totality over the six A-deferred families (file, directory, copy, transfer, endpoint, port) is true rather than claimed.",
+      "coverageStatus": "not-yet-generated"
+    },
+    {
+      "id": "fence",
+      "callClass": "durable-operation-mutation",
+      "targetKind": "sandbox-runtime",
+      "owner": "core",
+      "capabilityGate": "system-origin-only",
+      "mutationClass": "system-originated",
+      "resultCarrierKind": "durable-operation",
+      "allowedRequestErrors": [],
+      "allowedRecoveryErrors": [
+        "IdempotencyRecordExpired"
+      ],
+      "allowedKnownFailures": [],
+      "allowedAmbiguities": [],
+      "recoveryCoordinates": [
+        "system-origin-trigger-record"
+      ],
+      "refinesPacketASurfaces": [
+        "runtime.cleanup-errors",
+        "operator.cleanup-reconciliation"
+      ],
+      "refinesPacketBFields": [],
+      "invariants": [
+        "FEN-001",
+        "ADP-012",
+        "PRF-005"
+      ],
+      "delegatedPackets": [],
+      "rationale": "Advances the internal authority epoch durably before a successor receives authority, revoking any prior actor's ability to commit.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "quarantine",
+      "callClass": "durable-operation-mutation",
+      "targetKind": "sandbox-runtime",
+      "owner": "core",
+      "capabilityGate": "system-origin-only",
+      "mutationClass": "system-originated",
+      "resultCarrierKind": "durable-operation",
+      "allowedRequestErrors": [],
+      "allowedRecoveryErrors": [
+        "IdempotencyRecordExpired"
+      ],
+      "allowedKnownFailures": [],
+      "allowedAmbiguities": [],
+      "recoveryCoordinates": [
+        "system-origin-trigger-record"
+      ],
+      "refinesPacketASurfaces": [
+        "runtime.cleanup-errors",
+        "operator.cleanup-reconciliation"
+      ],
+      "refinesPacketBFields": [],
+      "invariants": [
+        "FEN-001",
+        "ADP-012",
+        "SBX-018"
+      ],
+      "delegatedPackets": [],
+      "rationale": "Closes execution admission with a typed reason when containment or exclusive authority cannot be proven. Never caller-invocable.",
+      "coverageStatus": "generated"
+    },
+    {
+      "id": "reconcile",
+      "callClass": "durable-operation-mutation",
+      "targetKind": "sandbox-runtime",
+      "owner": "core",
+      "capabilityGate": "system-origin-only",
+      "mutationClass": "system-originated",
+      "resultCarrierKind": "durable-operation",
+      "allowedRequestErrors": [],
+      "allowedRecoveryErrors": [
+        "IdempotencyRecordExpired"
+      ],
+      "allowedKnownFailures": [],
+      "allowedAmbiguities": [],
+      "recoveryCoordinates": [
+        "system-origin-trigger-record"
+      ],
+      "refinesPacketASurfaces": [
+        "runtime.cleanup-errors",
+        "operator.cleanup-reconciliation"
+      ],
+      "refinesPacketBFields": [],
+      "invariants": [
+        "FEN-001",
+        "SBX-018",
+        "ADP-012",
+        "ADP-014",
+        "PRF-005",
+        "PRF-014"
+      ],
+      "delegatedPackets": [],
+      "rationale": "Resolves an unproven Sandbox or Process observation against fenced evidence of the exact claimed epoch. Non-caller-invocable; surfaces as a wire-visible Operation kind so system work stays observable.",
+      "coverageStatus": "generated"
+    }
+  ],
+  "nonOperationCoverage": {
+    "principle": "A registered Packet E invariant governed by no operation record is a defect UNLESS its owner places it outside the operation surface. These assignments are declared so the zero coverage is stated, not accidental.",
+    "assignments": [
+      {
+        "ledger": "Packet B Artifact validation",
+        "owner": "artifact",
+        "invariants": [
+          "ADM-016",
+          "ADM-019",
+          "RET-005"
+        ],
+        "reason": "Artifact-owned declaration rules decided at A0/A1 before any operation exists."
+      },
+      {
+        "ledger": "framework adapter obligation ledger",
+        "owner": "framework",
+        "invariants": [
+          "ADP-004",
+          "ADP-005",
+          "ADP-006",
+          "ADP-010"
+        ],
+        "reason": "Adapter-owned translation rules at F0; the adapter is not a Core operation."
+      },
+      {
+        "ledger": "Managed-Sandbox Service Definition",
+        "owner": "service",
+        "invariants": [
+          "ADP-013"
+        ],
+        "reason": "Service-owned reconciliation rule at S0."
+      },
+      {
+        "ledger": "driver conformance ledger",
+        "owner": "runtime",
+        "invariants": [
+          "CNC-001",
+          "FEN-003",
+          "FEN-005",
+          "FRK-006"
+        ],
+        "reason": "Driver-owned proof obligations at D0/R0/R1; the driver is not a Core operation."
+      }
+    ]
+  }
+}
