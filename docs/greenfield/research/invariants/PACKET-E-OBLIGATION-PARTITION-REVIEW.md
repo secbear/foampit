@@ -217,3 +217,64 @@ Ranked by (probability the class has more instances) × (cost of a post-allocati
 6. **Statement fidelity to locked sources.** [206] (inverted escape hatch), [199] (dropped tuple member, over-strong permanence), [52]/[208] (unsourced "Operation") are three independent instances of statement text drifting from the locked records. These are the hardest to find mechanically and the most damaging downstream, since `statement` is the field the ~1,000 generated selectors are derived from.
 
 **Sequencing recommendation:** apply B1–B3 and all majors, resolve the five conditional additions ([51]×2, [86]/[94]×2, [152]×1) so the final count is fixed, run the sweep in item 1 above, then allocate. Do not allocate against 209.
+---
+
+# Addendum: Task 7A declined with evidence
+
+Date: 2026-08-02
+
+The plan's Task 7A directed extending the Packet D contract templates into the
+post-launch region (`R0`, `R1`, `L1`, `E1`, `T0`), on the stated premise that
+Packet E entries filed there "generate a degenerate one-step chain recording no
+defensive revalidation boundary". **Measured against the real generated matrix,
+that premise is wrong, and executing the task would have manufactured false
+coverage rather than repairing thin coverage.**
+
+## What the data shows
+
+Of 4,428 generated cells for the 82 Packet E invariants at post-launch phases,
+1,524 carry a one-step `boundaryChain`. Partitioning those by whether the
+invariant spans phases at all:
+
+| | one-step chains |
+|---|---:|
+| invariant is a self-loop (`firstSoundPhase == rejectionDeadline`) | **1,487** |
+| invariant spans phases (`firstSoundPhase != rejectionDeadline`) | 37 |
+
+A self-loop invariant is decided at exactly one station. There is no later
+boundary on its traversal, so a one-step chain is the **correct** answer, not a
+gap. That accounts for 97.6% of the supposed defect.
+
+The remaining 37 cells belong to two invariants, `PRF-008` and `FRK-003`, both
+`R0 -> R1`. Every one of them sits on a path that terminates upstream of both
+phases — `resolved-driver-handoff` ends at `D0`, `serialized-resolved-reentry`
+at `D0`, and the native-extension paths earlier still. A path that never reaches
+`R0` or `R1` has no revalidation to offer for a rule decided there. Their chains
+are honest too.
+
+## The authority reading that prompted the task
+
+`PRF-008` declares its authoritative hook at `R1/post-create-conformance-prober`
+while its cell on `resolved-driver-handoff` records `authority` as
+`C0/creation-resolver`, which looks like a misattribution. It is not. Cell
+`authority` is the **path-scoped** boundary that decides the invariant on that
+path; the registry hook is the invariant's **global** authority. They are
+different fields answering different questions, and they differ for 91% of the
+original Packet A-D cells as well — measured, not assumed. Packet E is
+consistent with the established model at 94%.
+
+## Ruling
+
+**Task 7A is declined.** All 54 composition paths terminate at or before driver
+preparation by design; the path universe deliberately does not model launch,
+conformance, live mutation, process launch, or teardown. Adding post-launch
+steps to those templates would assert that a configuration composition path
+reaches stations it does not reach — the same class of false coverage claim the
+phase ruling's hard prohibition forbids, arriving by a different route.
+
+Extending coverage into the post-launch region is a **path-universe** question,
+not a template question. It would mean adding post-launch composition paths to
+Packet D's locked 54, which is a genuine reopening with its own justification
+burden, and it is not required for Packet E to close.
+
+The plan text is corrected accordingly.

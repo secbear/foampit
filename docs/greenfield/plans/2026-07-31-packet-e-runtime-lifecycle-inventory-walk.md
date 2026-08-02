@@ -1044,7 +1044,19 @@ ends fully green; no batch may leave the gate red for the next.
 
 ---
 
-### Task 7A: Extend the Packet D contract templates into the post-launch region
+### Task 7A: Extend the Packet D contract templates into the post-launch region — DECLINED
+
+**DECLINED 2026-08-02 with measured evidence.** See the addendum in
+`PACKET-E-OBLIGATION-PARTITION-REVIEW.md`. The premise below is wrong: 1,487 of
+the 1,524 one-step chains belong to self-loop invariants, for which a one-step
+chain is correct because no later boundary exists on the traversal. The other 37
+sit on paths terminating upstream of the phases in question. Executing this task
+would assert that configuration composition paths reach stations they do not
+reach — false coverage, not repaired coverage. Extending into the post-launch
+region is a path-universe question for a future scoped Packet D reopening, not a
+template question, and is not required for Packet E to close.
+
+The original premise, retained for the record:
 
 Packet E is the first packet to inhabit the post-launch region, and the region
 has no template vocabulary. Verified: `P0`, `R0`, `R1`, `L1`, `E1`, and `T0`
