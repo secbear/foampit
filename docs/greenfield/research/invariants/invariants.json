@@ -31636,7 +31636,7 @@
     {
       "id": "PRC-016",
       "title": "Process observation or wait deadline mutating or terminalizing its target",
-      "statement": "A `WaitProcess`, `GetProcess`, or `ReadProcessOutput` deadline ends only that observation and never cancels, mutates, terminalizes, or advances the durable state of the observed Process or its output stream.",
+      "statement": "A `WaitProcess`, `GetProcess`, `ListProcesses`, or `ReadProcessOutput` deadline ends only that observation and never cancels, mutates, terminalizes, or advances the durable state of the observed Process or its output stream.",
       "owner": "core",
       "scope": "v1",
       "status": "specified",
@@ -31739,7 +31739,7 @@
         "remediation": "Return the observation result with the latest Process record and an explicit condition-met flag; leave the observed Process and its output stream unchanged.",
         "secretSafe": true
       },
-      "notes": "Packet E PRC family; discharges IDENTITY-17, RESULT-30. Traversal: one Process observation (WaitProcess, GetProcess, ReadProcessOutput) against an existing Process."
+      "notes": "Packet E PRC family; discharges IDENTITY-17, RESULT-30. Traversal: one Process observation (WaitProcess, GetProcess, ReadProcessOutput) against an existing Process. Subject list amended 2026-08-02 to include ListProcesses: the Packet E transition matrix cited PRC-016 on all six ListProcesses cells while the closed three-member subject list did not reach the method."
     },
     {
       "id": "PRC-017",

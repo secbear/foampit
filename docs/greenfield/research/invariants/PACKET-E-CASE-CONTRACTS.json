@@ -1,0 +1,3800 @@
+{
+  "reviewVersion": 1,
+  "packet": "E",
+  "status": "candidate",
+  "authority": "Candidate Packet E version 1 case-contract catalog. Only the closed structured control fields below are normative; prose carries no authority against them.",
+  "cellKindContract": {
+    "T": "transition -- the operation is admitted and commits a new durable effect. nextLifecycleStateId names the resulting composite, WHICH MAY EQUAL THE STARTING COMPOSITE when the committed effect is not a lifecycle-state change.",
+    "R": "replay -- an equal idempotent replay recovers the original handle and dispatches no new effect.",
+    "J": "reject -- admission refuses with exactly one declared RequestError variant.",
+    "N": "noop -- admitted, the operation's own declared postcondition is provably already satisfied, AND no new durable record is committed. This is the discriminator against T.",
+    "U": "unsupported -- the capability is not advertised for this operation in this state."
+  },
+  "sentinelContract": {
+    "none": "Declared sentinel for nextLifecycleStateId, requestErrorId, recoveryErrorId, and terminalOutcome. terminalOutcome is a terminalOutcomes member IFF the cell's operation has resultCarrierKind = durable-operation and the cell commits or recovers an Operation; it is 'none' for every observation, receipt, Process, core-record, and existing-handle carrier. Coercing those cells to 'succeeded' would assert an Operation outcome for calls that mint no Operation.",
+    "recoveryErrorId": "Always 'none' at cell level. Recovery-error branches are carried exclusively inside valueCases, never on the cell."
+  },
+  "epochRuleContract": {
+    "noopRule": "A noop commits no effect and therefore neither allocates, consumes, nor takes the epoch as an effect-bearing precondition. epochRule on every N cell is 'no-epoch' regardless of whether an epoch is present."
+  },
+  "offAxisDeclarations": [
+    {
+      "operationId": "CreateSandbox",
+      "declaration": "CreateSandbox's admitting coordinate is `Sandbox ID absent`, which is NOT a lifecycle composite. The six cells of this row therefore describe only replay against an already-bound Sandbox, and epochRule 'no-epoch' is a statement about the replay, not about Create. Create's own epoch rules -- epoch 1 before launch effects for Create-running and running restore-as-create, no epoch until first Start for Create-stopped and stopped restore-as-create -- are out of scope for this axis. Without this declaration the row would read as a totality claim the matrix cannot support."
+    }
+  ],
+  "lifecycleStateIds": [
+    "provisioning/closed",
+    "running/accepting",
+    "running/closed",
+    "suspended/closed",
+    "stopped/closed",
+    "unknown/closed"
+  ],
+  "operationIds": [
+    "CancelOperation",
+    "CloseProcessInput",
+    "CreateSandbox",
+    "CreateSnapshot",
+    "DeleteSandbox",
+    "DeleteSnapshot",
+    "Exec",
+    "ForkSandbox",
+    "GetOperation",
+    "GetProcess",
+    "GetSandbox",
+    "GetSnapshot",
+    "ListOperations",
+    "ListProcesses",
+    "ListSandboxes",
+    "ListSnapshots",
+    "ReadProcessOutput",
+    "ResizeProcessTerminal",
+    "ResizeSandboxResources",
+    "RestoreSandbox",
+    "ResumeSandbox",
+    "SetSandboxExpiration",
+    "SignalProcess",
+    "StartSandbox",
+    "StopSandbox",
+    "SuspendSandbox",
+    "TerminateProcess",
+    "UpdateSandboxMetadata",
+    "WaitOperation",
+    "WaitProcess",
+    "WaitSandbox",
+    "WriteProcessInput",
+    "adopt",
+    "cleanup",
+    "fence",
+    "quarantine",
+    "reconcile"
+  ],
+  "transitionVectorsByOperation": {
+    "CreateSandbox": "RRRRRR",
+    "StartSandbox": "JJJJTJ",
+    "StopSandbox": "JTTTNJ",
+    "DeleteSandbox": "JJJJTJ",
+    "SuspendSandbox": "JTTNJJ",
+    "ResumeSandbox": "JJJTJJ",
+    "ResizeSandboxResources": "JTTJTJ",
+    "UpdateSandboxMetadata": "TTTTTT",
+    "SetSandboxExpiration": "TTTTTT",
+    "CancelOperation": "TTTTTT",
+    "Exec": "JTJJJJ",
+    "TerminateProcess": "JTTJNJ",
+    "SignalProcess": "JTTJJJ",
+    "WriteProcessInput": "JTTJJJ",
+    "CloseProcessInput": "JTTJJJ",
+    "ResizeProcessTerminal": "JTTJJJ",
+    "GetSandbox": "NNNNNN",
+    "ListSandboxes": "NNNNNN",
+    "WaitSandbox": "NNNNNN",
+    "GetOperation": "NNNNNN",
+    "ListOperations": "NNNNNN",
+    "WaitOperation": "NNNNNN",
+    "GetProcess": "NNNNNN",
+    "ListProcesses": "NNNNNN",
+    "WaitProcess": "NNNNNN",
+    "GetSnapshot": "NNNNNN",
+    "ListSnapshots": "NNNNNN",
+    "ReadProcessOutput": "NNNNNN",
+    "CreateSnapshot": "JTTTJJ",
+    "DeleteSnapshot": "TTTTTT",
+    "RestoreSandbox": "JJJJTJ",
+    "ForkSandbox": "JTTTJJ",
+    "reconcile": "TTTTTT",
+    "adopt": "NNNNTT",
+    "fence": "TTTTTT",
+    "quarantine": "NTTNNN",
+    "cleanup": "TTTTTT"
+  },
+  "entries": [
+    {
+      "operationId": "CancelOperation",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "provisioning/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "OPA-017",
+            "IDE-004",
+            "PRF-002",
+            "ERR-014",
+            "ADP-007"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/accepting",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "OPA-017",
+            "PRF-005",
+            "PRF-002",
+            "SBX-003",
+            "ERR-002"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "OPA-017",
+            "CNC-002",
+            "SBX-003",
+            "ADP-007",
+            "PRF-002"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "suspended/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "OPA-017",
+            "ADM-011",
+            "SBX-008",
+            "PRF-002",
+            "PRF-013"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "stopped/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "OPA-017",
+            "RET-006",
+            "PRF-011",
+            "PRF-005",
+            "ERR-011"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "unknown/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "OPA-017",
+            "SBX-012",
+            "PRF-002",
+            "PRF-013",
+            "ADP-014"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "CloseProcessInput",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "StaleRuntime",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PIO-008",
+            "PIO-012",
+            "IDE-008",
+            "ERR-003",
+            "ERR-006"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/accepting",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "retains-epoch",
+          "invariants": [
+            "PIO-015",
+            "PIO-011",
+            "PIO-013",
+            "PIO-016",
+            "PIO-009"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "retains-epoch",
+          "invariants": [
+            "ADM-007",
+            "PIO-015",
+            "PIO-016",
+            "PIO-013",
+            "PIO-011"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "StaleWriterLease",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PIO-018",
+            "PIO-015",
+            "PIO-012",
+            "IDE-014",
+            "PIO-009"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRC-007",
+            "PIO-017",
+            "PIO-019",
+            "PIO-015",
+            "ERR-006"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SBX-012",
+            "FEN-001",
+            "PIO-015",
+            "PIO-016",
+            "PIO-008"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "CreateSandbox",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "R",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "OPA-007",
+            "OPA-004",
+            "IDE-002",
+            "PRF-008",
+            "OPA-023"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "R",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "OPA-007",
+            "OPA-001",
+            "SBX-014",
+            "PRF-005",
+            "IDE-001"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "R",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "OPA-007",
+            "ADM-012",
+            "PRF-005",
+            "ERR-013",
+            "OPA-023"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "R",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "OPA-007",
+            "OPA-013",
+            "PRF-005",
+            "IDE-001",
+            "ERR-010"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "R",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "OPA-007",
+            "SBX-002",
+            "IDE-002",
+            "PRF-005",
+            "OPA-023"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "R",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "OPA-007",
+            "SBX-025",
+            "PRF-005",
+            "PRF-009",
+            "OPA-020"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "CreateSnapshot",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "CNC-002",
+            "IDE-011",
+            "SOP-006",
+            "OPA-008",
+            "ERR-002"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/accepting",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "retains-epoch",
+          "invariants": [
+            "SOP-005",
+            "SOP-006",
+            "SOP-008",
+            "SOP-004",
+            "ADM-010",
+            "CNC-002"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "retains-epoch",
+          "invariants": [
+            "SBX-005",
+            "SOP-005",
+            "SOP-006",
+            "IDE-011",
+            "CNC-002"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "suspended/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "retains-epoch",
+          "invariants": [
+            "SOP-005",
+            "SOP-006",
+            "SOP-009",
+            "PRC-012",
+            "ADM-013"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "IDE-011",
+            "SOP-006",
+            "ADM-014",
+            "ADM-002",
+            "ERR-005"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SBX-012",
+            "FEN-001",
+            "PRF-010",
+            "SOP-006",
+            "ERR-002"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "DeleteSandbox",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "ADM-005",
+            "ADM-001",
+            "PRF-004",
+            "CNC-002",
+            "ERR-002"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "ADM-005",
+            "ADM-001",
+            "SBX-021",
+            "RET-001",
+            "ERR-002"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "ADM-005",
+            "ADM-010",
+            "SBX-021",
+            "ADM-001",
+            "ERR-002"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "ADM-005",
+            "PRC-007",
+            "SBX-021",
+            "ADM-001",
+            "ERR-002"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "stopped/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "ADM-005",
+            "SBX-021",
+            "RET-001",
+            "RET-002",
+            "RET-007",
+            "PRF-011"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "ADM-005",
+            "SBX-012",
+            "SBX-021",
+            "PRF-011",
+            "ERR-002"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "DeleteSnapshot",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "provisioning/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "IDE-011",
+            "CNC-002",
+            "RET-001",
+            "SOP-001",
+            "RET-010"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/accepting",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "RET-010",
+            "IDE-010",
+            "SOP-001",
+            "PRF-004",
+            "OPA-014"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "IDE-010",
+            "SOP-001",
+            "RET-010",
+            "PRF-006",
+            "ERR-002"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "suspended/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "RET-010",
+            "PRF-004",
+            "SOP-001",
+            "IDE-011",
+            "OPA-014"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "stopped/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "RET-002",
+            "RET-001",
+            "RET-010",
+            "PRF-011",
+            "SOP-001"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "unknown/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "FEN-001",
+            "RET-010",
+            "PRF-011",
+            "PRF-004",
+            "SOP-001"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "Exec",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "AdmissionClosed",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SBX-005",
+            "ADM-012",
+            "ADM-007",
+            "OPA-003",
+            "ERR-003"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/accepting",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "retains-epoch",
+          "invariants": [
+            "ADM-007",
+            "ADM-009",
+            "IDE-005",
+            "IDE-015",
+            "OPA-006"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "AdmissionClosed",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "ADM-007",
+            "ADM-010",
+            "SBX-005",
+            "OPA-009",
+            "ERR-003"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "AdmissionClosed",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "ADM-011",
+            "PRC-012",
+            "SBX-006",
+            "SBX-005",
+            "ADM-007"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "AdmissionClosed",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SBX-005",
+            "ADM-001",
+            "ADM-014",
+            "ADM-017",
+            "ERR-003"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "AdmissionClosed",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SBX-012",
+            "FEN-002",
+            "PRF-009",
+            "SBX-005",
+            "ADM-007"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "ForkSandbox",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "CNC-002",
+            "FRK-004",
+            "SOP-006",
+            "IDE-011",
+            "ERR-002"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/accepting",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "retains-source-epoch-allocates-child-epoch-1",
+          "invariants": [
+            "FRK-004",
+            "FRK-002",
+            "SOP-005",
+            "SOP-006",
+            "SBX-014"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "retains-source-epoch-allocates-child-epoch-1",
+          "invariants": [
+            "FRK-004",
+            "SBX-005",
+            "SOP-005",
+            "SOP-006",
+            "CNC-002"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "suspended/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "retains-source-epoch-allocates-child-epoch-1",
+          "invariants": [
+            "FRK-004",
+            "SOP-005",
+            "SOP-006",
+            "SOP-003",
+            "PRC-012"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "FRK-004",
+            "SOP-006",
+            "ADM-014",
+            "ADM-002",
+            "ERR-005"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SBX-012",
+            "FRK-004",
+            "FEN-001",
+            "PRF-010",
+            "ERR-002"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "GetOperation",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "PRF-005",
+            "OPA-016",
+            "ERR-014"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "PRF-013",
+            "ADP-012",
+            "ERR-014"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "PRF-013",
+            "PRC-002",
+            "ERR-014"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "PRF-005",
+            "ADP-014",
+            "ERR-014"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "PRF-014",
+            "RET-001",
+            "RET-006"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "PRF-005",
+            "PRC-002",
+            "ADP-014"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "GetProcess",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRC-016",
+            "IDE-015",
+            "PRC-011",
+            "PRC-001"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRC-016",
+            "PRC-013",
+            "PRC-014",
+            "ADP-008"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRC-016",
+            "PRC-010",
+            "PRC-002",
+            "PRC-008"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRC-016",
+            "PRC-012",
+            "PRC-013",
+            "PRC-002"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRC-016",
+            "PRC-007",
+            "PRC-014",
+            "PIO-005"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRC-016",
+            "PRC-002",
+            "PRC-009",
+            "PRC-010"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "GetSandbox",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "SBX-003",
+            "SBX-024",
+            "ADP-003"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "SBX-005",
+            "SBX-003",
+            "ERR-014"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "SBX-005",
+            "SBX-013",
+            "SBX-004"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "SBX-004",
+            "SBX-013",
+            "ADP-003"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "SBX-004",
+            "ERR-008",
+            "ADP-003"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "SBX-012",
+            "ERR-014",
+            "ADP-007"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "GetSnapshot",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "IDE-009",
+            "IDE-010",
+            "SOP-001"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "SOP-007",
+            "SOP-009",
+            "IDE-010"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "SOP-009",
+            "SOP-004",
+            "IDE-009"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "SOP-003",
+            "SOP-009",
+            "IDE-010"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "SOP-007",
+            "FRK-001",
+            "SOP-004"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "RET-001",
+            "SOP-001",
+            "IDE-010"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "ListOperations",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "PRF-005",
+            "ERR-008",
+            "ADP-012"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "ADP-012",
+            "ERR-008",
+            "ERR-014"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "PRF-013",
+            "ADP-012",
+            "ERR-008"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "PRF-005",
+            "ADP-014",
+            "ERR-008"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "RET-006",
+            "RET-001",
+            "ERR-008"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "PRF-005",
+            "ADP-014",
+            "ADP-012"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "ListProcesses",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRC-016",
+            "IDE-015",
+            "IDE-006",
+            "PRC-013"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRC-016",
+            "PRC-013",
+            "PRC-014",
+            "IDE-015"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRC-016",
+            "PRC-010",
+            "PRC-002",
+            "PRC-008"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRC-016",
+            "PRC-012",
+            "PRC-013",
+            "SOP-005"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRC-016",
+            "PRC-007",
+            "PRC-014",
+            "RET-001"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRC-016",
+            "PRC-002",
+            "PRC-009",
+            "PRC-010"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "ListSandboxes",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "SBX-024",
+            "SBX-003",
+            "ERR-008"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "SBX-005",
+            "SBX-003",
+            "ERR-008"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "SBX-005",
+            "SBX-013",
+            "ERR-008"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "SBX-004",
+            "SBX-013",
+            "ERR-008"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "SBX-004",
+            "ERR-008",
+            "ADP-003"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "SBX-012",
+            "ERR-014",
+            "ADP-003"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "ListSnapshots",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "IDE-009",
+            "SOP-001",
+            "ERR-008"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "SOP-001",
+            "SOP-009",
+            "ERR-008"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "SOP-004",
+            "SOP-001",
+            "ERR-008"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "SOP-003",
+            "SOP-009",
+            "ERR-008"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "RET-002",
+            "RET-001",
+            "SOP-001"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "RET-001",
+            "SOP-001",
+            "ERR-008"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "ReadProcessOutput",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRC-016",
+            "RET-001",
+            "IDE-020",
+            "PIO-003"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRC-016",
+            "PIO-001",
+            "PIO-002",
+            "PIO-003"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRC-016",
+            "PIO-003",
+            "PIO-001",
+            "RET-001"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRC-016",
+            "PIO-005",
+            "PIO-006",
+            "RET-001"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRC-016",
+            "PIO-017",
+            "PIO-019",
+            "PIO-007"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRC-016",
+            "PIO-005",
+            "PRC-002",
+            "RET-001"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "ResizeProcessTerminal",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "StaleRuntime",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PIO-014",
+            "PIO-008",
+            "PIO-012",
+            "IDE-008",
+            "ERR-006"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/accepting",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "retains-epoch",
+          "invariants": [
+            "PIO-014",
+            "PIO-011",
+            "PIO-013",
+            "PIO-016",
+            "PIO-009"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "retains-epoch",
+          "invariants": [
+            "ADM-007",
+            "PIO-014",
+            "PIO-016",
+            "PIO-013",
+            "PIO-011"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "StaleWriterLease",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PIO-018",
+            "PIO-014",
+            "PIO-012",
+            "IDE-014",
+            "SBX-006"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PIO-014",
+            "PRC-007",
+            "PIO-017",
+            "PIO-016",
+            "ERR-006"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SBX-012",
+            "PIO-014",
+            "PRC-002",
+            "FEN-001",
+            "PIO-016"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "ResizeSandboxResources",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SBX-009",
+            "SBX-010",
+            "ADM-002",
+            "CNC-002",
+            "ERR-002"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/accepting",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "retains-epoch",
+          "invariants": [
+            "SBX-009",
+            "IDE-013",
+            "ADM-003",
+            "PRF-002",
+            "ADM-002"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "retains-epoch",
+          "invariants": [
+            "SBX-009",
+            "SBX-005",
+            "IDE-013",
+            "PRF-002",
+            "ADM-002"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SBX-009",
+            "SBX-010",
+            "SBX-005",
+            "ADM-002",
+            "ERR-002"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "stopped/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SBX-010",
+            "ADM-003",
+            "IDE-018",
+            "PRF-002",
+            "ADM-002"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SBX-012",
+            "SBX-009",
+            "SBX-010",
+            "PRF-002",
+            "ERR-002"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "RestoreSandbox",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "CNC-002",
+            "FRK-001",
+            "IDE-004",
+            "OPA-008",
+            "ERR-002"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "FRK-001",
+            "ADM-014",
+            "ADM-002",
+            "IDE-011",
+            "ERR-005"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "FRK-001",
+            "SBX-005",
+            "CNC-002",
+            "ADM-014",
+            "ERR-002"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "FRK-001",
+            "FRK-003",
+            "SBX-006",
+            "ADM-014",
+            "ERR-005"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/accepting",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "allocates-next-epoch",
+          "invariants": [
+            "FRK-001",
+            "FRK-003",
+            "FRK-002",
+            "IDE-004",
+            "SBX-014",
+            "SBX-025"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "FRK-001",
+            "SBX-012",
+            "PRF-009",
+            "FEN-002",
+            "ERR-002"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "ResumeSandbox",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SBX-008",
+            "ADM-011",
+            "ADM-002",
+            "CNC-002",
+            "ERR-002"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SBX-008",
+            "ADM-011",
+            "SBX-005",
+            "IDE-014",
+            "ERR-002"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SBX-008",
+            "SBX-005",
+            "ADM-011",
+            "ADM-001",
+            "ERR-002"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/accepting",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "retains-epoch",
+          "invariants": [
+            "SBX-008",
+            "SBX-007",
+            "SBX-023",
+            "ADM-011",
+            "FEN-002",
+            "SBX-005"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SBX-008",
+            "ADM-011",
+            "ADM-001",
+            "ADM-002",
+            "ERR-002"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SBX-012",
+            "SBX-008",
+            "FEN-002",
+            "PRF-002",
+            "ERR-002"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "SetSandboxExpiration",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "provisioning/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "RET-003",
+            "RET-004",
+            "ADM-006",
+            "OPA-018",
+            "SBX-003"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/accepting",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "ADM-007",
+            "ADM-006",
+            "POL-002",
+            "RET-003",
+            "OPA-018"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "RET-008",
+            "PRF-005",
+            "ADM-006",
+            "IDE-008",
+            "OPA-018"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "suspended/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "ADM-006",
+            "SBX-006",
+            "RET-009",
+            "RET-003",
+            "OPA-018"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "stopped/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "RET-008",
+            "ADM-005",
+            "ADM-006",
+            "RET-003",
+            "OPA-018"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "unknown/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SBX-012",
+            "SBX-017",
+            "ADM-006",
+            "RET-009",
+            "FEN-001"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "SignalProcess",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "StaleRuntime",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "IDE-006",
+            "IDE-012",
+            "SIG-003",
+            "ERR-002",
+            "ERR-005"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/accepting",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "retains-epoch",
+          "invariants": [
+            "SIG-001",
+            "SIG-007",
+            "SIG-004",
+            "OPA-002",
+            "OPA-005"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "retains-epoch",
+          "invariants": [
+            "ADM-007",
+            "CNC-002",
+            "SIG-005",
+            "SIG-007",
+            "PRC-001"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SIG-002",
+            "SIG-001",
+            "SBX-006",
+            "ADM-013",
+            "ERR-005"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SIG-007",
+            "SIG-004",
+            "SIG-003",
+            "ADM-013",
+            "PRC-007"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SBX-012",
+            "SIG-007",
+            "SIG-005",
+            "FEN-002",
+            "PRF-010"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "StartSandbox",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "ADM-017",
+            "IDE-004",
+            "OPA-008",
+            "ERR-002",
+            "SBX-024"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "ADM-017",
+            "FEN-007",
+            "PRC-011",
+            "ADM-001",
+            "ERR-011"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "ADM-017",
+            "FEN-007",
+            "ADM-001",
+            "ERR-002",
+            "ERR-011"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "ADM-017",
+            "IDE-004",
+            "FEN-007",
+            "PRC-011",
+            "ERR-002"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/accepting",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "allocates-next-epoch",
+          "invariants": [
+            "ADM-017",
+            "IDE-004",
+            "FEN-007",
+            "SBX-022",
+            "SBX-014",
+            "ADM-012"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "ADM-017",
+            "SBX-025",
+            "FEN-007",
+            "FEN-004",
+            "ERR-002"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "StopSandbox",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "ConcurrentOperation",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "CNC-002",
+            "OPA-008",
+            "SBX-019",
+            "FEN-001",
+            "ERR-002"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "T",
+          "nextLifecycleStateId": "stopped/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "consumes-epoch",
+          "invariants": [
+            "ADM-010",
+            "PRC-007",
+            "SBX-019",
+            "SBX-020",
+            "SBX-011",
+            "PRF-004"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "stopped/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "consumes-epoch",
+          "invariants": [
+            "ADM-010",
+            "PRC-007",
+            "SBX-019",
+            "SBX-020",
+            "PIO-019",
+            "PIO-017",
+            "SBX-011"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "stopped/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "consumes-epoch",
+          "invariants": [
+            "ADM-010",
+            "PRC-007",
+            "SBX-019",
+            "PIO-017",
+            "PRF-004",
+            "SBX-011"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "RET-008",
+            "SBX-017",
+            "ADM-002",
+            "SBX-003",
+            "PRF-004"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SBX-012",
+            "SBX-020",
+            "PRF-011",
+            "ERR-002",
+            "ADM-002"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "SuspendSandbox",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SBX-006",
+            "SBX-005",
+            "ADM-002",
+            "CNC-002",
+            "ERR-002"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "T",
+          "nextLifecycleStateId": "suspended/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "retains-epoch",
+          "invariants": [
+            "SBX-006",
+            "SBX-007",
+            "SBX-023",
+            "ADM-010",
+            "PRC-012",
+            "SBX-005"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "suspended/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "retains-epoch",
+          "invariants": [
+            "SBX-006",
+            "SBX-007",
+            "ADM-010",
+            "PRC-012",
+            "SBX-023"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SBX-006",
+            "ADM-010",
+            "PRC-012",
+            "ADM-002",
+            "PRF-013"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SBX-006",
+            "SBX-007",
+            "ADM-002",
+            "ADM-001",
+            "ERR-002"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SBX-012",
+            "SBX-006",
+            "SBX-007",
+            "PRF-002",
+            "ERR-002"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "TerminateProcess",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "StaleRuntime",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "IDE-006",
+            "IDE-011",
+            "IDE-012",
+            "ERR-002",
+            "ERR-005"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/accepting",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "retains-epoch",
+          "invariants": [
+            "SIG-006",
+            "PRC-003",
+            "PRC-015",
+            "OPA-005",
+            "PRF-002"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "retains-epoch",
+          "invariants": [
+            "ADM-007",
+            "CNC-002",
+            "SIG-006",
+            "OPA-005",
+            "PRF-002"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SIG-006",
+            "SBX-006",
+            "ADM-013",
+            "ADM-014",
+            "ERR-005"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRC-007",
+            "SIG-006",
+            "PRC-001",
+            "IDE-006",
+            "PRC-003"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SBX-012",
+            "SIG-006",
+            "PRC-009",
+            "FEN-002",
+            "PRF-010"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "UpdateSandboxMetadata",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "provisioning/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "ADM-003",
+            "ADM-006",
+            "OPA-018",
+            "IDE-018",
+            "SBX-003"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/accepting",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "ADM-003",
+            "ADM-006",
+            "IDE-019",
+            "SBX-003",
+            "OPA-018"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "ADM-006",
+            "ADM-007",
+            "SBX-003",
+            "OPA-018",
+            "IDE-018"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "suspended/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "ADM-006",
+            "SBX-006",
+            "IDE-008",
+            "OPA-018",
+            "SBX-003"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "stopped/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "ADM-006",
+            "IDE-018",
+            "RET-001",
+            "OPA-018",
+            "SBX-003"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "unknown/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SBX-012",
+            "ADM-006",
+            "FEN-001",
+            "OPA-019",
+            "OPA-018"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "WaitOperation",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "PRF-005",
+            "ERR-014",
+            "ADP-007"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "ADP-012",
+            "ERR-014",
+            "ADP-007"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "PRF-013",
+            "ERR-014",
+            "ADP-007"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "PRF-005",
+            "ADP-014",
+            "ERR-014"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "OPA-016",
+            "RET-006",
+            "ERR-014"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "OPA-016",
+            "ADP-009",
+            "ERR-014"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "WaitProcess",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRC-016",
+            "PRC-011",
+            "PRC-001",
+            "IDE-015"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRC-016",
+            "PRC-014",
+            "ADP-007",
+            "PRC-001"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRC-016",
+            "PRC-010",
+            "PRC-002",
+            "PRC-008"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRC-016",
+            "PRC-012",
+            "PRC-013",
+            "ADP-007"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRC-016",
+            "PRC-007",
+            "PRC-014",
+            "PIO-005"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRC-016",
+            "PRC-002",
+            "PRC-009",
+            "ADP-007"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "WaitSandbox",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "SBX-025",
+            "SBX-024",
+            "ERR-014"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "SBX-005",
+            "ERR-014",
+            "ADP-007"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "SBX-005",
+            "SBX-013",
+            "ERR-014"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "SBX-004",
+            "ADP-003",
+            "ERR-014"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "SBX-004",
+            "ERR-014",
+            "ADP-007"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRF-007",
+            "SBX-012",
+            "SBX-025",
+            "ERR-014"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "WriteProcessInput",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "StaleRuntime",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PIO-008",
+            "PIO-012",
+            "IDE-008",
+            "ERR-003",
+            "ERR-006"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/accepting",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "retains-epoch",
+          "invariants": [
+            "PIO-011",
+            "PIO-009",
+            "PIO-010",
+            "PIO-013",
+            "PIO-004"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "retains-epoch",
+          "invariants": [
+            "ADM-007",
+            "PIO-013",
+            "PIO-016",
+            "PIO-008",
+            "PIO-011"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "StaleWriterLease",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PIO-018",
+            "PIO-012",
+            "PIO-009",
+            "IDE-014",
+            "SBX-006"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "PRC-007",
+            "PIO-017",
+            "PIO-016",
+            "PIO-013",
+            "ERR-006"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "J",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "InvalidState",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "none",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SBX-012",
+            "FEN-001",
+            "PIO-016",
+            "PIO-008",
+            "PRC-010"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "adopt",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SBX-018",
+            "PRF-008",
+            "ADM-012",
+            "FEN-001",
+            "ADP-012"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SBX-018",
+            "SBX-005",
+            "SBX-012",
+            "FEN-001",
+            "ADP-012"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SBX-018",
+            "ADM-008",
+            "SBX-005",
+            "FEN-001",
+            "ADP-012"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SBX-018",
+            "SBX-008",
+            "SBX-012",
+            "FEN-001",
+            "ADP-012"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "allocates-next-epoch",
+          "invariants": [
+            "SBX-018",
+            "IDE-004",
+            "ADM-008",
+            "ADM-012",
+            "SBX-014"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "allocates-next-epoch",
+          "invariants": [
+            "SBX-018",
+            "IDE-004",
+            "FEN-002",
+            "PRC-011",
+            "PRF-009"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "cleanup",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "stopped/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "consumes-epoch",
+          "invariants": [
+            "IDE-004",
+            "SBX-025",
+            "SBX-020",
+            "PRF-014",
+            "ADP-014"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/accepting",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "retains-epoch",
+          "invariants": [
+            "PRF-011",
+            "PRC-011",
+            "FEN-001",
+            "PRF-014",
+            "ADP-012"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "retains-epoch",
+          "invariants": [
+            "PRF-011",
+            "PRC-015",
+            "PRC-009",
+            "FEN-001",
+            "PRF-014"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "suspended/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "retains-epoch",
+          "invariants": [
+            "PRC-012",
+            "SBX-007",
+            "PRF-011",
+            "PRC-009",
+            "FEN-001"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "stopped/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "retains-epoch",
+          "invariants": [
+            "PRF-011",
+            "RET-007",
+            "SBX-021",
+            "PRF-014",
+            "FEN-001"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "stopped/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "consumes-epoch",
+          "invariants": [
+            "SBX-019",
+            "SBX-020",
+            "PRC-015",
+            "PRC-006",
+            "PRF-014"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "fence",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "provisioning/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "retains-epoch-advances-authority-epoch",
+          "invariants": [
+            "FEN-007",
+            "FEN-001",
+            "FEN-002",
+            "PRC-009",
+            "ADP-012"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "retains-epoch-advances-authority-epoch",
+          "invariants": [
+            "SBX-005",
+            "FEN-002",
+            "PRC-009",
+            "FEN-001",
+            "ADM-012"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "retains-epoch-advances-authority-epoch",
+          "invariants": [
+            "FEN-001",
+            "FEN-002",
+            "FEN-004",
+            "FEN-006",
+            "PRC-009"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "suspended/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "retains-epoch-advances-authority-epoch",
+          "invariants": [
+            "PRC-009",
+            "PRC-012",
+            "FEN-001",
+            "FEN-002",
+            "SBX-007"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "stopped/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "retains-epoch-advances-authority-epoch",
+          "invariants": [
+            "FEN-007",
+            "FEN-001",
+            "PRC-009",
+            "SBX-019",
+            "ADP-012"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "unknown/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "retains-epoch-advances-authority-epoch",
+          "invariants": [
+            "FEN-001",
+            "FEN-002",
+            "PRC-009",
+            "SBX-012",
+            "ADP-012"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "quarantine",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SBX-025",
+            "ADP-014",
+            "ADP-012",
+            "FEN-001",
+            "FEN-004"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "retains-epoch",
+          "invariants": [
+            "FEN-004",
+            "SBX-005",
+            "PRC-009",
+            "FEN-001",
+            "ADP-012"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "retains-epoch",
+          "invariants": [
+            "FEN-004",
+            "SBX-005",
+            "FEN-006",
+            "ERR-016",
+            "ADP-012"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SBX-006",
+            "SBX-007",
+            "SBX-012",
+            "FEN-004",
+            "ADP-012"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SBX-019",
+            "SBX-020",
+            "SBX-017",
+            "SBX-012",
+            "FEN-004"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "N",
+          "nextLifecycleStateId": "none",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "no-epoch",
+          "invariants": [
+            "SBX-012",
+            "FEN-004",
+            "FEN-001",
+            "ADP-012",
+            "PRF-014"
+          ]
+        }
+      ]
+    },
+    {
+      "operationId": "reconcile",
+      "cells": [
+        {
+          "lifecycleStateId": "provisioning/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "provisioning/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "retains-epoch-only-with-proven-continuity",
+          "invariants": [
+            "FEN-001",
+            "SBX-025",
+            "PRF-005",
+            "ADP-014",
+            "SBX-014"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/accepting",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/accepting",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "retains-epoch-only-with-proven-continuity",
+          "invariants": [
+            "FEN-001",
+            "SBX-005",
+            "SBX-012",
+            "ADP-012",
+            "PRF-013"
+          ]
+        },
+        {
+          "lifecycleStateId": "running/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "retains-epoch-only-with-proven-continuity",
+          "invariants": [
+            "PRC-010",
+            "PRC-008",
+            "SBX-012",
+            "FEN-001",
+            "SBX-005"
+          ]
+        },
+        {
+          "lifecycleStateId": "suspended/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "suspended/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "retains-epoch-only-with-proven-continuity",
+          "invariants": [
+            "SBX-007",
+            "SBX-008",
+            "SBX-012",
+            "PRC-012",
+            "FEN-001"
+          ]
+        },
+        {
+          "lifecycleStateId": "stopped/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "stopped/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "retains-epoch-only-with-proven-continuity",
+          "invariants": [
+            "SBX-019",
+            "SBX-020",
+            "SBX-017",
+            "SBX-012",
+            "PRF-014"
+          ]
+        },
+        {
+          "lifecycleStateId": "unknown/closed",
+          "cellKind": "T",
+          "nextLifecycleStateId": "running/closed",
+          "requestErrorId": "none",
+          "recoveryErrorId": "none",
+          "terminalOutcome": "succeeded",
+          "epochRule": "retains-epoch-only-with-proven-continuity",
+          "invariants": [
+            "SBX-012",
+            "FEN-001",
+            "PRF-005",
+            "ADP-014",
+            "ADP-012"
+          ]
+        }
+      ]
+    }
+  ],
+  "delegatedConcernResolution": {
+    "packetD": {
+      "concerns": [
+        "operation-transition",
+        "retry",
+        "cancellation",
+        "cleanup"
+      ],
+      "resolution": "operation-transition is the cell kind and nextLifecycleStateId of this matrix; retry and cancellation are the R and existing-handle-intent contracts carried by the operation registry's recoveryCoordinates and allowedRecoveryErrors; cleanup is the system-originated `cleanup` operation kind plus the T0 containment-absence invariants."
+    }
+  }
+}
