@@ -2,8 +2,8 @@
   "partitionVersion": 1,
   "packet": "E",
   "status": "candidate",
-  "allocationStatus": "unallocated",
-  "textAuthority": "Only the closed structured control fields of each entry are normative. This document records the Packet E obligation partition BEFORE stable registry identifiers are allocated. No entry here has a registry identifier, appears in invariants.json, or provides any Gate 2A coverage. Allocation is deferred until the confirmed defects recorded in PACKET-E-OBLIGATION-PARTITION-REVIEW.md are closed, because an identifier propagates into the corpus, the registry, all 54 Packet D classification vectors, and the generated rule selectors, making a later correction a whole-tree edit.",
+  "allocationStatus": "allocated",
+  "textAuthority": "Only the closed structured control fields of each entry are normative. This document records the Packet E obligation partition with its allocated identifier block. The identifiers are final and contiguous per family; no entry has yet been written into invariants.json, added to the corpus, or classified in the Packet D matrix, so nothing here provides Gate 2A coverage until the registration batches land.",
   "sourceObligationUniverse": {
     "IDENTITY": 30,
     "LIFECYCLE": 47,
@@ -11,14 +11,14 @@
     "RESULT": 51,
     "total": 178
   },
-  "entryCount": 209,
+  "entryCount": 214,
   "ownerDistribution": {
-    "core": 125,
+    "core": 128,
     "live": 31,
-    "runtime": 22,
+    "runtime": 23,
     "framework": 11,
-    "exec": 6,
-    "create": 6,
+    "exec": 8,
+    "create": 5,
     "artifact": 3,
     "service": 3,
     "operator": 2
@@ -32,12 +32,12 @@
     "FRK": 6,
     "IDE": 20,
     "OPA": 23,
-    "PIO": 18,
+    "PIO": 19,
     "POL": 4,
     "PRC": 17,
-    "PRF": 12,
+    "PRF": 14,
     "RET": 10,
-    "SBX": 23,
+    "SBX": 25,
     "SIG": 7,
     "SOP": 10
   },
@@ -62,7 +62,8 @@
         "create.sandboxId",
         "operation.target.sandboxId"
       ],
-      "remediation": "Allocate a fresh never-issued Sandbox ID for every new Sandbox lifetime and never rebind a retired one."
+      "remediation": "Allocate a fresh never-issued Sandbox ID for every new Sandbox lifetime and never rebind a retired one.",
+      "id": "IDE-001"
     },
     {
       "familyPrefix": "IDE",
@@ -84,7 +85,8 @@
         "sandbox.status.runtime.epoch",
         "create.initialRuntime"
       ],
-      "remediation": "Record epoch one for a runtime-creating Create and an explicit no-runtime marker for a stopped Create."
+      "remediation": "Record epoch one for a runtime-creating Create and an explicit no-runtime marker for a stopped Create.",
+      "id": "IDE-002"
     },
     {
       "familyPrefix": "IDE",
@@ -94,7 +96,7 @@
       "firstSoundPhase": "C0",
       "rejectionDeadline": "C0",
       "disposition": "reject-at-boundary",
-      "rationale": "Q1: the facts are the requested alias and the current name-reservation table, both complete at the create request surface. Q2: the creation request surface owns name selection. Q3: C0, because after acceptance the alias is already bound and two lifetimes would share it. Q4: the retention ruling places an obligation whose subject is a later, different operation on that operation's own traversal, so a Create reusing an unreleased name is filed here rather than on the Delete that retains the reservation.",
+      "rationale": "Q1: the facts are the requested alias and the current name-reservation table, both complete at the create request surface. Q2: the name-reservation table and its release on Delete are the control plane's own durable records, so under Criterion O the owner is `core`. Q3: C0, because after acceptance the alias is already bound and two lifetimes would share it. Q4: the retention ruling places an obligation whose subject is a later, different operation on that operation's own traversal, so a Create reusing an unreleased name is filed here rather than on the Delete that retains the reservation.",
       "sourceObligations": [
         "IDENTITY-01",
         "LIFECYCLE-17"
@@ -104,7 +106,8 @@
         "create.name",
         "sandbox.name"
       ],
-      "remediation": "Choose a different alias, or delete the holding Sandbox and let its reservation release before reusing the name."
+      "remediation": "Choose a different alias, or delete the holding Sandbox and let its reservation release before reusing the name.",
+      "id": "IDE-003"
     },
     {
       "familyPrefix": "IDE",
@@ -126,7 +129,8 @@
         "operation.result.resultingRuntimeEpoch",
         "operation.target.expectedRuntimeEpoch"
       ],
-      "remediation": "Allocate the next unused epoch for the Sandbox and durably commit it before any effect that can create that runtime."
+      "remediation": "Allocate the next unused epoch for the Sandbox and durably commit it before any effect that can create that runtime.",
+      "id": "IDE-004"
     },
     {
       "familyPrefix": "SOP",
@@ -145,7 +149,8 @@
         "snapshot.id",
         "operation.target.snapshotId"
       ],
-      "remediation": "Allocate a fresh Snapshot ID for every capture and retain tombstones so deleted identities are never reissued."
+      "remediation": "Allocate a fresh Snapshot ID for every capture and retain tombstones so deleted identities are never reissued.",
+      "id": "SOP-001"
     },
     {
       "familyPrefix": "IDE",
@@ -165,7 +170,8 @@
         "exec.sandboxRuntimeRef",
         "process.sandboxRuntimeRef"
       ],
-      "remediation": "Populate both the Sandbox ID and runtime epoch on every Exec request from the observed handle."
+      "remediation": "Populate both the Sandbox ID and runtime epoch on every Exec request from the observed handle.",
+      "id": "IDE-005"
     },
     {
       "familyPrefix": "IDE",
@@ -175,7 +181,7 @@
       "firstSoundPhase": "L0",
       "rejectionDeadline": "L0",
       "disposition": "reject-at-boundary",
-      "rationale": "Q1: the facts are the request's expected epoch and the Sandbox's current durable epoch; both are Core records requiring no external probe, so this is not a dynamic preflight. Q2: the current-epoch record is Core. Q3: L0, the admission station, because acceptance is already the retargeting. Q4: the silent retarget would be committed by this same live request.",
+      "rationale": "Q1: the facts are the request's expected epoch and the Sandbox's current durable epoch; both are Core records requiring no external probe, so this is not a dynamic preflight. Q2: the current-epoch record is a Core durable fact consulted here, but under Criterion O the invalid state is an expressible live request at its own caller station, so the owner is `live`. Q3: L0, the admission station, because acceptance is already the retargeting. Q4: the silent retarget would be committed by this same live request.",
       "sourceObligations": [
         "IDENTITY-03",
         "IDENTITY-06"
@@ -185,7 +191,8 @@
         "operation.target.expectedRuntimeEpoch",
         "sandbox.status.runtime.epoch"
       ],
-      "remediation": "Return the typed stale-runtime result and require an explicit handle refresh instead of resolving to the current runtime."
+      "remediation": "Return the typed stale-runtime result and require an explicit handle refresh instead of resolving to the current runtime.",
+      "id": "IDE-006"
     },
     {
       "familyPrefix": "IDE",
@@ -195,7 +202,7 @@
       "firstSoundPhase": "E0",
       "rejectionDeadline": "E0",
       "disposition": "reject-at-boundary",
-      "rationale": "Q1: the facts are the Exec's referenced epoch and the Sandbox's current durable epoch. Q2: the current-epoch record is Core. Q3: E0, because the Process record is bound at the next station and a bound Process cannot be un-retargeted. Q4: the exec traversal never traverses L0, so filing the live-surface entry here would emit a false coverage claim; this is a separate entry on the exec traversal.",
+      "rationale": "Q1: the facts are the Exec's referenced epoch and the Sandbox's current durable epoch. Q2: the current-epoch record is a Core durable fact consulted here, but under Criterion O the invalid state is an expressible Exec request at the exec request surface, so the owner is `exec`. Q3: E0, because the Process record is bound at the next station and a bound Process cannot be un-retargeted. Q4: the exec traversal never traverses L0, so filing the live-surface entry here would emit a false coverage claim; this is a separate entry on the exec traversal.",
       "sourceObligations": [
         "IDENTITY-03",
         "IDENTITY-06"
@@ -205,12 +212,13 @@
         "exec.sandboxRuntimeRef",
         "sandbox.status.runtime.epoch"
       ],
-      "remediation": "Reject the Exec with the typed stale-runtime result and require the caller to obtain a handle for the current runtime."
+      "remediation": "Reject the Exec with the typed stale-runtime result and require the caller to obtain a handle for the current runtime.",
+      "id": "IDE-007"
     },
     {
       "familyPrefix": "IDE",
       "title": "Coordinate substituted for another on the live request surface",
-      "statement": "Each live request coordinate keeps its own declared domain: a name alias resolves once to an ID-pinned handle and never persists as identity; a representation etag guards only the representation revision and neither satisfies nor is satisfied by an expected-runtime-epoch precondition; and an idempotency key, runtime epoch, Operation ID, or event cursor is accepted in no identity, target, precondition, or authority position.",
+      "statement": "Each live request coordinate keeps its own declared domain: a name alias resolves once to an ID-pinned handle and never persists as identity; a representation etag guards only the representation revision and neither satisfies nor is satisfied by an expected-runtime-epoch precondition; an event or output cursor is an observation position only and is accepted in no identity, target, precondition, or authority position; an idempotency key is a recovery coordinate only; and a runtime epoch is expressible only as an expected-value precondition and never as an assignable field.",
       "owner": "live",
       "firstSoundPhase": "L0",
       "rejectionDeadline": "L0",
@@ -230,7 +238,8 @@
         "observation.cursor",
         "operation.target.sandboxId"
       ],
-      "remediation": "Resolve the alias once and pin the returned Sandbox ID; evaluate etag and expected runtime epoch as independent preconditions; carry cursors only in observation requests."
+      "remediation": "Resolve the alias once and pin the returned Sandbox ID; evaluate etag and expected runtime epoch as independent preconditions; carry cursors only in observation requests.",
+      "id": "IDE-008"
     },
     {
       "familyPrefix": "IDE",
@@ -240,7 +249,7 @@
       "firstSoundPhase": "L0",
       "rejectionDeadline": "L0",
       "disposition": "unrepresentable",
-      "rationale": "Q1: the fact needed is the declared Snapshot target variant, complete at the live request surface. Q2: the Snapshot target union is Core-owned. Q3: L0, the station that decodes the sealed target. Q4: no other operation commits it. Disposition is unrepresentable because the Snapshot target admits only a Snapshot ID, and distinct Snapshots may legitimately share a digest.",
+      "rationale": "Q1: the fact needed is the declared Snapshot target variant, complete at the live request surface. Q2: the Snapshot target union is a Core control-plane fact, but under Criterion O the invalid state is an expressible Snapshot-targeted request at its own caller station, so the owner is `live`. Q3: L0, the station that decodes the sealed target. Q4: no other operation commits it. Disposition is unrepresentable because the Snapshot target admits only a Snapshot ID, and distinct Snapshots may legitimately share a digest.",
       "sourceObligations": [
         "IDENTITY-28"
       ],
@@ -249,7 +258,8 @@
         "operation.target.snapshotId",
         "snapshot.manifestDigest"
       ],
-      "remediation": "Target Snapshots by Snapshot ID and use the manifest digest only to verify retained content integrity."
+      "remediation": "Target Snapshots by Snapshot ID and use the manifest digest only to verify retained content integrity.",
+      "id": "IDE-009"
     },
     {
       "familyPrefix": "IDE",
@@ -259,7 +269,7 @@
       "firstSoundPhase": "L0",
       "rejectionDeadline": "L0",
       "disposition": "reject-at-boundary",
-      "rationale": "Q1: the facts are the requested Snapshot ID and the durable Snapshot record set including tombstones. Q2: the Snapshot record set is Core. Q3: L0, because acceptance already binds the operation to a resource the caller never named. Q4: the retarget is committed by this request. It is expressible because content-addressed fallback is a plausible implementation choice, so it must be rejected rather than excluded by type.",
+      "rationale": "Q1: the facts are the requested Snapshot ID and the durable Snapshot record set including tombstones. Q2: the Snapshot record set including its tombstones is a Core durable record consulted here, but under Criterion O the invalid state is an expressible live request at its own caller station, so the owner is `live`. Q3: L0, because acceptance already binds the operation to a resource the caller never named. Q4: the retarget is committed by this request. It is expressible because content-addressed fallback is a plausible implementation choice, so it must be rejected rather than excluded by type.",
       "sourceObligations": [
         "IDENTITY-29"
       ],
@@ -269,7 +279,8 @@
         "snapshot.id",
         "snapshot.manifestDigest"
       ],
-      "remediation": "Resolve Snapshot targets only by exact retained identity and return target-not-found for retired IDs."
+      "remediation": "Resolve Snapshot targets only by exact retained identity and return target-not-found for retired IDs.",
+      "id": "IDE-010"
     },
     {
       "familyPrefix": "IDE",
@@ -293,7 +304,8 @@
         "operation.target.sandboxId",
         "operation.target.expectedRuntimeEpoch"
       ],
-      "remediation": "Supply the tagged target variant declared for the requested method with all sealed coordinates populated, including the expected runtime epoch observed on the handle."
+      "remediation": "Supply the tagged target variant declared for the requested method with all sealed coordinates populated, including the expected runtime epoch observed on the handle.",
+      "id": "IDE-011"
     },
     {
       "familyPrefix": "IDE",
@@ -314,7 +326,8 @@
         "operation.target.sandboxId",
         "operation.target.runtimeEpoch"
       ],
-      "remediation": "Reconcile only against the target committed at acceptance and create a linked successor Operation for any different target."
+      "remediation": "Reconcile only against the target committed at acceptance and create a linked successor Operation for any different target.",
+      "id": "IDE-012"
     },
     {
       "familyPrefix": "IDE",
@@ -335,7 +348,8 @@
         "operation.result.resultingRuntimeEpoch",
         "sandbox.status.runtime.epoch"
       ],
-      "remediation": "Record both the previous and resulting runtime epochs on every runtime-replacing or runtime-creating result."
+      "remediation": "Record both the previous and resulting runtime epochs on every runtime-replacing or runtime-creating result.",
+      "id": "IDE-013"
     },
     {
       "familyPrefix": "IDE",
@@ -355,7 +369,8 @@
         "operation.result.resultingRuntimeEpoch",
         "sandbox.status.runtime.epoch"
       ],
-      "remediation": "Report attachment continuity as its own non-identity outcome and decide the epoch solely from proven runtime continuity."
+      "remediation": "Report attachment continuity as its own non-identity outcome and decide the epoch solely from proven runtime continuity.",
+      "id": "IDE-014"
     },
     {
       "familyPrefix": "IDE",
@@ -376,7 +391,8 @@
         "process.sandboxRuntimeRef",
         "exec.sandboxRuntimeRef"
       ],
-      "remediation": "Allocate a fresh Core Process ID bound to the exact requested Sandbox ID and epoch, and never rebind it."
+      "remediation": "Allocate a fresh Core Process ID bound to the exact requested Sandbox ID and epoch, and never rebind it.",
+      "id": "IDE-015"
     },
     {
       "familyPrefix": "IDE",
@@ -396,7 +412,8 @@
         "process.id",
         "sandbox.id"
       ],
-      "remediation": "Keep native identifiers in scoped protected evidence and resolve public resources only through Core-allocated identities."
+      "remediation": "Keep native identifiers in scoped protected evidence and resolve public resources only through Core-allocated identities.",
+      "id": "IDE-016"
     },
     {
       "familyPrefix": "IDE",
@@ -415,7 +432,8 @@
         "create.runtimeEpoch",
         "sandbox.status.runtime.epoch"
       ],
-      "remediation": "Read the allocated epoch from the Create result instead of attempting to supply one."
+      "remediation": "Read the allocated epoch from the Create result instead of attempting to supply one.",
+      "id": "IDE-017"
     },
     {
       "familyPrefix": "IDE",
@@ -435,7 +453,8 @@
         "operation.target.expectedRuntimeEpoch",
         "sandbox.status.runtime.epoch"
       ],
-      "remediation": "Use the epoch as a precondition only and let the Core allocate every new runtime epoch."
+      "remediation": "Use the epoch as a precondition only and let the Core allocate every new runtime epoch.",
+      "id": "IDE-018"
     },
     {
       "familyPrefix": "IDE",
@@ -454,7 +473,8 @@
         "sandbox.name",
         "live.metadata"
       ],
-      "remediation": "Create a new Sandbox with the desired alias rather than attempting to rename an existing one."
+      "remediation": "Create a new Sandbox with the desired alias rather than attempting to rename an existing one.",
+      "id": "IDE-019"
     },
     {
       "familyPrefix": "FEN",
@@ -475,7 +495,8 @@
         "capability.runtimeEpoch",
         "capability.sandboxId"
       ],
-      "remediation": "Validate the full capability against the current authority epoch before every authoritative commit and reject stale holders."
+      "remediation": "Validate the full capability against the current authority epoch before every authoritative commit and reject stale holders.",
+      "id": "FEN-001"
     },
     {
       "familyPrefix": "CNC",
@@ -496,7 +517,8 @@
         "driver.evidence.authorityEpoch",
         "capability.authorityEpoch"
       ],
-      "remediation": "Reject the transition by authority epoch and retain the event only as protected non-authoritative evidence."
+      "remediation": "Reject the transition by authority epoch and retain the event only as protected non-authoritative evidence.",
+      "id": "CNC-001"
     },
     {
       "familyPrefix": "FEN",
@@ -516,7 +538,8 @@
         "handoff.targetFencing",
         "handoff.predecessorDrain"
       ],
-      "remediation": "Prove atomic target fencing or a verifiable predecessor drain for the handoff, or quarantine and reconcile instead of granting authority."
+      "remediation": "Prove atomic target fencing or a verifiable predecessor drain for the handoff, or quarantine and reconcile instead of granting authority.",
+      "id": "FEN-002"
     },
     {
       "familyPrefix": "FEN",
@@ -537,7 +560,8 @@
         "driver.effectBoundary.drainProof",
         "capability.authorityEpoch"
       ],
-      "remediation": "Declare the fencing mechanism per effect boundary and refuse exclusive dispatch when neither atomic fencing nor a verifiable drain exists."
+      "remediation": "Declare the fencing mechanism per effect boundary and refuse exclusive dispatch when neither atomic fencing nor a verifiable drain exists.",
+      "id": "FEN-003"
     },
     {
       "familyPrefix": "FEN",
@@ -558,7 +582,8 @@
         "operation.ambiguity",
         "capability.authorityEpoch"
       ],
-      "remediation": "Quarantine or reconcile the affected resources and publish the ambiguity variant naming the fencing proof Core lacks."
+      "remediation": "Quarantine or reconcile the affected resources and publish the ambiguity variant naming the fencing proof Core lacks.",
+      "id": "FEN-004"
     },
     {
       "familyPrefix": "FEN",
@@ -579,7 +604,8 @@
         "driver.effectAttempt.idempotencyToken",
         "driver.effectAttempt.adoptionProof"
       ],
-      "remediation": "Retry only with the provider's own idempotency token, adopt only under exact identity and fencing proof, and otherwise reconcile."
+      "remediation": "Retry only with the provider's own idempotency token, adopt only under exact identity and fencing proof, and otherwise reconcile.",
+      "id": "FEN-005"
     },
     {
       "familyPrefix": "FEN",
@@ -600,7 +626,8 @@
         "driver.evidence.providerStatus",
         "operation.outcome"
       ],
-      "remediation": "Declare required evidence per outcome variant and map status-only responses to the ambiguity variant instead."
+      "remediation": "Declare required evidence per outcome variant and map status-only responses to the ambiguity variant instead.",
+      "id": "FEN-006"
     },
     {
       "familyPrefix": "OPA",
@@ -620,7 +647,8 @@
         "operation.acceptedAt",
         "create.idempotencyKey"
       ],
-      "remediation": "Return a request rejection only before the acceptance commit and afterwards report every outcome inside the Operation."
+      "remediation": "Return a request rejection only before the acceptance commit and afterwards report every outcome inside the Operation.",
+      "id": "OPA-001"
     },
     {
       "familyPrefix": "OPA",
@@ -640,7 +668,8 @@
         "operation.acceptedAt",
         "operation.target"
       ],
-      "remediation": "Prove the four acceptance conditions before returning a request rejection and otherwise accept and report through the Operation."
+      "remediation": "Prove the four acceptance conditions before returning a request rejection and otherwise accept and report through the Operation.",
+      "id": "OPA-002"
     },
     {
       "familyPrefix": "OPA",
@@ -660,7 +689,8 @@
         "process.acceptedAt",
         "exec.idempotencyKey"
       ],
-      "remediation": "Prove the four acceptance conditions before returning a request rejection and otherwise accept and report through the Process."
+      "remediation": "Prove the four acceptance conditions before returning a request rejection and otherwise accept and report through the Process.",
+      "id": "OPA-003"
     },
     {
       "familyPrefix": "OPA",
@@ -682,7 +712,8 @@
         "operation.effectAuthorityEpoch",
         "sandbox.status.runtime.epoch"
       ],
-      "remediation": "Commit the full acceptance record, epoch allocation, and effect intent atomically before invoking any provider or driver effect."
+      "remediation": "Commit the full acceptance record, epoch allocation, and effect intent atomically before invoking any provider or driver effect.",
+      "id": "OPA-004"
     },
     {
       "familyPrefix": "OPA",
@@ -704,7 +735,8 @@
         "operation.effectAuthorityEpoch",
         "operation.target"
       ],
-      "remediation": "Commit the acceptance record and effect intent atomically before dispatching the live effect."
+      "remediation": "Commit the acceptance record and effect intent atomically before dispatching the live effect.",
+      "id": "OPA-005"
     },
     {
       "familyPrefix": "OPA",
@@ -726,7 +758,8 @@
         "process.sandboxRuntimeRef",
         "exec.idempotencyKey"
       ],
-      "remediation": "Durably allocate the Process ID and launch token and commit the acceptance record before dispatching the execution."
+      "remediation": "Durably allocate the Process ID and launch token and commit the acceptance record before dispatching the execution.",
+      "id": "OPA-006"
     },
     {
       "familyPrefix": "OPA",
@@ -736,7 +769,7 @@
       "firstSoundPhase": "C0",
       "rejectionDeadline": "C0",
       "disposition": "reject-at-boundary",
-      "rationale": "Q1: the facts are the idempotency coordinate, the stored binding, and the declared admission order, all complete at the create request surface. Q2: the creation request surface owns its admission order. Q3: C0, because once a mutable-state error is returned the caller has lost the recovery path to its original handle. Q4: the misordering is committed by this request.",
+      "rationale": "Q1: the facts are the idempotency coordinate, the stored binding, and the declared admission order, all complete at the create request surface. Q2: the idempotency binding and the declared ordered admission sequence are the control plane's own durable artefacts, so under Criterion O the owner is `core`. Q3: C0, because once a mutable-state error is returned the caller has lost the recovery path to its original handle. Q4: the misordering is committed by this request.",
       "sourceObligations": [
         "RESULT-12",
         "RESULT-15"
@@ -746,7 +779,8 @@
         "create.idempotencyKey",
         "operation.id"
       ],
-      "remediation": "Resolve idempotency before evaluating mutable lifecycle, capacity, or quota preconditions."
+      "remediation": "Resolve idempotency before evaluating mutable lifecycle, capacity, or quota preconditions.",
+      "id": "OPA-007"
     },
     {
       "familyPrefix": "OPA",
@@ -767,7 +801,8 @@
         "operation.id",
         "sandbox.status.phase"
       ],
-      "remediation": "Look up the idempotency coordinate before any mutable-state check and return the original Operation on equal replay."
+      "remediation": "Look up the idempotency coordinate before any mutable-state check and return the original Operation on equal replay.",
+      "id": "OPA-008"
     },
     {
       "familyPrefix": "OPA",
@@ -788,7 +823,8 @@
         "process.id",
         "sandbox.executionAdmission"
       ],
-      "remediation": "Resolve the Exec idempotency coordinate before evaluating execution admission or capacity."
+      "remediation": "Resolve the Exec idempotency coordinate before evaluating execution admission or capacity.",
+      "id": "OPA-009"
     },
     {
       "familyPrefix": "OPA",
@@ -798,7 +834,7 @@
       "firstSoundPhase": "L0",
       "rejectionDeadline": "L0",
       "disposition": "reject-at-boundary",
-      "rationale": "Q1: the facts are the stored binding of coordinate to canonical digest to handle and the incoming digest; the consulted fact is a Core durable record, not request content, which fixes the owner as core rather than the request surface. Q2: the idempotency binding is a Core durable record. Q3: L0, because acceptance under a rebound key already produces a second effect. Q4: the create surface's half of this rule is discharged by the existing creation-scope entry and is filed as a witness extension rather than repeated here.",
+      "rationale": "Q1: the facts are the stored binding of coordinate to canonical digest to handle and the incoming digest; the consulted fact is a Core durable record, not request content, which fixes the owner as core rather than the request surface. Q2: the idempotency binding is a Core durable record. Q3: L0, because acceptance under a rebound key already produces a second effect. Q4: the create surface never traverses L0, so the creation-scope half of this rule cannot be asserted here and is filed as its own entry at `199`.",
       "sourceObligations": [
         "IDENTITY-08",
         "RESULT-13",
@@ -810,7 +846,8 @@
         "operation.canonicalDigest",
         "operation.id"
       ],
-      "remediation": "Reject the conflicting replay with the typed idempotency conflict and dispatch nothing, or submit a new key."
+      "remediation": "Reject the conflicting replay with the typed idempotency conflict and dispatch nothing, or submit a new key.",
+      "id": "OPA-010"
     },
     {
       "familyPrefix": "OPA",
@@ -832,7 +869,8 @@
         "process.canonicalDigest",
         "process.id"
       ],
-      "remediation": "Reject the conflicting Exec replay with the typed idempotency conflict and dispatch no execution."
+      "remediation": "Reject the conflicting Exec replay with the typed idempotency conflict and dispatch no execution.",
+      "id": "OPA-011"
     },
     {
       "familyPrefix": "OPA",
@@ -853,7 +891,8 @@
         "operation.canonicalDigest",
         "operation.correlationMetadata"
       ],
-      "remediation": "Canonicalize over semantic fields only and keep trace and correlation metadata outside the digest."
+      "remediation": "Canonicalize over semantic fields only and keep trace and correlation metadata outside the digest.",
+      "id": "OPA-012"
     },
     {
       "familyPrefix": "OPA",
@@ -863,7 +902,7 @@
       "firstSoundPhase": "C0",
       "rejectionDeadline": "C0",
       "disposition": "reject-at-boundary",
-      "rationale": "Q1: the facts are the coordinate age, the published recovery window, the acceptance tombstone, and the retained result reference, all Core records available at the create request surface. Q2: the creation request surface returns the recovery outcome. Q3: C0, because accepting it as new already authorizes a second creation. Q4: the conversion would be committed by this request.",
+      "rationale": "Q1: the facts are the coordinate age, the published recovery window, the acceptance tombstone, and the retained result reference, all Core records available at the create request surface. Q2: the acceptance tombstone, the published recovery window, and the retained result reference are the control plane's own durable artefacts, so under Criterion O the owner is `core`. Q3: C0, because accepting it as new already authorizes a second creation. Q4: the conversion would be committed by this request.",
       "sourceObligations": [
         "RESULT-15",
         "RESULT-12"
@@ -874,7 +913,8 @@
         "error.recovery",
         "operation.id"
       ],
-      "remediation": "Return the expired-record recovery error with its prior-acceptance evidence and require operator or observation recovery."
+      "remediation": "Return the expired-record recovery error with its prior-acceptance evidence and require operator or observation recovery.",
+      "id": "OPA-013"
     },
     {
       "familyPrefix": "OPA",
@@ -895,7 +935,8 @@
         "error.recovery",
         "operation.id"
       ],
-      "remediation": "Return the expired-record recovery error and never treat an expired coordinate as proof that no effect occurred."
+      "remediation": "Return the expired-record recovery error and never treat an expired coordinate as proof that no effect occurred.",
+      "id": "OPA-014"
     },
     {
       "familyPrefix": "OPA",
@@ -916,7 +957,8 @@
         "error.recovery",
         "process.id"
       ],
-      "remediation": "Return the expired-record recovery error and require explicit observation before any new execution is formed."
+      "remediation": "Return the expired-record recovery error and require explicit observation before any new execution is formed.",
+      "id": "OPA-015"
     },
     {
       "familyPrefix": "OPA",
@@ -937,7 +979,8 @@
         "operation.outcome",
         "operation.id"
       ],
-      "remediation": "Return the original failed Operation on replay and require a new key plus explicit authority for a fresh attempt."
+      "remediation": "Return the original failed Operation on replay and require a new key plus explicit authority for a fresh attempt.",
+      "id": "OPA-016"
     },
     {
       "familyPrefix": "OPA",
@@ -959,7 +1002,8 @@
         "operation.state",
         "operation.cancellationRequestedAt"
       ],
-      "remediation": "Record cancel_requested on the existing Operation and let that Operation publish the terminal outcome once exclusion is proven."
+      "remediation": "Record cancel_requested on the existing Operation and let that Operation publish the terminal outcome once exclusion is proven.",
+      "id": "OPA-017"
     },
     {
       "familyPrefix": "OPA",
@@ -980,7 +1024,8 @@
         "live.expiration",
         "operation.idempotencyCoordinate"
       ],
-      "remediation": "Commit representation, resulting revision, idempotency binding, and committed response in one atomic write."
+      "remediation": "Commit representation, resulting revision, idempotency binding, and committed response in one atomic write.",
+      "id": "OPA-018"
     },
     {
       "familyPrefix": "OPA",
@@ -999,7 +1044,8 @@
         "operator.recordStorage.atomicCommit",
         "operator.advertisedMethods"
       ],
-      "remediation": "Fail build, startup, or capability admission closed instead of advertising the atomic-update methods on non-transactional storage."
+      "remediation": "Fail build, startup, or capability admission closed instead of advertising the atomic-update methods on non-transactional storage.",
+      "id": "OPA-019"
     },
     {
       "familyPrefix": "OPA",
@@ -1021,7 +1067,8 @@
         "driver.effectAttempt.recoveryClass",
         "operation.effectIntent"
       ],
-      "remediation": "Persist the effect-attempt record with its recovery class before dispatch, and report ambiguity with quarantine when no class applies."
+      "remediation": "Persist the effect-attempt record with its recovery class before dispatch, and report ambiguity with quarantine when no class applies.",
+      "id": "OPA-020"
     },
     {
       "familyPrefix": "PRF",
@@ -1047,7 +1094,8 @@
         "operation.evidence.knowledgeSet",
         "operation.cancellation"
       ],
-      "remediation": "Commit `unknown` with its exact ambiguity variant unless the evidence proves the whole predicate of the chosen arm, including quiesced mutation authority and known residuals."
+      "remediation": "Commit `unknown` with its exact ambiguity variant unless the evidence proves the whole predicate of the chosen arm, including quiesced mutation authority and known residuals.",
+      "id": "PRF-001"
     },
     {
       "familyPrefix": "PRF",
@@ -1074,7 +1122,8 @@
         "operation.evidence.knowledgeSet",
         "operation.target.epoch"
       ],
-      "remediation": "Leave the Operation `unknown` while cancellation is unresolved or mutation authority may still act; never promote a cancellation request or deadline into a terminal arm."
+      "remediation": "Leave the Operation `unknown` while cancellation is unresolved or mutation authority may still act; never promote a cancellation request or deadline into a terminal arm.",
+      "id": "PRF-002"
     },
     {
       "familyPrefix": "PRF",
@@ -1098,7 +1147,8 @@
         "process.evidence.knowledgeSet",
         "process.launchToken"
       ],
-      "remediation": "Keep the Process `unknown` and reconcilable until exact evidence bound to the same launch token proves the committed outcome."
+      "remediation": "Keep the Process `unknown` and reconcilable until exact evidence bound to the same launch token proves the committed outcome.",
+      "id": "PRF-003"
     },
     {
       "familyPrefix": "PRF",
@@ -1121,7 +1171,8 @@
         "operation.residualObligations",
         "operation.evidence.knowledgeSet"
       ],
-      "remediation": "Report `unknown` while any descendant, orphan, or cleanup obligation may still act; never infer absence from a missing observation or an accepted cleanup call."
+      "remediation": "Report `unknown` while any descendant, orphan, or cleanup obligation may still act; never infer absence from a missing observation or an accepted cleanup call.",
+      "id": "PRF-004"
     },
     {
       "familyPrefix": "PRF",
@@ -1131,26 +1182,27 @@
       "firstSoundPhase": "R1",
       "rejectionDeadline": "R1",
       "disposition": "reject-at-boundary",
-      "rationale": "Q1: the deciding facts are the existing terminal Operation record and the proposed write; both are Core durable records and no new observation is needed to refuse the rewrite. Q2: Core owns durable records and terminal outcomes. Q3: R1 is the reconciliation/adoption traversal's own resolution station, fixed by the binding ruling; `origin` is attribution, so system-originated reconciliation is filed exactly where its caller-originated twin is. Q4: the offending write belongs to the reconciling traversal, which is the traversal described here. `reject-at-boundary` rather than `observed-conformance`: immutability is decided from two stored records, not proved after launch; the reconciler's separate evidence-gathering discipline is a different obligation. The legal form -- appending a linked successor resolution record -- is this entry's required valid witness.",
+      "rationale": "Q1: the deciding facts are the existing terminal Operation record and the proposed write; both are Core durable records and no new observation is needed to refuse the rewrite. Q2: Core owns durable records and terminal outcomes. Q3: R1 is the launch-branch reconciliation/adoption traversal's own resolution station and the last point on that traversal at which the rewrite can be refused; `origin` is attribution, so a system-originated reconciliation is filed at the station its caller-originated twin traverses, and reconciliations that resolve at L1 or T0 are filed as their own per-station siblings rather than asserted here. Q4: the offending write belongs to the reconciling traversal, which is the traversal described here. `reject-at-boundary` rather than `observed-conformance`: immutability is decided from two stored records, not proved after launch; the reconciler's separate evidence-gathering discipline is a different obligation. The legal form -- appending a linked successor resolution record -- is this entry's required valid witness.",
       "sourceObligations": [
         "IDENTITY-18",
         "LIFECYCLE-19",
         "TAXONOMY-49",
         "RESULT-24"
       ],
-      "traversal": "Reconciliation/adoption traversal resolving against an existing terminal Operation, at R1",
+      "traversal": "Launch-branch reconciliation/adoption traversal resolving against an existing terminal Operation, at R1",
       "diagnosticPaths": [
         "operation.outcome",
         "operation.revision",
         "operation.successorLinks",
         "operation.predecessorLinks"
       ],
-      "remediation": "Append a linked successor resolution Operation instead of rewriting the predecessor's terminal outcome."
+      "remediation": "Append a linked successor resolution Operation instead of rewriting the predecessor's terminal outcome.",
+      "id": "PRF-005"
     },
     {
       "familyPrefix": "PRF",
       "title": "Compensation represented as rollback",
-      "statement": "A compensating effect recorded on the teardown or cleanup traversal is recorded as a new forward effect with its own Operation, evidence, and terminal outcome, and never as erasure, reversal, or negation of the compensated Operation's external history -- including when in-sandbox state was restored from a Snapshot or filesystem capture.",
+      "statement": "A compensating effect recorded on the teardown or cleanup traversal is recorded as a new forward effect with its own durable record, evidence, and outcome, and never as erasure, reversal, or negation of the compensated Operation's external history -- including when in-sandbox state was restored from a Snapshot or filesystem capture.",
       "owner": "core",
       "firstSoundPhase": "T0",
       "rejectionDeadline": "T0",
@@ -1167,7 +1219,8 @@
         "operation.coreResolution",
         "operation.externalEffectLedger"
       ],
-      "remediation": "Record compensation as a new linked forward effect with its own outcome; never mark the compensated Operation or its external effects as reversed."
+      "remediation": "Record compensation as a new linked forward effect with its own outcome; never mark the compensated Operation or its external effects as reversed.",
+      "id": "PRF-006"
     },
     {
       "familyPrefix": "PRF",
@@ -1189,7 +1242,8 @@
         "process.state",
         "sandbox.status.phase"
       ],
-      "remediation": "Return the observation result with the latest resource and an explicit condition-met flag; leave the observed record unchanged."
+      "remediation": "Return the observation result with the latest resource and an explicit condition-met flag; leave the observed record unchanged.",
+      "id": "PRF-007"
     },
     {
       "familyPrefix": "PRF",
@@ -1212,7 +1266,8 @@
         "operation.externalIdentity",
         "operation.effectAuthorityEpoch"
       ],
-      "remediation": "Reconcile using the same committed intent and launch token, or terminalize the Operation `unknown`; never dispatch a second attempt to resolve the first."
+      "remediation": "Reconcile using the same committed intent and launch token, or terminalize the Operation `unknown`; never dispatch a second attempt to resolve the first.",
+      "id": "PRF-008"
     },
     {
       "familyPrefix": "PRF",
@@ -1234,7 +1289,8 @@
         "operation.successorLinks",
         "sandbox.status.runtime.epoch"
       ],
-      "remediation": "Gather fencing or exact adoption proof, or require a new caller request with a new idempotency key; never treat `unknown` as permission to launch again."
+      "remediation": "Gather fencing or exact adoption proof, or require a new caller request with a new idempotency key; never treat `unknown` as permission to launch again.",
+      "id": "PRF-009"
     },
     {
       "familyPrefix": "PRF",
@@ -1256,7 +1312,8 @@
         "operation.target",
         "operation.effectAuthorityEpoch"
       ],
-      "remediation": "Quarantine or reconcile the target under a linked Operation; do not re-dispatch the same external effect on the strength of the ambiguity."
+      "remediation": "Quarantine or reconcile the target under a linked Operation; do not re-dispatch the same external effect on the strength of the ambiguity.",
+      "id": "PRF-010"
     },
     {
       "familyPrefix": "PRF",
@@ -1278,7 +1335,8 @@
         "operation.coreResolution",
         "sandbox.tombstone"
       ],
-      "remediation": "Keep the residual obligations open and observable, and discharge them under a linked cleanup Operation with current authority before any further destructive effect."
+      "remediation": "Keep the residual obligations open and observable, and discharge them under a linked cleanup Operation with current authority before any further destructive effect.",
+      "id": "PRF-011"
     },
     {
       "familyPrefix": "RET",
@@ -1301,7 +1359,8 @@
         "process.retention",
         "snapshot.retention"
       ],
-      "remediation": "Scope deletion to the live aggregate and its covered live resources; let each retained record expire under its own published retention contract."
+      "remediation": "Scope deletion to the live aggregate and its covered live resources; let each retained record expire under its own published retention contract.",
+      "id": "RET-001"
     },
     {
       "familyPrefix": "RET",
@@ -1323,7 +1382,8 @@
         "snapshot.retentionHolds",
         "requestError.details.references"
       ],
-      "remediation": "Delete, mirror, or prove independent every dependent Snapshot, then reissue Delete."
+      "remediation": "Delete, mirror, or prove independent every dependent Snapshot, then reissue Delete.",
+      "id": "RET-002"
     },
     {
       "familyPrefix": "RET",
@@ -1343,7 +1403,8 @@
         "sandbox.expiration.at",
         "sandbox.expiration.action"
       ],
-      "remediation": "Submit `none` or an absolute instant together with an explicit `stop` or `delete` action."
+      "remediation": "Submit `none` or an absolute instant together with an explicit `stop` or `delete` action.",
+      "id": "RET-003"
     },
     {
       "familyPrefix": "RET",
@@ -1364,7 +1425,8 @@
         "sandbox.retentionContract",
         "snapshot.retention"
       ],
-      "remediation": "Set only the absolute expiry instant and action here; express idle, age, runtime-duration, and record-retention policy through their own declared contracts."
+      "remediation": "Set only the absolute expiry instant and action here; express idle, age, runtime-duration, and record-retention policy through their own declared contracts.",
+      "id": "RET-004"
     },
     {
       "familyPrefix": "RET",
@@ -1385,7 +1447,8 @@
         "artifact.idle",
         "artifact.retention"
       ],
-      "remediation": "Declare each time bound under its own named clock and subject; do not reuse one duration field for lifetime, idle, age, and retention."
+      "remediation": "Declare each time bound under its own named clock and subject; do not reuse one duration field for lifetime, idle, age, and retention.",
+      "id": "RET-005"
     },
     {
       "familyPrefix": "RET",
@@ -1395,7 +1458,7 @@
       "firstSoundPhase": "L0",
       "rejectionDeadline": "L0",
       "disposition": "unrepresentable",
-      "rationale": "Q1: the deciding facts are the closed public method union and the request's method identity; nothing else is consulted. Q2: Core owns retention and the durable Operation record whose lifetime the absent method would shorten. Q3: L0 is the request surface where such a call would arrive, and there is no later station on that traversal. Q4: deleting the Operation's target is a different operation filed on its own traversal, and retention is explicitly independent of it. `unrepresentable`: no supported API constructs a caller Operation deletion.",
+      "rationale": "Q1: the deciding facts are the closed public method union and the request's method identity; nothing else is consulted. Q2: retention and the durable Operation record whose lifetime the absent method would shorten are Core facts consulted here, but under Criterion O the invalid state is an expressible request at its own caller station, so the owner is `live`. Q3: L0 is the request surface where such a call would arrive, and there is no later station on that traversal. Q4: deleting the Operation's target is a different operation filed on its own traversal, and retention is explicitly independent of it. `unrepresentable`: no supported API constructs a caller Operation deletion.",
       "sourceObligations": [
         "TAXONOMY-15"
       ],
@@ -1405,7 +1468,8 @@
         "operation.id",
         "requestError.details.method"
       ],
-      "remediation": "Observe the Operation and let its service-published retention expire; use `CancelOperation` when the intent is to stop nonterminal work."
+      "remediation": "Observe the Operation and let its service-published retention expire; use `CancelOperation` when the intent is to stop nonterminal work.",
+      "id": "RET-006"
     },
     {
       "familyPrefix": "RET",
@@ -1427,7 +1491,8 @@
         "operation.outcome",
         "sandbox.name"
       ],
-      "remediation": "Commit the tombstone and audit coordinates durably as part of the deletion proof, before the Operation reports success."
+      "remediation": "Commit the tombstone and audit coordinates durably as part of the deletion proof, before the Operation reports success.",
+      "id": "RET-007"
     },
     {
       "familyPrefix": "ERR",
@@ -1450,7 +1515,8 @@
         "operationContract.allowedRequestErrors",
         "operationContract.allowedRecoveryErrors"
       ],
-      "remediation": "Add the condition to the sealed registry and regenerate the method subset, or map it onto an existing admitted variant."
+      "remediation": "Add the condition to the sealed registry and regenerate the method subset, or map it onto an existing admitted variant.",
+      "id": "ERR-001"
     },
     {
       "familyPrefix": "ERR",
@@ -1473,7 +1539,8 @@
         "operationContract.allowedRequestErrors",
         "operationContract.allowedRecoveryErrors"
       ],
-      "remediation": "Emit an admitted registry variant for this method, or extend the sealed registry and regenerate every dependent union, mapping, and fixture."
+      "remediation": "Emit an admitted registry variant for this method, or extend the sealed registry and regenerate every dependent union, mapping, and fixture.",
+      "id": "ERR-002"
     },
     {
       "familyPrefix": "ERR",
@@ -1496,7 +1563,8 @@
         "operationContract.allowedRequestErrors",
         "operationContract.allowedProcessControlOutcomes"
       ],
-      "remediation": "Emit an admitted registry variant for this method; never introduce a Process-control-specific open reason string."
+      "remediation": "Emit an admitted registry variant for this method; never introduce a Process-control-specific open reason string.",
+      "id": "ERR-003"
     },
     {
       "familyPrefix": "ERR",
@@ -1517,7 +1585,8 @@
         "operationContract.allowedRequestErrors",
         "providerEvidence.evidenceId"
       ],
-      "remediation": "Emit only the variant's declared payload fields and link protected context through a bounded opaque evidence identifier."
+      "remediation": "Emit only the variant's declared payload fields and link protected context through a bounded opaque evidence identifier.",
+      "id": "ERR-004"
     },
     {
       "familyPrefix": "ERR",
@@ -1538,7 +1607,8 @@
         "requestError.message",
         "providerEvidence.evidenceId"
       ],
-      "remediation": "Populate only the variant's declared fields; move protected context into the operator-visible evidence record behind an opaque identifier."
+      "remediation": "Populate only the variant's declared fields; move protected context into the operator-visible evidence record behind an opaque identifier.",
+      "id": "ERR-005"
     },
     {
       "familyPrefix": "ERR",
@@ -1559,7 +1629,8 @@
         "process.request.env",
         "providerEvidence.evidenceId"
       ],
-      "remediation": "Emit only the declared payload fields and never echo argv, environment, or native command output into the public detail."
+      "remediation": "Emit only the declared payload fields and never echo argv, environment, or native command output into the public detail.",
+      "id": "ERR-006"
     },
     {
       "familyPrefix": "ERR",
@@ -1581,7 +1652,8 @@
         "requestError.variant",
         "requestError.details.safeName"
       ],
-      "remediation": "Authorize at a non-leaking scope first, then validate; return the same public response for unauthorized-existing and authorized-absent targets."
+      "remediation": "Authorize at a non-leaking scope first, then validate; return the same public response for unauthorized-existing and authorized-absent targets.",
+      "id": "ERR-007"
     },
     {
       "familyPrefix": "ERR",
@@ -1603,7 +1675,8 @@
         "requestError.variant",
         "requestError.details.safeTargetRef"
       ],
-      "remediation": "Run authorization before semantic validation and keep `PermissionDenied` and `TargetNotFound` observationally equivalent for unauthorized callers."
+      "remediation": "Run authorization before semantic validation and keep `PermissionDenied` and `TargetNotFound` observationally equivalent for unauthorized callers.",
+      "id": "ERR-008"
     },
     {
       "familyPrefix": "ERR",
@@ -1626,7 +1699,8 @@
         "process.id",
         "sandbox.id"
       ],
-      "remediation": "Authorize before resolving Process existence, and return the same public response whether the Process is absent or merely invisible to this caller."
+      "remediation": "Authorize before resolving Process existence, and return the same public response whether the Process is absent or merely invisible to this caller.",
+      "id": "ERR-009"
     },
     {
       "familyPrefix": "ERR",
@@ -1649,7 +1723,8 @@
         "operationContract.callerRecoveryByOutcome",
         "requestError.details.retryAfter"
       ],
-      "remediation": "Emit the variant's registered `CallerRecovery`; treat `Retry-After` only as timing for an already-permitted action."
+      "remediation": "Emit the variant's registered `CallerRecovery`; treat `Retry-After` only as timing for an already-permitted action.",
+      "id": "ERR-010"
     },
     {
       "familyPrefix": "ERR",
@@ -1672,7 +1747,8 @@
         "requestError.variant",
         "operationContract.callerRecoveryByOutcome"
       ],
-      "remediation": "Bind each variant to its single registered recovery action; never emit a retryable boolean or let a wait hint imply replay permission."
+      "remediation": "Bind each variant to its single registered recovery action; never emit a retryable boolean or let a wait hint imply replay permission.",
+      "id": "ERR-011"
     },
     {
       "familyPrefix": "ERR",
@@ -1695,7 +1771,8 @@
         "processControlReceipt.coordinate",
         "operationContract.callerRecoveryByOutcome"
       ],
-      "remediation": "Emit the registered recovery action; an expired Process-control coordinate recovers by observation or operator action, never by a new sequence."
+      "remediation": "Emit the registered recovery action; an expired Process-control coordinate recovers by observation or operator action, never by a new sequence.",
+      "id": "ERR-012"
     },
     {
       "familyPrefix": "ERR",
@@ -1718,7 +1795,8 @@
         "requestError.variant",
         "operation.outcome"
       ],
-      "remediation": "Derive the status from the product variant; return accepted work as its durable Operation with a successful transport status."
+      "remediation": "Derive the status from the product variant; return accepted work as its durable Operation with a successful transport status.",
+      "id": "ERR-013"
     },
     {
       "familyPrefix": "ERR",
@@ -1742,7 +1820,8 @@
         "requestError.variant",
         "observation.conditionMet"
       ],
-      "remediation": "Return the Operation resource with its embedded terminal outcome under a successful status; never map a transport code onto an Operation outcome."
+      "remediation": "Return the Operation resource with its embedded terminal outcome under a successful status; never map a transport code onto an Operation outcome.",
+      "id": "ERR-014"
     },
     {
       "familyPrefix": "ERR",
@@ -1766,7 +1845,8 @@
         "processControlReceipt.state",
         "requestError.variant"
       ],
-      "remediation": "Return the durable Process or receipt under a successful status; never convert a closed connection or client deadline into a Process termination."
+      "remediation": "Return the durable Process or receipt under a successful status; never convert a closed connection or client deadline into a Process termination.",
+      "id": "ERR-015"
     },
     {
       "familyPrefix": "ERR",
@@ -1787,7 +1867,8 @@
         "requestError.variant",
         "operationContract.allowedKnownFailures"
       ],
-      "remediation": "Map the unrecognized code conservatively onto a registered variant and record the native code only in the protected evidence record."
+      "remediation": "Map the unrecognized code conservatively onto a registered variant and record the native code only in the protected evidence record.",
+      "id": "ERR-016"
     },
     {
       "familyPrefix": "ERR",
@@ -1808,7 +1889,8 @@
         "providerEvidence.redaction",
         "requestError.details"
       ],
-      "remediation": "Store the bounded redacted payload and digest in the protected evidence record and expose only its opaque identifier publicly."
+      "remediation": "Store the bounded redacted payload and digest in the protected evidence record and expose only its opaque identifier publicly.",
+      "id": "ERR-017"
     },
     {
       "familyPrefix": "SBX",
@@ -1828,17 +1910,18 @@
         "operation.request.initialRuntime",
         "operation.canonicalRequest"
       ],
-      "remediation": "Resolve `running` or `stopped` in the caller or profile layer and submit the exact value in the canonical request."
+      "remediation": "Resolve `running` or `stopped` in the caller or profile layer and submit the exact value in the canonical request.",
+      "id": "SBX-001"
     },
     {
       "familyPrefix": "SBX",
       "title": "Initially stopped creation performs launch effects",
       "statement": "A creation whose resolved `initialRuntime` is `stopped` commits a durable Sandbox whose runtime state is `stopped` and never enters `provisioning` or performs a launch effect.",
-      "owner": "create",
+      "owner": "core",
       "firstSoundPhase": "C0",
       "rejectionDeadline": "C0",
       "disposition": "reject-at-boundary",
-      "rationale": "Q1: the facts are the resolved initial-runtime selection and the Sandbox record being committed, both complete at C0; the driver, host, and provider are never consulted for a creation that must not launch. Q2: creation-record commitment is owned by `create`. Q3: C0, because the resolved creation is handed to operator placement and host preflight immediately after, and a stopped creation that reaches those stations has already begun the launch it must not perform. Q4: this same creation commits the violation. `reject-at-boundary` because the two fields are independently expressible and the creation boundary holds every fact needed to refuse.",
+      "rationale": "Q1: the facts are the resolved initial-runtime selection and the Sandbox record being committed, both complete at C0; the driver, host, and provider are never consulted for a creation that must not launch. Q2: the durable creation commit and the dispatch of a launch effect are the control plane's own artefacts. Q3: C0, because the resolved creation is handed to operator placement and host preflight immediately after, and a stopped creation that reaches those stations has already begun the launch it must not perform. Q4: this same creation commits the violation. `reject-at-boundary` because the creation boundary holds every fact needed to refuse.",
       "sourceObligations": [
         "LIFECYCLE-05",
         "TAXONOMY-04"
@@ -1848,7 +1931,8 @@
         "create.initialRuntime",
         "sandbox.status.runtime.state"
       ],
-      "remediation": "Commit the stopped Sandbox record without launch and require an explicit StartSandbox to establish a runtime."
+      "remediation": "Commit the stopped Sandbox record without launch and require an explicit StartSandbox to establish a runtime.",
+      "id": "SBX-002"
     },
     {
       "familyPrefix": "SBX",
@@ -1871,7 +1955,8 @@
         "sandbox.status.execution.state",
         "sandbox.status.lifecycleOperation"
       ],
-      "remediation": "Issue the named lifecycle operation that produces the wanted state and read status as an observation, or declare desired state in a Managed-Sandbox Service that issues the same Core operations."
+      "remediation": "Issue the named lifecycle operation that produces the wanted state and read status as an observation, or declare desired state in a Managed-Sandbox Service that issues the same Core operations.",
+      "id": "SBX-003"
     },
     {
       "familyPrefix": "RET",
@@ -1881,7 +1966,7 @@
       "firstSoundPhase": "L0",
       "rejectionDeadline": "L0",
       "disposition": "reject-at-boundary",
-      "rationale": "Q1: the facts are the durably recorded expiry trigger and the Sandbox's current durable stopped proof, both Core records complete at the lifecycle admission station L0. Q2: Operation acceptance against durable records is owned by `core`. Q3: L0, because acceptance durably seizes the lifecycle lane and publishes a stopping projection for a Sandbox already proven stopped. Q4: the offending operation is this system-originated Stop itself, and under the system-origin ruling it is filed at exactly the station its caller-originated twin uses, which is Stop admission at L0. `reject-at-boundary` under Ruling R2: the stopped proof is a Core durable fact, not current external state.",
+      "rationale": "Q1: the facts are the durably recorded expiry trigger and the Sandbox's current durable stopped proof, both Core records complete at the lifecycle admission station L0. Q2: the expiry trigger and the stopped proof are Core durable records consulted here, but under Criterion O the invalid state is an expressible Stop admission at its own caller station, so the owner is `live`. Q3: L0, because acceptance durably seizes the lifecycle lane and publishes a stopping projection for a Sandbox already proven stopped. Q4: the offending operation is this system-originated Stop itself, and under the system-origin ruling it is filed at exactly the station its caller-originated twin uses, which is Stop admission at L0. `reject-at-boundary` under Ruling R2: the stopped proof is a Core durable fact, not current external state.",
       "sourceObligations": [
         "TAXONOMY-20"
       ],
@@ -1891,7 +1976,8 @@
         "sandbox.status.runtime.state",
         "operation.origin"
       ],
-      "remediation": "Consult the durable stopped proof before creating the expiry Stop and link the existing proof instead."
+      "remediation": "Consult the durable stopped proof before creating the expiry Stop and link the existing proof instead.",
+      "id": "RET-008"
     },
     {
       "familyPrefix": "SBX",
@@ -1905,13 +1991,14 @@
       "sourceObligations": [
         "LIFECYCLE-03"
       ],
-      "traversal": "any lifecycle-mutation traversal, at Operation and status commit",
+      "traversal": "any live lifecycle-mutation traversal, at Operation and status commit",
       "diagnosticPaths": [
         "sandbox.status.runtime.state",
         "sandbox.status.lifecycleOperation",
         "operation.kind"
       ],
-      "remediation": "Derive presentation words at read time from the Operation kind and the authoritative status, and store neither."
+      "remediation": "Derive presentation words at read time from the Operation kind and the authoritative status, and store neither.",
+      "id": "SBX-004"
     },
     {
       "familyPrefix": "SBX",
@@ -1932,7 +2019,8 @@
         "sandbox.status.runtime.state",
         "sandbox.status.runtime.epoch"
       ],
-      "remediation": "Commit `closed` with its typed reason for every runtime state other than `running` for the exact current epoch under current authority."
+      "remediation": "Commit `closed` with its typed reason for every runtime state other than `running` for the exact current epoch under current authority.",
+      "id": "SBX-005"
     },
     {
       "familyPrefix": "SBX",
@@ -1953,7 +2041,8 @@
         "sandbox.status.execution.state",
         "operation.result"
       ],
-      "remediation": "Publish `suspended` only from returned quiescence and same-epoch continuity evidence; otherwise terminalize the Suspend as failed or unresolved."
+      "remediation": "Publish `suspended` only from returned quiescence and same-epoch continuity evidence; otherwise terminalize the Suspend as failed or unresolved.",
+      "id": "SBX-006"
     },
     {
       "familyPrefix": "SBX",
@@ -1973,7 +2062,8 @@
         "driver.reportedEpoch",
         "sandbox.status.runtime.epoch"
       ],
-      "remediation": "Return the target's continuity probes with the report, and report failure when the target cannot prove same-epoch retention."
+      "remediation": "Return the target's continuity probes with the report, and report failure when the target cannot prove same-epoch retention.",
+      "id": "SBX-007"
     },
     {
       "familyPrefix": "SBX",
@@ -1996,7 +2086,8 @@
         "operation.result",
         "operation.kind"
       ],
-      "remediation": "Terminalize a Resume that observed a cold fallback as failed or unresolved and leave any replacement to an explicitly authorized Start."
+      "remediation": "Terminalize a Resume that observed a cold fallback as failed or unresolved and leave any replacement to an explicitly authorized Start.",
+      "id": "SBX-008"
     },
     {
       "familyPrefix": "SBX",
@@ -2017,7 +2108,8 @@
         "sandbox.resources.applied",
         "operation.result"
       ],
-      "remediation": "Terminalize a partial or replacement-based resize as failed and require an explicit Stop, stopped resize, and Start instead."
+      "remediation": "Terminalize a partial or replacement-based resize as failed and require an explicit Stop, stopped resize, and Start instead.",
+      "id": "SBX-009"
     },
     {
       "familyPrefix": "SBX",
@@ -2037,7 +2129,8 @@
         "sandbox.status.runtime.state",
         "sandbox.resources.nextRuntimeAllocation"
       ],
-      "remediation": "Commit the next-Start allocation and report no epoch, reservation, or current capacity for a stopped Sandbox."
+      "remediation": "Commit the next-Start allocation and report no epoch, reservation, or current capacity for a stopped Sandbox.",
+      "id": "SBX-010"
     },
     {
       "familyPrefix": "SBX",
@@ -2058,7 +2151,8 @@
         "operation.requestedPostcondition",
         "sandbox.status.runtime.state"
       ],
-      "remediation": "Lower Stop to close-admission, revoke-launch, drain, terminate, and prove-absence steps against the current epoch, reject the target profile when only a destructive removal exists, and let the caller issue DeleteSandbox separately."
+      "remediation": "Lower Stop to close-admission, revoke-launch, drain, terminate, and prove-absence steps against the current epoch, reject the target profile when only a destructive removal exists, and let the caller issue DeleteSandbox separately.",
+      "id": "SBX-011"
     },
     {
       "familyPrefix": "SBX",
@@ -2072,13 +2166,14 @@
       "sourceObligations": [
         "LIFECYCLE-18"
       ],
-      "traversal": "any lifecycle-mutation traversal, at status commit",
+      "traversal": "any live lifecycle-mutation traversal, at status commit",
       "diagnosticPaths": [
         "sandbox.status.runtime.state",
         "sandbox.status.execution.state",
         "sandbox.status.conditions"
       ],
-      "remediation": "Commit `unknown` with closed admission and retain the evidence for a system-originated reconciliation Operation."
+      "remediation": "Commit `unknown` with closed admission and retain the evidence for a system-originated reconciliation Operation.",
+      "id": "SBX-012"
     },
     {
       "familyPrefix": "SBX",
@@ -2098,7 +2193,8 @@
         "driver.decodedEvidence",
         "sandbox.status.runtime.state"
       ],
-      "remediation": "Record the provider phase as evidence and derive Core runtime state only from the postcondition proofs the Core contract requires."
+      "remediation": "Record the provider phase as evidence and derive Core runtime state only from the postcondition proofs the Core contract requires.",
+      "id": "SBX-013"
     },
     {
       "familyPrefix": "RET",
@@ -2118,7 +2214,8 @@
         "driver.preparedLaunch",
         "sandbox.expiration"
       ],
-      "remediation": "Emit explicit disabling values for every native expiry knob, or bind them to the Core expiry sequence and record the fence."
+      "remediation": "Emit explicit disabling values for every native expiry knob, or bind them to the Core expiry sequence and record the fence.",
+      "id": "RET-009"
     },
     {
       "familyPrefix": "SBX",
@@ -2140,7 +2237,8 @@
         "sandbox.status.conditions",
         "operation.result"
       ],
-      "remediation": "Publish launch success only after all declared control, conformance, and admission probes pass for the exact new epoch."
+      "remediation": "Publish launch success only after all declared control, conformance, and admission probes pass for the exact new epoch.",
+      "id": "SBX-014"
     },
     {
       "familyPrefix": "SBX",
@@ -2160,7 +2258,8 @@
         "driver.conformanceEvidence",
         "sandbox.status.runtime.epoch"
       ],
-      "remediation": "Run every declared probe for the new epoch and report failure when any probe is unavailable or unproven."
+      "remediation": "Run every declared probe for the new epoch and report failure when any probe is unavailable or unproven.",
+      "id": "SBX-015"
     },
     {
       "familyPrefix": "SBX",
@@ -2181,7 +2280,8 @@
         "driver.launchEvidence",
         "operation.result"
       ],
-      "remediation": "Keep provider acknowledgements as evidence and satisfy each postcondition with the exact proof its contract requires."
+      "remediation": "Keep provider acknowledgements as evidence and satisfy each postcondition with the exact proof its contract requires.",
+      "id": "SBX-016"
     },
     {
       "familyPrefix": "SBX",
@@ -2202,7 +2302,8 @@
         "operation.origin",
         "operation.result"
       ],
-      "remediation": "Record the provider loss as its own event and reconcile the runtime state instead of crediting a Core Stop or Delete."
+      "remediation": "Record the provider loss as its own event and reconcile the runtime state instead of crediting a Core Stop or Delete.",
+      "id": "SBX-017"
     },
     {
       "familyPrefix": "SBX",
@@ -2222,7 +2323,8 @@
         "sandbox.status.execution.state",
         "operation.origin"
       ],
-      "remediation": "Sequence the observed runtime as a new epoch and open execution admission only after that record is durable."
+      "remediation": "Sequence the observed runtime as a new epoch and open execution admission only after that record is durable.",
+      "id": "SBX-018"
     },
     {
       "familyPrefix": "SBX",
@@ -2243,7 +2345,8 @@
         "sandbox.status.runtime.state",
         "driver.decodedEvidence"
       ],
-      "remediation": "Prove containment emptiness with the target's own kernel or host evidence before publishing `stopped`."
+      "remediation": "Prove containment emptiness with the target's own kernel or host evidence before publishing `stopped`.",
+      "id": "SBX-019"
     },
     {
       "familyPrefix": "SBX",
@@ -2263,7 +2366,8 @@
         "sandbox.status.conditions",
         "driver.containmentProof"
       ],
-      "remediation": "Commit `unknown` and preserve the evidence when the grace deadline expires without a containment-absence proof."
+      "remediation": "Commit `unknown` and preserve the evidence when the grace deadline expires without a containment-absence proof.",
+      "id": "SBX-020"
     },
     {
       "familyPrefix": "SBX",
@@ -2283,7 +2387,8 @@
         "sandbox.cleanup.proof",
         "sandbox.tombstone"
       ],
-      "remediation": "Terminalize an incompletely proven deletion as failed or unresolved, retain the cleanup obligation, and never claim success with cleanup pending."
+      "remediation": "Terminalize an incompletely proven deletion as failed or unresolved, retain the cleanup obligation, and never claim success with cleanup pending.",
+      "id": "SBX-021"
     },
     {
       "familyPrefix": "CNC",
@@ -2306,7 +2411,8 @@
         "live.operation.kind",
         "operation.conflict.activeOperationId"
       ],
-      "remediation": "Wait for or cancel the active lifecycle Operation, or issue a pair the compatibility ledger explicitly permits."
+      "remediation": "Wait for or cancel the active lifecycle Operation, or issue a pair the compatibility ledger explicitly permits.",
+      "id": "CNC-002"
     },
     {
       "familyPrefix": "POL",
@@ -2326,7 +2432,8 @@
         "resolution.effectiveCapabilities",
         "create.profile"
       ],
-      "remediation": "Select a profile advertising the exact conformed capability, or drop the capability-gated requirement from the creation."
+      "remediation": "Select a profile advertising the exact conformed capability, or drop the capability-gated requirement from the creation.",
+      "id": "POL-001"
     },
     {
       "familyPrefix": "POL",
@@ -2347,7 +2454,8 @@
         "sandbox.expiration",
         "sandbox.policy.lifecycleCeilings"
       ],
-      "remediation": "Use `none` only to clear the caller schedule, and keep the Artifact and Managed-Sandbox policy bounds in force in the committed record."
+      "remediation": "Use `none` only to clear the caller schedule, and keep the Artifact and Managed-Sandbox policy bounds in force in the committed record.",
+      "id": "POL-002"
     },
     {
       "familyPrefix": "ADM",
@@ -2369,7 +2477,8 @@
         "request.method",
         "api.publicMethodUnion"
       ],
-      "remediation": "Issue the exact named operations \u2014 observe StopSandbox then StartSandbox, SignalProcess, TerminateProcess, StopSandbox then DeleteSandbox, or RestoreSandbox \u2014 instead of a generic, compound, or provider-native verb."
+      "remediation": "Issue the exact named operations \u2014 observe StopSandbox then StartSandbox, SignalProcess, TerminateProcess, StopSandbox then DeleteSandbox, or RestoreSandbox \u2014 instead of a generic, compound, or provider-native verb.",
+      "id": "ADM-001"
     },
     {
       "familyPrefix": "ADM",
@@ -2379,7 +2488,7 @@
       "firstSoundPhase": "L0",
       "rejectionDeadline": "L0",
       "disposition": "unrepresentable",
-      "rationale": "Q1: the facts are the method's declared success postcondition and the request's method identity, both complete at the live request surface; a name whose meaning depends on which target serves it cannot be decided anywhere later without guessing the target. Q2: the declared postcondition per method is a Core control-plane fact, so core owns it. Q3: the live request surface must refuse before an acceptance record binds a meaning the Core cannot state. Q4: same traversal as the request. Unrepresentable because a generated contract requires a successPredicate per method, so a method with no exact postcondition has no construction path.",
+      "rationale": "Q1: the facts are the method's declared success postcondition and the request's method identity, both complete at the live request surface; a name whose meaning depends on which target serves it cannot be decided anywhere later without guessing the target. Q2: the declared success postcondition per method is a Core control-plane fact, but under Criterion O the invalid state is an expressible request at its own caller station, so the owner is `live`. Q3: the live request surface must refuse before an acceptance record binds a meaning the Core cannot state. Q4: same traversal as the request. Unrepresentable because a generated contract requires a successPredicate per method, so a method with no exact postcondition has no construction path.",
       "sourceObligations": [
         "TAXONOMY-02"
       ],
@@ -2388,7 +2497,8 @@
         "request.method",
         "operationContract.successPredicate"
       ],
-      "remediation": "Give the method one exact target-independent postcondition or decompose it into the precise operations whose postconditions the Core can state."
+      "remediation": "Give the method one exact target-independent postcondition or decompose it into the precise operations whose postconditions the Core can state.",
+      "id": "ADM-002"
     },
     {
       "familyPrefix": "ADM",
@@ -2398,7 +2508,7 @@
       "firstSoundPhase": "L0",
       "rejectionDeadline": "L0",
       "disposition": "unrepresentable",
-      "rationale": "Q1: the decision reads the closed method union plus the substantive fact that those six subjects have different authorization, capability, epoch, and failure contracts; both are complete at the live request surface. Q2: the method union and its per-subject contracts are Core control-plane facts. Q3: the live request surface is the last correct refusal point, since acceptance would bind one contract to six subjects. Q4: same traversal. This stays separate from the general public-surface entry because it consults the differing per-subject contracts, not only the union membership. Unrepresentable because the generated union has no UpdateSandbox arm.",
+      "rationale": "Q1: the decision reads the closed method union plus the substantive fact that those six subjects have different authorization, capability, epoch, and failure contracts; both are complete at the live request surface. Q2: the method union and its per-subject contracts are Core control-plane facts, but under Criterion O the invalid state is an expressible request at its own caller station, so the owner is `live`. Q3: the live request surface is the last correct refusal point, since acceptance would bind one contract to six subjects. Q4: same traversal. This stays separate from the general public-surface entry because it consults the differing per-subject contracts, not only the union membership. Unrepresentable because the generated union has no UpdateSandbox arm.",
       "sourceObligations": [
         "TAXONOMY-16"
       ],
@@ -2407,7 +2517,8 @@
         "request.method",
         "live.update"
       ],
-      "remediation": "Use UpdateSandboxMetadata or SetSandboxExpiration for representation changes and the exact lifecycle or resize operation for everything else."
+      "remediation": "Use UpdateSandboxMetadata or SetSandboxExpiration for representation changes and the exact lifecycle or resize operation for everything else.",
+      "id": "ADM-003"
     },
     {
       "familyPrefix": "ADM",
@@ -2417,7 +2528,7 @@
       "firstSoundPhase": "L0",
       "rejectionDeadline": "L0",
       "disposition": "unrepresentable",
-      "rationale": "Q1: the facts are the closed public method union and the request's method identity, complete at the live request surface. Q2: which names carry Core lifecycle authority is a Core control-plane fact. Q3: the live request surface must refuse before an acceptance record grants a client-ergonomic name lifecycle authority. Q4: the adapter-side obligation to own Session rebinding explicitly is a different owner on a different traversal and is filed on the adapter boundary, not here. Unrepresentable because these names have no arm in the generated Core method union.",
+      "rationale": "Q1: the facts are the closed public method union and the request's method identity, complete at the live request surface. Q2: which names carry Core lifecycle authority is a Core control-plane fact, but under Criterion O the invalid state is an expressible request at its own caller station, so the owner is `live`. Q3: the live request surface must refuse before an acceptance record grants a client-ergonomic name lifecycle authority. Q4: the adapter-side obligation to own Session rebinding explicitly is a different owner on a different traversal and is filed on the adapter boundary, not here. Unrepresentable because these names have no arm in the generated Core method union.",
       "sourceObligations": [
         "TAXONOMY-09"
       ],
@@ -2426,7 +2537,8 @@
         "request.method",
         "framework.session"
       ],
-      "remediation": "Express the intent as Sandbox reads, Exec, Process I/O, and explicit lifecycle methods, and keep attachment or Session state in the adapter."
+      "remediation": "Express the intent as Sandbox reads, Exec, Process I/O, and explicit lifecycle methods, and keep attachment or Session state in the adapter.",
+      "id": "ADM-004"
     },
     {
       "familyPrefix": "ADM",
@@ -2450,7 +2562,8 @@
         "operation.linkedOperationId",
         "operation.origin"
       ],
-      "remediation": "Issue and observe StopSandbox first, then issue DeleteSandbox against the proven stopped Sandbox; an expiry Delete is created only from a durable stopped proof and links the Stop Operation that produced it."
+      "remediation": "Issue and observe StopSandbox first, then issue DeleteSandbox against the proven stopped Sandbox; an expiry Delete is created only from a durable stopped proof and links the Stop Operation that produced it.",
+      "id": "ADM-005"
     },
     {
       "familyPrefix": "FRK",
@@ -2471,7 +2584,8 @@
         "sandbox.status.runtime.state",
         "snapshot.manifest"
       ],
-      "remediation": "Stop the Sandbox and observe its durable stopped proof, then restore from a complete Snapshot pinned to the same Artifact, member, and runtime profile."
+      "remediation": "Stop the Sandbox and observe its durable stopped proof, then restore from a complete Snapshot pinned to the same Artifact, member, and runtime profile.",
+      "id": "FRK-001"
     },
     {
       "familyPrefix": "ADM",
@@ -2493,7 +2607,8 @@
         "sandbox.status.runtime.epoch",
         "sandbox.etag"
       ],
-      "remediation": "Restrict metadata and expiration updates to labels, correlation metadata, and the caller-managed expiration schedule, and use the exact lifecycle or resize operation for anything else."
+      "remediation": "Restrict metadata and expiration updates to labels, correlation metadata, and the caller-managed expiration schedule, and use the exact lifecycle or resize operation for anything else.",
+      "id": "ADM-006"
     },
     {
       "familyPrefix": "ADM",
@@ -2514,17 +2629,18 @@
         "sandbox.status.execution.state",
         "sandbox.status.execution.reason"
       ],
-      "remediation": "Observe execution admission before submitting Exec, and after a lifecycle operation or expiry trigger start a new runtime epoch before executing again."
+      "remediation": "Observe execution admission before submitting Exec, and after a lifecycle operation or expiry trigger start a new runtime epoch before executing again.",
+      "id": "ADM-007"
     },
     {
       "familyPrefix": "ADM",
       "title": "Exec accepted against a provider-created epoch before Core sequences it",
       "statement": "An Exec is admitted against a runtime that a provider auto-wake, standby recovery, or lazy creation produced only after the Core has durably sequenced that runtime's epoch identity and execution admission.",
-      "owner": "core",
+      "owner": "exec",
       "firstSoundPhase": "E0",
       "rejectionDeadline": "E0",
       "disposition": "reject-at-boundary",
-      "rationale": "Q1: the decision reads the Core durable epoch-identity and admission records for the observed runtime against the Exec request's runtime reference; both are complete at the Exec request station and no post-dispatch fact is needed. Q2: durable epoch identity and admission sequencing are Core durable records, so core owns them even though the request surface is exec. Q3: the Exec request station is the last correct refusal point, because acceptance would bind a Process permanently to an unsequenced epoch. Q4: the reconciliation that establishes the provider-created runtime is a different operation and is filed on its own traversal. Reject-at-boundary: the sequencing record is Core-durable.",
+      "rationale": "Q1: the decision reads the Core durable epoch-identity and admission records for the observed runtime against the Exec request's runtime reference; both are complete at the Exec request station and no post-dispatch fact is needed. Q2: one Process request inside an existing Sandbox is the exec request surface; the Core sequencing record is the consulted fact. Q3: the Exec request station is the last correct refusal point, because acceptance would bind a Process permanently to an unsequenced epoch. Q4: the reconciliation that establishes the provider-created runtime is a different operation and is filed on its own traversal. Reject-at-boundary: the sequencing record is Core-durable.",
       "sourceObligations": [
         "LIFECYCLE-45"
       ],
@@ -2534,7 +2650,8 @@
         "sandbox.status.runtime.epoch",
         "operation.origin"
       ],
-      "remediation": "Let the system-originated reconciliation Operation durably sequence the new epoch and reopen admission, then submit Exec against that epoch."
+      "remediation": "Let the system-originated reconciliation Operation durably sequence the new epoch and reopen admission, then submit Exec against that epoch.",
+      "id": "ADM-008"
     },
     {
       "familyPrefix": "ADM",
@@ -2554,7 +2671,8 @@
         "process.launchAuthority",
         "sandbox.status.execution.state"
       ],
-      "remediation": "Revalidate the fenced launch-authority grant immediately before dispatch and terminalize or hold the Process when the grant is no longer current."
+      "remediation": "Revalidate the fenced launch-authority grant immediately before dispatch and terminalize or hold the Process when the grant is no longer current.",
+      "id": "ADM-009"
     },
     {
       "familyPrefix": "ADM",
@@ -2574,7 +2692,8 @@
         "operation.capturedProcessSet",
         "process.launchAuthority"
       ],
-      "remediation": "Order the operation as durable admission close, then launch-authority revocation, then Process-set capture, and never capture before both records commit."
+      "remediation": "Order the operation as durable admission close, then launch-authority revocation, then Process-set capture, and never capture before both records commit.",
+      "id": "ADM-010"
     },
     {
       "familyPrefix": "ADM",
@@ -2594,7 +2713,8 @@
         "operation.outcome",
         "exec.deadline"
       ],
-      "remediation": "Regrant launch authority only after the same-epoch Resume Operation commits success, and terminalize the Process when its deadline expired or a termination request intervened."
+      "remediation": "Regrant launch authority only after the same-epoch Resume Operation commits success, and terminalize the Process when its deadline expired or a termination request intervened.",
+      "id": "ADM-011"
     },
     {
       "familyPrefix": "ADM",
@@ -2615,7 +2735,8 @@
         "sandbox.status.runtime.state",
         "sandbox.status.runtime.epoch"
       ],
-      "remediation": "Prove runtime presence for the new epoch under current authority before publishing execution admission accepting."
+      "remediation": "Prove runtime presence for the new epoch under current authority before publishing execution admission accepting.",
+      "id": "ADM-012"
     },
     {
       "familyPrefix": "ADM",
@@ -2634,7 +2755,8 @@
         "driver.input",
         "driver.conformedCapabilities"
       ],
-      "remediation": "Return the typed capability-unsupported result before effect-producing work instead of substituting an approximate native mechanism."
+      "remediation": "Return the typed capability-unsupported result before effect-producing work instead of substituting an approximate native mechanism.",
+      "id": "ADM-013"
     },
     {
       "familyPrefix": "ADM",
@@ -2655,7 +2777,8 @@
         "driver.nativeStep",
         "operation.requestedPostcondition"
       ],
-      "remediation": "Reject the operation as unsupported rather than lowering it to a native step whose postcondition differs from the requested one."
+      "remediation": "Reject the operation as unsupported rather than lowering it to a native step whose postcondition differs from the requested one.",
+      "id": "ADM-014"
     },
     {
       "familyPrefix": "ADM",
@@ -2675,7 +2798,8 @@
         "driver.conformedCapabilities",
         "driver.execConformance"
       ],
-      "remediation": "Supply a Core-managed in-guest supervisor and durable spool, or do not advertise full Core Exec for this target."
+      "remediation": "Supply a Core-managed in-guest supervisor and durable spool, or do not advertise full Core Exec for this target.",
+      "id": "ADM-015"
     },
     {
       "familyPrefix": "ADM",
@@ -2694,7 +2818,8 @@
         "artifact.definition",
         "artifact.targets"
       ],
-      "remediation": "Express the dynamic condition as a runtime precondition on the Core operation and keep the Artifact limited to declarative facts."
+      "remediation": "Express the dynamic condition as a runtime precondition on the Core operation and keep the Artifact limited to declarative facts.",
+      "id": "ADM-016"
     },
     {
       "familyPrefix": "FRK",
@@ -2714,27 +2839,29 @@
         "process.id",
         "process.sandboxRuntimeRef"
       ],
-      "remediation": "Reject capture while any Core Process is nonterminal, and reintroduce execution in the new epoch through a fresh Exec that allocates a durable Process."
+      "remediation": "Reject capture while any Core Process is nonterminal, and reintroduce execution in the new epoch through a fresh Exec that allocates a durable Process.",
+      "id": "FRK-002"
     },
     {
       "familyPrefix": "PRC",
       "title": "Process terminal outcome mutated",
-      "statement": "A Process terminal outcome is immutable once committed, and every later signal acknowledgement, reaper observation, or provider event arriving before or during teardown is retained as evidence rather than applied as a rewrite.",
+      "statement": "A Process terminal outcome is immutable once committed, and every later signal acknowledgement, reaper observation, or provider event arriving after the outcome commit is retained as evidence rather than applied as a rewrite.",
       "owner": "core",
       "firstSoundPhase": "E1",
       "rejectionDeadline": "E1",
       "disposition": "reject-at-boundary",
-      "rationale": "Q1: the decision reads the existing terminal Process record and the proposed write; both are Core durable records and the protected outcome first exists at the exec outcome station. Q2: durable Process records and terminal outcomes are Core-owned. Q3: teardown is the last station on this traversal at which refusing is still correct, because a late signal ack, a stale reaper, or a provider event arriving during Stop must still be refused. Q4: the protected record is a Process outcome, not an Operation outcome, so this stays separate from the Operation immutability entry on the reconciliation traversal. Reject-at-boundary: refusing the rewrite consults two Core records and needs no new observation.",
+      "rationale": "Q1: the decision reads the existing terminal Process record and the proposed write; both are Core durable records and the protected outcome first exists at the exec outcome station. Q2: durable Process records and terminal outcomes are Core-owned. Q3: E1 is the exec outcome station and the last point on this traversal at which a late acknowledgement, reaper observation, or provider event can be refused as a rewrite; late evidence arriving during Stop or Delete is refused at `190`. Q4: the protected record is a Process outcome, not an Operation outcome, so this stays separate from the Operation immutability entry on the reconciliation traversal. Reject-at-boundary: refusing the rewrite consults two Core records and needs no new observation.",
       "sourceObligations": [
         "LIFECYCLE-29",
         "IDENTITY-18"
       ],
-      "traversal": "one Exec dispatch and its outcome, extended through Sandbox teardown",
+      "traversal": "one Exec dispatch and its outcome",
       "diagnosticPaths": [
         "process.status.termination",
         "process.status.state"
       ],
-      "remediation": "Retain the late observation as evidence linked to the Process and leave the committed terminal outcome unchanged."
+      "remediation": "Retain the late observation as evidence linked to the Process and leave the committed terminal outcome unchanged.",
+      "id": "PRC-001"
     },
     {
       "familyPrefix": "PRC",
@@ -2755,7 +2882,8 @@
         "process.status.state",
         "operation.outcome"
       ],
-      "remediation": "Keep the Process in its reconcilable state and terminalize only the Operation, then resolve the Process through reconciliation of its own launch token."
+      "remediation": "Keep the Process in its reconcilable state and terminalize only the Operation, then resolve the Process through reconciliation of its own launch token.",
+      "id": "PRC-002"
     },
     {
       "familyPrefix": "PRC",
@@ -2776,7 +2904,8 @@
         "operation.target.processId",
         "process.status.state"
       ],
-      "remediation": "Terminalize the Operation from its own proof obligations and update the Process only from Process-level termination evidence."
+      "remediation": "Terminalize the Operation from its own proof obligations and update the Process only from Process-level termination evidence.",
+      "id": "PRC-003"
     },
     {
       "familyPrefix": "PRC",
@@ -2798,7 +2927,8 @@
         "process.launchToken",
         "process.effectIntent"
       ],
-      "remediation": "Reconcile the same launch token and, once learned, the same backend execution identity, and leave the Process unproven rather than dispatching a replacement."
+      "remediation": "Reconcile the same launch token and, once learned, the same backend execution identity, and leave the Process unproven rather than dispatching a replacement.",
+      "id": "PRC-004"
     },
     {
       "familyPrefix": "PRC",
@@ -2821,7 +2951,8 @@
         "process.status.termination",
         "driver.terminationEvidence"
       ],
-      "remediation": "Decode the exact native termination evidence into its matching arm, and report the Process as unproven when the evidence does not justify any arm."
+      "remediation": "Decode the exact native termination evidence into its matching arm, and report the Process as unproven when the evidence does not justify any arm.",
+      "id": "PRC-005"
     },
     {
       "familyPrefix": "PRC",
@@ -2840,7 +2971,8 @@
       "diagnosticPaths": [
         "process.status.termination"
       ],
-      "remediation": "Record runtimeLost as the bare arm and carry any native detail in the protected evidence record instead."
+      "remediation": "Record runtimeLost as the bare arm and carry any native detail in the protected evidence record instead.",
+      "id": "PRC-006"
     },
     {
       "familyPrefix": "PRC",
@@ -2861,7 +2993,8 @@
         "process.status.termination",
         "sandbox.status.runtime.state"
       ],
-      "remediation": "Reap Process outcomes, terminalize every remaining nonterminal Process with its exact reason, and only then publish the Sandbox as stopped."
+      "remediation": "Reap Process outcomes, terminalize every remaining nonterminal Process with its exact reason, and only then publish the Sandbox as stopped.",
+      "id": "PRC-007"
     },
     {
       "familyPrefix": "PRC",
@@ -2882,7 +3015,8 @@
         "process.sandboxRuntimeRef",
         "driver.nativeExecutionIdentity"
       ],
-      "remediation": "Reject evidence bearing a different backend execution identity or runtime epoch and keep the Process unproven until matching evidence arrives."
+      "remediation": "Reject evidence bearing a different backend execution identity or runtime epoch and keep the Process unproven until matching evidence arrives.",
+      "id": "PRC-008"
     },
     {
       "familyPrefix": "PRC",
@@ -2906,7 +3040,8 @@
         "capability.authorityEpoch",
         "driver.fencingProof"
       ],
-      "remediation": "Advance authority to prevent stale commits, but keep the Process unproven until target fencing or a verifiable drain boundary proves it cannot act."
+      "remediation": "Advance authority to prevent stale commits, but keep the Process unproven until target fencing or a verifiable drain boundary proves it cannot act.",
+      "id": "PRC-009"
     },
     {
       "familyPrefix": "PRC",
@@ -2925,7 +3060,8 @@
         "process.status.state",
         "process.observationFreshness"
       ],
-      "remediation": "Demote the Process to its reconcilable state when its only fresh observer is lost, and restore running only from fresh same-epoch evidence."
+      "remediation": "Demote the Process to its reconcilable state when its only fresh observer is lost, and restore running only from fresh same-epoch evidence.",
+      "id": "PRC-010"
     },
     {
       "familyPrefix": "PRC",
@@ -2945,7 +3081,8 @@
         "process.status.termination",
         "sandbox.status.runtime.epoch"
       ],
-      "remediation": "Terminalize every nonterminal Process of the replaced epoch with its exact reason before publishing the new epoch as running."
+      "remediation": "Terminalize every nonterminal Process of the replaced epoch with its exact reason before publishing the new epoch as running.",
+      "id": "PRC-011"
     },
     {
       "familyPrefix": "PRC",
@@ -2964,7 +3101,8 @@
         "process.status.state",
         "process.launchAuthority"
       ],
-      "remediation": "Withhold the launch-authority grant and leave the undispatched Process accepted, so a successful same-epoch Resume can regrant it."
+      "remediation": "Withhold the launch-authority grant and leave the undispatched Process accepted, so a successful same-epoch Resume can regrant it.",
+      "id": "PRC-012"
     },
     {
       "familyPrefix": "PRC",
@@ -2983,7 +3121,8 @@
       "diagnosticPaths": [
         "process.status.state"
       ],
-      "remediation": "Advance the Process only along a locked edge, and reconcile rather than reviving a terminated Process."
+      "remediation": "Advance the Process only along a locked edge, and reconcile rather than reviving a terminated Process.",
+      "id": "PRC-013"
     },
     {
       "familyPrefix": "PRC",
@@ -3003,7 +3142,8 @@
       "diagnosticPaths": [
         "process.status.termination"
       ],
-      "remediation": "Commit exactly one closed ProcessTermination arm and keep native codes in the protected evidence record."
+      "remediation": "Commit exactly one closed ProcessTermination arm and keep native codes in the protected evidence record.",
+      "id": "PRC-014"
     },
     {
       "familyPrefix": "PRC",
@@ -3023,7 +3163,8 @@
         "process.status.termination",
         "driver.containmentAbsenceProof"
       ],
-      "remediation": "Prove target-side fencing or containment absence and deliberate Stop causality before selecting these arms, otherwise leave the Process unproven."
+      "remediation": "Prove target-side fencing or containment absence and deliberate Stop causality before selecting these arms, otherwise leave the Process unproven.",
+      "id": "PRC-015"
     },
     {
       "familyPrefix": "SIG",
@@ -3042,7 +3183,8 @@
         "live.signal.signal",
         "sandbox.capabilities.signals"
       ],
-      "remediation": "Select a signal from the advertised set, or use TerminateProcess or StopSandbox when the required signal is unsupported."
+      "remediation": "Select a signal from the advertised set, or use TerminateProcess or StopSandbox when the required signal is unsupported.",
+      "id": "SIG-001"
     },
     {
       "familyPrefix": "SIG",
@@ -3062,7 +3204,8 @@
         "sandbox.status.runtime.state",
         "sandbox.capabilities.signals"
       ],
-      "remediation": "Resume the Sandbox before signalling, or use StopSandbox when the target does not advertise deterministic delivery under suspension."
+      "remediation": "Resume the Sandbox before signalling, or use StopSandbox when the target does not advertise deterministic delivery under suspension.",
+      "id": "SIG-002"
     },
     {
       "familyPrefix": "SIG",
@@ -3081,7 +3224,8 @@
         "operation.outcome",
         "driver.signalDispatchEvidence"
       ],
-      "remediation": "Prove the exact target-specific dispatch was invoked and accepted before committing success, otherwise leave the Operation nonterminal or terminalize it as `unknown`."
+      "remediation": "Prove the exact target-specific dispatch was invoked and accepted before committing success, otherwise leave the Operation nonterminal or terminalize it as `unknown`.",
+      "id": "SIG-003"
     },
     {
       "familyPrefix": "SIG",
@@ -3102,7 +3246,8 @@
         "operation.successPredicate",
         "process.status.state"
       ],
-      "remediation": "Report the Signal Operation against its dispatch postcondition and observe the Process resource separately for delivery or exit."
+      "remediation": "Report the Signal Operation against its dispatch postcondition and observe the Process resource separately for delivery or exit.",
+      "id": "SIG-004"
     },
     {
       "familyPrefix": "SIG",
@@ -3112,7 +3257,7 @@
       "firstSoundPhase": "L1",
       "rejectionDeadline": "L1",
       "disposition": "reject-at-boundary",
-      "rationale": "Q1: the decision reads the target's declared dispatch-identity support and the driver's prior effect-attempt record for this Operation; both are known at the live operation's dispatch station before the repeat. Q2: declared native dispatch semantics live at the driver/provider boundary. Q3: the dispatch station is the last correct refusal point, because the duplicate native call follows immediately. Q4: the general effect-retry rule requiring native idempotency or exact adoption proof is a separate fencing entry at the driver-entry boundary; this is the Signal-specific specialization at a different station under a different fact set. Reject-at-boundary: the target's declared support is static driver metadata.",
+      "rationale": "Q1: the decision reads Core's durable dispatch record for this Operation -- the recorded dispatch-identity support for the resolved target and the prior effect-attempt entry -- both Core durable records available at the live operation's dispatch station before the repeat. Q2: the durable dispatch record and its possibly-at-least-once annotation are the control plane's own artefacts, so under Criterion O the owner is `core`; the driver-side declaration of native dispatch-identity support is filed at `25` on the driver-entry traversal. Q3: the dispatch station is the last correct refusal point, because the duplicate native call follows immediately. Q4: the general effect-retry rule requiring native idempotency or exact adoption proof is a separate fencing entry at the driver-entry boundary; this is the Signal-specific specialization at a different station under a different fact set. Reject-at-boundary: the recorded support and the prior attempt are both Core durable records at dispatch, so no fresh external observation is needed.",
       "sourceObligations": [
         "LIFECYCLE-35"
       ],
@@ -3121,7 +3266,8 @@
         "driver.signalDispatchEvidence",
         "operation.effectAttempt"
       ],
-      "remediation": "Coordinate dispatch identities where the target supports them, otherwise record the dispatch as possibly at-least-once rather than deduplicated."
+      "remediation": "Coordinate dispatch identities where the target supports them, otherwise record the dispatch as possibly at-least-once rather than deduplicated.",
+      "id": "SIG-005"
     },
     {
       "familyPrefix": "SIG",
@@ -3134,7 +3280,7 @@
       "rationale": "Q1: the decision reads the targeted Process record's terminal outcome and its inability-to-act proof against the Terminate Operation's declared success postcondition; all are Core durable records at the live operation's outcome station. Q2: the Process record, the Operation outcome, and the declared postcondition are Core-owned. Q3: the live outcome station is the last correct refusal point, because the Operation outcome is immutable once committed. Q4: the driver's graceful-then-force staging and its containment evidence are runtime-owned obligations filed separately. Reject-at-boundary: the required Process record state is a Core durable record.",
       "sourceObligations": [
         "LIFECYCLE-36",
-        "TAXONOMY-05"
+        "TAXONOMY-11"
       ],
       "traversal": "one TerminateProcess operation against an existing Sandbox",
       "diagnosticPaths": [
@@ -3142,7 +3288,8 @@
         "process.status.state",
         "process.status.termination"
       ],
-      "remediation": "Complete the graceful and force stages, record the Process terminal outcome with its inability-to-act proof, and only then commit Terminate as succeeded."
+      "remediation": "Complete the graceful and force stages, record the Process terminal outcome with its inability-to-act proof, and only then commit Terminate as succeeded.",
+      "id": "SIG-006"
     },
     {
       "familyPrefix": "PIO",
@@ -3162,7 +3309,8 @@
         "process.status.output.cursor",
         "process.output.persistedThrough"
       ],
-      "remediation": "Persist the byte range durably, then advance the cursor that covers it."
+      "remediation": "Persist the byte range durably, then advance the cursor that covers it.",
+      "id": "PIO-001"
     },
     {
       "familyPrefix": "PIO",
@@ -3182,7 +3330,8 @@
         "process.status.output.cursor",
         "exec.pty"
       ],
-      "remediation": "Read each stream from its own cursor, and request a terminal at Exec when merged ordering is required."
+      "remediation": "Read each stream from its own cursor, and request a terminal at Exec when merged ordering is required.",
+      "id": "PIO-002"
     },
     {
       "familyPrefix": "PIO",
@@ -3202,26 +3351,28 @@
         "process.status.output.cursor",
         "process.output.chunkSequence"
       ],
-      "remediation": "Attach the stable sequence identity to every emitted chunk so reattachment duplicates can be discarded by the caller."
+      "remediation": "Attach the stable sequence identity to every emitted chunk so reattachment duplicates can be discarded by the caller.",
+      "id": "PIO-003"
     },
     {
       "familyPrefix": "PIO",
-      "title": "stdin replayed or held by more than one writer lease",
+      "title": "Accepted Process input replayed",
       "statement": "Accepted Process input is never replayed: no operation over an accepted, sequenced input frame re-submits it.",
       "owner": "exec",
       "firstSoundPhase": "E0",
       "rejectionDeadline": "E0",
       "disposition": "unrepresentable",
-      "rationale": "Q1: the decision reads the accepted Process's stream contract and the set of live writer leases for that Process; both are complete at the Process-control request station where a lease is issued or used. Q2: the writer-lease record is a Core durable record. Q3: the request station is the last correct refusal point, because a second live lease immediately permits interleaved input. Q4: the separate rule binding a lease to one Process and epoch has its own fact set and is filed separately. Unrepresentable because the generated input path admits only a single live lease per Process and offers no replay operation over accepted input.",
+      "rationale": "Q1: the decision reads the accepted, sequenced Process input frame's durable record and the operation proposed against it; both are complete at the Process-control request station where the resubmission would arrive. Q2: one Process-control request inside an existing Sandbox is the exec request surface; the accepted input-frame record is the consulted fact. Q3: the request station is the last correct refusal point, because a re-submitted input frame is already ordered for a second delivery once accepted. Q4: the separate rule bounding live stdin writer leases to one per Process has its own fact set and is filed at `198`. Unrepresentable because the generated input path offers no replay operation over an accepted, sequenced input frame.",
       "sourceObligations": [
         "LIFECYCLE-39"
       ],
       "traversal": "one sequenced Process-control command inside an existing Sandbox",
       "diagnosticPaths": [
-        "exec.control.writerLeaseId",
-        "process.control.liveLeases"
+        "exec.control.sequence",
+        "process.control.receipt"
       ],
-      "remediation": "Acquire or take over the single writer lease explicitly, and recover a lost response by the retained coordinate rather than by replaying input."
+      "remediation": "Recover a lost response by the retained coordinate for the accepted input frame rather than by replaying the input.",
+      "id": "PIO-004"
     },
     {
       "familyPrefix": "PIO",
@@ -3231,16 +3382,17 @@
       "firstSoundPhase": "E1",
       "rejectionDeadline": "E1",
       "disposition": "reject-at-boundary",
-      "rationale": "Q1: the decision reads the Process terminal outcome and the output seal record; both are Core durable records first available at the exec outcome station. Q2: the Process record and the output spool are Core-owned. Q3: teardown is the last station on this traversal at which refusing is still correct, because a Sandbox Stop that drains and seals retained output must still refuse to declare end of output before the drain completes. Q4: the driver's obligation to produce backend-exit and drain evidence is a separate runtime-owned entry. Reject-at-boundary: both facts are Core records.",
+      "rationale": "Q1: the decision reads the Process terminal outcome and the output seal record; both are Core durable records first available at the exec outcome station. Q2: the Process record and the output spool are Core-owned. Q3: the exec outcome station is the last correct refusal point, because end of output becomes authoritative the moment the seal is committed there; the Stop and Delete window in which retained output is drained and sealed is covered by `191`. Q4: the driver's obligation to produce backend-exit and drain evidence is a separate runtime-owned entry. Reject-at-boundary: both facts are Core records.",
       "sourceObligations": [
         "LIFECYCLE-40"
       ],
-      "traversal": "one Exec dispatch and its output stream, extended through Sandbox teardown",
+      "traversal": "one Exec dispatch and its output stream",
       "diagnosticPaths": [
         "process.status.termination",
         "process.status.output.sealedAt"
       ],
-      "remediation": "Report termination and output sealing as separate facts and declare end of output only after backend exit and drain are proven."
+      "remediation": "Report termination and output sealing as separate facts and declare end of output only after backend exit and drain are proven.",
+      "id": "PIO-005"
     },
     {
       "familyPrefix": "PIO",
@@ -3250,17 +3402,18 @@
       "firstSoundPhase": "E1",
       "rejectionDeadline": "E1",
       "disposition": "observed-conformance",
-      "rationale": "Q1: the decision reads the driver's backend exit observation and its drain evidence for the Process's spool; both exist only after the execution ends. Q2: producing and decoding that native evidence is the driver/provider boundary, so runtime owns it; the Core stores the seal but does not observe the backend pipe. Q3: teardown is the last station on this traversal at which withholding the seal is still correct, because Stop drains and seals retained output as part of its sequence. Q4: the Core-side independence of termination and sealing is a separate entry under a different owner. Observed-conformance because the evidence is provable only after the effect.",
+      "rationale": "Q1: the decision reads the driver's backend exit observation and its drain evidence for the Process's spool; both exist only after the execution ends. Q2: producing and decoding that native evidence is the driver/provider boundary, so runtime owns it; the Core stores the seal but does not observe the backend pipe. Q3: the exec outcome station is the last correct refusal point, because the Core seals the stream there and a seal committed without proven drain cannot be withdrawn afterwards; the driver's obligation over the Stop and Delete drain window is filed as its own runtime-owned teardown entry alongside `191`. Q4: the Core-side independence of termination and sealing is a separate entry under a different owner. Observed-conformance because the evidence is provable only after the effect.",
       "sourceObligations": [
         "LIFECYCLE-40",
         "TAXONOMY-12"
       ],
-      "traversal": "one Exec dispatch and its output stream, extended through Sandbox teardown",
+      "traversal": "one Exec dispatch and its output stream",
       "diagnosticPaths": [
         "driver.outputDrainEvidence",
         "process.status.output.sealedAt"
       ],
-      "remediation": "Observe backend exit and drain the transport fully, then supply that evidence so the Core can seal the stream."
+      "remediation": "Observe backend exit and drain the transport fully, then supply that evidence so the Core can seal the stream.",
+      "id": "PIO-006"
     },
     {
       "familyPrefix": "PIO",
@@ -3281,7 +3434,8 @@
         "process.output.retention",
         "process.output.truncatedAt"
       ],
-      "remediation": "Return the typed output-expired result with the earliest retained cursor and record truncation explicitly instead of silently shortening the stream."
+      "remediation": "Return the typed output-expired result with the earliest retained cursor and record truncation explicitly instead of silently shortening the stream.",
+      "id": "PIO-007"
     },
     {
       "familyPrefix": "PIO",
@@ -3302,7 +3456,8 @@
         "exec.control.sequence",
         "exec.control.writerLeaseId"
       ],
-      "remediation": "Submit the command with its complete Process-control coordinate rather than as an ordinary retryable RPC."
+      "remediation": "Submit the command with its complete Process-control coordinate rather than as an ordinary retryable RPC.",
+      "id": "PIO-008"
     },
     {
       "familyPrefix": "PIO",
@@ -3321,7 +3476,8 @@
         "exec.control.sequence",
         "process.control.receipt"
       ],
-      "remediation": "Return the retained receipt for the matching lease, sequence, and canonical command instead of enqueuing the command again."
+      "remediation": "Return the retained receipt for the matching lease, sequence, and canonical command instead of enqueuing the command again.",
+      "id": "PIO-009"
     },
     {
       "familyPrefix": "PIO",
@@ -3340,7 +3496,8 @@
         "exec.control.sequence",
         "process.control.receipt.canonicalCommandDigest"
       ],
-      "remediation": "Reuse the exact canonical command for a retained sequence, and allocate the next sequence for genuinely new content."
+      "remediation": "Reuse the exact canonical command for a retained sequence, and allocate the next sequence for genuinely new content.",
+      "id": "PIO-010"
     },
     {
       "familyPrefix": "PIO",
@@ -3359,7 +3516,8 @@
         "exec.control.sequence",
         "process.control.lastAcceptedSequence"
       ],
-      "remediation": "Submit the exact next sequence for the lease, and resubmit the missing sequence before advancing."
+      "remediation": "Submit the exact next sequence for the lease, and resubmit the missing sequence before advancing.",
+      "id": "PIO-011"
     },
     {
       "familyPrefix": "PIO",
@@ -3369,7 +3527,7 @@
       "firstSoundPhase": "E0",
       "rejectionDeadline": "E0",
       "disposition": "reject-at-boundary",
-      "rationale": "Q1: the decision reads the lease's bound Process and epoch against the command's target coordinate; both are complete at the Process-control request station. Q2: the Process request surface inside an existing Sandbox is exec. Q3: the request station is the last correct refusal point, because acceptance would order a command against the wrong execution. Q4: the adapter's obligation to make Session rebinding explicit is a different owner on the adapter traversal and is filed there. Reject-at-boundary: the lease binding is a Core record compared against the request.",
+      "rationale": "Q1: the decision reads the lease's bound Process and epoch against the command's target coordinate; both are complete at the Process-control request station. Q2: the writer-lease binding to one Process and runtime epoch is the Core durable record that grants the single-writer lane, so under Criterion O the owner is `core`. Q3: the request station is the last correct refusal point, because acceptance would order a command against the wrong execution. Q4: the adapter's obligation to make Session rebinding explicit is a different owner on the adapter traversal and is filed there. Reject-at-boundary: the lease binding is a Core record compared against the request.",
       "sourceObligations": [
         "RESULT-36"
       ],
@@ -3379,7 +3537,8 @@
         "exec.control.coordinate",
         "process.sandboxRuntimeRef"
       ],
-      "remediation": "Acquire a new writer lease for the new Process and epoch instead of reusing a stale lease."
+      "remediation": "Acquire a new writer lease for the new Process and epoch instead of reusing a stale lease.",
+      "id": "PIO-012"
     },
     {
       "familyPrefix": "PIO",
@@ -3398,13 +3557,14 @@
         "process.control.receipt.state",
         "process.control.outcome"
       ],
-      "remediation": "Report the receipt against its ordering and delivery meaning and observe the Process resource separately for application behaviour."
+      "remediation": "Report the receipt against its ordering and delivery meaning and observe the Process resource separately for application behaviour.",
+      "id": "PIO-013"
     },
     {
       "familyPrefix": "PIO",
       "title": "Terminal resize accepted for a Process without a terminal or after termination",
       "statement": "ResizeProcessTerminal is accepted only for a nonterminal Process whose accepted Exec selected a terminal, and travels the same ordered Process-control stream as input and close.",
-      "owner": "core",
+      "owner": "exec",
       "firstSoundPhase": "E0",
       "rejectionDeadline": "E0",
       "disposition": "reject-at-boundary",
@@ -3419,7 +3579,8 @@
         "exec.pty",
         "process.status.state"
       ],
-      "remediation": "Request a terminal at Exec and issue resize only while the Process is nonterminal, through the ordered Process-control stream."
+      "remediation": "Request a terminal at Exec and issue resize only while the Process is nonterminal, through the ordered Process-control stream.",
+      "id": "PIO-014"
     },
     {
       "familyPrefix": "PIO",
@@ -3438,7 +3599,8 @@
         "exec.control.close",
         "process.control.log"
       ],
-      "remediation": "Treat the close as final for that Process and start a new Exec when further input is required."
+      "remediation": "Treat the close as final for that Process and start a new Exec when further input is required.",
+      "id": "PIO-015"
     },
     {
       "familyPrefix": "PIO",
@@ -3448,16 +3610,17 @@
       "firstSoundPhase": "E1",
       "rejectionDeadline": "E1",
       "disposition": "reject-at-boundary",
-      "rationale": "Q1: the decision reads the accepted receipt, the delivery evidence, and the Process-terminal rule that may discard it; all are Core durable records first complete at the exec outcome station. Q2: the receipt and its outcome carrier are Core durable records. Q3: teardown is the last station on this traversal at which refusing to drop the command is still correct, because Stop terminalizes remaining Processes and may discard pending commands. Q4: same traversal as the command. Reject-at-boundary: the four outcome arms are disjoint and selectable from Core records plus the driver evidence already retained.",
+      "rationale": "Q1: the decision reads the accepted receipt, the delivery evidence, and the Process-terminal rule that may discard it; all are Core durable records first complete at the exec outcome station. Q2: the receipt and its outcome carrier are Core durable records. Q3: the exec outcome station is the last correct refusal point, because the command's terminal outcome is committed there and a silently dropped receipt cannot be recovered afterwards; the Stop and Delete window in which remaining Processes are terminalized and pending commands resolved is covered by `191`. Q4: same traversal as the command. Reject-at-boundary: the four outcome arms are disjoint and selectable from Core records plus the driver evidence already retained.",
       "sourceObligations": [
         "RESULT-40"
       ],
-      "traversal": "one sequenced Process-control command inside an existing Sandbox, extended through Sandbox teardown",
+      "traversal": "one sequenced Process-control command inside an existing Sandbox",
       "diagnosticPaths": [
         "process.control.receipt.state",
         "process.control.outcome"
       ],
-      "remediation": "Terminalize every accepted command with one of the four disjoint outcomes and keep the receipt observable rather than discarding it silently."
+      "remediation": "Terminalize every accepted command with one of the four disjoint outcomes and keep the receipt observable rather than discarding it silently.",
+      "id": "PIO-016"
     },
     {
       "familyPrefix": "SOP",
@@ -3476,7 +3639,8 @@
         "live.snapshot.class",
         "live.snapshot.sourceAfterCapture"
       ],
-      "remediation": "Name one exact resolved Snapshot class and one explicit source-after-capture disposition in the canonical request."
+      "remediation": "Name one exact resolved Snapshot class and one explicit source-after-capture disposition in the canonical request.",
+      "id": "SOP-002"
     },
     {
       "familyPrefix": "SOP",
@@ -3495,7 +3659,8 @@
         "live.snapshot.class.kind",
         "live.snapshot.class.componentSet"
       ],
-      "remediation": "Select a runtime Snapshot class when memory, Process, descriptor, clock, connection, or device continuity is required."
+      "remediation": "Select a runtime Snapshot class when memory, Process, descriptor, clock, connection, or device continuity is required.",
+      "id": "SOP-003"
     },
     {
       "familyPrefix": "SOP",
@@ -3514,7 +3679,8 @@
         "operation.result.snapshotId",
         "snapshot.manifest.componentSet"
       ],
-      "remediation": "Withhold success and report the exact missing component or uncommitted compatibility metadata until every class-required component is durable."
+      "remediation": "Withhold success and report the exact missing component or uncommitted compatibility metadata until every class-required component is durable.",
+      "id": "SOP-004"
     },
     {
       "familyPrefix": "SOP",
@@ -3533,7 +3699,8 @@
         "live.snapshot.class.coreProcessHandling",
         "sandbox.processes"
       ],
-      "remediation": "Terminate or await every Core Process in the source epoch before requesting capture or Fork."
+      "remediation": "Terminate or await every Core Process in the source epoch before requesting capture or Fork.",
+      "id": "SOP-005"
     },
     {
       "familyPrefix": "SOP",
@@ -3554,7 +3721,8 @@
         "operation.result.sourceAfterCapture",
         "sandbox.status.runtime.epoch"
       ],
-      "remediation": "Restore the original source runtime state, epoch, and authority after quiescence, or declare a target that cannot claim the preserved postcondition."
+      "remediation": "Restore the original source runtime state, epoch, and authority after quiescence, or declare a target that cannot claim the preserved postcondition.",
+      "id": "SOP-006"
     },
     {
       "familyPrefix": "SOP",
@@ -3573,7 +3741,8 @@
         "snapshot.manifest.artifactIdentity",
         "snapshot.manifest.runtimeProfile"
       ],
-      "remediation": "Let the capture inherit the source runtime's pinned Artifact member, profile identity, and digests; construct a new Sandbox to use a different Artifact."
+      "remediation": "Let the capture inherit the source runtime's pinned Artifact member, profile identity, and digests; construct a new Sandbox to use a different Artifact.",
+      "id": "SOP-007"
     },
     {
       "familyPrefix": "FRK",
@@ -3595,7 +3764,8 @@
         "operation.target.epoch",
         "sandbox.status.runtime.epoch"
       ],
-      "remediation": "Run the restored runtime only under the newly allocated epoch and keep every prior epoch permanently fenced."
+      "remediation": "Run the restored runtime only under the newly allocated epoch and keep every prior epoch permanently fenced.",
+      "id": "FRK-003"
     },
     {
       "familyPrefix": "FRK",
@@ -3620,7 +3790,8 @@
         "sandbox.status.runtime.epoch",
         "sandbox.provenance"
       ],
-      "remediation": "Seal the source Sandbox ID and epoch and preallocate a distinct child Sandbox ID at epoch 1 in the Fork acceptance commit, with independent mutation authority and full recorded provenance."
+      "remediation": "Seal the source Sandbox ID and epoch and preallocate a distinct child Sandbox ID at epoch 1 in the Fork acceptance commit, with independent mutation authority and full recorded provenance.",
+      "id": "FRK-004"
     },
     {
       "familyPrefix": "FRK",
@@ -3640,7 +3811,8 @@
         "operation.target.epoch",
         "sandbox.status.runtime"
       ],
-      "remediation": "Prove the full fenced-handoff set before retaining the epoch, or represent the transfer as a cold relocation that allocates a new epoch."
+      "remediation": "Prove the full fenced-handoff set before retaining the epoch, or represent the transfer as a cold relocation that allocates a new epoch.",
+      "id": "FRK-005"
     },
     {
       "familyPrefix": "ADP",
@@ -3660,7 +3832,8 @@
         "framework.session",
         "framework.sandboxClient"
       ],
-      "remediation": "Carry SandboxRuntimeRef, Process ID, Operation ID, etag, and idempotency key explicitly and keep Session identity adapter-local."
+      "remediation": "Carry SandboxRuntimeRef, Process ID, Operation ID, etag, and idempotency key explicitly and keep Session identity adapter-local.",
+      "id": "ADP-001"
     },
     {
       "familyPrefix": "ADP",
@@ -3682,7 +3855,8 @@
         "framework.session",
         "live.operation.expectedRuntimeEpoch"
       ],
-      "remediation": "Determine attachment, same-epoch continuity, or replacement first, issue the exact matching Core operation, and rebind the Session explicitly."
+      "remediation": "Determine attachment, same-epoch continuity, or replacement first, issue the exact matching Core operation, and rebind the Session explicitly.",
+      "id": "ADP-002"
     },
     {
       "familyPrefix": "ADP",
@@ -3702,7 +3876,8 @@
         "framework.status",
         "sandbox.status.phase"
       ],
-      "remediation": "Project the Core status union verbatim and keep any adapter-specific phase clearly labelled as adapter-local presentation."
+      "remediation": "Project the Core status union verbatim and keep any adapter-specific phase clearly labelled as adapter-local presentation.",
+      "id": "ADP-003"
     },
     {
       "familyPrefix": "ADP",
@@ -3723,7 +3898,8 @@
         "framework.idempotencyKey",
         "framework.sandboxClient"
       ],
-      "remediation": "Reuse the caller's original idempotency key with the byte-identical canonical request when recovering, and derive a fresh key only for a genuinely new intent."
+      "remediation": "Reuse the caller's original idempotency key with the byte-identical canonical request when recovering, and derive a fresh key only for a genuinely new intent.",
+      "id": "ADP-004"
     },
     {
       "familyPrefix": "ADP",
@@ -3743,7 +3919,8 @@
         "framework.tools",
         "framework.sandboxClient"
       ],
-      "remediation": "Document exactly the Core's compatibility and precondition contract and use etag and runtime-epoch preconditions instead of an adapter-local lock."
+      "remediation": "Document exactly the Core's compatibility and precondition contract and use etag and runtime-epoch preconditions instead of an adapter-local lock.",
+      "id": "ADP-005"
     },
     {
       "familyPrefix": "ADP",
@@ -3761,7 +3938,8 @@
       "diagnosticPaths": [
         "framework.errors"
       ],
-      "remediation": "Generate the adapter failure type from the closed Core union and express adapter-specific context as non-semantic annotation."
+      "remediation": "Generate the adapter failure type from the closed Core union and express adapter-specific context as non-semantic annotation.",
+      "id": "ADP-006"
     },
     {
       "familyPrefix": "ADP",
@@ -3781,7 +3959,8 @@
         "framework.errors",
         "framework.transport"
       ],
-      "remediation": "Report the transport condition distinctly and resolve the Operation or Process state by retrieving it from the Core."
+      "remediation": "Report the transport condition distinctly and resolve the Operation or Process state by retrieving it from the Core.",
+      "id": "ADP-007"
     },
     {
       "familyPrefix": "ADP",
@@ -3801,7 +3980,8 @@
         "framework.errors",
         "process.termination"
       ],
-      "remediation": "Surface the exact ProcessTermination arm and exit code as a normal Process result, reserving infrastructure errors for infrastructure conditions."
+      "remediation": "Surface the exact ProcessTermination arm and exit code as a normal Process result, reserving infrastructure errors for infrastructure conditions.",
+      "id": "ADP-008"
     },
     {
       "familyPrefix": "ADP",
@@ -3822,7 +4002,8 @@
         "framework.retryPolicy",
         "operation.outcome"
       ],
-      "remediation": "Surface the ambiguity arm, or recover the same coordinate through Core idempotency or Core observation, instead of issuing a replacement effect."
+      "remediation": "Surface the ambiguity arm, or recover the same coordinate through Core idempotency or Core observation, instead of issuing a replacement effect.",
+      "id": "ADP-009"
     },
     {
       "familyPrefix": "ADP",
@@ -3842,7 +4023,8 @@
         "framework.cleanup",
         "operation.result.proof"
       ],
-      "remediation": "Report only the Core Operation's published proof and outcome, and mark any adapter observation explicitly as non-authoritative."
+      "remediation": "Report only the Core Operation's published proof and outcome, and mark any adapter observation explicitly as non-authoritative.",
+      "id": "ADP-010"
     },
     {
       "familyPrefix": "ADP",
@@ -3862,26 +4044,30 @@
         "framework.composites",
         "operation.id"
       ],
-      "remediation": "Issue and surface each named Core operation and its Operation handle separately, and label the composite as an adapter helper."
+      "remediation": "Issue and surface each named Core operation and its Operation handle separately, and label the composite as an adapter helper.",
+      "id": "ADP-011"
     },
     {
       "familyPrefix": "ADP",
-      "title": "Desired-state reconciler rewrites Core lifecycle or terminal Operation semantics",
+      "title": "Desired-state reconciler reaches the Core without etag and epoch preconditions or hides its system-originated Operations",
       "statement": "A managed desired-state reconciler reaches the Core only by issuing named Core operations under etag and runtime-epoch preconditions, and exposes its system-originated Operations for observation.",
       "owner": "service",
       "firstSoundPhase": "S0",
       "rejectionDeadline": "L0",
       "disposition": "reject-at-boundary",
-      "rationale": "Q1: the facts are the reconciler's declared action set and record model together with the Core Operation and lifecycle contract; both are complete at the Managed-Sandbox Service Definition station, so firstSoundPhase is S0. Q2: the managed layer is the Managed-Sandbox Service Definition owner, so the owner is service. Q3: L0 is the last station on this same traversal at which refusing is still correct, because a reconciler action that reaches the Core as a live request must be refused there if it carries a rewritten result or a substitute state; S0 to L0 is a direct edge. Q4: the rewriting is attempted by the managed controller, so it is filed on the managed traversal; the Core-side immutability of a terminal Operation result and the core filing of system-originated Operations at their caller-originated twin's phase remain separate core entries.",
+      "rationale": "Q1: the facts are the reconciler's declared action set and record model together with the Core Operation and lifecycle contract; both are complete at the Managed-Sandbox Service Definition station, so firstSoundPhase is S0. Q2: the managed layer is the Managed-Sandbox Service Definition owner, so the owner is service. Q3: L0 is the last station on this same traversal at which refusing is still correct, because a reconciler action that reaches the Core as a live request must be refused there if it carries no etag or runtime-epoch precondition; S0 to L0 is a direct edge. Q4: the unguarded Core action and the concealment are performed by the managed controller, so they are filed on the managed traversal; the reconciler's rewriting of a predecessor Operation's terminal result is filed separately at `196`, and the core filing of system-originated Operations at their caller-originated twin's phase remains a separate core entry.",
       "sourceObligations": [
-        "TAXONOMY-45"
+        "TAXONOMY-45",
+        "TAXONOMY-48"
       ],
       "traversal": "Managed desired-state reconciliation issuing Core operations",
       "diagnosticPaths": [
         "service.reconciler",
-        "operation.result"
+        "operation.target.expectedEtag",
+        "operation.target.expectedRuntimeEpoch"
       ],
-      "remediation": "Record desired state in the managed layer, issue named Core operations under etag and epoch preconditions, and append linked successor Operations instead of rewriting results."
+      "remediation": "Issue named Core operations under etag and runtime-epoch preconditions, and expose the reconciler's system-originated Operations for observation.",
+      "id": "ADP-012"
     },
     {
       "familyPrefix": "ADM",
@@ -3902,7 +4088,8 @@
         "sandbox.status.runtime.state",
         "sandbox.status.runtime.epoch"
       ],
-      "remediation": "Observe a current durable stopped proof before issuing StartSandbox; stop the present runtime and let its epoch retire first."
+      "remediation": "Observe a current durable stopped proof before issuing StartSandbox; stop the present runtime and let its epoch retire first.",
+      "id": "ADM-017"
     },
     {
       "familyPrefix": "FEN",
@@ -3923,7 +4110,8 @@
         "sandbox.authorityEpoch",
         "operation.result.resultingRuntimeEpoch"
       ],
-      "remediation": "Permanently fence the prior runtime epoch and its authority before committing the Start's launch authorization."
+      "remediation": "Permanently fence the prior runtime epoch and its authority before committing the Start's launch authorization.",
+      "id": "FEN-007"
     },
     {
       "familyPrefix": "SBX",
@@ -3944,7 +4132,8 @@
         "sandbox.artifact.resolvedManifest",
         "sandbox.runtimeProfile"
       ],
-      "remediation": "Re-resolve the Artifact, member, and runtime-profile manifest at the launch stage and refuse to launch from a stale or absent resolution."
+      "remediation": "Re-resolve the Artifact, member, and runtime-profile manifest at the launch stage and refuse to launch from a stale or absent resolution.",
+      "id": "SBX-022"
     },
     {
       "familyPrefix": "ADM",
@@ -3965,7 +4154,8 @@
         "operator.admission.tier",
         "sandbox.status.runtime.epoch"
       ],
-      "remediation": "Re-admit the resolved placement, capacity, and tier at the operator admission plane for the current epoch before dispatching the launch."
+      "remediation": "Re-admit the resolved placement, capacity, and tier at the operator admission plane for the current epoch before dispatching the launch.",
+      "id": "ADM-018"
     },
     {
       "familyPrefix": "IDE",
@@ -3985,7 +4175,8 @@
         "process.id",
         "exec.control.coordinate"
       ],
-      "remediation": "Carry output and event cursors only in observation requests and use the Core Process ID as the sole Process identity coordinate."
+      "remediation": "Carry output and event cursors only in observation requests and use the Core Process ID as the sole Process identity coordinate.",
+      "id": "IDE-020"
     },
     {
       "familyPrefix": "PRC",
@@ -4006,7 +4197,8 @@
         "process.status.state",
         "process.status.output.cursor"
       ],
-      "remediation": "Return the observation result with the latest Process record and an explicit condition-met flag; leave the observed Process and its output stream unchanged."
+      "remediation": "Return the observation result with the latest Process record and an explicit condition-met flag; leave the observed Process and its output stream unchanged.",
+      "id": "PRC-016"
     },
     {
       "familyPrefix": "PRC",
@@ -4027,7 +4219,8 @@
         "process.status.state",
         "driver.lateEvidence"
       ],
-      "remediation": "Link late acknowledgements, reaper observations, and provider events to the Process as evidence and leave the committed terminal outcome unchanged."
+      "remediation": "Link late acknowledgements, reaper observations, and provider events to the Process as evidence and leave the committed terminal outcome unchanged.",
+      "id": "PRC-017"
     },
     {
       "familyPrefix": "PIO",
@@ -4048,7 +4241,8 @@
         "process.output.sealed",
         "process.control.command.outcome"
       ],
-      "remediation": "Drain and seal retained output and resolve every accepted Process-control command with one of its four declared terminal outcomes before completing teardown."
+      "remediation": "Drain and seal retained output and resolve every accepted Process-control command with one of its four declared terminal outcomes before completing teardown.",
+      "id": "PIO-017"
     },
     {
       "familyPrefix": "OPA",
@@ -4070,7 +4264,8 @@
         "operation.effectAttempt.recoveryClass",
         "operation.effectAttempt.parameters"
       ],
-      "remediation": "Durably record the attempt and one of the four locked recovery classes before dispatching the live external effect, and quarantine the attempt as ambiguous when no class applies."
+      "remediation": "Durably record the attempt and one of the four locked recovery classes before dispatching the live external effect, and quarantine the attempt as ambiguous when no class applies.",
+      "id": "OPA-021"
     },
     {
       "familyPrefix": "OPA",
@@ -4092,7 +4287,8 @@
         "process.effectAttempt.recoveryClass",
         "process.effectAttempt.parameters"
       ],
-      "remediation": "Durably record the attempt and one of the four locked recovery classes before dispatching the exec external effect, and quarantine the attempt as ambiguous when no class applies."
+      "remediation": "Durably record the attempt and one of the four locked recovery classes before dispatching the exec external effect, and quarantine the attempt as ambiguous when no class applies.",
+      "id": "OPA-022"
     },
     {
       "familyPrefix": "SIG",
@@ -4113,7 +4309,8 @@
         "sandbox.status.runtime.epoch",
         "driver.signalDispatchEvidence"
       ],
-      "remediation": "Commit `succeeded` only on validated coordinates, exact target selection, and returned driver acceptance evidence; otherwise leave the Operation nonterminal or terminalize it `unknown`."
+      "remediation": "Commit `succeeded` only on validated coordinates, exact target selection, and returned driver acceptance evidence; otherwise leave the Operation nonterminal or terminalize it `unknown`.",
+      "id": "SIG-007"
     },
     {
       "familyPrefix": "ADP",
@@ -4133,7 +4330,8 @@
         "service.restartPolicy",
         "request.method"
       ],
-      "remediation": "Keep the desired-state revision and the restart/recreate policy in the managed layer's own records and drive the Core only through named Core operations."
+      "remediation": "Keep the desired-state revision and the restart/recreate policy in the managed layer's own records and drive the Core only through named Core operations.",
+      "id": "ADP-013"
     },
     {
       "familyPrefix": "ADP",
@@ -4145,7 +4343,9 @@
       "disposition": "reject-at-boundary",
       "rationale": "Q1: the facts are the predecessor Operation's committed terminal result and the correction the reconciler proposes, both complete from the service station through live admission. Q2: the reconciler's own conduct against the Core surface is the Managed-Sandbox Service boundary, so the owner is `service`. Q3: L0 is the last station at which a rewrite request can be refused. Q4: the offending act is the reconciler's request. Split out as clause (c) of `203` (L1.D17).",
       "sourceObligations": [
-        "TAXONOMY-48"
+        "TAXONOMY-49",
+        "LIFECYCLE-19",
+        "RESULT-24"
       ],
       "traversal": "Managed desired-state reconciliation issuing Core operations against a completed predecessor Operation",
       "diagnosticPaths": [
@@ -4153,7 +4353,8 @@
         "operation.result",
         "operation.linkedOperationId"
       ],
-      "remediation": "Append a new linked successor Operation instead of rewriting, reopening, or reinterpreting a predecessor's committed terminal result."
+      "remediation": "Append a new linked successor Operation instead of rewriting, reopening, or reinterpreting a predecessor's committed terminal result.",
+      "id": "ADP-014"
     },
     {
       "familyPrefix": "FRK",
@@ -4174,7 +4375,8 @@
         "sandbox.status.runtime.epoch",
         "operation.target.epoch"
       ],
-      "remediation": "Return all six target-side handoff proofs, or refuse the transfer and let Core represent the relocation as one that allocates a new epoch."
+      "remediation": "Return all six target-side handoff proofs, or refuse the transfer and let Core represent the relocation as one that allocates a new epoch.",
+      "id": "FRK-006"
     },
     {
       "familyPrefix": "PIO",
@@ -4193,12 +4395,13 @@
         "exec.control.writerLeaseId",
         "process.control.liveLeases"
       ],
-      "remediation": "Acquire or take over the single live writer lease explicitly, and refuse commands bearing any other lease with the typed lease-conflict result."
+      "remediation": "Acquire or take over the single live writer lease explicitly, and refuse commands bearing any other lease with the typed lease-conflict result.",
+      "id": "PIO-018"
     },
     {
       "familyPrefix": "OPA",
       "title": "Create idempotency coordinate rebound to a different intent",
-      "statement": "One caller-and-idempotency-key coordinate binds permanently to one canonical CreateSandbox request digest; a replay under the same coordinate with a different canonical digest is refused as a conflict and dispatches no effect.",
+      "statement": "One authenticated scope, method, and idempotency key binds exactly one canonical CreateSandbox request digest for its published recovery window; a replay under the same coordinate with a different canonical digest is refused as a conflict and dispatches no effect.",
       "owner": "core",
       "firstSoundPhase": "C0",
       "rejectionDeadline": "C0",
@@ -4215,7 +4418,8 @@
         "operation.canonicalRequest",
         "operation.canonicalDigest"
       ],
-      "remediation": "Refuse a replay whose canonical digest differs from the one already bound to the coordinate, and use a fresh idempotency key for a different intent."
+      "remediation": "Refuse a replay whose canonical digest differs from the one already bound to the coordinate, and use a fresh idempotency key for a different intent.",
+      "id": "OPA-023"
     },
     {
       "familyPrefix": "POL",
@@ -4236,7 +4440,8 @@
         "sandbox.artifact.policy",
         "sandbox.policy.lifecycleCeilings"
       ],
-      "remediation": "Restore under the exact policy pinned by the Sandbox's Artifact, and create a new Sandbox from a different Artifact when different policy is needed."
+      "remediation": "Restore under the exact policy pinned by the Sandbox's Artifact, and create a new Sandbox from a different Artifact when different policy is needed.",
+      "id": "POL-003"
     },
     {
       "familyPrefix": "POL",
@@ -4257,7 +4462,8 @@
         "artifact.policy",
         "create.policySelection"
       ],
-      "remediation": "Select or refine only permitted access within the pinned Artifact's hard policy, and never replace or widen an immutable policy dimension at creation."
+      "remediation": "Select or refine only permitted access within the pinned Artifact's hard policy, and never replace or widen an immutable policy dimension at creation.",
+      "id": "POL-004"
     },
     {
       "familyPrefix": "SOP",
@@ -4278,7 +4484,8 @@
         "driver.containmentProof",
         "process.status.state"
       ],
-      "remediation": "Publish `stopped` only after every Process is terminal, containment absence is proven, and the prior epoch can no longer act."
+      "remediation": "Publish `stopped` only after every Process is terminal, containment absence is proven, and the prior epoch can no longer act.",
+      "id": "SOP-008"
     },
     {
       "familyPrefix": "SOP",
@@ -4299,7 +4506,8 @@
         "snapshot.secretTreatment",
         "snapshot.compatibilityEnvelope"
       ],
-      "remediation": "Declare a class whose kind, component set, external-storage state, secret treatment, compatibility envelope, quiescence, device state, portability, and Process handling all agree, or refuse the capture."
+      "remediation": "Declare a class whose kind, component set, external-storage state, secret treatment, compatibility envelope, quiescence, device state, portability, and Process handling all agree, or refuse the capture.",
+      "id": "SOP-009"
     },
     {
       "familyPrefix": "RET",
@@ -4319,7 +4527,8 @@
         "snapshot.references",
         "snapshot.retentionHold"
       ],
-      "remediation": "Release the protecting references and retention holds before issuing DeleteSnapshot; the refusal names the exact protecting references."
+      "remediation": "Release the protecting references and retention holds before issuing DeleteSnapshot; the refusal names the exact protecting references.",
+      "id": "RET-010"
     },
     {
       "familyPrefix": "SBX",
@@ -4339,12 +4548,13 @@
         "sandbox.capabilities.suspendResume",
         "sandbox.status.runtime.state"
       ],
-      "remediation": "Admit Suspend and Resume only against a conformed target advertising both halves of the same-epoch continuity capability; otherwise use StopSandbox and StartSandbox."
+      "remediation": "Admit Suspend and Resume only against a conformed target advertising both halves of the same-epoch continuity capability; otherwise use StopSandbox and StartSandbox.",
+      "id": "SBX-023"
     },
     {
       "familyPrefix": "ADM",
       "title": "Statically absent cross-target capability deferred to launch without an explicit target branch",
-      "statement": "A cross-target capability, semantic, or ceiling that is statically absent from an enabled target fails Artifact validation with an explicit named target branch, and is never deferred to workload launch or to runtime discovery.",
+      "statement": "A cross-target capability, semantic, or ceiling that is statically absent from an enabled target is rejected during Artifact validation unless the Artifact declares an explicit named target branch for it, and is never deferred to workload launch or runtime discovery.",
       "owner": "artifact",
       "firstSoundPhase": "A0",
       "rejectionDeadline": "A1",
@@ -4360,7 +4570,8 @@
         "artifact.capabilities",
         "artifact.targetBranch"
       ],
-      "remediation": "Declare an explicit named target branch in the Artifact for every statically absent cross-target capability, semantic, or ceiling instead of deferring it to launch or runtime discovery."
+      "remediation": "Declare an explicit named target branch in the Artifact for every statically absent cross-target capability, semantic, or ceiling instead of deferring it to launch or runtime discovery.",
+      "id": "ADM-019"
     },
     {
       "familyPrefix": "SOP",
@@ -4380,12 +4591,13 @@
         "snapshot.components",
         "snapshot.class"
       ],
-      "remediation": "Return per-component durability and compatibility-metadata evidence for every required component, or report failure naming the exact missing component."
+      "remediation": "Return per-component durability and compatibility-metadata evidence for every required component, or report failure naming the exact missing component.",
+      "id": "SOP-010"
     },
     {
       "familyPrefix": "PRF",
       "title": "Launch-branch compensating effect represented as rollback",
-      "statement": "A compensating effect on the launch traversal is recorded as a new forward effect with its own Operation, evidence, and terminal outcome, never as erasure, reversal, or negation of the compensated Operation's external history.",
+      "statement": "A compensating effect on the launch traversal is recorded as a new forward effect with its own durable record, evidence, and outcome, never as erasure, reversal, or negation of the compensated Operation's external history.",
       "owner": "core",
       "firstSoundPhase": "R1",
       "rejectionDeadline": "R1",
@@ -4401,7 +4613,205 @@
         "operation.outcome",
         "operation.externalEffectLedger"
       ],
-      "remediation": "Record launch-branch compensation as a new linked forward effect with its own Operation, evidence, and terminal outcome; never mark the compensated Operation or its external effects as reversed."
+      "remediation": "Record launch-branch compensation as a new linked forward effect with its own durable record, evidence, and outcome; never mark the compensated Operation or its external effects as reversed.",
+      "id": "PRF-012"
+    },
+    {
+      "familyPrefix": "PRF",
+      "title": "Terminal Operation result rewritten on a live reconciliation traversal",
+      "statement": "An Operation's committed terminal outcome and its payload are immutable on the live mutation traversal, and later evidence, reconciliation, adoption, quarantine, or cleanup resolving at the live outcome station may only append a linked successor record that references the unchanged predecessor.",
+      "owner": "core",
+      "firstSoundPhase": "L1",
+      "rejectionDeadline": "L1",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the deciding facts are the existing terminal Operation record and the proposed write; both are Core durable records available at the live outcome station and no new observation is needed to refuse the rewrite. Q2: durable Operation records and terminal outcomes are the control plane's own artefacts, so under Criterion O the owner is `core`. Q3: L1 is the live traversal's own resolution station and the last point on that traversal at which the rewrite can be refused. Q4: the offending write belongs to the live reconciliation traversal described here; the launch-branch station is `51` and the teardown station is the T0 sibling. `reject-at-boundary`: immutability is decided from two stored records, not proved after an effect. Added because `51`'s traversal was narrowed to the launch branch and a reconciliation entering at L0 never reaches R1.",
+      "sourceObligations": [
+        "IDENTITY-18",
+        "LIFECYCLE-19",
+        "TAXONOMY-49",
+        "RESULT-24"
+      ],
+      "traversal": "Live reconciliation/adoption traversal resolving against an existing terminal Operation, at L1",
+      "diagnosticPaths": [
+        "operation.outcome",
+        "operation.revision",
+        "operation.successorLinks",
+        "operation.predecessorLinks"
+      ],
+      "remediation": "Append a linked successor resolution Operation instead of rewriting the predecessor's terminal outcome.",
+      "id": "PRF-013"
+    },
+    {
+      "familyPrefix": "PRF",
+      "title": "Terminal Operation result rewritten on a teardown or cleanup reconciliation traversal",
+      "statement": "An Operation's committed terminal outcome and its payload are immutable on the teardown and cleanup traversal, and later evidence, reconciliation, adoption, quarantine, or cleanup resolving at teardown may only append a linked successor record that references the unchanged predecessor.",
+      "owner": "core",
+      "firstSoundPhase": "T0",
+      "rejectionDeadline": "T0",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the deciding facts are the existing terminal Operation record and the proposed write; both are Core durable records available at the teardown sink and no new observation is needed to refuse the rewrite. Q2: durable Operation records and terminal outcomes are the control plane's own artefacts, so under Criterion O the owner is `core`. Q3: T0 is the teardown traversal's sink and the last point at which the rewrite can be refused. Q4: the offending write belongs to the teardown or cleanup traversal described here; the launch-branch station is `51` and the live station is the L1 sibling. `reject-at-boundary`: immutability is decided from two stored records. Added because `51`'s traversal was narrowed to the launch branch and a teardown or cleanup reconciliation never reaches R1.",
+      "sourceObligations": [
+        "IDENTITY-18",
+        "LIFECYCLE-19",
+        "TAXONOMY-49",
+        "RESULT-24"
+      ],
+      "traversal": "Teardown/cleanup reconciliation traversal resolving against an existing terminal Operation, at T0",
+      "diagnosticPaths": [
+        "operation.outcome",
+        "operation.revision",
+        "operation.successorLinks",
+        "operation.predecessorLinks"
+      ],
+      "remediation": "Append a linked successor resolution Operation instead of rewriting the predecessor's terminal outcome.",
+      "id": "PRF-014"
+    },
+    {
+      "familyPrefix": "SBX",
+      "title": "Verb-derived presentation label stored as Sandbox state on a launch traversal",
+      "statement": "On a launch traversal, Sandbox runtime state is exactly one of `provisioning`, `running`, `suspended`, `stopped`, or `unknown`; every derived launch presentation label -- creating, starting, restoring -- is recomputed at read time from the durable Operation and that authoritative status, and is never independently stored or used as the serialization oracle.",
+      "owner": "core",
+      "firstSoundPhase": "R1",
+      "rejectionDeadline": "R1",
+      "disposition": "unrepresentable",
+      "rationale": "Q1: the facts are the durable Operation kind and the authoritative Core runtime status at the launch Operation and status commit station. Q2: the protected artefact is the Core durable status record and its serialization oracle, so under Criterion O the owner is `core`. Q3: R1 is the launch traversal's commit station, at which a stored launch presentation label would first become durable. Q4: the offending act is the launch traversal's own commit; the live half is `86`, whose traversal is narrowed to live lifecycle mutations, and the request-input clause of LIFECYCLE-03 stays at L0. Unrepresentable because the generated status type has no field in which a presentation label can be stored. Added because a launch traversal never reaches L1, so `86` could not bind launch-branch status commits.",
+      "sourceObligations": [
+        "LIFECYCLE-03"
+      ],
+      "traversal": "one launch (Create running, Start, or same-Sandbox Restore) traversal, at Operation and status commit",
+      "diagnosticPaths": [
+        "sandbox.status.runtime.state",
+        "sandbox.status.lifecycleOperation",
+        "operation.kind"
+      ],
+      "remediation": "Derive launch presentation words at read time from the Operation kind and the authoritative status, and store neither.",
+      "id": "SBX-024"
+    },
+    {
+      "familyPrefix": "SBX",
+      "title": "Unprovable launch runtime state approximated as stopped or running",
+      "statement": "When a launch traversal cannot safely establish runtime presence or absence, claimed-epoch continuity, exclusive effect authority, containment emptiness, or external-effect liveness, the committed Sandbox runtime state is `unknown` with execution admission `closed`.",
+      "owner": "core",
+      "firstSoundPhase": "R1",
+      "rejectionDeadline": "R1",
+      "disposition": "observed-conformance",
+      "rationale": "Q1: the facts are the evidence set gathered for this launch weighed against the five presence, continuity, authority, containment, and liveness predicates, complete only at the launch result station. Q2: the published runtime state is a Core durable record, so under Criterion O the owner is `core`. Q3: R1, because the approximation becomes authoritative the moment launch publishes it and would then admit Exec against the new epoch. Q4: the same launch commits the approximation; the live half is `94`, whose traversal is narrowed to live lifecycle mutations. `observed-conformance` because insufficiency of proof is established only from post-launch evidence. Added because a launch traversal never reaches L1, so `94` could not bind the launch-failure case its own predicate describes.",
+      "sourceObligations": [
+        "LIFECYCLE-18"
+      ],
+      "traversal": "one launch (Create running, Start, or same-Sandbox Restore) traversal, at status publication",
+      "diagnosticPaths": [
+        "sandbox.status.runtime.state",
+        "sandbox.status.execution.state",
+        "sandbox.status.conditions"
+      ],
+      "remediation": "Commit `unknown` with closed admission and retain the launch evidence for a system-originated reconciliation Operation.",
+      "id": "SBX-025"
+    },
+    {
+      "familyPrefix": "PIO",
+      "title": "Teardown seal declared without driver-supplied backend exit and drain evidence",
+      "statement": "A driver supplies proven backend exit and output-drain evidence for every retained Process stream during Stop or Delete before the Core may seal that stream at teardown.",
+      "owner": "runtime",
+      "firstSoundPhase": "T0",
+      "rejectionDeadline": "T0",
+      "disposition": "observed-conformance",
+      "rationale": "Q1: the decision reads the driver's backend-exit observation and its drain evidence for each retained spool on the teardown traversal; both exist only after the teardown effect has acted. Q2: producing and decoding that native evidence is the driver/provider boundary, so runtime owns it; the Core stores the teardown seal but does not observe the backend pipe. Q3: T0 is the teardown station and the last point at which withholding the seal is still correct. Q4: the Core-side teardown obligation to drain, seal, and resolve accepted commands is `191` under a different owner; the exec-outcome half of the driver obligation is `152`, whose traversal is narrowed to one Exec dispatch and its output stream. Observed-conformance because the evidence is provable only after the effect. Added because the locked Stop Completion Protocol assigns the reap-drain-seal step to the portable Stop driver, so the driver obligation does not terminate at E1.",
+      "sourceObligations": [
+        "LIFECYCLE-40",
+        "TAXONOMY-12"
+      ],
+      "traversal": "Sandbox teardown traversal during Stop or Delete, at output drain and seal",
+      "diagnosticPaths": [
+        "driver.outputDrainEvidence",
+        "process.status.output.sealedAt",
+        "process.output.sealed"
+      ],
+      "remediation": "Observe backend exit for every retained Process stream during teardown and drain the transport fully, then supply that evidence so the Core can seal at teardown.",
+      "id": "PIO-019"
     }
-  ]
+  ],
+  "identifierBlock": {
+    "ADM": {
+      "first": "ADM-001",
+      "last": "ADM-019",
+      "count": 19
+    },
+    "ADP": {
+      "first": "ADP-001",
+      "last": "ADP-014",
+      "count": 14
+    },
+    "CNC": {
+      "first": "CNC-001",
+      "last": "CNC-002",
+      "count": 2
+    },
+    "ERR": {
+      "first": "ERR-001",
+      "last": "ERR-017",
+      "count": 17
+    },
+    "FEN": {
+      "first": "FEN-001",
+      "last": "FEN-007",
+      "count": 7
+    },
+    "FRK": {
+      "first": "FRK-001",
+      "last": "FRK-006",
+      "count": 6
+    },
+    "IDE": {
+      "first": "IDE-001",
+      "last": "IDE-020",
+      "count": 20
+    },
+    "OPA": {
+      "first": "OPA-001",
+      "last": "OPA-023",
+      "count": 23
+    },
+    "PIO": {
+      "first": "PIO-001",
+      "last": "PIO-019",
+      "count": 19
+    },
+    "POL": {
+      "first": "POL-001",
+      "last": "POL-004",
+      "count": 4
+    },
+    "PRC": {
+      "first": "PRC-001",
+      "last": "PRC-017",
+      "count": 17
+    },
+    "PRF": {
+      "first": "PRF-001",
+      "last": "PRF-014",
+      "count": 14
+    },
+    "RET": {
+      "first": "RET-001",
+      "last": "RET-010",
+      "count": 10
+    },
+    "SBX": {
+      "first": "SBX-001",
+      "last": "SBX-025",
+      "count": 25
+    },
+    "SIG": {
+      "first": "SIG-001",
+      "last": "SIG-007",
+      "count": 7
+    },
+    "SOP": {
+      "first": "SOP-001",
+      "last": "SOP-010",
+      "count": 10
+    }
+  },
+  "registrySizeAfterMerge": 354
 }

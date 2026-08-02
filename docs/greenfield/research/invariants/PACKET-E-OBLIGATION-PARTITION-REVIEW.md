@@ -1,6 +1,6 @@
 # Packet E Obligation Partition Review
 
-Status: **Candidate — identifiers not allocated; 20 confirmed defects open**
+Status: **Candidate — identifier block allocated; all confirmed defects closed**
 
 Date: 2026-07-31
 
@@ -25,6 +25,8 @@ edit rather than a file edit.
 | First adversarial review | 73 defects, 21 blocking — **failed** |
 | After consolidation (11 merges, 7 drops, 106 edits, 25 additions) | 209 |
 | Second adversarial review, with independent refutation | 35 claimed, 15 refuted (43%), **20 confirmed** |
+| After applying the 20 fixes (50 edits, 5 additions) | **214** |
+| Identifier block allocated | 16 families, contiguous, no collision |
 
 The first draft failed because the five family clusters authored in parallel
 without visibility into each other, so adjacent families independently filed the
@@ -44,10 +46,46 @@ obligations were cited three or more times and 6 were cited by nobody.
   owner/phase/obligation signature are distinct rules partitioned from one
   composite obligation, not duplicates.
 
-## Why the count is not final
+## Final count and allocation
 
-Three confirmed findings require *adding* entries, so 209 is not the number to
-allocate against: 209 -> 211-214.
+Three confirmed findings required *adding* entries, so 209 was never the number
+to allocate against. The fixes produced 50 edits and 5 additions, landing at
+**214** — inside the predicted 211-214 band.
+
+Conditional additions were resolved against the locked records, not by default:
+
+- **[51]** gained both per-station siblings (`L1 -> L1`, `T0 -> T0`), because
+  narrowing its traversal to the launch branch removed coverage of
+  reconciliations entering at `L0` and on the teardown traversal, which carry
+  the same Operation-immutability rule.
+- **[86]/[94]** gained both `R1` siblings: launch coverage is intended, and the
+  entries' own text says so — `[86]` enumerates `creating` and `provisioning`,
+  labels only a launch traversal produces.
+- **[152]** took the runtime-owned `T0 -> T0` sibling rather than declaring the
+  driver obligation terminates at `E1`. The Stop Completion Protocol is what a
+  portable Stop driver must implement, and its steps 8 and 9 place
+  containment-emptiness and drain evidence on the teardown traversal.
+
+The lexical station-name sweep flagged 15 entries whose prose named a station
+outside their declared phase pair. Four were the confirmed `E1` teardown cluster
+and are fixed; the other eleven were adjudicated as legitimate context, where a
+rationale names another station precisely to explain why it is *not* the
+deadline.
+
+## Post-fix verification
+
+- 214 entries; 0 unreachable phase pairs;
+- 0 uses of `C0 -> R1`, `L0 -> E0`, `E0 -> L1`; `T0` a sink in every filing;
+- 178/178 source obligations cited;
+- 0 bare `unknown` values;
+- **0 traversal fields naming a station outside their declared pair** — the
+  check that caught the cluster now returns clean.
+
+## Allocated identifier block
+
+16 families, contiguous `001..N`, no collision with the 30 existing prefixes and
+no collision with any of the 140 registered identifiers. Registry size after the
+registration batches: **140 + 214 = 354**.
 
 ## Calibration of the review
 
