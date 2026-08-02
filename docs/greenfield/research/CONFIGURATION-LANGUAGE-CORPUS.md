@@ -1865,6 +1865,590 @@ boundary.
   provider build adapter rejects before publishing a target member; the result
   later re-enters ordinary manifest verification before `C0`.
 
+### Packet E authority fencing and effect-authority ordering
+
+#### `FEN-001` Authoritative Core commit by a stale authority epoch
+
+- Owner: `core`
+- First-sound phase: `D0`
+- Rejection deadline: `D0`
+- Invariant: Every authoritative Core-state commit validates the complete capability of Sandbox ID, runtime epoch, and authority epoch against the durable authority high-water mark and commits only under the current authority epoch.
+- Minimum witness: An authoritative Core-state commit accepted from a capability whose authority epoch is below the durable high-water mark.
+- Required diagnostic: identifies `FEN-001`, names `capability.authorityEpoch`, `capability.runtimeEpoch`, `capability.sandboxId`, and states the remediation without disclosing secret values.
+
+#### `FEN-002` Successor effect authority granted without fencing or drain proof
+
+- Owner: `core`
+- First-sound phase: `H0`
+- Rejection deadline: `D0`
+- Invariant: The Core grants a successor actor effect authority only after the target is proven, for this exact handoff, to validate the fencing token atomically or to provide a product-verifiable predecessor drain or termination boundary.
+- Minimum witness: A successor actor granted effect authority against a target that neither validates a fencing token atomically nor offers a verifiable drain boundary.
+- Required diagnostic: identifies `FEN-002`, names `capability.authorityEpoch`, `handoff.targetFencing`, `handoff.predecessorDrain`, and states the remediation without disclosing secret values.
+
+#### `FEN-003` Driver claims exclusive effect authority without target fencing support
+
+- Owner: `runtime`
+- First-sound phase: `D0`
+- Rejection deadline: `D0`
+- Invariant: A driver declares for each effect boundary it exposes whether the target validates its fencing token atomically or offers a verifiable drain boundary, and refuses to dispatch an exclusive effect when it can prove neither.
+- Minimum witness: A driver that dispatches an exclusive effect on an effect boundary for which it declares neither atomic fencing nor a verifiable drain.
+- Required diagnostic: identifies `FEN-003`, names `driver.effectBoundary.fencingToken`, `driver.effectBoundary.drainProof`, `capability.authorityEpoch`, and states the remediation without disclosing secret values.
+
+#### `FEN-004` Unfenced handoff reported as a definite outcome
+
+- Owner: `core`
+- First-sound phase: `R1`
+- Rejection deadline: `R1`
+- Invariant: When a handoff cannot establish exclusive effect authority, the affected resources are quarantined or reconciled and the Operation retains its ambiguous terminal outcome rather than a definite success or failure.
+- Minimum witness: A handoff that could not be fenced whose Operation is published as a definite success.
+- Required diagnostic: identifies `FEN-004`, names `operation.outcome`, `operation.ambiguity`, `capability.authorityEpoch`, and states the remediation without disclosing secret values.
+
+#### `FEN-005` Driver retry or adoption without native idempotency or exact adoption proof
+
+- Owner: `runtime`
+- First-sound phase: `D0`
+- Rejection deadline: `D0`
+- Invariant: A driver retries the same external effect only under the provider's own idempotency token for that effect and adopts an existing external execution only with exact proof of its external identity, target, runtime epoch, and fencing.
+- Minimum witness: A driver that retries an external effect after a transport timeout without a provider idempotency token for that effect.
+- Required diagnostic: identifies `FEN-005`, names `driver.effectClass`, `driver.effectAttempt.idempotencyToken`, `driver.effectAttempt.adoptionProof`, and states the remediation without disclosing secret values.
+
+#### `FEN-006` Provider status alone justifies a Core outcome
+
+- Owner: `runtime`
+- First-sound phase: `D0`
+- Rejection deadline: `D0`
+- Invariant: Every driver declares which native identities, state observations, fencing results, and supervision facts justify each Core outcome variant it may report, and reports no variant whose declared evidence it did not obtain.
+- Minimum witness: A driver reporting a definite success on the strength of a provider status field alone.
+- Required diagnostic: identifies `FEN-006`, names `driver.evidenceContract`, `driver.evidence.providerStatus`, `operation.outcome`, and states the remediation without disclosing secret values.
+
+#### `FEN-007` Start authorizes a launch without fencing the prior runtime epoch
+
+- Owner: `core`
+- First-sound phase: `L1`
+- Rejection deadline: `L1`
+- Invariant: A Start commits its launch authorization only after the Sandbox's prior runtime epoch is permanently fenced, so no predecessor authority can commit Core state or act against the new epoch.
+- Minimum witness: A Start that commits its launch authorization while the prior runtime epoch's authority can still commit Core state.
+- Required diagnostic: identifies `FEN-007`, names `sandbox.status.runtime.epoch`, `sandbox.authorityEpoch`, `operation.result.resultingRuntimeEpoch`, and states the remediation without disclosing secret values.
+
+### Packet E identity and coordinate integrity
+
+#### `IDE-001` Sandbox identity reused across lifetimes
+
+- Owner: `core`
+- First-sound phase: `C0`
+- Rejection deadline: `C0`
+- Invariant: Every Sandbox ID identifies exactly one Sandbox lifetime and is never allocated again, including by re-creation after Delete, restore-as-create, or Fork child allocation.
+- Minimum witness: A Create that proposes the Sandbox ID of a previously deleted Sandbox and is accepted as a new lifetime.
+- Required diagnostic: identifies `IDE-001`, names `sandbox.id`, `create.sandboxId`, `operation.target.sandboxId`, and states the remediation without disclosing secret values.
+
+#### `IDE-002` Create omits its initial runtime-epoch record
+
+- Owner: `core`
+- First-sound phase: `C0`
+- Rejection deadline: `C0`
+- Invariant: Every accepted Create durably records either the runtime epoch allocated for a runtime-creating Create or an explicit absence of any runtime epoch for a Create that ends stopped.
+- Minimum witness: A Create accepted with a running runtime whose durable record carries no runtime-epoch value and no explicit absence marker.
+- Required diagnostic: identifies `IDE-002`, names `operation.result.resultingRuntimeEpoch`, `sandbox.status.runtime.epoch`, `create.initialRuntime`, and states the remediation without disclosing secret values.
+
+#### `IDE-003` Sandbox name reused before the former Sandbox is released
+
+- Owner: `core`
+- First-sound phase: `C0`
+- Rejection deadline: `C0`
+- Invariant: A Create accepts a Sandbox name only when no undeleted Sandbox holds that name and the prior holder's reservation has been released by Delete.
+- Minimum witness: Two Creates accepted with the same Sandbox name while the first Sandbox is still undeleted.
+- Required diagnostic: identifies `IDE-003`, names `create.name`, `sandbox.name`, and states the remediation without disclosing secret values.
+
+#### `IDE-004` Runtime epoch reused within a Sandbox
+
+- Owner: `core`
+- First-sound phase: `L0`
+- Rejection deadline: `L1`
+- Invariant: Every runtime epoch is a positive, strictly increasing, never-reused integer within its Sandbox ID, durably committed before the launch it authorizes and consumed even when that launch fails or ends ambiguously.
+- Minimum witness: A Start whose launch fails and whose successor Start reissues the same runtime-epoch integer.
+- Required diagnostic: identifies `IDE-004`, names `sandbox.status.runtime.epoch`, `operation.result.resultingRuntimeEpoch`, `operation.target.expectedRuntimeEpoch`, and states the remediation without disclosing secret values.
+
+#### `IDE-005` Exec request without a complete Sandbox runtime reference
+
+- Owner: `exec`
+- First-sound phase: `E0`
+- Rejection deadline: `E0`
+- Invariant: Every Exec request carries a complete Sandbox runtime reference naming the exact Sandbox ID and runtime epoch the execution is intended for.
+- Minimum witness: An Exec request carrying a Sandbox ID with the runtime epoch absent.
+- Required diagnostic: identifies `IDE-005`, names `exec.sandboxRuntimeRef`, `process.sandboxRuntimeRef`, and states the remediation without disclosing secret values.
+
+#### `IDE-006` Stale runtime reference silently retargeted
+
+- Owner: `live`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: A live request whose expected runtime epoch differs from the current epoch returns a typed stale-runtime result naming the requested Sandbox and expected epoch, and is never applied to the replacement runtime.
+- Minimum witness: A live mutation whose expected runtime epoch is one behind the current epoch and is applied to the replacement runtime anyway.
+- Required diagnostic: identifies `IDE-006`, names `operation.target.expectedRuntimeEpoch`, `sandbox.status.runtime.epoch`, and states the remediation without disclosing secret values.
+
+#### `IDE-007` Exec silently applied to a replacement runtime
+
+- Owner: `exec`
+- First-sound phase: `E0`
+- Rejection deadline: `E0`
+- Invariant: An Exec whose referenced runtime epoch is no longer current returns a typed stale-runtime result and is never admitted against the replacement runtime.
+- Minimum witness: An Exec naming a superseded runtime epoch that is admitted against the current runtime.
+- Required diagnostic: identifies `IDE-007`, names `exec.sandboxRuntimeRef`, `sandbox.status.runtime.epoch`, and states the remediation without disclosing secret values.
+
+#### `IDE-008` Coordinate substituted for another on the live request surface
+
+- Owner: `live`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: Each live request coordinate keeps its own declared domain: a name alias resolves once to an ID-pinned handle and never persists as identity; a representation etag guards only the representation revision and neither satisfies nor is satisfied by an expected-runtime-epoch precondition; an event or output cursor is an observation position only and is accepted in no identity, target, precondition, or authority position; an idempotency key is a recovery coordinate only; and a runtime epoch is expressible only as an expected-value precondition and never as an assignable field.
+- Minimum witness: A live mutation that carries an output cursor in the target position, or whose etag precondition is accepted in place of the expected-runtime-epoch precondition.
+- Required diagnostic: identifies `IDE-008`, names `sandbox.name`, `sandbox.id`, `sandbox.etag`, and states the remediation without disclosing secret values.
+
+#### `IDE-009` Snapshot manifest digest substituted for Snapshot identity
+
+- Owner: `live`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: Every Snapshot-targeted operation identifies its target by Snapshot ID, and the manifest digest remains an integrity coordinate that resolves no resource.
+- Minimum witness: A Snapshot-targeted operation whose target coordinate is a manifest digest rather than a Snapshot ID.
+- Required diagnostic: identifies `IDE-009`, names `operation.target.snapshotId`, `snapshot.manifestDigest`, and states the remediation without disclosing secret values.
+
+#### `IDE-010` Deleted or stale Snapshot handle retargeted to equal content
+
+- Owner: `live`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: A Snapshot ID that no longer resolves returns a typed target-not-found result and is never resolved to a different Snapshot with equal manifest digest or equivalent content.
+- Minimum witness: A Restore of a deleted Snapshot ID that succeeds against a different retained Snapshot with an equal manifest digest.
+- Required diagnostic: identifies `IDE-010`, names `operation.target.snapshotId`, `snapshot.id`, `snapshot.manifestDigest`, and states the remediation without disclosing secret values.
+
+#### `IDE-011` Operation accepted without the exact target its kind seals
+
+- Owner: `core`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: Every accepted Operation records exactly the tagged target variant its operation kind requires, with every coordinate that variant seals present and resolved -- including the exact expected runtime epoch that every runtime-acting live mutation's target variant seals.
+- Minimum witness: A runtime-acting live mutation accepted with a target variant whose sealed expected runtime epoch is absent.
+- Required diagnostic: identifies `IDE-011`, names `operation.target`, `operation.method`, `operation.target.sandboxId`, and states the remediation without disclosing secret values.
+
+#### `IDE-012` Process-targeted Operation retargeted during retry or reconciliation
+
+- Owner: `core`
+- First-sound phase: `L1`
+- Rejection deadline: `L1`
+- Invariant: A Process-targeted Operation keeps the exact Process ID, Sandbox ID, and runtime epoch committed at its acceptance through every retry, adoption, and reconciliation.
+- Minimum witness: A Signal Operation retried against a replacement Process ID after its committed target disappeared.
+- Required diagnostic: identifies `IDE-012`, names `operation.target.processId`, `operation.target.sandboxId`, `operation.target.runtimeEpoch`, and states the remediation without disclosing secret values.
+
+#### `IDE-013` Runtime-replacing result omits its previous or resulting epoch
+
+- Owner: `core`
+- First-sound phase: `L1`
+- Rejection deadline: `L1`
+- Invariant: Every Operation result that replaces or creates a runtime records both the previous runtime epoch, or its explicit absence, and the resulting runtime epoch.
+- Minimum witness: A Restore result recording only the resulting runtime epoch, with the previous epoch neither present nor explicitly absent.
+- Required diagnostic: identifies `IDE-013`, names `operation.result.previousRuntimeEpoch`, `operation.result.resultingRuntimeEpoch`, `sandbox.status.runtime.epoch`, and states the remediation without disclosing secret values.
+
+#### `IDE-014` Attachment continuity conflated with runtime continuity
+
+- Owner: `core`
+- First-sound phase: `L1`
+- Rejection deadline: `L1`
+- Invariant: Every lifecycle Operation able to change client attachment reports an explicit attachment outcome equivalent to preserved or reconnect-required, and that outcome never decides, substitutes for, or is decided by the runtime epoch.
+- Minimum witness: A lifecycle Operation that leaves the runtime epoch unchanged because the client attachment was preserved.
+- Required diagnostic: identifies `IDE-014`, names `operation.result.attachmentContinuity`, `operation.result.resultingRuntimeEpoch`, `sandbox.status.runtime.epoch`, and states the remediation without disclosing secret values.
+
+#### `IDE-015` Process record not permanently bound to one Sandbox runtime
+
+- Owner: `core`
+- First-sound phase: `E0`
+- Rejection deadline: `E0`
+- Invariant: Every accepted Process receives a newly allocated Core Process ID permanently bound to exactly one Sandbox ID and runtime epoch, and that binding is never rewritten.
+- Minimum witness: A Process record whose Sandbox runtime reference is rewritten to a newer epoch after its runtime was replaced.
+- Required diagnostic: identifies `IDE-015`, names `process.id`, `process.sandboxRuntimeRef`, `exec.sandboxRuntimeRef`, and states the remediation without disclosing secret values.
+
+#### `IDE-016` Native execution identifier used as durable public identity
+
+- Owner: `runtime`
+- First-sound phase: `D0`
+- Rejection deadline: `D0`
+- Invariant: Native PIDs, provider execution identifiers, provider resource identifiers, and VMM identities are recorded only as scoped decoded observations and never become or resolve durable public Sandbox, runtime, Process, Operation, or Snapshot identity.
+- Minimum witness: A driver result in which the provider execution identifier is published as the Core Process ID.
+- Required diagnostic: identifies `IDE-016`, names `driver.evidence.nativeExecutionId`, `process.id`, `sandbox.id`, and states the remediation without disclosing secret values.
+
+#### `IDE-017` Runtime epoch accepted as Create input
+
+- Owner: `create`
+- First-sound phase: `C0`
+- Rejection deadline: `C0`
+- Invariant: The canonical Create request expresses no runtime epoch, leaving the first epoch server-allocated output-only state that no caller, native extension, or adapter can set, preserve, or reset.
+- Minimum witness: A CreateSandbox request carrying a runtime-epoch value.
+- Required diagnostic: identifies `IDE-017`, names `create.runtimeEpoch`, `sandbox.status.runtime.epoch`, and states the remediation without disclosing secret values.
+
+#### `IDE-018` Runtime epoch written by a live request
+
+- Owner: `live`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: A live request expresses the runtime epoch only as an expected-value precondition and never as an assignable field able to set, reset, preserve, or decrement it.
+- Minimum witness: A live request that sets, resets, or decrements the Sandbox runtime epoch.
+- Required diagnostic: identifies `IDE-018`, names `operation.target.expectedRuntimeEpoch`, `sandbox.status.runtime.epoch`, and states the remediation without disclosing secret values.
+
+#### `IDE-019` Sandbox name mutated after Create
+
+- Owner: `live`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: The Sandbox name is fixed at Create, and no metadata, expiration, or other live update request can express a replacement name.
+- Minimum witness: An UpdateSandboxMetadata request carrying a replacement Sandbox name.
+- Required diagnostic: identifies `IDE-019`, names `sandbox.name`, `live.metadata`, and states the remediation without disclosing secret values.
+
+#### `IDE-020` Process identifier or output cursor used as an exec identity or authority coordinate
+
+- Owner: `exec`
+- First-sound phase: `E0`
+- Rejection deadline: `E0`
+- Invariant: Every output and event cursor on the exec branch is an observation position only, and the Core Process ID is the sole Process identity coordinate; neither is accepted in an identity, target, precondition, or authority position, and a native execution identifier is accepted in none of them.
+- Minimum witness: A Process-control request whose target coordinate is an output cursor or a native PID rather than the Core Process ID.
+- Required diagnostic: identifies `IDE-020`, names `process.status.output.cursor`, `process.id`, `exec.control.coordinate`, and states the remediation without disclosing secret values.
+
+### Packet E durable acceptance, idempotency, and recovery
+
+#### `OPA-001` Create rejected after durable creation intent exists
+
+- Owner: `core`
+- First-sound phase: `C0`
+- Rejection deadline: `D0`
+- Invariant: A CreateSandbox call returns a request rejection only while Core proves that no Operation, no dispatchable effect intent, no external invocation, and no recoverable accepted result exists; otherwise it is accepted and every later outcome is embedded in its Operation.
+- Minimum witness: A CreateSandbox that returns a request rejection after its effect intent was durably recorded.
+- Required diagnostic: identifies `OPA-001`, names `operation.id`, `operation.acceptedAt`, `create.idempotencyKey`, and states the remediation without disclosing secret values.
+
+#### `OPA-002` Live request rejected after durable mutation intent exists
+
+- Owner: `core`
+- First-sound phase: `L0`
+- Rejection deadline: `L1`
+- Invariant: A live Sandbox, Process-signal, Snapshot, or Fork mutation returns a request rejection only while Core proves that no Operation, no dispatchable effect intent, no external invocation, and no recoverable accepted result exists.
+- Minimum witness: A live mutation that returns a request rejection after its Operation and effect intent were durably committed.
+- Required diagnostic: identifies `OPA-002`, names `operation.id`, `operation.acceptedAt`, `operation.target`, and states the remediation without disclosing secret values.
+
+#### `OPA-003` Exec rejected after durable execution intent exists
+
+- Owner: `core`
+- First-sound phase: `E0`
+- Rejection deadline: `E1`
+- Invariant: An Exec returns a request rejection only while Core proves that no Process, no dispatchable effect intent, no external invocation, and no recoverable accepted result exists.
+- Minimum witness: An Exec that returns a request rejection after its Core Process ID and launch token were durably allocated.
+- Required diagnostic: identifies `OPA-003`, names `process.id`, `process.acceptedAt`, `exec.idempotencyKey`, and states the remediation without disclosing secret values.
+
+#### `OPA-004` Launch dispatched before its acceptance commit
+
+- Owner: `core`
+- First-sound phase: `C0`
+- Rejection deadline: `D0`
+- Invariant: No launch or other external creation effect is dispatched before Core atomically commits the Operation handle, canonical request and digest, preallocated Sandbox identity, idempotency binding, allocated runtime epoch, effect intent, and effect-authority epoch.
+- Minimum witness: A launch dispatched to a driver before the Operation's effect intent and effect-authority epoch were committed.
+- Required diagnostic: identifies `OPA-004`, names `operation.id`, `operation.effectIntent`, `operation.effectAuthorityEpoch`, and states the remediation without disclosing secret values.
+
+#### `OPA-005` Live effect dispatched before its acceptance commit
+
+- Owner: `core`
+- First-sound phase: `L0`
+- Rejection deadline: `L1`
+- Invariant: No live external effect is dispatched before Core atomically commits the Operation handle, canonical request and digest, sealed target with every applicable freshness precondition, idempotency binding, effect intent, and effect-authority epoch.
+- Minimum witness: A live external effect dispatched before its Operation handle and effect intent were committed.
+- Required diagnostic: identifies `OPA-005`, names `operation.id`, `operation.effectIntent`, `operation.effectAuthorityEpoch`, and states the remediation without disclosing secret values.
+
+#### `OPA-006` Exec dispatched before its acceptance commit
+
+- Owner: `core`
+- First-sound phase: `E0`
+- Rejection deadline: `E1`
+- Invariant: No Exec is dispatched before Core atomically commits the Core Process ID, canonical request and digest, exact Sandbox runtime reference, idempotency binding, launch token, effect intent, and effect-authority epoch.
+- Minimum witness: An Exec dispatched before its Core Process ID and launch token were durably committed.
+- Required diagnostic: identifies `OPA-006`, names `process.id`, `process.launchToken`, `process.sandboxRuntimeRef`, and states the remediation without disclosing secret values.
+
+#### `OPA-007` Create replay rejected against current mutable state
+
+- Owner: `core`
+- First-sound phase: `C0`
+- Rejection deadline: `C0`
+- Invariant: Idempotency lookup for a CreateSandbox request runs immediately after authorization and canonicalization and before target-state, capability, concurrency, capacity, and quota checks, so an equal replay recovers its original handle.
+- Minimum witness: An equal CreateSandbox replay rejected for quota exhaustion instead of returning its original Operation.
+- Required diagnostic: identifies `OPA-007`, names `create.idempotencyKey`, `operation.id`, and states the remediation without disclosing secret values.
+
+#### `OPA-008` Live replay rejected against current mutable state
+
+- Owner: `core`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: Idempotency lookup for a live mutation runs immediately after authorization and canonicalization and before lifecycle-state, concurrency, capacity, and quota checks, so a retry of an accepted mutation recovers its original Operation instead of being rejected as invalid for the current state.
+- Minimum witness: An equal replay of an accepted Stop rejected as invalid for the current Sandbox phase.
+- Required diagnostic: identifies `OPA-008`, names `operation.idempotencyCoordinate`, `operation.id`, `sandbox.status.phase`, and states the remediation without disclosing secret values.
+
+#### `OPA-009` Exec replay rejected against current mutable state
+
+- Owner: `core`
+- First-sound phase: `E0`
+- Rejection deadline: `E0`
+- Invariant: Idempotency lookup for an Exec runs immediately after authorization and canonicalization and before execution-admission, concurrency, capacity, and quota checks, so an equal replay recovers its original Process.
+- Minimum witness: An equal Exec replay rejected for a concurrency ceiling instead of returning its original Process.
+- Required diagnostic: identifies `OPA-009`, names `exec.idempotencyKey`, `process.id`, `sandbox.executionAdmission`, and states the remediation without disclosing secret values.
+
+#### `OPA-010` Live idempotency coordinate rebound to a different intent
+
+- Owner: `core`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: One authenticated scope, method, and idempotency key binds exactly one canonical request digest for its published recovery window, so an equal replay returns the original Operation and a conflicting replay is rejected without dispatching any effect.
+- Minimum witness: A live mutation replay under an existing idempotency coordinate with a different canonical digest that is accepted and dispatched.
+- Required diagnostic: identifies `OPA-010`, names `operation.idempotencyCoordinate`, `operation.canonicalDigest`, `operation.id`, and states the remediation without disclosing secret values.
+
+#### `OPA-011` Exec idempotency coordinate rebound to a different intent
+
+- Owner: `core`
+- First-sound phase: `E0`
+- Rejection deadline: `E0`
+- Invariant: One authenticated scope, method, and idempotency key binds exactly one canonical Exec digest for its published recovery window, so an equal replay returns the original Process and a conflicting replay is rejected without dispatching any execution.
+- Minimum witness: An Exec replay under an existing idempotency coordinate with a different canonical Exec digest that is accepted and dispatched.
+- Required diagnostic: identifies `OPA-011`, names `exec.idempotencyKey`, `process.canonicalDigest`, `process.id`, and states the remediation without disclosing secret values.
+
+#### `OPA-012` Canonical request identity includes transport or presentation fields
+
+- Owner: `core`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: The canonical request digest excludes transport-only fields, trace identifiers, and correlation metadata, and includes every field able to change target, authority, effect, policy, result, or postcondition.
+- Minimum witness: Two otherwise identical live mutations differing only in trace identifier that produce different canonical digests.
+- Required diagnostic: identifies `OPA-012`, names `operation.canonicalDigest`, `operation.correlationMetadata`, and states the remediation without disclosing secret values.
+
+#### `OPA-013` Retired create idempotency record silently authorizes a new effect
+
+- Owner: `core`
+- First-sound phase: `C0`
+- Rejection deadline: `C0`
+- Invariant: A CreateSandbox replay whose idempotency coordinate is retired or older than the published recovery window returns a recovery error carrying its tagged prior-acceptance evidence and never becomes a new accepted creation.
+- Minimum witness: A CreateSandbox replay under a retired idempotency coordinate that is accepted as a new creation.
+- Required diagnostic: identifies `OPA-013`, names `create.idempotencyKey`, `error.recovery`, `operation.id`, and states the remediation without disclosing secret values.
+
+#### `OPA-014` Retired live idempotency record silently authorizes a new mutation
+
+- Owner: `core`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: A live mutation replay whose idempotency coordinate is retired or older than the published recovery window returns a recovery error carrying its tagged prior-acceptance evidence and never becomes a new accepted mutation.
+- Minimum witness: A live mutation replay under a retired idempotency coordinate that is accepted as a new mutation.
+- Required diagnostic: identifies `OPA-014`, names `operation.idempotencyCoordinate`, `error.recovery`, `operation.id`, and states the remediation without disclosing secret values.
+
+#### `OPA-015` Retired exec idempotency record silently authorizes a new execution
+
+- Owner: `core`
+- First-sound phase: `E0`
+- Rejection deadline: `E0`
+- Invariant: An Exec replay whose idempotency coordinate is retired or older than the published recovery window returns a recovery error carrying its tagged prior-acceptance evidence and never becomes a new accepted execution.
+- Minimum witness: An Exec replay under a retired idempotency coordinate that is accepted as a new execution.
+- Required diagnostic: identifies `OPA-015`, names `exec.idempotencyKey`, `error.recovery`, `process.id`, and states the remediation without disclosing secret values.
+
+#### `OPA-016` Terminal failed Operation automatically replayed as a new attempt
+
+- Owner: `core`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: An accepted terminal failure is recovered as the original Operation's outcome, and creating a genuinely new attempt requires a new idempotency key together with operation-specific authority to attempt it again.
+- Minimum witness: A replay under the coordinate of a terminally failed Operation that automatically dispatches a fresh attempt.
+- Required diagnostic: identifies `OPA-016`, names `operation.idempotencyCoordinate`, `operation.outcome`, `operation.id`, and states the remediation without disclosing secret values.
+
+#### `OPA-017` Cancellation request recorded as a cancellation fact
+
+- Owner: `core`
+- First-sound phase: `L0`
+- Rejection deadline: `L1`
+- Invariant: An accepted cancellation request monotonically records cancel_requested on the existing Operation and allocates no new Operation, leaving that Operation the sole authority for its terminal outcome.
+- Minimum witness: A CancelOperation that records its target Operation as cancelled, or that allocates a second Operation to represent the cancellation.
+- Required diagnostic: identifies `OPA-017`, names `operation.id`, `operation.state`, `operation.cancellationRequestedAt`, and states the remediation without disclosing secret values.
+
+#### `OPA-018` Representation and idempotency result committed separately
+
+- Owner: `core`
+- First-sound phase: `L0`
+- Rejection deadline: `L1`
+- Invariant: An atomic Core-record update commits the new representation, its resulting revision, the idempotency binding, and the recoverable committed response in one commit, so an equal replay returns that response without applying the update again.
+- Minimum witness: A metadata update whose representation is committed before its idempotency binding, so an equal replay applies the update a second time.
+- Required diagnostic: identifies `OPA-018`, names `sandbox.etag`, `live.metadata`, `live.expiration`, and states the remediation without disclosing secret values.
+
+#### `OPA-019` Non-atomic record storage exposed for atomic update methods
+
+- Owner: `operator`
+- First-sound phase: `OC0`
+- Rejection deadline: `O0`
+- Invariant: A Core deployment whose record storage cannot commit the representation and its idempotency result atomically fails admission for the atomic-update methods rather than advertising them or substituting a durable Operation.
+- Minimum witness: A Core deployment on non-transactional record storage that still advertises UpdateSandboxMetadata as an atomic-update method.
+- Required diagnostic: identifies `OPA-019`, names `operator.recordStorage.atomicCommit`, `operator.advertisedMethods`, and states the remediation without disclosing secret values.
+
+#### `OPA-020` External effect attempted before its recovery classification is recorded
+
+- Owner: `core`
+- First-sound phase: `D0`
+- Rejection deadline: `D0`
+- Invariant: Before each external effect attempt on the launch traversal Core durably records the attempt with its exact parameters together with one of the four locked recovery classes: no durable intent, provider idempotency token available, external identity discoverable for adoption, or none available.
+- Minimum witness: An external launch effect dispatched with no durable attempt record naming its recovery class.
+- Required diagnostic: identifies `OPA-020`, names `driver.effectAttempt`, `driver.effectAttempt.recoveryClass`, `operation.effectIntent`, and states the remediation without disclosing secret values.
+
+#### `OPA-021` Live external effect attempted before its recovery classification is recorded
+
+- Owner: `core`
+- First-sound phase: `L0`
+- Rejection deadline: `L1`
+- Invariant: Before dispatching any external effect on the live-mutation traversal, Core durably records the attempt with its exact parameters together with one of the four locked recovery classes — no durable intent, provider idempotency token available, external identity discoverable for adoption, or none available — and reports ambiguity with quarantine when no class applies.
+- Minimum witness: A live external effect dispatched with no durable attempt record naming its recovery class.
+- Required diagnostic: identifies `OPA-021`, names `operation.effectAttempt`, `operation.effectAttempt.recoveryClass`, `operation.effectAttempt.parameters`, and states the remediation without disclosing secret values.
+
+#### `OPA-022` Exec external effect attempted before its recovery classification is recorded
+
+- Owner: `core`
+- First-sound phase: `E0`
+- Rejection deadline: `E1`
+- Invariant: Before dispatching any external effect on the Exec traversal, Core durably records the attempt with its exact parameters together with one of the four locked recovery classes — no durable intent, provider idempotency token available, external identity discoverable for adoption, or none available — and reports ambiguity with quarantine when no class applies.
+- Minimum witness: An exec external effect dispatched with no durable attempt record naming its recovery class.
+- Required diagnostic: identifies `OPA-022`, names `process.effectAttempt`, `process.effectAttempt.recoveryClass`, `process.effectAttempt.parameters`, and states the remediation without disclosing secret values.
+
+#### `OPA-023` Create idempotency coordinate rebound to a different intent
+
+- Owner: `core`
+- First-sound phase: `C0`
+- Rejection deadline: `C0`
+- Invariant: One authenticated scope, method, and idempotency key binds exactly one canonical CreateSandbox request digest for its published recovery window; a replay under the same coordinate with a different canonical digest is refused as a conflict and dispatches no effect.
+- Minimum witness: A CreateSandbox replay under an existing idempotency coordinate with a different canonical digest that is accepted.
+- Required diagnostic: identifies `OPA-023`, names `create.idempotencyKey`, `operation.canonicalRequest`, `operation.canonicalDigest`, and states the remediation without disclosing secret values.
+
+### Packet E outcome proof and terminal immutability
+
+#### `PRF-001` Launch Operation terminalized beyond its proven evidence
+
+- Owner: `core`
+- First-sound phase: `R1`
+- Rejection deadline: `R1`
+- Invariant: A launch Operation commits `succeeded` only when every possibility remaining under Core's evidence satisfies its exact success postcondition with cancellation `notRequested` or proven `lost`, commits `failed` or `cancelled` only when no remaining possibility satisfies that postcondition, every possibility has `mutationAuthority = quiesced`, and residual effects are known, and otherwise commits `unknown` with its exact ambiguity variant.
+- Minimum witness: A launch Operation committed `succeeded` while its evidence still admits a possibility in which the runtime never started.
+- Required diagnostic: identifies `PRF-001`, names `operation.outcome`, `operation.outcome.failed.cause`, `operation.outcome.cancelled.proof`, and states the remediation without disclosing secret values.
+
+#### `PRF-002` Live mutation Operation terminalized beyond its proven evidence
+
+- Owner: `core`
+- First-sound phase: `L1`
+- Rejection deadline: `L1`
+- Invariant: A live Sandbox, Snapshot, or Process-targeted mutation Operation commits `succeeded`, `failed`, or `cancelled` only when its exact evidence predicate for that arm holds over every remaining possibility, and otherwise commits `unknown`; a received cancellation request, an unresolved `cancellation = requested`, an internal timer expiry, or an RPC deadline never selects a definite arm.
+- Minimum witness: A live mutation committed `cancelled` because an RPC deadline expired while the external effect could still act.
+- Required diagnostic: identifies `PRF-002`, names `operation.outcome`, `operation.outcome.unknown.missingProofs`, `operation.cancellation`, and states the remediation without disclosing secret values.
+
+#### `PRF-003` Exec dispatch outcome committed beyond its proven evidence
+
+- Owner: `core`
+- First-sound phase: `E1`
+- Rejection deadline: `E1`
+- Invariant: An accepted Exec dispatch commits a terminal Process outcome only when every possibility remaining under Core's evidence satisfies that outcome's exact predicate with quiesced dispatch authority and known residuals; every other nonempty knowledge set leaves the Process in reconcilable `unknown`.
+- Minimum witness: A Process committed as exited from an observation not bound to its launch token.
+- Required diagnostic: identifies `PRF-003`, names `process.state`, `process.termination`, `process.evidence.knowledgeSet`, and states the remediation without disclosing secret values.
+
+#### `PRF-004` Teardown Operation terminalized beyond its proven evidence
+
+- Owner: `core`
+- First-sound phase: `T0`
+- Rejection deadline: `T0`
+- Invariant: A Stop, Delete, or other teardown Operation commits `succeeded`, `failed`, or `cancelled` only when its exact evidence predicate holds over every remaining possibility, and otherwise commits `unknown`; a cleanup attempt, a missing observation, native resource absence, or a provider acknowledgement never substitutes for cleanup completion, target absence, descendant quiescence, or the required Core postcondition.
+- Minimum witness: A Delete committed `succeeded` because the provider returned not-found for the instance.
+- Required diagnostic: identifies `PRF-004`, names `operation.outcome`, `operation.outcome.failed.cause`, `operation.residualObligations`, and states the remediation without disclosing secret values.
+
+#### `PRF-005` Terminal Operation result rewritten
+
+- Owner: `core`
+- First-sound phase: `R1`
+- Rejection deadline: `R1`
+- Invariant: An Operation's committed terminal outcome and its payload are immutable, and later evidence, reconciliation, adoption, quarantine, or cleanup may only append a linked successor record that references the unchanged predecessor.
+- Minimum witness: A launch Operation whose committed `unknown` outcome is rewritten to `succeeded` by a later reconciliation.
+- Required diagnostic: identifies `PRF-005`, names `operation.outcome`, `operation.revision`, `operation.successorLinks`, and states the remediation without disclosing secret values.
+
+#### `PRF-006` Compensation represented as rollback
+
+- Owner: `core`
+- First-sound phase: `T0`
+- Rejection deadline: `T0`
+- Invariant: A compensating effect recorded on the teardown or cleanup traversal is recorded as a new forward effect with its own durable record, evidence, and outcome, and never as erasure, reversal, or negation of the compensated Operation's external history -- including when in-sandbox state was restored from a Snapshot or filesystem capture.
+- Minimum witness: A cleanup that marks the compensated Operation's external effects as rolled back.
+- Required diagnostic: identifies `PRF-006`, names `operation.compensates`, `operation.outcome`, `operation.coreResolution`, and states the remediation without disclosing secret values.
+
+#### `PRF-007` Observation deadline mutating or terminalizing its target
+
+- Owner: `core`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: An observation, wait, or watch deadline ends only that observation and never cancels, mutates, terminalizes, requests cancellation of, or advances the durable state of the observed Sandbox, Operation, or Snapshot.
+- Minimum witness: A Wait whose deadline expiry marks the observed Operation as timed out.
+- Required diagnostic: identifies `PRF-007`, names `observation.deadline`, `operation.state`, `process.state`, and states the remediation without disclosing secret values.
+
+#### `PRF-008` Interrupted effect attempt resolved without its committed intent
+
+- Owner: `core`
+- First-sound phase: `R0`
+- Rejection deadline: `R1`
+- Invariant: An effect attempt interrupted after dispatch is resolved only by evidence bound to its own committed effect intent, launch token, exact external identity, and authority epoch, and is otherwise terminalized `unknown`; it is never resolved by a fresh attempt, by a differently identified native execution, or by assuming the attempt's outcome.
+- Minimum witness: An interrupted launch attempt resolved by dispatching a fresh attempt and adopting its outcome as the original's.
+- Required diagnostic: identifies `PRF-008`, names `operation.effectIntent`, `operation.launchToken`, `operation.externalIdentity`, and states the remediation without disclosing secret values.
+
+#### `PRF-009` Ambiguous launch outcome used as successor-effect permission
+
+- Owner: `core`
+- First-sound phase: `R1`
+- Rejection deadline: `R1`
+- Invariant: A launch Operation that terminalized `unknown` authorizes no relaunch, replacement, or adoption effect against the same intent, and any successor launch requires an independently proven fencing boundary, an exact adoption identity, or a newly authorized caller request with its own accepted intent.
+- Minimum witness: A relaunch dispatched against the same intent solely because the prior launch Operation terminalized `unknown`.
+- Required diagnostic: identifies `PRF-009`, names `operation.outcome.unknown.missingProofs`, `operation.coreResolution`, `operation.successorLinks`, and states the remediation without disclosing secret values.
+
+#### `PRF-010` Ambiguous live outcome used as successor-effect permission
+
+- Owner: `core`
+- First-sound phase: `L1`
+- Rejection deadline: `L1`
+- Invariant: A live mutation Operation that terminalized `unknown` authorizes no repeated, replacement, or compensating external effect against the same target and epoch until fenced evidence, exact adoption identity, or a newly authorized request establishes the successor's authority.
+- Minimum witness: A live external effect re-dispatched against the same target and epoch because the prior Operation terminalized `unknown`.
+- Required diagnostic: identifies `PRF-010`, names `operation.outcome.unknown.missingProofs`, `operation.coreResolution`, `operation.target`, and states the remediation without disclosing secret values.
+
+#### `PRF-011` Ambiguous teardown outcome used as cleanup or destruction permission
+
+- Owner: `core`
+- First-sound phase: `T0`
+- Rejection deadline: `T0`
+- Invariant: A Stop or Delete Operation that terminalized `unknown`, or `failed` with residual obligations, authorizes no assumed-complete cleanup, no identity release, and no successor destructive effect until an actor holding current authority durably discharges each exact residual obligation.
+- Minimum witness: A Delete that terminalized `unknown` whose Sandbox identity is nonetheless released and tombstoned as complete.
+- Required diagnostic: identifies `PRF-011`, names `operation.outcome.unknown.missingProofs`, `operation.residualObligations`, `operation.coreResolution`, and states the remediation without disclosing secret values.
+
+#### `PRF-012` Launch-branch compensating effect represented as rollback
+
+- Owner: `core`
+- First-sound phase: `R1`
+- Rejection deadline: `R1`
+- Invariant: A compensating effect on the launch traversal is recorded as a new forward effect with its own durable record, evidence, and outcome, never as erasure, reversal, or negation of the compensated Operation's external history.
+- Minimum witness: A failed launch whose compensating teardown marks the launch's external effects as never having occurred.
+- Required diagnostic: identifies `PRF-012`, names `operation.compensates`, `operation.outcome`, `operation.externalEffectLedger`, and states the remediation without disclosing secret values.
+
+#### `PRF-013` Terminal Operation result rewritten on a live reconciliation traversal
+
+- Owner: `core`
+- First-sound phase: `L1`
+- Rejection deadline: `L1`
+- Invariant: An Operation's committed terminal outcome and its payload are immutable on the live mutation traversal, and later evidence, reconciliation, adoption, quarantine, or cleanup resolving at the live outcome station may only append a linked successor record that references the unchanged predecessor.
+- Minimum witness: A live mutation Operation whose committed `unknown` outcome is rewritten to `failed` by a later reconciliation.
+- Required diagnostic: identifies `PRF-013`, names `operation.outcome`, `operation.revision`, `operation.successorLinks`, and states the remediation without disclosing secret values.
+
+#### `PRF-014` Terminal Operation result rewritten on a teardown or cleanup reconciliation traversal
+
+- Owner: `core`
+- First-sound phase: `T0`
+- Rejection deadline: `T0`
+- Invariant: An Operation's committed terminal outcome and its payload are immutable on the teardown and cleanup traversal, and later evidence, reconciliation, adoption, quarantine, or cleanup resolving at teardown may only append a linked successor record that references the unchanged predecessor.
+- Minimum witness: A teardown Operation whose committed terminal outcome is rewritten by a later cleanup reconciliation.
+- Required diagnostic: identifies `PRF-014`, names `operation.outcome`, `operation.revision`, `operation.successorLinks`, and states the remediation without disclosing secret values.
+
 ## Valid Cases
 
 Invalid-state rejection is insufficient if a language makes necessary
@@ -2222,6 +2806,390 @@ same canonical semantic value.
   Artifact/member identity and resolved-stage facts are fully replayed.
 - The product reacquires current Operator and host state and constructs a fresh
   private `PreparedLaunch`; no serialized or copied object is reused as one.
+
+### `VAL-043` Commit under the current authority epoch
+
+- A driver holds a capability naming Sandbox ID, runtime epoch 4, and authority epoch 7.
+- Core validates all three against the durable authority high-water mark and commits only while 7 is current.
+- After a handoff raises the mark to 8, the identical capability is refused and its holder is told to reacquire rather than being silently upgraded.
+
+### `VAL-044` Fenced successor handoff
+
+- Before granting successor effect authority, Core confirms for this exact handoff that the target validates the fencing token atomically.
+- Where the target cannot fence, Core instead obtains a product-verifiable predecessor drain or termination boundary and records which proof it used.
+- With neither proof available the affected resources are quarantined and reconciled, and no successor authority is granted.
+
+### `VAL-045` Per-boundary fencing declaration
+
+- A driver declares, for each effect boundary it exposes, whether the target validates its fencing token atomically or offers a verifiable drain boundary.
+- An exclusive effect on a boundary with declared atomic fencing dispatches normally under the current authority epoch.
+- An exclusive effect on a boundary with neither proof is refused before dispatch and the Operation is routed to reconciliation instead.
+
+### `VAL-046` Ambiguity retained on an unfenced handoff
+
+- A handoff cannot establish exclusive effect authority, so the affected Sandbox and its runtime are quarantined.
+- The Operation terminalizes with its ambiguous outcome and the exact ambiguity variant naming the fencing proof Core lacks.
+- A later reconciliation that obtains fencing evidence appends a linked successor resolution rather than editing the ambiguous outcome.
+
+### `VAL-047` Idempotent retry and proven adoption
+
+- A driver retries a create-instance call only under the provider's own idempotency token for that effect, reusing the token verbatim.
+- An existing external execution is adopted only after its external identity, target, runtime epoch, and fencing all match the committed intent exactly.
+- With neither a provider idempotency token nor exact adoption proof, the driver reconciles and reports ambiguity instead of retrying.
+
+### `VAL-048` Declared evidence per outcome variant
+
+- A driver publishes, for each Core outcome variant it may report, the native identities, state observations, fencing results, and supervision facts required to justify it.
+- A launch reported as succeeded carries exactly the declared observation set for that variant.
+- A provider response carrying only a status string maps to the ambiguity variant, naming the declared evidence the driver did not obtain.
+
+### `VAL-049` Prior epoch fenced before Start commits
+
+- A Start on a stopped Sandbox permanently fences runtime epoch 2 and its authority before committing the launch authorization for epoch 3.
+- A predecessor holder of epoch 2 authority is thereafter refused at every authoritative Core commit.
+- Where fencing cannot be completed the Start is not authorized, and the Sandbox is reconciled instead of relaunched.
+
+### `VAL-050` Fresh identity for every lifetime
+
+- A Create allocates a never-issued Sandbox ID, and a later Delete retires that ID permanently.
+- A re-creation with the same name and byte-identical Artifact receives a different Sandbox ID.
+- A Fork child and a restore-as-create each allocate their own fresh Sandbox ID while recording the parent or source Snapshot identity as provenance only.
+
+### `VAL-051` Epoch one or an explicit no-runtime marker
+
+- A Create that ends running durably commits runtime epoch 1 before the launch it authorizes and returns it on the Create result.
+- A Create that ends stopped commits an explicit no-runtime marker rather than leaving the epoch absent, null, or zero.
+- Both records occupy the same result field, so a later Start can allocate the next epoch without inferring one.
+
+### `VAL-052` Name released by Delete before reuse
+
+- A Create takes the name `agent-workspace` while no undeleted Sandbox holds it.
+- A Delete of the holder releases the reservation, and a later Create takes the same name with a fresh Sandbox ID.
+- The two lifetimes stay distinguishable by Sandbox ID, and the name resolves to exactly one Sandbox at any instant.
+
+### `VAL-053` Strictly increasing epoch committed before launch
+
+- A Sandbox created running holds epoch 1; a Stop followed by a Start commits epoch 2 durably before dispatching the launch.
+- That Start's launch fails ambiguously and epoch 2 stays consumed, so the next Start commits epoch 3.
+- A same-Sandbox Restore and a Fork each consume the next unused epoch within their own Sandbox ID.
+
+### `VAL-054` Exec pinned to an observed Sandbox runtime
+
+- The caller reads Sandbox ID and runtime epoch from the Create or Get result and copies both into the Exec request.
+- Both coordinates are required fields of the canonical Exec request, so a partial reference is not expressible.
+- The accepted Process records exactly the pair it was admitted against.
+
+### `VAL-055` Typed stale-runtime result on epoch mismatch
+
+- A caller holding epoch 3 issues a live mutation after a Stop/Start installed epoch 4.
+- Core returns the typed stale-runtime result naming the requested Sandbox and the expected epoch 3, and dispatches nothing.
+- The caller refreshes its handle, observes epoch 4, and reissues the identical mutation, which is admitted unchanged.
+
+### `VAL-056` Exec refused against a replaced runtime
+
+- A cached handle naming epoch 2 is used for an Exec after a Restore installed epoch 3.
+- Core returns the typed stale-runtime result; no Core Process ID is allocated and no execution is dispatched.
+- After refreshing to epoch 3 the same Exec request body is admitted unchanged.
+
+### `VAL-057` Coordinates kept in their declared domains
+
+- A request resolves the name alias once, pins the returned Sandbox ID, and carries only that ID thereafter.
+- An etag precondition and an expected-runtime-epoch precondition are evaluated independently, so satisfying one never satisfies or excuses the other.
+- An output or event cursor appears only in an observation request, and the runtime epoch appears only as an expected-value precondition.
+
+### `VAL-058` Snapshot targeted by identity, verified by digest
+
+- A Restore names the Snapshot ID in its target position and separately carries the manifest digest it expects.
+- The digest is checked for content integrity only after the Snapshot ID resolves, and resolves nothing on its own.
+- The canonical request type offers no position in which a manifest digest can act as a target.
+
+### `VAL-059` Retired Snapshot ID returns target-not-found
+
+- A Snapshot is deleted, and a later Restore naming its ID returns the typed target-not-found result.
+- A second, distinct Snapshot with an identical manifest digest exists in the store and is not substituted.
+- The caller lists Snapshots, selects the surviving Snapshot ID explicitly, and restores from it.
+
+### `VAL-060` Every Operation carries its sealed target variant
+
+- A Stop carries the Sandbox target variant with the Sandbox ID and the expected runtime epoch observed on the handle.
+- A Signal carries the Process target variant with Process ID, Sandbox ID, and runtime epoch, all resolved.
+- Each accepted Operation durably records exactly the tagged variant its method declares, with no sealed coordinate left absent or unresolved.
+
+### `VAL-061` Retry reconciles only the committed target
+
+- A Signal Operation commits its Process ID, Sandbox ID, and runtime epoch at acceptance.
+- A transport retry and a later reconciliation both resolve strictly against that committed triple.
+- Where no Process exists under that triple, a linked successor Operation is created rather than retargeting the original.
+
+### `VAL-062` Both epochs recorded on a runtime-replacing result
+
+- A Start from stopped records the previous runtime epoch as explicitly absent and the resulting epoch as 2.
+- A same-Sandbox Restore records previous epoch 2 and resulting epoch 3.
+- The Sandbox status epoch after commit equals the recorded resulting epoch, so no reader has to infer the transition.
+
+### `VAL-063` Attachment continuity reported as its own outcome
+
+- A live resize preserves the runtime, reports attachment `preserved`, and leaves the runtime epoch unchanged for an independent reason.
+- A Restore replaces the runtime, reports attachment `reconnect-required`, and separately records the newly allocated epoch.
+- Neither field is derived from the other: a preserved attachment never implies epoch continuity, and an unchanged epoch never implies the attachment survived.
+
+### `VAL-064` Process permanently bound to one runtime
+
+- An accepted Exec allocates a fresh Core Process ID bound to the exact Sandbox ID and runtime epoch it was admitted against.
+- When that runtime is later replaced, the Process record keeps its original binding and terminalizes under it.
+- A subsequent Exec against the new epoch allocates a different Core Process ID.
+
+### `VAL-065` Native identifiers kept as scoped evidence
+
+- A driver records the guest PID and the VMM instance identity as scoped protected evidence attached to the launch attempt.
+- Public Sandbox, runtime, Process, Operation, and Snapshot identities remain Core-allocated and resolve without consulting any native identifier.
+- Those same native identifiers remain usable for reconciliation and adoption proof without ever appearing in an identity, target, or authority position.
+
+### `VAL-066` Server-allocated first epoch
+
+- The canonical CreateSandbox request type has no runtime-epoch field, so no caller, adapter, or create-native extension can supply, preserve, or reset one.
+- The Create result returns the allocated epoch and clients read it from there.
+- A restore-as-create records the source Snapshot's provenance and still receives a freshly allocated first epoch.
+
+### `VAL-067` Epoch expressible only as a precondition
+
+- A live mutation carries `expectedRuntimeEpoch` as a precondition, and the request type contains no assignable epoch field.
+- Core allocates the next epoch for any runtime-replacing mutation and returns it on the result.
+- A live-native extension inherits the same request type and therefore cannot introduce a settable epoch.
+
+### `VAL-068` Name fixed at Create, metadata still mutable
+
+- UpdateSandboxMetadata changes labels and annotations and has no field able to express a Sandbox name.
+- SetSandboxExpiration changes only the expiration and leaves the name untouched.
+- A caller wanting a different alias creates a new Sandbox and deletes the old one, releasing the old name for reuse.
+
+### `VAL-069` Cursors observe, Process IDs identify
+
+- A process output read carries a cursor in the observation request and returns the next cursor.
+- Signal and Terminate carry only the Core Process ID in the target position.
+- Native execution identifiers appear in evidence only and are accepted in no identity, target, precondition, or authority position.
+
+### `VAL-070` Request rejection only before acceptance
+
+- A CreateSandbox with an unbound required slot is refused as a request rejection while no Operation, dispatchable effect intent, external invocation, or recoverable accepted result exists.
+- Once acceptance commits, a provider failure is reported as the Operation's failed outcome rather than as a request rejection.
+- The two are distinguishable by construction: a request rejection carries no Operation handle, and every accepted request carries one.
+
+### `VAL-071` Live rejection only before acceptance
+
+- A live resize outside immutable bounds is refused as a request rejection before any Operation, effect intent, external invocation, or recoverable accepted result exists.
+- After acceptance, a driver failure is embedded in the Operation's terminal outcome instead of surfacing as a rejection.
+- The four acceptance conditions are proven together, so no code path can return a rejection once a dispatchable intent is durable.
+
+### `VAL-072` Exec rejection only before acceptance
+
+- An Exec with empty argv is refused before any Process, dispatchable effect intent, external invocation, or recoverable accepted result exists.
+- After acceptance, a failure to start is reported as the Process's terminal state rather than as a request rejection.
+- A rejected Exec allocates no Core Process ID; every accepted Exec allocates one.
+
+### `VAL-073` Acceptance committed atomically before launch
+
+- One atomic write commits the Operation handle, canonical request and digest, preallocated Sandbox identity, idempotency binding, allocated runtime epoch, effect intent, and effect-authority epoch.
+- Only after that write completes does the driver receive the launch.
+- A crash between the commit and the dispatch leaves a recoverable Operation that reconciliation can resolve against its own committed intent.
+
+### `VAL-074` Live acceptance committed before dispatch
+
+- One atomic write commits the Operation handle, canonical request and digest, sealed target with every applicable freshness precondition, idempotency binding, effect intent, and effect-authority epoch.
+- The live external effect is dispatched only after that write.
+- An interrupted dispatch stays recoverable because the committed intent names exactly what was attempted and against which target and epoch.
+
+### `VAL-075` Exec acceptance committed before dispatch
+
+- One atomic write commits the Core Process ID, canonical request and digest, exact Sandbox runtime reference, idempotency binding, launch token, effect intent, and effect-authority epoch.
+- Only then is the execution dispatched into the Sandbox.
+- The launch token lets any later observation bind evidence to this exact attempt rather than to some other execution.
+
+### `VAL-076` Create idempotency resolved before mutable-state checks
+
+- A CreateSandbox replay is authorized and canonicalized, then looked up by idempotency coordinate before quota, capacity, concurrency, and target-state checks run.
+- An equal replay returns the original Operation handle even though the quota that admitted the first request is now exhausted.
+- A first-time request continues into the mutable-state checks with no change in behaviour.
+
+### `VAL-077` Live idempotency resolved before lifecycle checks
+
+- A live mutation replay is looked up by idempotency coordinate immediately after authorization and canonicalization.
+- An equal replay of an accepted Stop returns the original Operation even though the Sandbox has since reached the stopped phase.
+- A first-time request proceeds to lifecycle-state, concurrency, capacity, and quota checks unchanged.
+
+### `VAL-078` Exec idempotency resolved before admission checks
+
+- An Exec replay is looked up by idempotency coordinate before execution-admission, concurrency, capacity, and quota checks.
+- An equal replay returns the original Process even though the Sandbox has since reached its concurrent-process ceiling.
+- A first-time Exec proceeds to execution admission unchanged.
+
+### `VAL-079` One live coordinate, one canonical intent
+
+- An authenticated scope, method, and idempotency key bind exactly one canonical request digest for the published recovery window.
+- An equal replay returns the original Operation and dispatches no second effect.
+- A replay under the same coordinate with a different canonical digest is refused with the typed idempotency conflict and dispatches nothing.
+
+### `VAL-080` One exec coordinate, one canonical intent
+
+- An authenticated scope, method, and idempotency key bind exactly one canonical Exec digest for the published recovery window.
+- An equal replay returns the original Process and dispatches no second execution.
+- A replay under the same coordinate with different argv, environment, or working directory is refused with the typed idempotency conflict.
+
+### `VAL-081` Semantic-only canonical digest
+
+- The canonical digest covers every field able to change target, authority, effect, policy, result, or postcondition.
+- Trace identifiers, correlation metadata, and transport-only headers are excluded, so the same intent submitted twice under different trace IDs is one canonical request.
+- Adding any field able to change the effect changes the digest and therefore conflicts with a prior binding rather than silently reusing it.
+
+### `VAL-082` Expired create record returns recovery evidence
+
+- A CreateSandbox replay whose coordinate has aged out of the published recovery window returns a recovery error rather than a fresh acceptance.
+- The error carries tagged prior-acceptance evidence naming the original Operation.
+- No new creation is accepted until the caller observes the prior outcome or submits a fresh key with explicit new intent.
+
+### `VAL-083` Expired live record returns recovery evidence
+
+- A live mutation replay whose coordinate is retired or older than the published recovery window returns a recovery error.
+- The error carries tagged prior-acceptance evidence naming the original Operation.
+- The caller must observe the prior outcome or supply a fresh key; the expired coordinate authorizes no new mutation.
+
+### `VAL-084` Expired exec record returns recovery evidence
+
+- An Exec replay whose coordinate is retired or older than the published recovery window returns a recovery error.
+- The error carries tagged prior-acceptance evidence naming the original Process.
+- Explicit observation of the prior Process is required before any new execution is formed.
+
+### `VAL-085` Failed Operation recovered, not replayed
+
+- A replay under the coordinate of a terminally failed Operation returns that Operation and its failed outcome.
+- Nothing is dispatched on the replay path, so a retry loop cannot manufacture repeated external effects.
+- A genuinely new attempt uses a new idempotency key and carries the operation-specific authority to attempt the effect again.
+
+### `VAL-086` Cancellation requested, outcome still owned by the Operation
+
+- CancelOperation records `cancel_requested` monotonically on the existing Operation and allocates no new Operation.
+- That Operation later publishes `cancelled` only once exclusion of the effect is proven, and otherwise publishes succeeded, failed, or its ambiguous outcome.
+- A second cancellation request is absorbed by the same monotonic marker and changes nothing else.
+
+### `VAL-087` Representation and recovery committed together
+
+- UpdateSandboxMetadata commits the new representation, its resulting etag, the idempotency binding, and the recoverable committed response in one write.
+- An equal replay returns that stored response without reapplying the update, so the etag does not advance twice.
+- There is no window in which the representation is durable and its recovery record is not, because there is only one commit.
+
+### `VAL-088` Atomic-update methods admitted only on transactional storage
+
+- An Operator Configuration selecting transactional record storage passes admission and advertises the atomic-update methods.
+- A configuration selecting non-transactional storage fails admission at `O0` with a diagnostic naming the storage capability and the affected methods.
+- The deployment may not substitute a durable Operation for the atomic update, so every caller sees a method set the storage can actually honour.
+
+### `VAL-089` Launch attempt recorded with its recovery class
+
+- Before each external launch effect, Core durably writes the attempt with its exact parameters and one of the four locked recovery classes.
+- A provider offering an idempotency token is recorded under that class, and the same token is reused verbatim on any retry.
+- Where no class applies, the attempt is recorded as `none available` and any interruption is reported as ambiguity with quarantine rather than retried.
+
+### `VAL-090` Live attempt recorded with its recovery class
+
+- Before dispatching a live external effect, Core durably writes the attempt, its exact parameters, and one of the four locked recovery classes.
+- A provider-idempotent effect is recorded under that class and its token is reused verbatim on retry.
+- Where no class applies, the attempt is recorded as `none available` and quarantined as ambiguous if interrupted.
+
+### `VAL-091` Exec attempt recorded with its recovery class
+
+- Before dispatching an exec external effect, Core durably writes the attempt, its exact parameters, and one of the four locked recovery classes.
+- The record is bound to the Process's launch token so later evidence resolves this attempt and no other.
+- Where no class applies, the attempt is recorded as `none available` and quarantined as ambiguous if interrupted.
+
+### `VAL-092` One create coordinate, one canonical intent
+
+- An authenticated scope, method, and idempotency key bind exactly one canonical CreateSandbox digest for the published recovery window.
+- An equal replay returns the original Operation and the same Sandbox identity without creating a second Sandbox.
+- A replay under the same coordinate naming a different Artifact, binding, or allocation is refused as a conflict and dispatches nothing.
+
+### `VAL-093` Launch outcome bounded by the proven knowledge set
+
+- A launch commits `succeeded` only when every possibility remaining under Core's evidence satisfies the exact success postcondition, cancellation is `notRequested` or proven lost, mutation authority is quiesced, and residual effects are known.
+- `failed` or `cancelled` is committed only when no remaining possibility satisfies that postcondition.
+- Every other nonempty knowledge set commits `unknown` with its exact ambiguity variant, which a later linked successor may resolve.
+
+### `VAL-094` Live outcome bounded by evidence
+
+- A live mutation commits a definite arm only when that arm's evidence predicate holds over every remaining possibility.
+- An unresolved `cancellation = requested`, an internal timer expiry, or an expired RPC deadline leaves the Operation `unknown` with its missing proofs enumerated.
+- Reconciliation later appends a linked successor once fenced evidence resolves the ambiguity, leaving the original record intact.
+
+### `VAL-095` Exec outcome bounded by launch-token evidence
+
+- A Process terminalizes only when every remaining possibility satisfies that outcome's exact predicate, dispatch authority is quiesced, and residuals are known.
+- All accepted evidence is bound to the same launch token, so another execution's exit cannot terminalize this Process.
+- Every other nonempty knowledge set leaves the Process in reconcilable `unknown`.
+
+### `VAL-096` Teardown outcome proven, not assumed
+
+- A Delete commits `succeeded` only when target absence, descendant quiescence, and cleanup completion hold over every remaining possibility.
+- A missing observation or a provider acknowledgement of a cleanup call is recorded as evidence, never as completion.
+- Otherwise the Operation commits `unknown` with its residual obligations enumerated and observable.
+
+### `VAL-097` Terminal launch result appended, never edited
+
+- A launch Operation's terminal outcome and payload become immutable at commit.
+- A later adoption that discovers the runtime did in fact start appends a linked successor resolution Operation referencing the unchanged predecessor.
+- Readers reconstruct the full history from predecessor and successor links without any committed record having changed.
+
+### `VAL-098` Teardown compensation recorded as a forward effect
+
+- A teardown-branch compensation is recorded as a new Operation with its own durable record, evidence, and outcome, linked by a `compensates` reference.
+- The compensated Operation's outcome and its external-effect ledger entries stay unchanged.
+- Restoring in-sandbox state from a Snapshot or filesystem capture is likewise a forward effect and marks no prior external effect as reversed.
+
+### `VAL-099` Observation deadlines end only the observation
+
+- A Wait with a five-second deadline returns the latest Operation state together with an explicit condition-met flag set false.
+- The observed Operation, Sandbox, Process, and Snapshot records are byte-identical before and after the expiry.
+- Reissuing the Wait resumes observation without anything having been advanced, cancelled, or terminalized in the meantime.
+
+### `VAL-100` Interrupted attempt resolved by its own intent
+
+- A crash between dispatch and terminalization leaves a committed effect intent, launch token, exact external identity, and authority epoch.
+- Resumption queries the provider for exactly that external identity and resolves the Operation only from evidence bound to it.
+- Where that evidence cannot be obtained the Operation terminalizes `unknown`; no second attempt is dispatched to discover the first one's fate.
+
+### `VAL-101` Ambiguous launch does not authorize relaunch
+
+- A launch that terminalized `unknown` leaves the Sandbox quarantined with its missing proofs recorded and observable.
+- A successor launch proceeds only after an independently proven fencing boundary or an exact adoption identity is established.
+- Alternatively a newly authorized caller request with its own idempotency key and accepted intent begins a fresh traversal.
+
+### `VAL-102` Ambiguous live outcome quarantines instead of retrying
+
+- A live mutation that terminalized `unknown` blocks repeated, replacement, and compensating external effects against the same target and epoch.
+- A linked reconciliation Operation first gathers fenced evidence or an exact adoption identity.
+- A newly authorized caller request carrying its own accepted intent may also establish successor authority.
+
+### `VAL-103` Residual obligations discharged before further destruction
+
+- A Delete that terminalized `unknown`, or failed with residuals, keeps each residual obligation open and observable and releases no identity.
+- A linked cleanup Operation held by an actor with current authority durably discharges each exact obligation.
+- Only once every obligation is discharged may a successor destructive effect, tombstone, or identity release proceed.
+
+### `VAL-104` Launch-branch compensation as a forward effect
+
+- A partially created runtime is removed by a new compensating Operation carrying its own durable record, evidence, and outcome.
+- The compensated launch Operation keeps its committed outcome and every entry in its external-effect ledger.
+- The `compensates` link makes the pairing readable without either record being edited.
+
+### `VAL-105` Terminal live result appended, never edited
+
+- A live mutation Operation's terminal outcome and payload become immutable at commit.
+- A later reconciliation that resolves an `unknown` appends a linked successor Operation referencing the unchanged predecessor.
+- The predecessor's revision does not advance and its payload bytes do not change.
+
+### `VAL-106` Terminal teardown result appended, never edited
+
+- A teardown Operation's committed terminal outcome and payload become immutable at commit.
+- A cleanup reconciliation that later proves target absence appends a linked successor Operation referencing the unchanged predecessor.
+- Residual obligations are discharged on the successor record, leaving the predecessor's outcome and revision untouched.
 
 ## Composition Authority Matrix
 

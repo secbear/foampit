@@ -1024,12 +1024,12 @@ def expected_paths_registry_sha256:
   "65322c7c30f4c75222a36793b8d1b877fa5813df4d1c83f236bb18884c364a65";
 
 def expected_case_contracts_sha256:
-  "955c3dd8c03927be6876c58b2c3c67210f1fc0710ecf5f5ea2a4a2c59bc3f5b0";
+  "1232fed356ce3e0be6ca7e1b9c410532d7f107bd1302af5ddfb34b4750fb2715";
 
 # Digest pins detect accidental drift and impose review friction. They do not
 # authorize inputs that fail the semantic relationship checks below.
 def expected_invariant_registry_sha256:
-  "9109aff5f44aeebe9be5cd9c967f06d42cad6f766b6acb89d9510f22c2656917";
+  "9440109a3fd0920c759231daa170db8cac9f5037962ea50d74703a6cd64c7283";
 
 def nonempty_string:
   type == "string" and (gsub("^\\s+|\\s+$"; "") | length > 0);
@@ -2039,7 +2039,7 @@ def case_contract_errors:
          ][];
            (. as $path |
             $caseContracts[0].classificationVectorsByPath[$path] |
-            test("^[FLIH]{140}$"))
+            test("^[FLIH]{204}$"))
          )
       then empty
       else "resource source classifications must apply ownership before exact mechanism refinement and native escapes must have no authority"
@@ -2048,10 +2048,10 @@ def case_contract_errors:
     if all(forbidden_driver_path_ids[];
          (. as $path |
           $caseContracts[0].classificationVectorsByPath[$path] |
-          test("^[FLIH]{140}$"))
+          test("^[FLIH]{204}$"))
        )
     then empty
-    else "forbidden direct/raw driver paths must classify all 140 invariants no-authority"
+    else "forbidden direct/raw driver paths must classify all 204 invariants no-authority"
     end,
     (
       ($caseContracts[0].portableArtifactInvariantIds + ["NAT-002","NAT-003"] | unique) as $expected |
@@ -2410,9 +2410,9 @@ def coverage_schema_errors:
     else "composition coverage textAuthority must be non-empty"
     end,
     if .invariantIds == registry_ids and
-       (.invariantIds | length) == 140
+       (.invariantIds | length) == 204
     then empty
-    else "coverage invariant IDs must equal the exact 140-ID registry order"
+    else "coverage invariant IDs must equal the exact 204-ID registry order"
     end,
     if .pathIds == locked_path_ids
     then empty
