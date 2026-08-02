@@ -13,6 +13,10 @@ provider_contracts="${script_dir}/PACKET-C-PROVIDER-CONTRACTS.json"
 composition_paths="${script_dir}/PACKET-D-COMPOSITION-PATHS.json"
 composition_coverage="${script_dir}/PACKET-D-COMPOSITION-COVERAGE.json"
 composition_case_contracts="${script_dir}/PACKET-D-CASE-CONTRACTS.json"
+operation_registry="${script_dir}/PACKET-E-OPERATION-REGISTRY.json"
+operation_case_contracts="${script_dir}/PACKET-E-CASE-CONTRACTS.json"
+operation_contracts="${script_dir}/PACKET-E-OPERATION-CONTRACTS.json"
+concurrency_matrix="${script_dir}/PACKET-E-CONCURRENCY-MATRIX.json"
 
 for required_packet_d_file in \
   "${composition_paths}" \
@@ -20,7 +24,14 @@ for required_packet_d_file in \
   "${composition_coverage}" \
   "${script_dir}/generate-composition-coverage.mjs" \
   "${script_dir}/validate-composition-coverage.jq" \
-  "${script_dir}/test-composition-coverage.sh"; do
+  "${script_dir}/test-composition-coverage.sh" \
+  "${operation_registry}" \
+  "${operation_case_contracts}" \
+  "${operation_contracts}" \
+  "${concurrency_matrix}" \
+  "${script_dir}/generate-operation-contracts.mjs" \
+  "${script_dir}/validate-operation-contracts.jq" \
+  "${script_dir}/test-operation-contracts.sh"; do
   if [[ ! -f "${required_packet_d_file}" ]]; then
     echo "Missing required Packet D inventory file: ${required_packet_d_file}" >&2
     exit 1
@@ -53,6 +64,12 @@ composition_case_contracts_sha256="$(
 )"
 invariant_registry_sha256="$(
   sha256_file "${registry}"
+)"
+operation_registry_sha256="$(
+  sha256_file "${operation_registry}"
+)"
+operation_case_contracts_sha256="$(
+  sha256_file "${operation_case_contracts}"
 )"
 
 # These pins detect drift and force explicit review. Semantic validation below,
@@ -151,6 +168,20 @@ jq -e \
   ' \
   "${composition_coverage}" >/dev/null
 
+"${script_dir}/test-operation-contracts.sh"
+node "${script_dir}/generate-operation-contracts.mjs" --check
+jq -e \
+  --arg validationScope full \
+  --arg operationRegistrySha256 "${operation_registry_sha256}" \
+  --arg caseContractsSha256 "${operation_case_contracts_sha256}" \
+  --arg invariantRegistrySha256 "${invariant_registry_sha256}" \
+  --slurpfile registry "${operation_registry}" \
+  --slurpfile catalog "${operation_case_contracts}" \
+  --slurpfile invariants "${registry}" \
+  --slurpfile concurrency "${concurrency_matrix}" \
+  -f "${script_dir}/validate-operation-contracts.jq" \
+  "${operation_contracts}" >/dev/null
+
 invariant_count="$(jq '.invariants | length' "${registry}")"
 surface_count="$(jq '.surfaces | length' "${surface_coverage}")"
 artifact_field_count="$(jq '.fields | length' "${artifact_field_review}")"
@@ -236,4 +267,33 @@ echo "Gate 2A Packet D: ${composition_path_count} paths × ${invariant_count} in
 echo "Gate 2A Packet D effects: ${composition_effect_counts}"
 echo "Gate 2A Packet D mappings/surfaces: ${composition_frontend_mapping_count} frontend/path mappings; ${composition_native_path_count} native paths"
 echo "Gate 2A Packet D invariants: ${packet_d_invariant_count} introduced"
+operation_method_count="$(
+  jq '[.operations[] | select(.id | startswith("deferred.") | not)] | length' "${operation_registry}"
+)"
+operation_deferral_count="$(
+  jq '[.operations[] | select(.id | startswith("deferred."))] | length' "${operation_registry}"
+)"
+operation_state_count="$(jq '.lifecycleStates | length' "${operation_registry}")"
+operation_cell_count="$(jq '.expectedCellCount' "${operation_contracts}")"
+operation_rule_count="$(jq '.rules | length' "${operation_contracts}")"
+operation_kind_counts="$(
+  jq -r '
+    [.rules[].valueCases[].cellKind] |
+    group_by(.) |
+    map("\(.[0])=\(length)") |
+    join(", ")
+  ' "${operation_contracts}"
+)"
+concurrency_cell_count="$(jq '.expectedCellCount' "${concurrency_matrix}")"
+packet_e_operation_invariants="$(
+  jq '[.operations[].invariants[]] | unique | length' "${operation_registry}"
+)"
+packet_e_non_operation_invariants="$(
+  jq '[.nonOperationCoverage.assignments[].invariants[]] | length' "${operation_registry}"
+)"
+
+echo "Gate 2A Packet E: ${operation_method_count} operations (+${operation_deferral_count} deferral markers) × ${operation_state_count} lifecycle states = ${operation_cell_count} cells; ${operation_rule_count} contract rules"
+echo "Gate 2A Packet E cell kinds: ${operation_kind_counts}"
+echo "Gate 2A Packet E concurrency: ${concurrency_cell_count} operation-pair cells"
+echo "Gate 2A Packet E invariants: ${packet_e_operation_invariants} governed by an operation; ${packet_e_non_operation_invariants} assigned to other ledgers"
 echo "Gate 2A remains open for Packets E-F"
