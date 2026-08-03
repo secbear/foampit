@@ -100,8 +100,8 @@ loading.
 These are prototype witnesses, not claims that the future production wire,
 attestation, migration, or private stage-type implementation is closed.
 
-The current machine inventory is 54 paths × 140 invariants = 7,560 unique
-cells in 634 complete-contract groups. Fresh suite totals are 31 strengthened
+The current machine inventory is 54 paths × 354 invariants = 19,116 unique
+cells in 948 complete-contract groups. Fresh suite totals are 31 strengthened
 Nix assertions; 14 resource-composition cases/172 internal assertions; 16
 CUE; 19 Nickel; 18 Pkl; 12 Dhall-control; 10 native-handle; 18 frontend
 adaptation; 27 wire; 13 resolved-reentry cases with 18 diagnostic, 8 identity,

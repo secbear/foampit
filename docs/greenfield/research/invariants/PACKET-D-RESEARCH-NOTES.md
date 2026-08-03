@@ -84,8 +84,8 @@ never gains authority by successfully producing a value.
 
 ## Reconstructable candidate
 
-The current machine records contain 54 paths, 140 invariant IDs, 7,560 unique
-cells, 634 complete-contract groups, 76 registry path aliases, 74
+The current machine records contain 54 paths, 354 invariant IDs, 19,116 unique
+cells, 948 complete-contract groups, 76 registry path aliases, 74
 frontend/path mappings, 19 native paths, and 50 invalid witnesses with nearby
 valid controls. Their copied contracts preserve the exact Packet E taxonomy
 (`operation-transition`, `retry`, `cancellation`, `cleanup`), Packet F

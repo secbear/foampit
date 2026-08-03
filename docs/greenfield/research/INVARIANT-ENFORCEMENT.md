@@ -225,7 +225,7 @@ hooks. The three provider contracts are validated separately because transport
 is not a target profile.
 
 Packet D's candidate expands exactly 54 composition paths across all 140
-current invariants, producing 7,560 unique cells in 634 identical
+current invariants, producing 19,116 unique cells in 948 identical
 complete-contract groups. The case catalog pins one total 140-code vector per
 path; 76 registry path aliases are invariant-facing names, not the
 classification oracle. Boundary inputs may begin strict validation before a
@@ -446,7 +446,7 @@ checks that the generated Packet C realization document is current, proves its
 profile bundle records, validates all provider transport contracts, and checks
 their introduced invariant references against the registry. It also checks
 that Packet D's 54-path and 140-invariant universes, independent digest pins,
-classification vectors, 7,560-cell expansion, phase graph, terminal
+classification vectors, 19,116-cell expansion, phase graph, terminal
 authorities, ownership exclusions, native-handle tuple, Packet C traceability
 set, evidence/test obligations, and later-packet delegations are exact.
 

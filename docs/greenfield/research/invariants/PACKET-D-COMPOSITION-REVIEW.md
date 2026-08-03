@@ -35,7 +35,15 @@ here, not a claim that production Gate 4B is closed.
 
 ## Reviewed universe
 
-| Coordinate | Reviewed count |
+The counts below are what Packet D **reviewed** on 2026-07-24. Packet E
+registration later widened the invariant axis from 140 to 354, so the current
+machine state is 54 paths × 354 invariants = 19,116 cells in 948 rule groups.
+The reviewed path universe, classification semantics, effect vocabulary, and
+boundary contracts are unchanged by that widening; the added cells are Packet
+E's and were classified under the same rules. Where a number below is a
+*reviewed* fact it is left as reviewed.
+
+| Coordinate | Reviewed count (2026-07-24) |
 |---|---:|
 | Composition paths | 54 |
 | Registered invariants | 140 |
@@ -67,7 +75,9 @@ Packet D and changes a validator-owned absolute universe.
 
 ## Effect decision
 
-The 7,560 cells have this exact partition:
+The 7,560 reviewed cells had this exact partition. The current 19,116-cell
+partition is reported by `check-inventory.sh` and is not restated here, so this
+record continues to describe what was reviewed:
 
 | Effect | Cells | Meaning |
 |---|---:|---|

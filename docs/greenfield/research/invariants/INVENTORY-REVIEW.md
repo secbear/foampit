@@ -1,7 +1,14 @@
 # Gate 2A Invariant Inventory Review
 
-Status: **Open — Packets A through D reviewed; Packet E identity, lifecycle,
-operation taxonomy, and result/error contract locked; Packets E and F remain**
+Status: **Open — Packets A through E reviewed; Packet F remains, and the
+dynamic-state row carries an undischarged Packet E remainder**
+
+Two dimension rows are still `partial`. Security and disclosure is Packet F's
+scope. Dynamic state is not: acquisition, reservation, and rollback, together
+with the dynamic reservation and time-of-check/time-of-use protocol, were
+explicitly deferred during the Packet E walk because all four locked Packet E
+records list that protocol as still unlocked. Gate 2A cannot close on Packet F
+alone.
 
 This is the working review record for Gate 2A in the
 [Invariant Inventory and Enforcement Protocol](../INVARIANT-ENFORCEMENT.md).
@@ -15,11 +22,11 @@ Gate 2A classifies it, Packet E closes, or implementation consumes it.
 
 As of 2026-07-24:
 
-- 140 corpus invariant identifiers are present in the registry;
+- 354 corpus invariant identifiers are present in the registry;
 - the corpus and registry identifier sets match exactly;
-- 140 entries are `specified`;
-- 140 authoritative hooks are planned;
-- 560 tests are planned;
+- 354 entries are `specified`;
+- 354 authoritative hooks are planned;
+- 1,453 tests are planned;
 - no entry is marked `closed`;
 - Gate 2A structure passes;
 - Packet A has reviewed 117 public resource/operation surface groups;
@@ -29,8 +36,8 @@ As of 2026-07-24:
   field/profile cells, 85 structurally complete ordered value cases, and 3
   provider transport contracts, introducing 7 invariant cases;
 - Packet D has reviewed 17 composition/trust-boundary invariant cases and its
-  exact matrix covers 54 paths × 140 invariants = 7,560 unique cells in 634
-  complete-contract groups, with 90 focused validator checks;
+  exact matrix covers 54 paths × 354 invariants = 19,116 unique cells in 948
+  complete-contract groups, with 92 focused validator checks;
 - Gate 2A review is open; and
 - Gate 4B correctly fails.
 
@@ -82,13 +89,13 @@ The status labels mean:
 | Single-resource semantics | reviewed for Artifact | Packet B covers profiles, defaults, environment, filesystem, network, resources, identity/security, secrets, lifecycle requirements, outputs, provenance, and targets | Preserve Packet B as Packets C-F refine realization, lifecycle, and disclosure |
 | Cross-resource semantics | reviewed through composition | Packet D owner/effect checks cover distinct Artifact, Operator Configuration, Managed-Service Definition, Create, and runtime branches | Packets E-F must preserve these ownership exclusions while completing lifecycle and disclosure |
 | Cross-target semantics | reviewed for initial targets | Packet C: 81 fields × Bubblewrap, Firecracker, Cloud Hypervisor, and OCI; provider transport remains separate | Packet D-F must preserve the matrix while adding bypass, lifecycle, and evidence detail; every later profile repeats Packet C |
-| Composition semantics | reviewed through Packet D | Packet D: 54 paths × 140 invariants = 7,560 cells; 634 complete-contract groups; 90 focused checks; three clean final verdicts | Packets E/F additions reopen affected composition coordinates |
+| Composition semantics | reviewed through Packet D | Packet D: 54 paths × 354 invariants = 19,116 cells; 948 complete-contract groups; 92 focused checks; three clean final verdicts. Widened by Packet E registration; the reviewed path and classification semantics stand, the new cells are Packet E's | Packet F additions reopen affected composition coordinates |
 | Escape mechanisms | reviewed through Packet D | resource-qualified native escapes, typed/direct Nix values, unsafe opaque input, raw wire, and five driver trust states | Packet E/F additions reopen the affected path universe |
 | Trust boundaries | reviewed through Packet D | exact 89+30 serialized replay sets, private stage chain, total D0 output, direct/raw rejection, six separate-path handoffs | Packet E must still walk operation-specific API, guest, restore, teardown, and evidence decoding |
-| Lifecycle semantics | partial | Packet E durable Operation/runtime identity, Sandbox/Process state models, typed operation taxonomy, and request/result/error/recovery architecture are locked; exhaustive operation contracts and transition cases remain unregistered | Inventory every legal and illegal transition, operation pair, admission rejection, idempotency/cancellation/recovery outcome, cleanup state, restore/fork/migration contract, Process-control command, and deletion proof |
-| Dynamic state | partial | Packet C profiles classify host prerequisites, object-handle retention, resources, networking, devices, and provider admission | Packet E must walk acquisition, reservation, rollback, retry, cancellation, mutation, and teardown transitions |
+| Lifecycle semantics | reviewed | Packet E: 214 registered invariants in 16 families; 37 operations × 6 lifecycle states = 222 contract cells; 625 operation-pair concurrency cells; all 20 Packet A surfaces and 5 Packet B fields delegating to E are claimed | Packet F adds disclosure and evidence obligations over the same operations |
+| Dynamic state | partial | Packet C profiles classify host prerequisites, object-handle retention, resources, networking, devices, and provider admission; Packet E discharges retry, cancellation, mutation, and teardown transitions through the operation ledger | **Acquisition, reservation, and rollback remain undischarged**, together with the dynamic reservation and time-of-check/time-of-use protocol all four locked Packet E records list as still unlocked. This row cannot close on Packet E alone |
 | Security and disclosure | partial | secret ownership/redaction, offline policy, host paths | Walk ambient environment, sockets, protected paths, logs, evidence, provenance, diagnostics, process inheritance, metadata services, and side-channel claims |
-| Valid expressiveness | reviewed through Packet D | `VAL-001` through `VAL-042`; Packet D adds pinned closed Operator Configuration, Managed-Service Definition, and revalidated resolved reentry controls | Packets E-F add complete lifecycle and disclosure witnesses |
+| Valid expressiveness | reviewed through Packets D-E | `VAL-001` through `VAL-256`; Packet D adds pinned closed Operator Configuration, Managed-Service Definition, and revalidated resolved reentry controls | Packets E-F add complete lifecycle and disclosure witnesses |
 
 No row may remain `partial` or `unwalked` when Gate 2A closes.
 
@@ -185,7 +192,7 @@ The reviewed, digest-bound machine snapshot is reconstructable from
 [`PACKET-D-COMPOSITION-PATHS.json`](./PACKET-D-COMPOSITION-PATHS.json),
 [`PACKET-D-CASE-CONTRACTS.json`](./PACKET-D-CASE-CONTRACTS.json), and
 [`PACKET-D-COMPOSITION-COVERAGE.json`](./PACKET-D-COMPOSITION-COVERAGE.json):
-54 paths, 140 invariants, 7,560 cells, 634 complete-contract groups, exact
+54 paths, 354 invariants, 19,116 cells, 948 complete-contract groups, exact
 89 built-member/load and 30 resolved-stage replay arrays, six separate-path
 handoffs, and exact Packet E/F concern taxonomies.
 
@@ -234,85 +241,65 @@ therefore remains open; Gate 2A remains open only for Packets E and F.
 
 ### Packet E: Runtime lifecycle and trust boundaries
 
-The durable-mutation and identity substrate is locked in
-[Packet E: Durable Operations and Sandbox Runtime Identity](./PACKET-E-OPERATION-IDENTITY-DESIGN.md):
+Status: **Reviewed — 214 invariants registered, operation ledger complete,
+independent verification pending.** See
+[`PACKET-E-OBLIGATION-PARTITION-REVIEW.md`](./PACKET-E-OBLIGATION-PARTITION-REVIEW.md)
+and the machine records
+[`PACKET-E-OBLIGATION-PARTITION.json`](./PACKET-E-OBLIGATION-PARTITION.json),
+[`PACKET-E-OPERATION-REGISTRY.json`](./PACKET-E-OPERATION-REGISTRY.json),
+[`PACKET-E-CASE-CONTRACTS.json`](./PACKET-E-CASE-CONTRACTS.json),
+[`PACKET-E-OPERATION-CONTRACTS.json`](./PACKET-E-OPERATION-CONTRACTS.json), and
+[`PACKET-E-CONCURRENCY-MATRIX.json`](./PACKET-E-CONCURRENCY-MATRIX.json).
 
-- one writable Sandbox aggregate with stable ID and optional human alias;
-- a public monotonically increasing runtime epoch distinct from `etag`;
-- a separate internal authority epoch that fences stale effect producers;
-- durable Operations for Sandbox lifecycle and Process signal/termination
-  mutations, with tagged targets, plus durable epoch-bound Processes for Exec;
-- explicit idempotency, cancellation, deadline, ambiguity, and stale-handle
-  semantics; and
-- no writable Core `Session` or independently authoritative runtime child.
+The four locked decision records — operation identity, lifecycle state,
+operation taxonomy, and the request/result/error/recovery contract — listed 178
+registry obligations between them. Those obligations are now discharged:
 
-The portable lifecycle state model is locked in
-[Packet E: Sandbox and Process Lifecycle State](./PACKET-E-LIFECYCLE-STATE-DESIGN.md):
+| Disposition | Count |
+|---|---:|
+| Registered as invariants | 214 entries in 16 families |
+| Governed by an operation contract | 202 |
+| Assigned to the driver, adapter, artifact, or service ledger | 12 |
+| Source obligations cited at least once | 178 / 178 |
 
-- separate Operation, Sandbox, and Process state machines;
-- Sandbox runtime states `provisioning`, `running`, `suspended`, `stopped`,
-  and `unknown`;
-- independent execution admission `accepting` or `closed`;
-- no caller-writable desired state and no authoritative verb-specific
-  transition phases;
-- Process states `accepted`, `starting`, `running`, `unknown`, and
-  `terminated`, with typed terminal outcomes;
-- proof-based Stop and Delete completion;
-- signal dispatch distinct from Process exit;
-- durable replayable-output obligations; and
-- conservative concurrency, crash, and reconciliation rules.
+The ledger closes what earlier packets delegated: all 20 Packet A surfaces
+marked `delegatedPacket: "E"` are claimed by an operation, all 5 Packet B fields
+delegating `"E"` are resolved, and Packet D's
+`delegatedConcernTaxonomy.E` — operation-transition, retry, cancellation,
+cleanup — is resolved by the transition matrix, the recovery contracts, and the
+system-originated `cleanup` operation kind.
 
-The lifecycle/control method taxonomy is locked in
-[Packet E: Lifecycle and Control Operation Taxonomy](./PACKET-E-OPERATION-TAXONOMY-DESIGN.md):
+Four structural rulings were required and are recorded with their evidence:
 
-- required Create, Start, Stop, Delete, Exec, and Terminate semantics;
-- precise Get/List/Wait and Process-I/O observations;
-- capability-gated Signal, Suspend/Resume, in-place Resize, Snapshot,
-  Restore, and Fork;
-- immutable, exact Snapshot capability classes with filesystem/runtime kind,
-  complete component semantics, explicit source disposition, and v1 rejection
-  of nonterminal Core Processes;
-- narrow metadata and exact absolute-expiration `{ at, action }` schedules
-  instead of generic Update or TTL;
-- rejection of portable Restart, Wake, KillSandbox, Destroy, Rollback,
-  Connect, Attach, Session, Archive, and Migration; and
-- desired-state adapter and private native-driver ownership.
+1. **A ninth owner, `core`,** for the Core Sandbox API control plane. Every
+   existing `runtime` entry is `DRV-*`/`WIRE-*` at the driver boundary, so
+   overloading it would have made that family mean two things at two phases.
+2. **No phase or edge added.** The graph is a validation-order model over a
+   single traversal, not runtime history. Every candidate restart edge creates a
+   cycle *and* makes `L0 -> E0` reachable, contradicting this protocol directly.
+3. **Specification-totality meta-rules became validator rules** over the ledger
+   rather than registry entries, following Packet C/D precedent.
+4. **The locked token `unknown` is namespaced** in ledger encodings
+   (`state-unknown`, `outcome-unknown`) because every ledger validator rejects
+   `^UNKNOWN$` as placeholder content. Vocabulary entries carry a
+   `lockedSourceRef` citation so the correspondence is checkable.
 
-The request/result/error/recovery architecture is locked in
-[Packet E: Request, Result, Error, and Recovery Contract](./PACKET-E-RESULT-ERROR-CONTRACT-DESIGN.md):
+Known open work, stated rather than absorbed:
 
-- synchronous `RequestError` only with proof of no durable acceptance and no
-  effect-producing dispatch;
-- distinct `RecoveryError` when no new effect was dispatched but an old
-  idempotency or Process-control coordinate is outside its recovery window;
-- class-specific ownership of every post-acceptance outcome by durable
-  Operation, durable Process, committed Core-record result, or retained
-  Process-control receipt;
-- transport uncertainty recovered through the identical canonical request and
-  idempotency key;
-- a shared sealed reason registry with generated per-method subsets and no
-  open provider error or `retryable` boolean;
-- proof-gated `succeeded`, `failed`, `cancelled`, and terminal Operation
-  `unknown`;
-- separate caller recovery, private native resolution, and protected provider
-  evidence;
-- six exact call classes, including sequenced Process-control commands; and
-- fail-closed machine generation and formal-model obligations.
+- the `create-native-extension` surface is defined nowhere in `DESIGN.md`, so
+  six `CRT-*` cells carry rejection-only evidence as a deliberate hedge;
+- no `ERR` arm exists for Process or Operation *observation*, so four
+  observation records state the gap rather than cite an arm scoped to Exec;
+- `OPA-002` does not enumerate Process termination and `ADM-007` is ambiguous
+  between set-time and fire-time; both need amendment before closure;
+- the Packet A-owned data-plane families (file, directory, copy, transfer,
+  endpoint, port) have deferral markers because their method names are not yet
+  closed;
+- the 12 non-operation invariants require the driver, adapter, artifact, and
+  service ledgers they are assigned to actually to exist.
 
-These foundations do not close Packet E. The next review must turn all four
-decision records' registry obligations into an exhaustive machine-readable
-operation-contract, transition, and compatibility inventory, then walk:
-
-- Create, prepare, Start, Exec, Process I/O, Signal, Terminate, Suspend,
-  Resume, Stop, Snapshot, Restore, Fork, Resize, expiration, Delete,
-  provider-native kill, inspect, and copy/data-plane interaction;
-- ordered admission, rejection, retry, recovery, cancellation, timeout,
-  partial failure, orphan cleanup, idempotency, and Process-control sequence;
-- manifest/API/provider/guest/evidence decoding;
-- dynamic reservation and time-of-check/time-of-use behavior;
-- declared, lowered, prepared, observed, and recorded facts.
-
-This packet cannot be closed by authoring-language fixtures alone.
+Packet E does not close Gate 4B. All 354 authoritative hooks and 1,453 tests
+remain `planned`.
 
 ### Packet F: Security, disclosure, and evidence
 

@@ -107,7 +107,7 @@ or API name.
 The closed Packet D registry is
 [`PACKET-D-COMPOSITION-PATHS.json`](./research/invariants/PACKET-D-COMPOSITION-PATHS.json).
 Its candidate universe contains exactly 54 first-class paths. Every one of the
-140 registered invariants is evaluated against every path, producing 7,560
+354 registered invariants is evaluated against every path, producing 19,116
 unique cells in
 [`PACKET-D-COMPOSITION-COVERAGE.json`](./research/invariants/PACKET-D-COMPOSITION-COVERAGE.json).
 The source-resource branches are distinct:
