@@ -15090,7 +15090,9 @@
             "cli-adapter",
             "managed-service",
             "resolved-driver-handoff",
-            "provider-native-operation"
+            "provider-native-operation",
+            "driver-entry",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -15441,7 +15443,9 @@
             "cli-adapter",
             "managed-service",
             "live-native-extension",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "live-operation",
+            "driver-preparation"
           ],
           "targets": [
             "portable"
@@ -15881,7 +15885,9 @@
             "cli-adapter",
             "managed-service",
             "live-native-extension",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "live-operation",
+            "driver-preparation"
           ],
           "targets": [
             "portable"
@@ -15981,7 +15987,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "exec-native-extension"
+            "exec-native-extension",
+            "process-launch"
           ],
           "targets": [
             "portable"
@@ -16081,7 +16088,8 @@
             "cli-adapter",
             "managed-service",
             "live-native-extension",
-            "provider-native-operation"
+            "provider-native-operation",
+            "live-operation-dispatch"
           ],
           "targets": [
             "portable"
@@ -16180,7 +16188,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "exec-native-extension"
+            "exec-native-extension",
+            "process-launch"
           ],
           "targets": [
             "portable"
@@ -16280,7 +16289,8 @@
             "cli-adapter",
             "managed-service",
             "live-native-extension",
-            "provider-native-operation"
+            "provider-native-operation",
+            "live-operation-dispatch"
           ],
           "targets": [
             "portable"
@@ -16387,7 +16397,9 @@
             "cli-adapter",
             "managed-service",
             "live-native-extension",
-            "provider-native-operation"
+            "provider-native-operation",
+            "snapshot-store",
+            "live-operation-dispatch"
           ],
           "targets": [
             "portable"
@@ -16489,7 +16501,9 @@
             "cli-adapter",
             "managed-service",
             "live-native-extension",
-            "provider-native-operation"
+            "provider-native-operation",
+            "snapshot-store",
+            "live-operation-dispatch"
           ],
           "targets": [
             "portable"
@@ -16591,7 +16605,8 @@
             "cli-adapter",
             "managed-service",
             "live-native-extension",
-            "provider-native-operation"
+            "provider-native-operation",
+            "live-operation-dispatch"
           ],
           "targets": [
             "portable"
@@ -16695,7 +16710,9 @@
             "cli-adapter",
             "managed-service",
             "live-native-extension",
-            "provider-native-operation"
+            "provider-native-operation",
+            "live-operation",
+            "driver-entry"
           ],
           "targets": [
             "portable"
@@ -16798,7 +16815,9 @@
             "cli-adapter",
             "managed-service",
             "live-native-extension",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "live-operation",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -16899,7 +16918,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -16998,7 +17019,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "exec-native-extension"
+            "exec-native-extension",
+            "process-launch"
           ],
           "targets": [
             "portable"
@@ -17322,7 +17344,8 @@
             "cli-adapter",
             "managed-service",
             "live-native-extension",
-            "provider-native-operation"
+            "provider-native-operation",
+            "live-operation-dispatch"
           ],
           "targets": [
             "portable"
@@ -17421,7 +17444,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch"
           ],
           "targets": [
             "portable"
@@ -17519,7 +17543,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "exec-native-extension"
+            "exec-native-extension",
+            "process-launch"
           ],
           "targets": [
             "portable"
@@ -17735,7 +17760,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation",
+            "live-operation-dispatch"
           ],
           "targets": [
             "portable"
@@ -17834,7 +17861,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "exec-native-extension"
+            "exec-native-extension",
+            "process-launch"
           ],
           "targets": [
             "portable"
@@ -18058,7 +18086,9 @@
             "managed-service",
             "live-native-extension",
             "resolved-driver-handoff",
-            "direct-driver-invocation"
+            "direct-driver-invocation",
+            "live-operation-dispatch",
+            "driver-preparation"
           ],
           "targets": [
             "portable"
@@ -18163,7 +18193,9 @@
             "cli-adapter",
             "managed-service",
             "exec-native-extension",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "process-launch",
+            "driver-preparation"
           ],
           "targets": [
             "portable"
@@ -18377,7 +18409,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch",
+            "idempotency-store"
           ],
           "targets": [
             "portable"
@@ -18477,7 +18511,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "exec-native-extension"
+            "exec-native-extension",
+            "process-launch",
+            "idempotency-store"
           ],
           "targets": [
             "portable"
@@ -18577,7 +18613,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch",
+            "idempotency-store"
           ],
           "targets": [
             "portable"
@@ -18677,7 +18715,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "exec-native-extension"
+            "exec-native-extension",
+            "process-launch",
+            "idempotency-store"
           ],
           "targets": [
             "portable"
@@ -18777,7 +18817,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch",
+            "idempotency-store"
           ],
           "targets": [
             "portable"
@@ -18989,7 +19031,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch",
+            "idempotency-store"
           ],
           "targets": [
             "portable"
@@ -19089,7 +19133,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "exec-native-extension"
+            "exec-native-extension",
+            "process-launch",
+            "idempotency-store"
           ],
           "targets": [
             "portable"
@@ -19189,7 +19235,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch",
+            "idempotency-store"
           ],
           "targets": [
             "portable"
@@ -19289,7 +19337,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation",
+            "live-operation-dispatch"
           ],
           "targets": [
             "portable"
@@ -19389,7 +19439,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation",
+            "idempotency-store"
           ],
           "targets": [
             "portable"
@@ -19709,7 +19761,9 @@
             "cli-adapter",
             "managed-service",
             "live-native-extension",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "live-operation-dispatch",
+            "driver-preparation"
           ],
           "targets": [
             "portable"
@@ -19812,7 +19866,9 @@
             "cli-adapter",
             "managed-service",
             "exec-native-extension",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "process-launch",
+            "driver-preparation"
           ],
           "targets": [
             "portable"
@@ -20028,7 +20084,9 @@
             "cli-adapter",
             "managed-service",
             "resolved-driver-handoff",
-            "provider-native-operation"
+            "provider-native-operation",
+            "driver-entry",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -20150,7 +20208,9 @@
             "cli-adapter",
             "managed-service",
             "live-native-extension",
-            "provider-native-operation"
+            "provider-native-operation",
+            "live-operation",
+            "driver-entry"
           ],
           "targets": [
             "portable"
@@ -20272,7 +20332,9 @@
             "cli-adapter",
             "managed-service",
             "exec-native-extension",
-            "provider-native-operation"
+            "provider-native-operation",
+            "process-launch",
+            "driver-entry"
           ],
           "targets": [
             "portable"
@@ -20393,7 +20455,9 @@
             "cli-adapter",
             "managed-service",
             "provider-native-operation",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "driver-entry",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -20514,7 +20578,9 @@
             "cli-adapter",
             "managed-service",
             "resolved-driver-handoff",
-            "provider-native-operation"
+            "provider-native-operation",
+            "core-api",
+            "driver-entry"
           ],
           "targets": [
             "portable"
@@ -20616,7 +20682,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "provider-native-operation"
+            "provider-native-operation",
+            "core-api",
+            "driver-entry"
           ],
           "targets": [
             "portable"
@@ -20717,7 +20785,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -20816,7 +20886,9 @@
             "resolved-driver-handoff",
             "serialized-resolved-reentry",
             "provider-native-operation",
-            "direct-driver-invocation"
+            "direct-driver-invocation",
+            "driver-entry",
+            "driver-preparation"
           ],
           "targets": [
             "portable"
@@ -20918,7 +20990,9 @@
             "cli-adapter",
             "managed-service",
             "resolved-driver-handoff",
-            "provider-native-operation"
+            "provider-native-operation",
+            "core-api",
+            "driver-preparation"
           ],
           "targets": [
             "portable"
@@ -21022,7 +21096,9 @@
             "cli-adapter",
             "managed-service",
             "live-native-extension",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "live-operation",
+            "driver-preparation"
           ],
           "targets": [
             "portable"
@@ -21126,7 +21202,9 @@
             "cli-adapter",
             "managed-service",
             "provider-native-operation",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "core-api",
+            "driver-preparation"
           ],
           "targets": [
             "portable"
@@ -21230,7 +21308,9 @@
             "cli-adapter",
             "managed-service",
             "resolved-driver-handoff",
-            "provider-native-operation"
+            "provider-native-operation",
+            "core-api",
+            "driver-entry"
           ],
           "targets": [
             "portable"
@@ -21333,7 +21413,9 @@
             "cli-adapter",
             "managed-service",
             "live-native-extension",
-            "provider-native-operation"
+            "provider-native-operation",
+            "live-operation",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -21435,7 +21517,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "provider-native-operation"
+            "provider-native-operation",
+            "core-api",
+            "driver-entry"
           ],
           "targets": [
             "portable"
@@ -21538,7 +21622,9 @@
             "cli-adapter",
             "managed-service",
             "live-native-extension",
-            "provider-native-operation"
+            "provider-native-operation",
+            "live-operation-dispatch",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -21638,7 +21724,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -21737,7 +21825,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -21838,7 +21928,9 @@
             "cli-adapter",
             "managed-service",
             "adapter-native-extension",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch",
+            "framework-core-api"
           ],
           "targets": [
             "portable"
@@ -21936,7 +22028,9 @@
             "direct-api",
             "framework-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -22035,7 +22129,9 @@
             "direct-api",
             "framework-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -22133,7 +22229,9 @@
             "direct-api",
             "framework-adapter",
             "managed-service",
-            "exec-native-extension"
+            "exec-native-extension",
+            "process-launch",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -22230,7 +22328,9 @@
             "direct-api",
             "framework-adapter",
             "managed-service",
-            "exec-native-extension"
+            "exec-native-extension",
+            "process-launch",
+            "core-api"
           ],
           "targets": [
             "all-enabled-targets"
@@ -22328,7 +22428,8 @@
             "framework-adapter",
             "managed-service",
             "exec-native-extension",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "process-launch"
           ],
           "targets": [
             "portable"
@@ -22426,7 +22527,9 @@
             "direct-api",
             "framework-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "core-api",
+            "process-launch"
           ],
           "targets": [
             "portable"
@@ -22523,7 +22626,9 @@
             "direct-api",
             "framework-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "core-api",
+            "process-launch"
           ],
           "targets": [
             "all-enabled-targets"
@@ -22624,7 +22729,9 @@
             "managed-service",
             "create-native-extension",
             "live-native-extension",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "core-api",
+            "process-launch"
           ],
           "targets": [
             "all-enabled-targets"
@@ -23171,7 +23278,9 @@
             "direct-api",
             "framework-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -23593,7 +23702,9 @@
             "direct-api",
             "framework-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "core-api",
+            "live-operation-dispatch"
           ],
           "targets": [
             "portable"
@@ -23803,7 +23914,9 @@
             "direct-api",
             "framework-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -23900,7 +24013,9 @@
             "direct-api",
             "framework-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch",
+            "snapshot-store"
           ],
           "targets": [
             "all-enabled-targets"
@@ -24332,7 +24447,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -24432,7 +24549,9 @@
             "direct-api",
             "framework-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "core-api",
+            "live-operation"
           ],
           "targets": [
             "portable"
@@ -24529,7 +24648,9 @@
             "direct-api",
             "framework-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "core-api",
+            "live-operation"
           ],
           "targets": [
             "portable"
@@ -24629,7 +24750,9 @@
             "framework-adapter",
             "managed-service",
             "live-native-extension",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "core-api",
+            "live-operation"
           ],
           "targets": [
             "all-enabled-targets"
@@ -24740,7 +24863,9 @@
           "status": "planned",
           "covers": [
             "resolved-driver-handoff",
-            "provider-native-operation"
+            "provider-native-operation",
+            "driver-entry",
+            "core-api"
           ],
           "targets": [
             "all-enabled-targets"
@@ -24850,7 +24975,9 @@
             "framework-adapter",
             "managed-service",
             "live-native-extension",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "core-api",
+            "live-operation"
           ],
           "targets": [
             "all-enabled-targets"
@@ -24967,7 +25094,9 @@
             "framework-adapter",
             "managed-service",
             "live-native-extension",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "core-api",
+            "live-operation"
           ],
           "targets": [
             "all-enabled-targets"
@@ -25082,7 +25211,9 @@
             "direct-api",
             "framework-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "core-api",
+            "live-operation"
           ],
           "targets": [
             "portable"
@@ -25289,7 +25420,9 @@
             "framework-adapter",
             "managed-service",
             "live-native-extension",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "core-api",
+            "live-operation"
           ],
           "targets": [
             "all-enabled-targets"
@@ -25513,7 +25646,8 @@
             "managed-service",
             "create-native-extension",
             "live-native-extension",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "core-api"
           ],
           "targets": [
             "all-enabled-targets"
@@ -25628,7 +25762,9 @@
           "covers": [
             "resolved-driver-handoff",
             "generated-runtime-configuration",
-            "provider-native-operation"
+            "provider-native-operation",
+            "driver-entry",
+            "core-api"
           ],
           "targets": [
             "all-enabled-targets"
@@ -25973,7 +26109,9 @@
           "status": "planned",
           "covers": [
             "provider-native-operation",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "core-api",
+            "process-launch"
           ],
           "targets": [
             "all-enabled-targets"
@@ -26079,7 +26217,9 @@
           "covers": [
             "resolved-driver-handoff",
             "provider-native-operation",
-            "generated-runtime-configuration"
+            "generated-runtime-configuration",
+            "driver-entry",
+            "core-api"
           ],
           "targets": [
             "all-enabled-targets"
@@ -26190,7 +26330,8 @@
             "framework-adapter",
             "managed-service",
             "live-native-extension",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "core-api"
           ],
           "targets": [
             "all-enabled-targets"
@@ -26305,7 +26446,8 @@
             "framework-adapter",
             "managed-service",
             "live-native-extension",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "core-api"
           ],
           "targets": [
             "all-enabled-targets"
@@ -26532,7 +26674,9 @@
             "direct-api",
             "framework-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch",
+            "core-api"
           ],
           "targets": [
             "all-enabled-targets"
@@ -26630,7 +26774,8 @@
             "framework-adapter",
             "managed-service",
             "create-native-extension",
-            "live-native-extension"
+            "live-native-extension",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -26731,7 +26876,8 @@
             "managed-service",
             "create-native-extension",
             "live-native-extension",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "core-api"
           ],
           "targets": [
             "all-enabled-targets"
@@ -26848,7 +26994,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -26945,7 +27092,9 @@
             "direct-api",
             "framework-adapter",
             "cli-adapter",
-            "managed-service"
+            "managed-service",
+            "core-api",
+            "process-launch"
           ],
           "targets": [
             "portable"
@@ -27042,7 +27191,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -27141,7 +27291,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "exec-native-extension"
+            "exec-native-extension",
+            "process-launch",
+            "idempotency-store"
           ],
           "targets": [
             "portable"
@@ -27239,7 +27391,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -27334,7 +27487,9 @@
           "covers": [
             "resolved-driver-handoff",
             "generated-runtime-configuration",
-            "provider-native-operation"
+            "provider-native-operation",
+            "driver-entry",
+            "core-api"
           ],
           "targets": [
             "all-enabled-targets"
@@ -27442,7 +27597,8 @@
             "direct-api",
             "framework-adapter",
             "cli-adapter",
-            "managed-service"
+            "managed-service",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -27540,7 +27696,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "exec-native-extension"
+            "exec-native-extension",
+            "process-launch"
           ],
           "targets": [
             "portable"
@@ -27638,7 +27795,9 @@
             "direct-api",
             "framework-adapter",
             "cli-adapter",
-            "managed-service"
+            "managed-service",
+            "idempotency-store",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -27734,7 +27893,9 @@
             "direct-api",
             "framework-adapter",
             "cli-adapter",
-            "managed-service"
+            "managed-service",
+            "idempotency-store",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -27830,7 +27991,9 @@
             "direct-api",
             "framework-adapter",
             "cli-adapter",
-            "managed-service"
+            "managed-service",
+            "core-api",
+            "process-launch"
           ],
           "targets": [
             "portable"
@@ -27926,7 +28089,9 @@
             "direct-api",
             "framework-adapter",
             "cli-adapter",
-            "managed-service"
+            "managed-service",
+            "process-launch",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -28022,7 +28187,8 @@
             "direct-api",
             "framework-adapter",
             "cli-adapter",
-            "managed-service"
+            "managed-service",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -28119,7 +28285,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "exec-native-extension"
+            "exec-native-extension",
+            "process-launch"
           ],
           "targets": [
             "portable"
@@ -28217,7 +28384,9 @@
             "direct-api",
             "framework-adapter",
             "cli-adapter",
-            "managed-service"
+            "managed-service",
+            "core-api",
+            "process-launch"
           ],
           "targets": [
             "portable"
@@ -28314,7 +28483,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -28412,7 +28582,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -28510,7 +28681,9 @@
             "direct-api",
             "framework-adapter",
             "cli-adapter",
-            "managed-service"
+            "managed-service",
+            "process-launch",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -28604,7 +28777,9 @@
           "covers": [
             "resolved-driver-handoff",
             "generated-runtime-configuration",
-            "provider-native-operation"
+            "provider-native-operation",
+            "driver-entry",
+            "core-api"
           ],
           "targets": [
             "all-enabled-targets"
@@ -28712,7 +28887,9 @@
           "covers": [
             "resolved-driver-handoff",
             "generated-runtime-configuration",
-            "provider-native-operation"
+            "provider-native-operation",
+            "core-api",
+            "process-launch"
           ],
           "targets": [
             "all-enabled-targets"
@@ -28808,7 +28985,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -28907,7 +29085,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "core-api",
+            "live-operation"
           ],
           "targets": [
             "portable"
@@ -29007,7 +29187,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "core-api",
+            "process-launch"
           ],
           "targets": [
             "portable"
@@ -29103,7 +29285,9 @@
           "covers": [
             "resolved-driver-handoff",
             "generated-runtime-configuration",
-            "provider-native-operation"
+            "provider-native-operation",
+            "driver-entry",
+            "process-launch"
           ],
           "targets": [
             "all-enabled-targets"
@@ -29207,7 +29391,8 @@
           "status": "planned",
           "covers": [
             "resolved-driver-handoff",
-            "generated-runtime-configuration"
+            "generated-runtime-configuration",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -29302,7 +29487,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "core-api",
+            "process-launch"
           ],
           "targets": [
             "all-enabled-targets"
@@ -29414,7 +29601,9 @@
           "covers": [
             "resolved-driver-handoff",
             "generated-runtime-configuration",
-            "provider-native-operation"
+            "provider-native-operation",
+            "core-api",
+            "process-launch"
           ],
           "targets": [
             "all-enabled-targets"
@@ -29510,7 +29699,9 @@
             "direct-api",
             "framework-adapter",
             "managed-service",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "core-api",
+            "driver-entry"
           ],
           "targets": [
             "all-enabled-targets"
@@ -29606,7 +29797,8 @@
           "covers": [
             "resolved-driver-handoff",
             "generated-runtime-configuration",
-            "provider-native-operation"
+            "provider-native-operation",
+            "core-api"
           ],
           "targets": [
             "all-enabled-targets"
@@ -29703,7 +29895,9 @@
             "framework-adapter",
             "managed-service",
             "resolved-driver-handoff",
-            "generated-runtime-configuration"
+            "generated-runtime-configuration",
+            "core-api",
+            "process-launch"
           ],
           "targets": [
             "all-enabled-targets"
@@ -29818,7 +30012,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "core-api",
+            "live-operation"
           ],
           "targets": [
             "portable"
@@ -29916,7 +30112,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -30009,7 +30206,8 @@
           "covers": [
             "resolved-driver-handoff",
             "generated-runtime-configuration",
-            "provider-native-operation"
+            "provider-native-operation",
+            "core-api"
           ],
           "targets": [
             "all-enabled-targets"
@@ -30105,7 +30303,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "core-api",
+            "driver-entry"
           ],
           "targets": [
             "all-enabled-targets"
@@ -30217,7 +30417,8 @@
             "direct-api",
             "framework-adapter",
             "cli-adapter",
-            "managed-service"
+            "managed-service",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -30311,7 +30512,8 @@
           "covers": [
             "resolved-driver-handoff",
             "generated-runtime-configuration",
-            "provider-native-operation"
+            "provider-native-operation",
+            "core-api"
           ],
           "targets": [
             "all-enabled-targets"
@@ -30408,7 +30610,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch"
           ],
           "targets": [
             "all-enabled-targets"
@@ -30506,7 +30709,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch"
           ],
           "targets": [
             "all-enabled-targets"
@@ -30602,7 +30806,9 @@
           "covers": [
             "resolved-driver-handoff",
             "generated-runtime-configuration",
-            "provider-native-operation"
+            "provider-native-operation",
+            "live-operation",
+            "driver-entry"
           ],
           "targets": [
             "all-enabled-targets"
@@ -30713,7 +30919,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "core-api",
+            "live-operation"
           ],
           "targets": [
             "portable"
@@ -30813,7 +31021,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "live-operation-dispatch",
+            "idempotency-store"
           ],
           "targets": [
             "all-enabled-targets"
@@ -30912,7 +31122,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "core-api",
+            "live-operation"
           ],
           "targets": [
             "portable"
@@ -31012,7 +31224,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "core-api",
+            "live-operation"
           ],
           "targets": [
             "all-enabled-targets"
@@ -31228,7 +31442,8 @@
           "covers": [
             "framework-adapter",
             "cli-adapter",
-            "adapter-native-extension"
+            "adapter-native-extension",
+            "live-operation-dispatch"
           ],
           "targets": [
             "portable"
@@ -32256,7 +32471,9 @@
           "covers": [
             "managed-service",
             "service-native-extension",
-            "managed-service-definition-authoring"
+            "managed-service-definition-authoring",
+            "live-operation-dispatch",
+            "managed-service-core-api"
           ],
           "targets": [
             "portable"
@@ -32453,7 +32670,9 @@
           "status": "planned",
           "covers": [
             "managed-service",
-            "service-native-extension"
+            "service-native-extension",
+            "live-operation-dispatch",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -32660,7 +32879,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch"
           ],
           "targets": [
             "portable"
@@ -32759,7 +32979,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "exec-native-extension"
+            "exec-native-extension",
+            "process-launch"
           ],
           "targets": [
             "portable"
@@ -32970,7 +33191,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch"
           ],
           "targets": [
             "portable"
@@ -33070,7 +33292,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "exec-native-extension"
+            "exec-native-extension",
+            "process-launch"
           ],
           "targets": [
             "portable"
@@ -33281,7 +33504,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch"
           ],
           "targets": [
             "portable"
@@ -33380,7 +33604,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "exec-native-extension"
+            "exec-native-extension",
+            "process-launch"
           ],
           "targets": [
             "portable"
@@ -33592,7 +33817,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch"
           ],
           "targets": [
             "portable"
@@ -33692,7 +33918,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "exec-native-extension"
+            "exec-native-extension",
+            "process-launch"
           ],
           "targets": [
             "portable"
@@ -33903,7 +34130,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch"
           ],
           "targets": [
             "portable"
@@ -34003,7 +34231,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "exec-native-extension"
+            "exec-native-extension",
+            "process-launch"
           ],
           "targets": [
             "portable"
@@ -34320,7 +34549,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch",
+            "snapshot-store"
           ],
           "targets": [
             "portable"
@@ -34422,7 +34653,9 @@
             "managed-service",
             "live-native-extension",
             "create-native-extension",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "process-launch",
+            "core-api"
           ],
           "targets": [
             "all-enabled-targets"
@@ -34538,7 +34771,9 @@
             "direct-api",
             "live-native-extension",
             "resolved-driver-handoff",
-            "serialized-resolved-reentry"
+            "serialized-resolved-reentry",
+            "prepared-launch-identity",
+            "live-operation-dispatch"
           ],
           "targets": [
             "all-enabled-targets"
@@ -34636,7 +34871,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -34736,7 +34973,9 @@
             "direct-api",
             "managed-service",
             "resolved-driver-handoff",
-            "provider-native-operation"
+            "provider-native-operation",
+            "live-operation",
+            "core-api"
           ],
           "targets": [
             "all-enabled-targets"
@@ -34965,7 +35204,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -35067,7 +35307,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch",
+            "snapshot-store"
           ],
           "targets": [
             "portable"
@@ -35167,7 +35409,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch"
           ],
           "targets": [
             "portable"
@@ -35266,7 +35509,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch"
           ],
           "targets": [
             "portable"
@@ -35473,7 +35717,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -35572,7 +35818,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -35667,7 +35914,9 @@
           "status": "planned",
           "covers": [
             "direct-api",
-            "managed-service"
+            "managed-service",
+            "live-operation-dispatch",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -35871,7 +36120,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch",
+            "snapshot-store"
           ],
           "targets": [
             "portable"
@@ -35971,7 +36222,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "snapshot-store",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -36070,7 +36323,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch",
+            "snapshot-store"
           ],
           "targets": [
             "portable"
@@ -36169,7 +36424,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch",
+            "snapshot-store"
           ],
           "targets": [
             "portable"
@@ -36268,7 +36525,9 @@
             "framework-adapter",
             "managed-service",
             "live-native-extension",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "live-operation",
+            "snapshot-store"
           ],
           "targets": [
             "portable"
@@ -36383,7 +36642,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch",
+            "snapshot-store"
           ],
           "targets": [
             "portable"
@@ -36482,7 +36743,9 @@
             "framework-adapter",
             "managed-service",
             "live-native-extension",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "live-operation",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -36597,7 +36860,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch",
+            "snapshot-store"
           ],
           "targets": [
             "portable"
@@ -36696,7 +36961,9 @@
             "framework-adapter",
             "managed-service",
             "live-native-extension",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "live-operation",
+            "core-api"
           ],
           "targets": [
             "portable"
@@ -36813,7 +37080,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch",
+            "snapshot-store"
           ],
           "targets": [
             "portable"
@@ -36908,7 +37177,9 @@
           "status": "planned",
           "covers": [
             "resolved-driver-handoff",
-            "provider-native-operation"
+            "provider-native-operation",
+            "core-api",
+            "snapshot-store"
           ],
           "targets": [
             "all-enabled-targets"

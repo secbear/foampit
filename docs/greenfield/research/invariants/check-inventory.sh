@@ -76,7 +76,17 @@ operation_case_contracts_sha256="$(
 # not a coordinated digest rewrite, remains authoritative.
 expected_composition_paths_sha256="65322c7c30f4c75222a36793b8d1b877fa5813df4d1c83f236bb18884c364a65"
 expected_composition_case_contracts_sha256="52feb46769b058401fc14e73198635c71abfad6789e50b3fd7de260741c59401"
-expected_invariant_registry_sha256="9a4144d8832798292aa83ed89ed742250da1172707e0963ef960aceac9968bce"
+# Packet E pins. Second copies of the values inside validate-operation-contracts.jq, so a
+# drifted pin aborts here before any validator runs -- the same discipline as Packet D.
+expected_operation_registry_sha256="7612e8d346072e217b7a9107fea17d9ce79e60559d09db36f6de77ccad5a7ce5"
+expected_operation_case_contracts_sha256="e9dde541702c02370b37e6dc844a58fd79acca5edd4faa4966241e00885e0ba9"
+expected_invariant_registry_sha256="0a3bd061e6456c6fccb7521d27daaa81a42d83aff4c8de04402c4598c4eea97a"
+
+if [[ "${operation_registry_sha256}" != "${expected_operation_registry_sha256}" ||
+      "${operation_case_contracts_sha256}" != "${expected_operation_case_contracts_sha256}" ]]; then
+  echo "Packet E digest pin mismatch; pins provide drift detection, not semantic authority" >&2
+  exit 1
+fi
 
 if [[ "${composition_paths_sha256}" != "${expected_composition_paths_sha256}" ||
       "${composition_case_contracts_sha256}" != "${expected_composition_case_contracts_sha256}" ||

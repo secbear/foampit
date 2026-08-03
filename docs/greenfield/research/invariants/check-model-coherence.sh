@@ -290,22 +290,29 @@ done
 #    must move together or the early abort guards a stale value.
 # ---------------------------------------------------------------------------
 
+# Every validator that carries a pin, not just the first one found. A third copy of the
+# registry pin lives in validate-operation-contracts.jq; missing it let a stale pin ship.
 for pin in \
-  "expected_paths_registry_sha256:${paths_doc}" \
-  "expected_case_contracts_sha256:${case_contracts}" \
-  "expected_invariant_registry_sha256:${registry}"; do
-  def_name="${pin%%:*}"
-  target_file="${pin##*:}"
-  in_validator="$(jq_def_value "${script_dir}/validate-composition-coverage.jq" "${def_name}" |
+  "validate-composition-coverage.jq:expected_paths_registry_sha256:${paths_doc}" \
+  "validate-composition-coverage.jq:expected_case_contracts_sha256:${case_contracts}" \
+  "validate-composition-coverage.jq:expected_invariant_registry_sha256:${registry}" \
+  "validate-operation-contracts.jq:expected_invariant_registry_sha256:${registry}" \
+  "validate-operation-contracts.jq:expected_operation_registry_sha256:${script_dir}/PACKET-E-OPERATION-REGISTRY.json" \
+  "validate-operation-contracts.jq:expected_case_contracts_sha256:${script_dir}/PACKET-E-CASE-CONTRACTS.json"; do
+  validator_file="${pin%%:*}"
+  rest="${pin#*:}"
+  def_name="${rest%%:*}"
+  target_file="${rest##*:}"
+  in_validator="$(jq_def_value "${script_dir}/${validator_file}" "${def_name}" |
     jq -r '.' 2>/dev/null || echo "__MISSING__")"
   actual="$(shasum -a 256 "${target_file}" | awk '{print $1}')"
   if [[ "${in_validator}" == "__MISSING__" ]]; then
-    fail "digest-pin ${def_name}: not defined in validate-composition-coverage.jq"
+    fail "digest-pin ${validator_file}/${def_name}: not defined"
   elif [[ "${in_validator}" != "${actual}" ]]; then
-    fail "digest-pin ${def_name}: validator pin does not match the file it names" \
+    fail "digest-pin ${validator_file}/${def_name}: validator pin does not match the file it names" \
       "validator: ${in_validator}" "actual:    ${actual}"
   elif ! grep -q "${actual}" "${script_dir}/check-inventory.sh"; then
-    fail "digest-pin ${def_name}: check-inventory.sh does not carry the same pin" \
+    fail "digest-pin ${validator_file}/${def_name}: check-inventory.sh does not carry the same pin" \
       "expected ${actual} to appear in check-inventory.sh"
   else
     pass

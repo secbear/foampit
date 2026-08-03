@@ -64,7 +64,7 @@ def expected_case_contracts_sha256:
   "e9dde541702c02370b37e6dc844a58fd79acca5edd4faa4966241e00885e0ba9";
 
 def expected_invariant_registry_sha256:
-  "7cd71ffdd40be3f61744704731b6de8acee30f91c060c51b9caa6f8f81c2b517";
+  "0a3bd061e6456c6fccb7521d27daaa81a42d83aff4c8de04402c4598c4eea97a";
 
 # --- recomputed vocabularies ---------------------------------------------------------
 def registry_doc: $registry[0];
