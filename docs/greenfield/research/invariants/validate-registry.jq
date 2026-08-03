@@ -99,6 +99,33 @@ def string_array:
 def nonempty_string_array:
   string_array and length > 0;
 
+# A boundary at which a serialized, product-owned representation is decoded and
+# revalidated. `wire-corruption` is defined as "a malformed/corrupted FRONTEND RESULT is
+# rejected by the next trust boundary", so the obligation belongs to these boundaries and
+# not to in-process Core boundaries such as core-api, live-operation-dispatch,
+# process-launch, idempotency-store, or driver-preparation, which receive a private
+# product-owned stage rather than a decoded representation.
+def decoding_trust_boundaries:
+  [
+    "canonical-wire",
+    "frontend-adaptation",
+    "frontend-evaluation",
+    "schema-migration",
+    "raw-wire-input",
+    "resolved-reentry-wire",
+    "built-manifest",
+    "artifact-manifest-load",
+    "provider-build-result",
+    "provider-transport",
+    "provider-cache",
+    "nix-construction",
+    "generated-service-unit"
+  ];
+
+def decodes_a_representation($invariant):
+  any($invariant.trustBoundaries[]?;
+      . as $b | decoding_trust_boundaries | index($b) != null);
+
 def placeholder_strings:
   [
     .. |
@@ -283,7 +310,7 @@ def common_invariant_errors($invariant):
     else empty
     end,
 
-    if ($invariant.trustBoundaries | length > 0) and
+    if decodes_a_representation($invariant) and
        (has_test($invariant; "wire-corruption") | not)
     then inv_error($invariant; "inventory requires planned wire-corruption evidence")
     else empty
@@ -473,7 +500,7 @@ def closure_errors($invariant):
     else empty
     end,
 
-    if ($invariant.trustBoundaries | length > 0) and
+    if decodes_a_representation($invariant) and
        (has_passing_test($invariant; "wire-corruption") | not)
     then inv_error($invariant; "closure requires wire-corruption evidence")
     else empty

@@ -1029,7 +1029,7 @@ def expected_case_contracts_sha256:
 # Digest pins detect accidental drift and impose review friction. They do not
 # authorize inputs that fail the semantic relationship checks below.
 def expected_invariant_registry_sha256:
-  "7cd71ffdd40be3f61744704731b6de8acee30f91c060c51b9caa6f8f81c2b517";
+  "9a4144d8832798292aa83ed89ed742250da1172707e0963ef960aceac9968bce";
 
 def nonempty_string:
   type == "string" and (gsub("^\\s+|\\s+$"; "") | length > 0);

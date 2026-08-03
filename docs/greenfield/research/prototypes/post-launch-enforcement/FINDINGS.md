@@ -6,10 +6,11 @@ Nine invariants implemented with their authoritative hooks and declared test kin
 five owners, six rejection deadlines, and all three post-launch dispositions. 19 checks pass.
 The code is the instrument; these findings are the deliverable.
 
-## F1. 176 invariants declare a test that cannot be written — `wire-corruption`
+## F1. 247 invariants declare a test that cannot be written — `wire-corruption`
 
-**Every one of the 176 invariants whose rejection deadline is post-launch declares a
-`wire-corruption` test. Not one of them declares a trust boundary that crosses a wire.**
+**Every one of the 176 invariants whose rejection deadline is post-launch declared a
+`wire-corruption` test. Not one of them declares a trust boundary that crosses a wire. The
+same defect reaches 247 invariants in total — see below.**
 
 ```
 post-launch invariants declaring a wire-crossing trust boundary:  0 of 176
@@ -29,11 +30,31 @@ was on the artifact branch, where it is correct.
 
 I could not write this test for `SBX-004`, `PRC-007`, or `PIO-017`. There is no wire.
 
-**Consequence for Gate 4B: 176 of the 1,453 planned tests (12%) are currently unwritable as
-specified.** The fix is to make the `wire-corruption` obligation conditional on a boundary
-that actually decodes an external representation, rather than on `trustBoundaries` being
-non-empty. That is a change to a shared validator rule and would reopen the obligation
-counts for every packet.
+**The finding is broader than the nine.** Classifying all 31 trust boundaries by whether a
+serialized product-owned representation is actually decoded there:
+
+```
+would require wire-corruption:  107 of 354
+would NOT require:              247 of 354   (202 Packet E, 45 pre-existing)
+```
+
+So **247**, not 176. Forty-five pre-existing invariants at `C0`/`O0`/`H0`/`D0` have the same
+problem — their boundaries are `driver-preparation`, `operator-admission`, and similar, which
+receive a private product-owned stage rather than a decoded representation.
+
+**Fixed 2026-08-03.** `validate-registry.jq` now derives the obligation from
+`decoding_trust_boundaries` rather than from `trustBoundaries` being non-empty, in both
+inventory and closure mode. Verified the rule still fires where it should: removing
+`wire-corruption` from `STR-001`, which declares `canonical-wire`, is still rejected.
+
+The 160 unwritable declarations were removed from the post-launch Packet E invariants — the
+ones for which this slice produced direct evidence. Planned tests 1,453 -> 1,293. Gate 4B
+`wire-corruption` obligations 354 -> 107.
+
+**The 45 pre-existing invariants were deliberately NOT edited.** Their obligation is now
+correctly not required, but their declared tests remain, and whether those tests are writable
+is a Packets A-D question this slice did not test. Removing them would reopen reviewed test
+obligations on evidence I do not have.
 
 ## F2. `unrepresentable` means two different things, and only one is a type claim
 
@@ -103,7 +124,12 @@ carry. The vocabulary was designed against Packets A-D, which are almost entirel
 and Packet E is the first packet to live somewhere else.
 
 **Recommendation before Gate 4B is costed**: revisit the test-kind obligations per branch
-rather than per invariant. The current model over-counts the test obligation by at least 176
-and misclassifies roughly 14 dispositions, and both errors point the same way — the estimate
-of 1,453 tests is high, and the shape of the remaining work is different from what the
-registry implies.
+rather than per invariant. F1 is now fixed and cost 160 planned tests (1,453 -> 1,293) with a
+further 45 pre-existing declarations still to review. F2 remains open and would reclassify
+roughly 14 dispositions. Both errors pointed the same way: the estimate was high, and the
+shape of the remaining work differs from what the registry implied.
+
+The general lesson is narrower than "the model is wrong". The model's *structure* held. What
+failed was a vocabulary designed against one branch of the phase graph and then applied
+universally by a validator rule that composed two individually reasonable requirements into
+an unconditional one. That composition is worth looking for elsewhere.
