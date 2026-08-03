@@ -106,6 +106,12 @@ Apply the fixes as recorded below, not as first proposed.
 
 ## 1. Readiness verdict
 
+> **Superseded 2026-08-02.** Sections 1-3 record the SECOND adversarial review,
+> taken before its 20 confirmed defects were fixed. All were closed, the count
+> settled at 214, identifiers were allocated, and the entries are registered.
+> The verdict below is retained as the review record it was, not as current
+> status. Current status is the document header and the addenda.
+
 **NOT READY for identifier allocation.** Do not allocate. The set requires a further edit round, and — decisively — **the entry count is not final**: three confirmed findings require *adding* entries (up to 5), so allocating against 209 now guarantees a renumber.
 
 Three independent reasons, any one of which is sufficient:
@@ -246,10 +252,11 @@ boundary on its traversal, so a one-step chain is the **correct** answer, not a
 gap. That accounts for 97.6% of the supposed defect.
 
 The remaining 37 cells belong to two invariants, `PRF-008` and `FRK-003`, both
-`R0 -> R1`. Every one of them sits on a path that terminates upstream of both
-phases — `resolved-driver-handoff` ends at `D0`, `serialized-resolved-reentry`
-at `D0`, and the native-extension paths earlier still. A path that never reaches
-`R0` or `R1` has no revalidation to offer for a rule decided there. Their chains
+`R0 -> R1`. Every one of them sits on a path with no boundary step at `R0` or `R1` —
+`resolved-driver-handoff` and `serialized-resolved-reentry` end at `D0`,
+`live-native-extension` at `L0`, `exec-native-extension` at `E0`. None of those
+stations is `R0` or `R1`, so none of these paths has revalidation to offer for a
+rule decided there. Their chains
 are honest too.
 
 ## The authority reading that prompted the task
@@ -265,9 +272,14 @@ consistent with the established model at 94%.
 
 ## Ruling
 
-**Task 7A is declined.** All 54 composition paths terminate at or before driver
-preparation by design; the path universe deliberately does not model launch,
-conformance, live mutation, process launch, or teardown. Adding post-launch
+**Task 7A is declined.** No composition path has a boundary step at `R0`, `R1`,
+`L1`, `E1`, or `T0` — that is what was measured, and it is what the decline
+rests on. (An earlier draft of this ruling said "all 54 paths terminate at or
+before driver preparation", which is **false**: `live-native-extension`
+terminates at `L0` and `exec-native-extension` at `E0`, both strictly downstream
+of `D0`. The corrected statement is the one above; the operative clause is
+unchanged.) The path universe deliberately does not model launch, conformance,
+live mutation, process launch, or teardown. Adding post-launch
 steps to those templates would assert that a configuration composition path
 reaches stations it does not reach — the same class of false coverage claim the
 phase ruling's hard prohibition forbids, arriving by a different route.
@@ -278,3 +290,92 @@ Packet D's locked 54, which is a genuine reopening with its own justification
 burden, and it is not required for Packet E to close.
 
 The plan text is corrected accordingly.
+
+---
+
+# Gate 2A exit-record fragment: Packet E
+
+Date: 2026-08-02
+
+This is the **Packet E fragment** of the Gate 2A exit record, not the exit
+record itself. Gate 2A cannot close: Packet F is unwalked, and the
+dynamic-state dimension row carries an undischarged Packet E remainder
+(acquisition, reservation, rollback, and the dynamic reservation and
+time-of-check/time-of-use protocol, which all four locked Packet E records list
+as still unlocked).
+
+## Reviewed scope
+
+| Coordinate | Value |
+|---|---:|
+| Source obligations across the four locked records | 178 |
+| Registered invariants | 214 in 16 families |
+| Registry after merge | 354 |
+| Corpus invalid / valid cases | 354 / 256 |
+| Packet D cells / rule groups | 19,116 / 948 |
+| Operations (methods + deferral markers) | 37 + 4 |
+| Operation-contract cells | 222 |
+| Operation-pair concurrency cells | 625 |
+
+Invariant coverage: **201** governed by a generated operation contract, **1**
+(`FRK-005`) covered only by a stated absence, **12** assigned to the driver,
+adapter, artifact, and service ledgers. 201 + 1 + 12 = 214.
+
+Delegations discharged: all 20 Packet A surfaces marked `delegatedPacket: "E"`,
+all 5 Packet B fields delegating `"E"`, and Packet D's four `E` concerns.
+
+## Inventory-validator result
+
+`check-inventory.sh` exits 0. `check-enforcement-closure.sh` exits 5 and must:
+all 354 authoritative hooks and 1,453 tests remain `planned`. Gate 4B is not
+closed and Packet E does not close it.
+
+## Reviewer findings and their disposition
+
+Three independent lenses were run — cold reconstruction from the machine records
+alone, adversarial coordinated mutation, and a two-directional claim audit. **All
+three returned `defects-found`**: 30 findings, 6 blocking and 10 major. The
+blocking and major findings concerned this packet's own review records more than
+its machine records.
+
+Fixed before this record was written:
+
+| Finding | Disposition |
+|---|---|
+| The partition record's `textAuthority` denied that its 214 entries were registered, in the corpus, or classified — all three false | Rewritten; `allocationStatus` now `registered` |
+| Section 1's "NOT READY, do not allocate" read as current status | Marked superseded, retained as the review record it was |
+| `PRC-016` disagreed three ways: registry widened, corpus and partition not | Both narrow copies widened |
+| The Task 7A decline rested on "all 54 paths terminate at or before driver preparation" — false for `live-native-extension` (`L0`) and `exec-native-extension` (`E0`) | Restated as what was measured: no path has a boundary step at `R0`/`R1`/`L1`/`E1`/`T0`. The ruling is unchanged |
+| "202 governed by an operation contract" counted `FRK-005`, covered only by a deferral marker | Split to 201 / 1 / 12 in the prose **and** in the gate counter |
+| The owner-distribution table was the pre-Packet-E 140-invariant table and omitted `core` | Recomputed to 354 across 9 owners |
+| Four SHA-256 values presented as the reviewed snapshot binding were stale | Re-pinned, with the Packet E widening noted |
+| `INVARIANT-ENFORCEMENT.md` asserted 54 × 140 = 19,116 | Corrected to 354 in all three places; the Packet E validator is now named in the inventory-mode description |
+| Two different pass counts for one validator (90 and 92) | 92 |
+
+Recorded as known open work, not fixed:
+
+- `PACKET-E-OPERATION-CONTRACT-REVIEW.md` does not exist; its content is split
+  across this document and the `INVENTORY-REVIEW.md` Packet E section.
+- The gate prints `Packets E-F`, which is correct while the decision record is
+  missing and the dynamic-state remainder stands.
+- Four of eight digest pins have no second copy, contradicting the
+  `CONTRIBUTING.md` lockstep table. Both Packet E pins are in that group.
+- **The Packet E validator anchors cell structure but not cell semantics.** A
+  transition target, error variant, or terminal outcome rewritten in the catalog
+  and the generated matrix together survives, because the generated document is
+  checked against the catalog rather than against an independent statement of
+  the rule. Cell kind and transition-vector position are two copies of one fact,
+  so their agreement proves consistency, not correctness. This is the most
+  significant residual weakness and it is a real gap, not a formality.
+- The `create-native-extension` surface is undefined in `DESIGN.md`; six `CRT-*`
+  cells carry rejection-only evidence as a deliberate hedge.
+- No `ERR` arm exists for Process or Operation observation.
+- `OPA-002` omits Process termination; `ADM-007` is ambiguous between set-time
+  and fire-time.
+- The Packet A data-plane families are deferred pending their method names.
+
+## Remaining `partial` or `unwalked` rows
+
+**Two**, both `partial`: dynamic state and security-and-disclosure. Security and
+disclosure is Packet F's scope. Dynamic state is not solely Packet F's and is
+the reason Gate 2A cannot close on Packet F alone.

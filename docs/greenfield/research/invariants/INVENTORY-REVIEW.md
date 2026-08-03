@@ -41,18 +41,19 @@ As of 2026-07-24:
 - Gate 2A review is open; and
 - Gate 4B correctly fails.
 
-Current owner distribution:
+Current owner distribution (354 across 9 owners):
 
 | Owner | Registered invariants |
 |---|---:|
-| Artifact Definition | 91 |
-| `CreateSandbox` | 13 |
-| Operator Configuration | 11 |
-| Managed-Sandbox Service Definition | 5 |
-| Live Sandbox operation | 5 |
-| `Exec` / Process | 7 |
-| Framework/CLI adapter | 3 |
-| Runtime/driver boundary | 5 |
+| Core Sandbox API control plane | 128 |
+| Artifact Definition | 94 |
+| Live Sandbox operation | 36 |
+| Runtime/driver boundary | 28 |
+| `CreateSandbox` | 18 |
+| `Exec` / Process | 15 |
+| Framework/CLI adapter | 14 |
+| Operator Configuration | 13 |
+| Managed-Sandbox Service Definition | 8 |
 
 Packet A's complete field/operation ledger and decision record are
 [`PACKET-A-SURFACE-COVERAGE.json`](./PACKET-A-SURFACE-COVERAGE.json) and
@@ -188,7 +189,7 @@ Status: **Reviewed — cold reconstruction, adversarial semantic review, and
 prototype-evidence sign-off complete.** See
 [`PACKET-D-COMPOSITION-REVIEW.md`](./PACKET-D-COMPOSITION-REVIEW.md).
 
-The reviewed, digest-bound machine snapshot is reconstructable from
+The digest-bound machine snapshot is reconstructable from (digests recomputed after Packet E registration widened the invariant axis; the Packet D review verdicts stand for the path universe and classification semantics, not for the Packet E cells)
 [`PACKET-D-COMPOSITION-PATHS.json`](./PACKET-D-COMPOSITION-PATHS.json),
 [`PACKET-D-CASE-CONTRACTS.json`](./PACKET-D-CASE-CONTRACTS.json), and
 [`PACKET-D-COMPOSITION-COVERAGE.json`](./PACKET-D-COMPOSITION-COVERAGE.json):
@@ -221,19 +222,19 @@ For every supported frontend and native extension, walk:
 The output lists both ordinary and strongest supported construction paths for
 each invariant.
 
-The final focused validator passes 90 cases. Independent reviewers
+The final focused validator passes 92 cases. Independent reviewers
 reconstructed all totals and contracts, rejected coordinated mutations after
 neutralizing digest pins, and verified the real Nix/Rust prototype mechanisms
 and exact counters. The reviewed snapshot is bound to path
-`488bf76167461b52766dd9fa8a9b1756d084f1ebc08c795315fd2baf2fbab6e0`,
+`65322c7c30f4c75222a36793b8d1b877fa5813df4d1c83f236bb18884c364a65`,
 case-contract
-`955c3dd8c03927be6876c58b2c3c67210f1fc0710ecf5f5ea2a4a2c59bc3f5b0`,
+`52feb46769b058401fc14e73198635c71abfad6789e50b3fd7de260741c59401`,
 invariant
-`8901d7f384a8fea6b5c8bec82271b4456b4052b988ba74ff1947adda5a768ee2`
+`7cd71ffdd40be3f61744704731b6de8acee30f91c060c51b9caa6f8f81c2b517`
 (reviewed as `d798c8fd…3284c2`; amended by the 2026-07-31 coherence repair
 without changing any classification, path, phase, owner, or effect),
 and coverage
-`16b156ef2d39c10f55f5aedb5abc025385b865e7d92f9a8ccbb2dd4bf635e532`
+`bee8df000f15578079ef2723edb85a26edcb621b384a432b346449681da44248`
 SHA-256 values.
 
 All 140 production hooks and 560 production tests remain planned. Gate 4B
@@ -258,7 +259,8 @@ registry obligations between them. Those obligations are now discharged:
 | Disposition | Count |
 |---|---:|
 | Registered as invariants | 214 entries in 16 families |
-| Governed by an operation contract | 202 |
+| Governed by a generated operation contract | 201 |
+| Covered only by a stated absence (`FRK-005` via `deferred.migration`) | 1 |
 | Assigned to the driver, adapter, artifact, or service ledger | 12 |
 | Source obligations cited at least once | 178 / 178 |
 
@@ -297,6 +299,32 @@ Known open work, stated rather than absorbed:
   closed;
 - the 12 non-operation invariants require the driver, adapter, artifact, and
   service ledgers they are assigned to actually to exist.
+
+Additional open work found by the Task 14 independent verification and recorded
+rather than absorbed:
+
+- **`PACKET-E-OPERATION-CONTRACT-REVIEW.md` does not exist.** The plan requires
+  a Packet E decision record separate from the obligation-partition review. Its
+  content currently lives split across this section and
+  `PACKET-E-OBLIGATION-PARTITION-REVIEW.md`.
+- **The gate still prints `Gate 2A remains open for Packets E-F`.** That is
+  deliberate and correct while the decision record is missing and the
+  dynamic-state row carries an undischarged Packet E remainder, but it means
+  the gate output and a bare reading of "Packets A through E reviewed" disagree
+  unless both caveats are read.
+- **`FRK-005` is governed by no generated operation contract**, only by the
+  `deferred.migration` stated-absence marker, because public Migration is a
+  rejected v1 name.
+- **Four of the eight digest pins have no second copy**, contradicting the
+  lockstep table in `CONTRIBUTING.md`. Both Packet E pins are in that group.
+- **The Packet E validator anchors cell structure but not cell semantics.**
+  Adversarial review confirmed that a transition target, error variant, or
+  terminal outcome can be rewritten in the catalog and the generated matrix
+  together and survive, because the generated document is checked against the
+  catalog rather than against an independent statement of the rule. The cell
+  kind and its transition-vector position are likewise two copies of one fact,
+  so their agreement proves consistency and not correctness. Closing this needs
+  a semantic anchor the ledger does not yet have.
 
 Packet E does not close Gate 4B. All 354 authoritative hooks and 1,453 tests
 remain `planned`.

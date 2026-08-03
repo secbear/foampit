@@ -3222,7 +3222,7 @@ boundary.
 - Owner: `core`
 - First-sound phase: `E1`
 - Rejection deadline: `E1`
-- Invariant: A `WaitProcess`, `GetProcess`, or `ReadProcessOutput` deadline ends only that observation and never cancels, mutates, terminalizes, or advances the durable state of the observed Process or its output stream.
+- Invariant: A `WaitProcess`, `GetProcess`, `ListProcesses`, or `ReadProcessOutput` deadline ends only that observation and never cancels, mutates, terminalizes, or advances the durable state of the observed Process or its output stream.
 - Minimum witness: A `WaitProcess` deadline expiring cancels the observed Process and writes a `deadlineExceeded` termination onto it.
 - Required diagnostic: identifies `PRC-016`, names `observation.deadline`, `process.status.state`, `process.status.output.cursor`, and states the remediation without disclosing secret values.
 

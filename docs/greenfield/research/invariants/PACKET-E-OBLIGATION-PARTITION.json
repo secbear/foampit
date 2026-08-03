@@ -2,8 +2,8 @@
   "partitionVersion": 1,
   "packet": "E",
   "status": "candidate",
-  "allocationStatus": "allocated",
-  "textAuthority": "Only the closed structured control fields of each entry are normative. This document records the Packet E obligation partition with its allocated identifier block. The identifiers are final and contiguous per family; no entry has yet been written into invariants.json, added to the corpus, or classified in the Packet D matrix, so nothing here provides Gate 2A coverage until the registration batches land.",
+  "allocationStatus": "registered",
+  "textAuthority": "Only the closed structured control fields of each entry are normative. The 214 entries recorded here were allocated stable identifiers and REGISTERED: all 214 appear in invariants.json, in the corpus as `#### `ID`` invalid cases, and in the Packet D classification vectors. This record is therefore the partition provenance for registered Packet E coverage, not a pre-registration proposal. It does not close Gate 4B: every hook and test remains planned.",
   "sourceObligationUniverse": {
     "IDENTITY": 30,
     "LIFECYCLE": 47,
@@ -4181,7 +4181,7 @@
     {
       "familyPrefix": "PRC",
       "title": "Process observation or wait deadline mutating or terminalizing its target",
-      "statement": "A `WaitProcess`, `GetProcess`, or `ReadProcessOutput` deadline ends only that observation and never cancels, mutates, terminalizes, or advances the durable state of the observed Process or its output stream.",
+      "statement": "A `WaitProcess`, `GetProcess`, `ListProcesses`, or `ReadProcessOutput` deadline ends only that observation and never cancels, mutates, terminalizes, or advances the durable state of the observed Process or its output stream.",
       "owner": "core",
       "firstSoundPhase": "E1",
       "rejectionDeadline": "E1",

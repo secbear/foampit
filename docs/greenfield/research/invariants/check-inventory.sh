@@ -286,7 +286,16 @@ operation_kind_counts="$(
 )"
 concurrency_cell_count="$(jq '.expectedCellCount' "${concurrency_matrix}")"
 packet_e_operation_invariants="$(
-  jq '[.operations[].invariants[]] | unique | length' "${operation_registry}"
+  jq '[.operations[] | select(.coverageStatus == "generated") | .invariants[]] | unique | length' "${operation_registry}"
+)"
+packet_e_stated_absence_invariants="$(
+  jq '
+    ([.operations[] | select(.coverageStatus == "generated") | .invariants[]] | unique) as $generated |
+    [.operations[] | select(.coverageStatus != "generated") | .invariants[]] |
+    unique |
+    map(select(. as $id | $generated | index($id) | not)) |
+    length
+  ' "${operation_registry}"
 )"
 packet_e_non_operation_invariants="$(
   jq '[.nonOperationCoverage.assignments[].invariants[]] | length' "${operation_registry}"
@@ -295,5 +304,5 @@ packet_e_non_operation_invariants="$(
 echo "Gate 2A Packet E: ${operation_method_count} operations (+${operation_deferral_count} deferral markers) × ${operation_state_count} lifecycle states = ${operation_cell_count} cells; ${operation_rule_count} contract rules"
 echo "Gate 2A Packet E cell kinds: ${operation_kind_counts}"
 echo "Gate 2A Packet E concurrency: ${concurrency_cell_count} operation-pair cells"
-echo "Gate 2A Packet E invariants: ${packet_e_operation_invariants} governed by an operation; ${packet_e_non_operation_invariants} assigned to other ledgers"
+echo "Gate 2A Packet E invariants: ${packet_e_operation_invariants} governed by a generated operation contract; ${packet_e_stated_absence_invariants} covered only by a stated absence; ${packet_e_non_operation_invariants} assigned to other ledgers"
 echo "Gate 2A remains open for Packets E-F"
