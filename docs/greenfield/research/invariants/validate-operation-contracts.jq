@@ -295,6 +295,62 @@ def catalog_errors:
       "\($entry.operationId) × \($cell.lifecycleStateId): cites an unregistered invariant \($cited)"
     ),
 
+
+    # --- registry-derived semantic anchors -------------------------------------------
+    # Everything above compares the generated matrix against the catalog, or a cell kind
+    # against its transition vector -- two copies of one fact in each case, so agreement
+    # proves consistency and not correctness. The rules below derive their expectation
+    # from a SEPARATELY AUTHORED, SEPARATELY PINNED artifact, so a coordinated rewrite of
+    # catalog and matrix does not satisfy them.
+
+    # An operation may only reject with an error it declares. Derived from the operation
+    # record, not from the cell.
+    (
+      catalog_doc.entries[] as $entry |
+      (operation_by($entry.operationId)) as $operation |
+      $entry.cells[] |
+      select(.requestErrorId != "none") |
+      select(lacks_member($operation.allowedRequestErrors; .requestErrorId)) |
+      "\($entry.operationId) × \(.lifecycleStateId): rejects with \(.requestErrorId), which the operation does not declare in allowedRequestErrors"
+    ),
+
+    (
+      catalog_doc.entries[] as $entry |
+      (operation_by($entry.operationId)) as $operation |
+      $entry.cells[] |
+      select((.recoveryErrorId // "none") != "none") |
+      select(lacks_member($operation.allowedRecoveryErrors; .recoveryErrorId)) |
+      "\($entry.operationId) × \(.lifecycleStateId): recovers with \(.recoveryErrorId), which the operation does not declare in allowedRecoveryErrors"
+    ),
+
+    # A rejection must be grounded in a rule that rejects. Refusing at admission on a fact
+    # provable only after launch is unsound, so a J cell whose every cited invariant is
+    # observed-conformance or dynamic-preflight has no rejecting ground.
+    (
+      catalog_doc.entries[] as $entry |
+      $entry.cells[] |
+      select(.cellKind == "J") |
+      . as $cell |
+      select(
+        [ $cell.invariants[] as $id |
+          ($invariants[0].invariants[] | select(.id == $id) | .disposition) ] |
+        map(select(. == "reject-at-boundary" or . == "unrepresentable")) |
+        length == 0
+      ) |
+      "\($entry.operationId) × \($cell.lifecycleStateId): rejects but cites no invariant whose disposition rejects"
+    ),
+
+    # An unsupported cell asserts a capability is not advertised, so the operation must
+    # actually be capability-gated.
+    (
+      catalog_doc.entries[] as $entry |
+      (operation_by($entry.operationId)) as $operation |
+      $entry.cells[] |
+      select(.cellKind == "U") |
+      select(has_member(["none", "required", ""]; $operation.capabilityGate)) |
+      "\($entry.operationId) × \(.lifecycleStateId): declares an unsupported capability on an operation that is not capability-gated"
+    ),
+
     # Cell kind and transition vector are two statements of one fact; they must agree.
     (
       catalog_doc.entries[] as $entry |

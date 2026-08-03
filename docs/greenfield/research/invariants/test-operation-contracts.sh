@@ -315,4 +315,21 @@ expect_coordinated_regeneration_failure "coordinated-invariant-forgery" \
   '(.entries[0].cells[0].invariants) += ["ZZZ-999"]' \
   'unregistered invariant'
 
+# --- registry-derived semantic anchors -------------------------------------------------
+# These derive their expectation from the operation registry and the invariant registry,
+# not from the catalog, so they survive a coordinated catalog+matrix rewrite.
+expect_failure "reject-with-undeclared-error" catalog \
+  '(.entries[] | select(.operationId == "DeleteSandbox") | .cells[] | select(.cellKind == "J") | .requestErrorId) = "CapabilityUnsupported"' \
+  'which the operation does not declare in allowedRequestErrors'
+expect_failure "recover-with-undeclared-error" catalog \
+  '(.entries[0].cells[0].recoveryErrorId) = "ProcessControlRecordExpired"' \
+  'which the operation does not declare in allowedRecoveryErrors'
+expect_failure "reject-without-rejecting-ground" catalog \
+  '(.entries[] | select(.operationId == "DeleteSandbox") | .cells[] | select(.cellKind == "J") | .invariants) = ["FEN-004"]' \
+  'rejects but cites no invariant whose disposition rejects'
+# NOTE: the shipped catalog contains no cell of kind U, so the unsupported-capability
+# anchor is currently VACUOUS -- it constrains nothing until a U cell exists. It is
+# implemented ahead of need and deliberately carries no mutation case, because a passing
+# test here would be evidence about a rule that never fires.
+
 echo "operation contract validator: ${pass_count} cases passed"
