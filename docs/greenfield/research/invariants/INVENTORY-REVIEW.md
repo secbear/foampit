@@ -94,7 +94,7 @@ The status labels mean:
 | Escape mechanisms | reviewed through Packet D | resource-qualified native escapes, typed/direct Nix values, unsafe opaque input, raw wire, and five driver trust states | Packet E/F additions reopen the affected path universe |
 | Trust boundaries | reviewed through Packet D | exact 89+30 serialized replay sets, private stage chain, total D0 output, direct/raw rejection, six separate-path handoffs | Packet E must still walk operation-specific API, guest, restore, teardown, and evidence decoding |
 | Lifecycle semantics | reviewed | Packet E: 214 registered invariants in 16 families; 37 operations × 6 lifecycle states = 222 contract cells; 625 operation-pair concurrency cells; all 20 Packet A surfaces and 5 Packet B fields delegating to E are claimed | Packet F adds disclosure and evidence obligations over the same operations |
-| Dynamic state | partial | Packet C profiles classify host prerequisites, object-handle retention, resources, networking, devices, and provider admission; Packet E discharges retry, cancellation, mutation, and teardown transitions through the operation ledger | **Acquisition, reservation, and rollback remain undischarged**, together with the dynamic reservation and time-of-check/time-of-use protocol all four locked Packet E records list as still unlocked. This row cannot close on Packet E alone |
+| Dynamic state | partial — ruled, deferred to F | Packet C profiles classify host prerequisites, object-handle retention, resources, networking, devices, and provider admission; Packet E discharges retry, cancellation, mutation, and teardown transitions through the operation ledger | **Acquisition, reservation, and rollback remain undischarged**, together with the dynamic reservation and time-of-check/time-of-use protocol all four locked Packet E records list as still unlocked. This row cannot close on Packet E alone |
 | Security and disclosure | partial | secret ownership/redaction, offline policy, host paths | Walk ambient environment, sockets, protected paths, logs, evidence, provenance, diagnostics, process inheritance, metadata services, and side-channel claims |
 | Valid expressiveness | reviewed through Packets D-E | `VAL-001` through `VAL-256`; Packet D adds pinned closed Operator Configuration, Managed-Service Definition, and revalidated resolved reentry controls | Packets E-F add complete lifecycle and disclosure witnesses |
 
@@ -329,7 +329,41 @@ rather than absorbed:
 Packet E does not close Gate 4B. All 354 authoritative hooks and 1,453 tests
 remain `planned`.
 
+### Dynamic-state remainder: ruled 2026-08-03
+
+Acquisition, reservation, and rollback, together with the dynamic reservation
+and time-of-check/time-of-use protocol that all four locked Packet E records
+list as still unlocked, are **reassigned to Packet F** rather than left as an
+unowned remainder.
+
+The reasoning is that these are not lifecycle-semantics questions. Acquisition
+and reservation are about *what the product may take from a host it does not
+own, and on whose evidence*; rollback is about *what it may claim to have
+undone*. Their invalid states are disclosure and evidence failures — a
+reservation claimed without host evidence, a capacity fact read at check time
+and relied on at use time, a rollback reported that the target never performed.
+That is Packet F's declared scope: claimed versus measured, and evidence
+integrity.
+
+Packet E's own boundary supports this. The locked records place the reservation
+protocol outside the operation contract, and Packet E's ledger already carries
+the *operation-side* halves — retry, cancellation, mutation, and teardown
+transitions — through the transition matrix and the recovery contracts. What
+remains is the host-evidence side.
+
+Consequence, stated plainly: **Packet F's scope is wider than its original
+statement.** Packet F must walk acquisition, reservation, rollback, and the
+TOCTOU protocol in addition to secrets, ambient environment, sockets, protected
+paths, redaction, provenance, and side channels. The row stays `partial` until
+Packet F closes it, and Gate 2A cannot close before then.
+
 ### Packet F: Security, disclosure, and evidence
+
+**Scope widened 2026-08-03** by the dynamic-state ruling above: Packet F also
+owns acquisition, reservation, rollback, and the dynamic reservation and
+time-of-check/time-of-use protocol. These are evidence-integrity questions —
+a reservation claimed without host evidence, a capacity fact read at check time
+and relied on at use time, a rollback reported that the target never performed.
 
 Walk:
 
@@ -338,7 +372,11 @@ Walk:
 - host sockets, metadata endpoints, protected paths, and control state;
 - diagnostic, log, provenance, trajectory, and evidence redaction;
 - artifact identity versus non-hashed explanation records;
-- claimed versus measured isolation/conformance.
+- claimed versus measured isolation/conformance;
+- host resource acquisition and reservation, and the evidence a reservation
+  claim rests on;
+- time-of-check/time-of-use between a host fact and its use;
+- rollback claims versus what a target actually performed.
 
 Each rule records the earliest phase that has the relevant information and the
 trust boundary that revalidates external input.
