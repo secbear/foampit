@@ -142,11 +142,25 @@ and Packet E is the first packet to live somewhere else.
 
 **Recommendation before Gate 4B is costed**: revisit the test-kind obligations per branch
 rather than per invariant. F1 is now fixed and cost 160 planned tests (1,453 -> 1,293) with a
-further 45 pre-existing declarations still to review. F2 remains open and would reclassify
-roughly 14 dispositions. Both errors pointed the same way: the estimate was high, and the
+further 45 pre-existing declarations still to review. F2 is corrected: three dispositions were
+reclassified on implementation evidence and its original ~14 estimate is
+withdrawn above. Both errors pointed the same way: the estimate was high, and the
 shape of the remaining work differs from what the registry implied.
 
 The general lesson is narrower than "the model is wrong". The model's *structure* held. What
 failed was a vocabulary designed against one branch of the phase graph and then applied
 universally by a validator rule that composed two individually reasonable requirements into
 an unconditional one. That composition is worth looking for elsewhere.
+
+## Follow-on: the declaration residue (2026-08-03)
+
+Fixing F1 relieved the *obligation* for 160 invariants but left 87 others still
+*declaring* a `wire-corruption` test they could not write -- 45 seeded before
+Packet E and 42 introduced by it. The argument the fix rests on is that a
+boundary which decodes no representation has nothing to corrupt, and that
+argument does not depend on the phase in which the invariant becomes sound.
+Applying it only to post-launch entries was caution about evidence, not a
+principle. All 87 declarations were removed; declared and required
+`wire-corruption` counts are now equal at 107, and planned tests fell 1,293 ->
+1,206. The coverage each removed test carried was moved to the invariant's
+primary test rather than dropped.

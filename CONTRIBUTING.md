@@ -68,9 +68,11 @@ growing it is a considered act, and two conventions bind:
   keys are historical records of pre-rename usage; minting one would fabricate a
   legacy name.
 - **Canonical declaration** — where several tokens alias one path, new
-  declarations use the identity token. A token that is also a `trustBoundaries`
-  value is discharged for free by the `wire-corruption` test and creates no real
-  obligation.
+  declarations use the identity token. Historically a token that was also a
+  `trustBoundaries` value was discharged for free by the `wire-corruption` test.
+  Since 2026-08-03 that is true only for the thirteen `decoding_trust_boundaries`,
+  because the `wire-corruption` obligation is now conditional on a boundary that
+  actually decodes a representation.
 
 Only **active** classification cells (`may-contribute`, `may-narrow`,
 `may-select`) require a declaring `compositionPaths` entry. `boundary-input`

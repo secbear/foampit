@@ -26,7 +26,7 @@ As of 2026-07-24:
 - the corpus and registry identifier sets match exactly;
 - 354 entries are `specified`;
 - 354 authoritative hooks are planned;
-- 1,453 tests are planned;
+- 1,206 tests are planned;
 - no entry is marked `closed`;
 - Gate 2A structure passes;
 - Packet A has reviewed 117 public resource/operation surface groups;
@@ -303,10 +303,9 @@ Known open work, stated rather than absorbed:
 Additional open work found by the Task 14 independent verification and recorded
 rather than absorbed:
 
-- **`PACKET-E-OPERATION-CONTRACT-REVIEW.md` does not exist.** The plan requires
-  a Packet E decision record separate from the obligation-partition review. Its
-  content currently lives split across this section and
-  `PACKET-E-OBLIGATION-PARTITION-REVIEW.md`.
+- ~~`PACKET-E-OPERATION-CONTRACT-REVIEW.md` does not exist.~~ **Closed
+  2026-08-03**: the decision record now exists with the ledger digests, the
+  rulings, the scope, and what Packet E does not close.
 - **The gate still prints `Gate 2A remains open for Packets E-F`.** That is
   deliberate and correct while the decision record is missing and the
   dynamic-state row carries an undischarged Packet E remainder, but it means
@@ -326,7 +325,7 @@ rather than absorbed:
   so their agreement proves consistency and not correctness. Closing this needs
   a semantic anchor the ledger does not yet have.
 
-Packet E does not close Gate 4B. All 354 authoritative hooks and 1,453 tests
+Packet E does not close Gate 4B. All 354 authoritative hooks and 1,206 tests
 remain `planned`.
 
 ### Dynamic-state remainder: ruled 2026-08-03
@@ -376,7 +375,20 @@ Walk:
 - host resource acquisition and reservation, and the evidence a reservation
   claim rests on;
 - time-of-check/time-of-use between a host fact and its use;
-- rollback claims versus what a target actually performed.
+- rollback claims versus what a target actually performed;
+- process inheritance from the supervisor, and inherited descriptors after
+  launch;
+- side-channel claims;
+- authentication and tenancy, delegated by
+  [`PACKET-A-RESOURCE-OPERATION-REVIEW.md`](./PACKET-A-RESOURCE-OPERATION-REVIEW.md);
+- metadata services, including the host-side carve-out where an endpoint is
+  reachable by the supervisor but not by the guest.
+
+**Scope reconciled 2026-08-03.** The dimension row above requires walking
+process inheritance, metadata services, and side-channel claims, and Packet A
+delegates authentication and tenancy here; the walk list named only metadata
+endpoints. The four omissions are added rather than left to be rediscovered
+during the walk.
 
 Each rule records the earliest phase that has the relevant information and the
 trust boundary that revalidates external input.

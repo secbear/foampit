@@ -80,7 +80,7 @@ coordinated catalog-plus-matrix rewrite does not satisfy them.
 
 ## What Packet E does not close
 
-**Gate 4B.** All 354 authoritative hooks and 1,453 tests remain `planned`.
+**Gate 4B.** All 354 authoritative hooks and 1,206 tests remain `planned`.
 `check-enforcement-closure.sh` exits 5 and must.
 
 **Gate 2A.** Packet F is unwalked, and the dynamic-state dimension row carries

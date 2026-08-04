@@ -327,7 +327,7 @@ all 5 Packet B fields delegating `"E"`, and Packet D's four `E` concerns.
 ## Inventory-validator result
 
 `check-inventory.sh` exits 0. `check-enforcement-closure.sh` exits 5 and must:
-all 354 authoritative hooks and 1,453 tests remain `planned`. Gate 4B is not
+all 354 authoritative hooks and 1,206 tests remain `planned`. Gate 4B is not
 closed and Packet E does not close it.
 
 ## Reviewer findings and their disposition

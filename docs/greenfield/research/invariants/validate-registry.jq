@@ -78,6 +78,7 @@ def hook_statuses:
 def test_kinds:
   [
     "source-rejection",
+    "construction-exclusion",
     "positive-boundary",
     "composition-bypass",
     "wire-corruption",
@@ -291,10 +292,19 @@ def common_invariant_errors($invariant):
     else inv_error($invariant; "inventory requires planned diagnostic evidence")
     end,
 
-    if ($invariant.disposition == "unrepresentable" or
-        $invariant.disposition == "reject-at-boundary") and
+    if ($invariant.disposition == "reject-at-boundary") and
        (has_test($invariant; "source-rejection") | not)
     then inv_error($invariant; "inventory requires planned source-rejection evidence")
+    else empty
+    end,
+
+    # `unrepresentable` accepts either kind. A value the schema cannot express has no
+    # source text to reject, so `construction-exclusion` -- a compile- or schema-level
+    # test that the supported API cannot name the value -- is the honest evidence.
+    if ($invariant.disposition == "unrepresentable") and
+       (has_test($invariant; "source-rejection") | not) and
+       (has_test($invariant; "construction-exclusion") | not)
+    then inv_error($invariant; "inventory requires planned source-rejection or construction-exclusion evidence")
     else empty
     end,
 
@@ -481,10 +491,16 @@ def closure_errors($invariant):
     else inv_error($invariant; "closure requires diagnostic evidence")
     end,
 
-    if ($invariant.disposition == "unrepresentable" or
-        $invariant.disposition == "reject-at-boundary") and
+    if ($invariant.disposition == "reject-at-boundary") and
        (has_passing_test($invariant; "source-rejection") | not)
     then inv_error($invariant; "closure requires source-rejection evidence")
+    else empty
+    end,
+
+    if ($invariant.disposition == "unrepresentable") and
+       (has_passing_test($invariant; "source-rejection") | not) and
+       (has_passing_test($invariant; "construction-exclusion") | not)
+    then inv_error($invariant; "closure requires source-rejection or construction-exclusion evidence")
     else empty
     end,
 

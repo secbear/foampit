@@ -411,6 +411,7 @@ Tests use the smallest set of kinds that proves the disposition:
 | Test kind | Required purpose |
 |---|---|
 | `source-rejection` | The ordinary authoring path rejects the invalid witness |
+| `construction-exclusion` | The supported API cannot name the invalid witness at all — compile- or schema-level |
 | `positive-boundary` | A nearby valid witness remains expressible and preserves semantics |
 | `composition-bypass` | Import order, override, profile, or escape mechanisms cannot bypass the rule |
 | `wire-corruption` | A malformed/corrupted frontend result is rejected by the next trust boundary |
@@ -418,6 +419,12 @@ Tests use the smallest set of kinds that proves the disposition:
 | `dynamic-preflight` | Current-state failure occurs before external mutation or launch |
 | `runtime-probe` | Declared and lowered behavior is compared with observed runtime behavior |
 | `diagnostic` | Owner, paths, related definitions, remediation, and redaction are asserted |
+
+`unrepresentable` discharges with either `source-rejection` or
+`construction-exclusion`, and which one is a real claim about the design: the
+first says the value can be written and is refused, the second says it cannot be
+written. `reject-at-boundary` requires `source-rejection` specifically, because
+a boundary check presupposes something arrived to be checked.
 
 Every entry needs at least one invalid and one valid witness. Entries with
 multiple construction paths need a test for every supported path. Test

@@ -1353,7 +1353,8 @@
           "covers": [
             "core-api",
             "create-native-extension",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "driver-preparation"
           ],
           "targets": [
             "portable"
@@ -1368,18 +1369,6 @@
             "core-api",
             "create-native-extension",
             "resolved-driver-handoff"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/xrs-001/wire-corruption",
-          "case": "XRS-001-corrupted",
-          "status": "planned",
-          "covers": [
-            "driver-preparation"
           ],
           "targets": [
             "portable"
@@ -1407,7 +1396,7 @@
         "remediation": "Request an allocation within the Artifact bounds.",
         "secretSafe": true
       },
-      "notes": "Seeded from the locked executable corpus; hook and test locations remain open until prototype tracing."
+      "notes": "Seeded from the locked executable corpus; hook and test locations remain open until prototype tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "XRS-002",
@@ -1456,7 +1445,8 @@
           "covers": [
             "core-api",
             "create-native-extension",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "driver-preparation"
           ],
           "targets": [
             "portable"
@@ -1471,18 +1461,6 @@
             "core-api",
             "create-native-extension",
             "resolved-driver-handoff"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/xrs-002/wire-corruption",
-          "case": "XRS-002-corrupted",
-          "status": "planned",
-          "covers": [
-            "driver-preparation"
           ],
           "targets": [
             "portable"
@@ -1510,7 +1488,7 @@
         "remediation": "Narrow the request to the immutable Artifact policy bound.",
         "secretSafe": true
       },
-      "notes": "Seeded from the locked executable corpus; hook and test locations remain open until prototype tracing."
+      "notes": "Seeded from the locked executable corpus; hook and test locations remain open until prototype tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "XRS-003",
@@ -1561,7 +1539,8 @@
             "core-api",
             "binding-resolution",
             "create-native-extension",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "driver-preparation"
           ],
           "targets": [
             "portable"
@@ -1577,18 +1556,6 @@
             "binding-resolution",
             "create-native-extension",
             "resolved-driver-handoff"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/xrs-003/wire-corruption",
-          "case": "XRS-003-corrupted",
-          "status": "planned",
-          "covers": [
-            "driver-preparation"
           ],
           "targets": [
             "portable"
@@ -1616,7 +1583,7 @@
         "remediation": "Bind the workspace read-only or choose an Artifact contract that permits writes.",
         "secretSafe": true
       },
-      "notes": "Seeded from the locked executable corpus; hook and test locations remain open until prototype tracing."
+      "notes": "Seeded from the locked executable corpus; hook and test locations remain open until prototype tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "XRS-004",
@@ -1667,7 +1634,8 @@
             "core-api",
             "secret-delivery",
             "create-native-extension",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "driver-preparation"
           ],
           "targets": [
             "portable"
@@ -1683,18 +1651,6 @@
             "secret-delivery",
             "create-native-extension",
             "resolved-driver-handoff"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/xrs-004/wire-corruption",
-          "case": "XRS-004-corrupted",
-          "status": "planned",
-          "covers": [
-            "driver-preparation"
           ],
           "targets": [
             "portable"
@@ -1722,7 +1678,7 @@
         "remediation": "Use a declared ephemeral secret-delivery channel.",
         "secretSafe": true
       },
-      "notes": "Seeded from the locked executable corpus; hook and test locations remain open until prototype tracing."
+      "notes": "Seeded from the locked executable corpus; hook and test locations remain open until prototype tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "XRS-005",
@@ -1875,7 +1831,8 @@
             "provider-selection",
             "operator-configuration-authoring",
             "operator-configuration-imports",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "operator-admission"
           ],
           "targets": [
             "remote-provider"
@@ -1892,18 +1849,6 @@
             "operator-configuration-authoring",
             "operator-configuration-imports",
             "resolved-driver-handoff"
-          ],
-          "targets": [
-            "remote-provider"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/xrs-006/wire-corruption",
-          "case": "XRS-006-corrupted",
-          "status": "planned",
-          "covers": [
-            "operator-admission"
           ],
           "targets": [
             "remote-provider"
@@ -1931,7 +1876,7 @@
         "remediation": "Select a registered provider without embedding its credential value.",
         "secretSafe": true
       },
-      "notes": "Seeded from the locked executable corpus; hook and test locations remain open until prototype tracing."
+      "notes": "Seeded from the locked executable corpus; hook and test locations remain open until prototype tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "XRS-007",
@@ -2289,7 +2234,8 @@
             "core-api",
             "binding-resolution",
             "create-native-extension",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "driver-preparation"
           ],
           "targets": [
             "firecracker"
@@ -2305,18 +2251,6 @@
             "binding-resolution",
             "create-native-extension",
             "resolved-driver-handoff"
-          ],
-          "targets": [
-            "firecracker"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/tgt-002/wire-corruption",
-          "case": "TGT-002-corrupted",
-          "status": "planned",
-          "covers": [
-            "driver-preparation"
           ],
           "targets": [
             "firecracker"
@@ -2345,7 +2279,7 @@
         "remediation": "Choose copy-in for Firecracker or select a live-workspace-capable profile.",
         "secretSafe": true
       },
-      "notes": "Seeded from the locked executable corpus; hook and test locations remain open until prototype tracing."
+      "notes": "Seeded from the locked executable corpus; hook and test locations remain open until prototype tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "TGT-003",
@@ -4108,7 +4042,8 @@
           "status": "planned",
           "covers": [
             "frontend-output",
-            "target-lowering"
+            "target-lowering",
+            "driver-preparation"
           ],
           "targets": [
             "all-enabled-targets"
@@ -4122,18 +4057,6 @@
           "covers": [
             "frontend-output",
             "target-lowering"
-          ],
-          "targets": [
-            "all-enabled-targets"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/wire-004/wire-corruption",
-          "case": "WIRE-004-corrupted",
-          "status": "planned",
-          "covers": [
-            "driver-preparation"
           ],
           "targets": [
             "all-enabled-targets"
@@ -4161,7 +4084,7 @@
         "remediation": "Convert validated portable values to the generated target-specific driver type.",
         "secretSafe": true
       },
-      "notes": "Seeded from the locked executable corpus; hook and test locations remain open until prototype tracing."
+      "notes": "Seeded from the locked executable corpus; hook and test locations remain open until prototype tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "OPS-001",
@@ -4214,7 +4137,8 @@
             "core-api",
             "operator-configuration-refinement",
             "operator-configuration-precedence",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "driver-preparation"
           ],
           "targets": [
             "portable"
@@ -4231,18 +4155,6 @@
             "operator-configuration-refinement",
             "operator-configuration-precedence",
             "resolved-driver-handoff"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/ops-001/wire-corruption",
-          "case": "OPS-001-corrupted",
-          "status": "planned",
-          "covers": [
-            "driver-preparation"
           ],
           "targets": [
             "portable"
@@ -4271,7 +4183,7 @@
         "remediation": "Register the selected profile's driver or select a registered compatible profile.",
         "secretSafe": true
       },
-      "notes": "Seeded from the locked executable corpus; hook and test locations remain open until prototype tracing."
+      "notes": "Seeded from the locked executable corpus; hook and test locations remain open until prototype tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "OPS-002",
@@ -4324,7 +4236,8 @@
             "core-api",
             "operator-configuration-refinement",
             "operator-configuration-precedence",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "driver-preparation"
           ],
           "targets": [
             "portable"
@@ -4341,18 +4254,6 @@
             "operator-configuration-refinement",
             "operator-configuration-precedence",
             "resolved-driver-handoff"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/ops-002/wire-corruption",
-          "case": "OPS-002-corrupted",
-          "status": "planned",
-          "covers": [
-            "driver-preparation"
           ],
           "targets": [
             "portable"
@@ -4381,7 +4282,7 @@
         "remediation": "Choose compatible operator capacity or an Artifact with satisfiable bounds.",
         "secretSafe": true
       },
-      "notes": "Seeded from the locked executable corpus; hook and test locations remain open until prototype tracing."
+      "notes": "Seeded from the locked executable corpus; hook and test locations remain open until prototype tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "HOST-001",
@@ -4428,7 +4329,8 @@
           "status": "planned",
           "covers": [
             "host-preflight",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "driver-preparation"
           ],
           "targets": [
             "microvm-kvm"
@@ -4442,18 +4344,6 @@
           "covers": [
             "host-preflight",
             "resolved-driver-handoff"
-          ],
-          "targets": [
-            "microvm-kvm"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/host-001/wire-corruption",
-          "case": "HOST-001-corrupted",
-          "status": "planned",
-          "covers": [
-            "driver-preparation"
           ],
           "targets": [
             "microvm-kvm"
@@ -4482,7 +4372,7 @@
         "remediation": "Choose a compatible prepared host; do not silently change backend.",
         "secretSafe": true
       },
-      "notes": "Seeded from the locked executable corpus; hook and test locations remain open until prototype tracing."
+      "notes": "Seeded from the locked executable corpus; hook and test locations remain open until prototype tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "HOST-002",
@@ -4533,7 +4423,8 @@
             "host-preflight",
             "binding-resolution",
             "create-native-extension",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "driver-preparation"
           ],
           "targets": [
             "portable"
@@ -4549,18 +4440,6 @@
             "binding-resolution",
             "create-native-extension",
             "resolved-driver-handoff"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/host-002/wire-corruption",
-          "case": "HOST-002-corrupted",
-          "status": "planned",
-          "covers": [
-            "driver-preparation"
           ],
           "targets": [
             "portable"
@@ -4589,7 +4468,7 @@
         "remediation": "Provide an existing acceptable path or choose another declared materialization.",
         "secretSafe": true
       },
-      "notes": "Seeded from the locked executable corpus; hook and test locations remain open until prototype tracing."
+      "notes": "Seeded from the locked executable corpus; hook and test locations remain open until prototype tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "HOST-003",
@@ -4638,7 +4517,8 @@
           "covers": [
             "host-preflight",
             "provider-selection",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "driver-preparation"
           ],
           "targets": [
             "remote-provider"
@@ -4653,18 +4533,6 @@
             "host-preflight",
             "provider-selection",
             "resolved-driver-handoff"
-          ],
-          "targets": [
-            "remote-provider"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/host-003/wire-corruption",
-          "case": "HOST-003-corrupted",
-          "status": "planned",
-          "covers": [
-            "driver-preparation"
           ],
           "targets": [
             "remote-provider"
@@ -4692,7 +4560,7 @@
         "remediation": "Repair the redacted operator credential or capacity state and retry preflight.",
         "secretSafe": true
       },
-      "notes": "Seeded from the locked executable corpus; hook and test locations remain open until prototype tracing."
+      "notes": "Seeded from the locked executable corpus; hook and test locations remain open until prototype tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "DRV-001",
@@ -4743,7 +4611,8 @@
             "target-lowering",
             "corrupted-resolved-input",
             "resolved-driver-handoff",
-            "generated-runtime-configuration"
+            "generated-runtime-configuration",
+            "driver-preparation"
           ],
           "targets": [
             "all-enabled-targets"
@@ -4759,18 +4628,6 @@
             "corrupted-resolved-input",
             "resolved-driver-handoff",
             "generated-runtime-configuration"
-          ],
-          "targets": [
-            "all-enabled-targets"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/drv-001/wire-corruption",
-          "case": "DRV-001-corrupted",
-          "status": "planned",
-          "covers": [
-            "driver-preparation"
           ],
           "targets": [
             "all-enabled-targets"
@@ -4804,7 +4661,7 @@
         "remediation": "Regenerate a complete target configuration from validated resolved types, explicitly suppress every undeclared backend default, and remove all best-effort, try/fallback, raw-hook, and inheritance paths.",
         "secretSafe": true
       },
-      "notes": "Strengthened during Gate 2A Packet C to make total configuration and backend-default suppression part of the driver trust-boundary invariant."
+      "notes": "Strengthened during Gate 2A Packet C to make total configuration and backend-default suppression part of the driver trust-boundary invariant. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "MAN-001",
@@ -5158,7 +5015,8 @@
             "framework-adapter",
             "managed-service",
             "resolved-driver-handoff",
-            "create-native-extension"
+            "create-native-extension",
+            "core-api-create"
           ],
           "targets": [
             "portable"
@@ -5174,18 +5032,6 @@
             "framework-adapter",
             "managed-service",
             "resolved-driver-handoff"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/crt-001/wire-corruption",
-          "case": "CRT-001-corrupted",
-          "status": "planned",
-          "covers": [
-            "core-api-create"
           ],
           "targets": [
             "portable"
@@ -5213,7 +5059,7 @@
         "remediation": "Bind every required slot with its declared cardinality.",
         "secretSafe": true
       },
-      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing."
+      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "CRT-002",
@@ -5266,7 +5112,8 @@
             "framework-adapter",
             "managed-service",
             "resolved-driver-handoff",
-            "create-native-extension"
+            "create-native-extension",
+            "core-api-create"
           ],
           "targets": [
             "portable"
@@ -5282,18 +5129,6 @@
             "framework-adapter",
             "managed-service",
             "resolved-driver-handoff"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/crt-002/wire-corruption",
-          "case": "CRT-002-corrupted",
-          "status": "planned",
-          "covers": [
-            "core-api-create"
           ],
           "targets": [
             "portable"
@@ -5321,7 +5156,7 @@
         "remediation": "Use a declared slot and a binding matching its complete contract.",
         "secretSafe": true
       },
-      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing."
+      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "CRT-003",
@@ -5374,7 +5209,8 @@
             "framework-adapter",
             "managed-service",
             "resolved-driver-handoff",
-            "create-native-extension"
+            "create-native-extension",
+            "core-api-create"
           ],
           "targets": [
             "portable"
@@ -5390,18 +5226,6 @@
             "framework-adapter",
             "managed-service",
             "resolved-driver-handoff"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/crt-003/wire-corruption",
-          "case": "CRT-003-corrupted",
-          "status": "planned",
-          "covers": [
-            "core-api-create"
           ],
           "targets": [
             "portable"
@@ -5429,7 +5253,7 @@
         "remediation": "Provide exactly one binding for each single-cardinality slot.",
         "secretSafe": true
       },
-      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing."
+      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "CRT-004",
@@ -5485,7 +5309,9 @@
             "managed-service",
             "idempotent-retry",
             "resolved-driver-handoff",
-            "create-native-extension"
+            "create-native-extension",
+            "core-api-create",
+            "idempotency-store"
           ],
           "targets": [
             "portable"
@@ -5502,19 +5328,6 @@
             "managed-service",
             "idempotent-retry",
             "resolved-driver-handoff"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/crt-004/wire-corruption",
-          "case": "CRT-004-corrupted",
-          "status": "planned",
-          "covers": [
-            "core-api-create",
-            "idempotency-store"
           ],
           "targets": [
             "portable"
@@ -5543,7 +5356,7 @@
         "remediation": "Reuse a key only with the identical canonical request or choose a new key.",
         "secretSafe": true
       },
-      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing."
+      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "CRT-005",
@@ -5596,7 +5409,8 @@
             "framework-adapter",
             "managed-service",
             "resolved-driver-handoff",
-            "create-native-extension"
+            "create-native-extension",
+            "core-api-create"
           ],
           "targets": [
             "all-enabled-targets"
@@ -5612,18 +5426,6 @@
             "framework-adapter",
             "managed-service",
             "resolved-driver-handoff"
-          ],
-          "targets": [
-            "all-enabled-targets"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/crt-005/wire-corruption",
-          "case": "CRT-005-corrupted",
-          "status": "planned",
-          "covers": [
-            "core-api-create"
           ],
           "targets": [
             "all-enabled-targets"
@@ -5652,7 +5454,7 @@
         "remediation": "Select a target and profile present in the Artifact manifest.",
         "secretSafe": true
       },
-      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing."
+      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "CRT-006",
@@ -5705,7 +5507,8 @@
             "framework-adapter",
             "managed-service",
             "resolved-driver-handoff",
-            "create-native-extension"
+            "create-native-extension",
+            "core-api-create"
           ],
           "targets": [
             "portable"
@@ -5721,18 +5524,6 @@
             "framework-adapter",
             "managed-service",
             "resolved-driver-handoff"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/crt-006/wire-corruption",
-          "case": "CRT-006-corrupted",
-          "status": "planned",
-          "covers": [
-            "core-api-create"
           ],
           "targets": [
             "portable"
@@ -5760,7 +5551,7 @@
         "remediation": "Encode the initial Process with the shared Exec contract.",
         "secretSafe": true
       },
-      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing."
+      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "SVC-001",
@@ -5816,7 +5607,8 @@
             "managed-service-definition-authoring",
             "managed-service-definition-imports",
             "managed-service-definition-precedence",
-            "managed-service-definition-refinement"
+            "managed-service-definition-refinement",
+            "managed-service-core-api"
           ],
           "targets": [
             "portable"
@@ -5834,18 +5626,6 @@
             "managed-service-definition-imports",
             "managed-service-definition-precedence",
             "managed-service-definition-refinement"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/svc-001/wire-corruption",
-          "case": "SVC-001-corrupted",
-          "status": "planned",
-          "covers": [
-            "managed-service-core-api"
           ],
           "targets": [
             "portable"
@@ -5873,7 +5653,7 @@
         "remediation": "Express desired policy through the canonical Artifact and Core API request.",
         "secretSafe": true
       },
-      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing."
+      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "SVC-002",
@@ -6027,7 +5807,8 @@
             "direct-api",
             "framework-adapter",
             "managed-service",
-            "live-native-extension"
+            "live-native-extension",
+            "live-operation-dispatch"
           ],
           "targets": [
             "portable"
@@ -6043,18 +5824,6 @@
             "framework-adapter",
             "managed-service",
             "live-native-extension"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/live-001/wire-corruption",
-          "case": "LIVE-001-corrupted",
-          "status": "planned",
-          "covers": [
-            "live-operation-dispatch"
           ],
           "targets": [
             "portable"
@@ -6082,7 +5851,7 @@
         "remediation": "Create a new Sandbox for wider authority or remain inside existing bounds.",
         "secretSafe": true
       },
-      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing."
+      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "LIVE-002",
@@ -6133,7 +5902,8 @@
             "direct-api",
             "framework-adapter",
             "managed-service",
-            "provider-native-operation"
+            "provider-native-operation",
+            "live-operation-dispatch"
           ],
           "targets": [
             "all-enabled-targets"
@@ -6149,18 +5919,6 @@
             "framework-adapter",
             "managed-service",
             "provider-native-operation"
-          ],
-          "targets": [
-            "all-enabled-targets"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/live-002/wire-corruption",
-          "case": "LIVE-002-corrupted",
-          "status": "planned",
-          "covers": [
-            "live-operation-dispatch"
           ],
           "targets": [
             "all-enabled-targets"
@@ -6189,7 +5947,7 @@
         "remediation": "Use an advertised operation or create a compatible Sandbox.",
         "secretSafe": true
       },
-      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing."
+      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "LIVE-003",
@@ -6240,7 +5998,8 @@
             "direct-api",
             "framework-adapter",
             "managed-service",
-            "provider-native-operation"
+            "provider-native-operation",
+            "live-operation-dispatch"
           ],
           "targets": [
             "all-enabled-targets"
@@ -6256,18 +6015,6 @@
             "framework-adapter",
             "managed-service",
             "provider-native-operation"
-          ],
-          "targets": [
-            "all-enabled-targets"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/live-003/wire-corruption",
-          "case": "LIVE-003-corrupted",
-          "status": "planned",
-          "covers": [
-            "live-operation-dispatch"
           ],
           "targets": [
             "all-enabled-targets"
@@ -6295,7 +6042,7 @@
         "remediation": "Choose a permitted mutable in-sandbox path and typed channel.",
         "secretSafe": true
       },
-      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing."
+      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "LIVE-004",
@@ -6346,7 +6093,8 @@
             "direct-api",
             "framework-adapter",
             "managed-service",
-            "provider-native-operation"
+            "provider-native-operation",
+            "live-operation-dispatch"
           ],
           "targets": [
             "all-enabled-targets"
@@ -6362,18 +6110,6 @@
             "framework-adapter",
             "managed-service",
             "provider-native-operation"
-          ],
-          "targets": [
-            "all-enabled-targets"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/live-004/wire-corruption",
-          "case": "LIVE-004-corrupted",
-          "status": "planned",
-          "covers": [
-            "live-operation-dispatch"
           ],
           "targets": [
             "all-enabled-targets"
@@ -6402,7 +6138,7 @@
         "remediation": "Use a declared port slot within resolved network policy.",
         "secretSafe": true
       },
-      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing."
+      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "EXE-001",
@@ -6453,7 +6189,8 @@
             "direct-api",
             "framework-adapter",
             "managed-service",
-            "initial-process"
+            "initial-process",
+            "process-launch"
           ],
           "targets": [
             "portable"
@@ -6469,18 +6206,6 @@
             "framework-adapter",
             "managed-service",
             "initial-process"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/exe-001/wire-corruption",
-          "case": "EXE-001-corrupted",
-          "status": "planned",
-          "covers": [
-            "process-launch"
           ],
           "targets": [
             "portable"
@@ -6508,7 +6233,7 @@
         "remediation": "Provide a non-empty argv array.",
         "secretSafe": true
       },
-      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing."
+      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "EXE-002",
@@ -6559,7 +6284,8 @@
             "direct-api",
             "framework-adapter",
             "managed-service",
-            "initial-process"
+            "initial-process",
+            "process-launch"
           ],
           "targets": [
             "portable"
@@ -6575,18 +6301,6 @@
             "framework-adapter",
             "managed-service",
             "initial-process"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/exe-002/wire-corruption",
-          "case": "EXE-002-corrupted",
-          "status": "planned",
-          "covers": [
-            "process-launch"
           ],
           "targets": [
             "portable"
@@ -6614,7 +6328,7 @@
         "remediation": "Use an absolute permitted path inside the Sandbox.",
         "secretSafe": true
       },
-      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing."
+      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "EXE-003",
@@ -6665,7 +6379,8 @@
             "direct-api",
             "framework-adapter",
             "managed-service",
-            "initial-process"
+            "initial-process",
+            "process-launch"
           ],
           "targets": [
             "portable"
@@ -6681,18 +6396,6 @@
             "framework-adapter",
             "managed-service",
             "initial-process"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/exe-003/wire-corruption",
-          "case": "EXE-003-corrupted",
-          "status": "planned",
-          "covers": [
-            "process-launch"
           ],
           "targets": [
             "portable"
@@ -6721,7 +6424,7 @@
         "remediation": "Use the typed secret channel or a non-reserved environment value.",
         "secretSafe": true
       },
-      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing."
+      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "EXE-004",
@@ -6774,7 +6477,8 @@
             "framework-adapter",
             "managed-service",
             "initial-process",
-            "exec-native-extension"
+            "exec-native-extension",
+            "process-launch"
           ],
           "targets": [
             "all-enabled-targets"
@@ -6791,18 +6495,6 @@
             "managed-service",
             "initial-process",
             "exec-native-extension"
-          ],
-          "targets": [
-            "all-enabled-targets"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/exe-004/wire-corruption",
-          "case": "EXE-004-corrupted",
-          "status": "planned",
-          "covers": [
-            "process-launch"
           ],
           "targets": [
             "all-enabled-targets"
@@ -6832,7 +6524,7 @@
         "remediation": "Narrow the Process request to the resolved Sandbox bound.",
         "secretSafe": true
       },
-      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing."
+      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "EXE-005",
@@ -6883,7 +6575,8 @@
             "direct-api",
             "framework-adapter",
             "managed-service",
-            "exec-native-extension"
+            "exec-native-extension",
+            "process-launch"
           ],
           "targets": [
             "all-enabled-targets"
@@ -6899,18 +6592,6 @@
             "framework-adapter",
             "managed-service",
             "exec-native-extension"
-          ],
-          "targets": [
-            "all-enabled-targets"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/exe-005/wire-corruption",
-          "case": "EXE-005-corrupted",
-          "status": "planned",
-          "covers": [
-            "process-launch"
           ],
           "targets": [
             "all-enabled-targets"
@@ -6938,7 +6619,7 @@
         "remediation": "Move Sandbox-wide mechanisms to create or live APIs.",
         "secretSafe": true
       },
-      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing."
+      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "EXE-006",
@@ -6989,7 +6670,8 @@
             "direct-api",
             "framework-adapter",
             "managed-service",
-            "initial-process"
+            "initial-process",
+            "process-launch"
           ],
           "targets": [
             "all-enabled-targets"
@@ -7005,18 +6687,6 @@
             "framework-adapter",
             "managed-service",
             "initial-process"
-          ],
-          "targets": [
-            "all-enabled-targets"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/exe-006/wire-corruption",
-          "case": "EXE-006-corrupted",
-          "status": "planned",
-          "covers": [
-            "process-launch"
           ],
           "targets": [
             "all-enabled-targets"
@@ -7045,7 +6715,7 @@
         "remediation": "Use pipes explicitly or select a Sandbox with conformed PTY support.",
         "secretSafe": true
       },
-      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing."
+      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "EXE-007",
@@ -7096,7 +6766,8 @@
             "direct-api",
             "framework-adapter",
             "managed-service",
-            "initial-process"
+            "initial-process",
+            "process-launch"
           ],
           "targets": [
             "portable"
@@ -7112,18 +6783,6 @@
             "framework-adapter",
             "managed-service",
             "initial-process"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/exe-007/wire-corruption",
-          "case": "EXE-007-corrupted",
-          "status": "planned",
-          "covers": [
-            "process-launch"
           ],
           "targets": [
             "portable"
@@ -7152,7 +6811,7 @@
         "remediation": "Choose a deadline within the remaining Sandbox lifetime.",
         "secretSafe": true
       },
-      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing."
+      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "FWK-001",
@@ -7201,7 +6860,8 @@
           "covers": [
             "framework-adapter",
             "cli-adapter",
-            "adapter-native-extension"
+            "adapter-native-extension",
+            "framework-core-api"
           ],
           "targets": [
             "all-enabled-targets"
@@ -7216,18 +6876,6 @@
             "framework-adapter",
             "cli-adapter",
             "adapter-native-extension"
-          ],
-          "targets": [
-            "all-enabled-targets"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/fwk-001/wire-corruption",
-          "case": "FWK-001-corrupted",
-          "status": "planned",
-          "covers": [
-            "framework-core-api"
           ],
           "targets": [
             "all-enabled-targets"
@@ -7255,7 +6903,7 @@
         "remediation": "Route the action through the typed Core Sandbox API.",
         "secretSafe": true
       },
-      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing."
+      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "FWK-002",
@@ -7304,7 +6952,8 @@
           "covers": [
             "framework-adapter",
             "cli-adapter",
-            "tool-registration"
+            "tool-registration",
+            "framework-core-api"
           ],
           "targets": [
             "all-enabled-targets"
@@ -7319,18 +6968,6 @@
             "framework-adapter",
             "cli-adapter",
             "tool-registration"
-          ],
-          "targets": [
-            "all-enabled-targets"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/fwk-002/wire-corruption",
-          "case": "FWK-002-corrupted",
-          "status": "planned",
-          "covers": [
-            "framework-core-api"
           ],
           "targets": [
             "all-enabled-targets"
@@ -7359,7 +6996,7 @@
         "remediation": "Register only operations supported by the selected Sandbox.",
         "secretSafe": true
       },
-      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing."
+      "notes": "Discovered during Gate 2A Packet A; hook and test locations remain open until implementation tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "PLT-001",
@@ -12420,7 +12057,9 @@
             "driver-selection",
             "operator-configuration-refinement",
             "operator-configuration-precedence",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "host-preflight",
+            "driver-preparation"
           ],
           "targets": [
             "all-enabled-targets"
@@ -12438,19 +12077,6 @@
             "operator-configuration-refinement",
             "operator-configuration-precedence",
             "resolved-driver-handoff"
-          ],
-          "targets": [
-            "all-enabled-targets"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/host-004/wire-corruption",
-          "case": "HOST-004-corrupted",
-          "status": "planned",
-          "covers": [
-            "host-preflight",
-            "driver-preparation"
           ],
           "targets": [
             "all-enabled-targets"
@@ -12482,7 +12108,7 @@
         "remediation": "Select a host and registered implementation bundle matching every pinned component, feature, helper, confinement, kernel, and conformance requirement; do not fall back.",
         "secretSafe": true
       },
-      "notes": "Discovered during Gate 2A Packet C from non-setuid Bubblewrap, Firecracker jailer, and Cloud Hypervisor outer-confinement requirements."
+      "notes": "Discovered during Gate 2A Packet C from non-setuid Bubblewrap, Firecracker jailer, and Cloud Hypervisor outer-confinement requirements. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "HOST-005",
@@ -12534,7 +12160,8 @@
             "binding-resolution",
             "host-path-resolution",
             "driver-preparation",
-            "create-native-extension"
+            "create-native-extension",
+            "host-preflight"
           ],
           "targets": [
             "all-enabled-targets"
@@ -12550,19 +12177,6 @@
             "host-path-resolution",
             "driver-preparation",
             "create-native-extension"
-          ],
-          "targets": [
-            "all-enabled-targets"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/host-005/wire-corruption",
-          "case": "HOST-005-corrupted",
-          "status": "planned",
-          "covers": [
-            "host-preflight",
-            "driver-preparation"
           ],
           "targets": [
             "all-enabled-targets"
@@ -12594,7 +12208,7 @@
         "remediation": "Resolve the source safely, retain a descriptor or equivalent stable object handle through attachment, and reject any identity change.",
         "secretSafe": true
       },
-      "notes": "Discovered during Gate 2A Packet C from Bubblewrap FD-bind support and Cloud Hypervisor trusted-caller path-resolution requirements."
+      "notes": "Discovered during Gate 2A Packet C from Bubblewrap FD-bind support and Cloud Hypervisor trusted-caller path-resolution requirements. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "SNP-002",
@@ -12645,7 +12259,9 @@
           "covers": [
             "live-operation",
             "snapshot-capture",
-            "snapshot-restore"
+            "snapshot-restore",
+            "core-api",
+            "snapshot-store"
           ],
           "targets": [
             "microvm"
@@ -12660,20 +12276,6 @@
             "live-operation",
             "snapshot-capture",
             "snapshot-restore"
-          ],
-          "targets": [
-            "microvm"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/snp-002/wire-corruption",
-          "case": "SNP-002-corrupted",
-          "status": "planned",
-          "covers": [
-            "core-api",
-            "live-operation",
-            "snapshot-store"
           ],
           "targets": [
             "microvm"
@@ -12706,7 +12308,7 @@
         "remediation": "Quiesce and scrub as required, use a compatible restore envelope, rebind runtime identities, and refresh clone identity state before capture or resume.",
         "secretSafe": true
       },
-      "notes": "Discovered during Gate 2A Packet C from Firecracker and Cloud Hypervisor component, compatibility, secret, and clone-safety limitations."
+      "notes": "Discovered during Gate 2A Packet C from Firecracker and Cloud Hypervisor component, compatibility, secret, and clone-safety limitations. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "PRV-001",
@@ -13737,7 +13339,8 @@
           "case": "OPS-003",
           "status": "planned",
           "covers": [
-            "operator-configuration-imports"
+            "operator-configuration-imports",
+            "operator-configuration-validation"
           ],
           "targets": [
             "portable"
@@ -13750,18 +13353,6 @@
           "status": "planned",
           "covers": [
             "operator-configuration-imports"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/ops-003/wire-corruption",
-          "case": "OPS-003-corrupted",
-          "status": "planned",
-          "covers": [
-            "operator-configuration-validation"
           ],
           "targets": [
             "portable"
@@ -13790,7 +13381,7 @@
         "remediation": "Pin every dependency, evaluate offline without ambient inputs, and submit the closed result to OC0.",
         "secretSafe": true
       },
-      "notes": "Registered for Packet D resource-composition and driver-boundary correction; hook and test locations remain planned until prototype tracing."
+      "notes": "Registered for Packet D resource-composition and driver-boundary correction; hook and test locations remain planned until prototype tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "OPS-004",
@@ -13835,7 +13426,8 @@
           "case": "OPS-004",
           "status": "planned",
           "covers": [
-            "operator-configuration-precedence"
+            "operator-configuration-precedence",
+            "operator-configuration-validation"
           ],
           "targets": [
             "portable"
@@ -13848,18 +13440,6 @@
           "status": "planned",
           "covers": [
             "operator-configuration-precedence"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/ops-004/wire-corruption",
-          "case": "OPS-004-corrupted",
-          "status": "planned",
-          "covers": [
-            "operator-configuration-validation"
           ],
           "targets": [
             "portable"
@@ -13888,7 +13468,7 @@
         "remediation": "Declare every contributor and precedence decision, and reject undeclared force-class overrides at OC0.",
         "secretSafe": true
       },
-      "notes": "Registered for Packet D resource-composition and driver-boundary correction; hook and test locations remain planned until prototype tracing."
+      "notes": "Registered for Packet D resource-composition and driver-boundary correction; hook and test locations remain planned until prototype tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "OPS-005",
@@ -13933,7 +13513,8 @@
           "case": "OPS-005",
           "status": "planned",
           "covers": [
-            "operator-configuration-native-escape"
+            "operator-configuration-native-escape",
+            "operator-configuration-validation"
           ],
           "targets": [
             "portable"
@@ -13946,18 +13527,6 @@
           "status": "planned",
           "covers": [
             "operator-configuration-native-escape"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/ops-005/wire-corruption",
-          "case": "OPS-005-corrupted",
-          "status": "planned",
-          "covers": [
-            "operator-configuration-validation"
           ],
           "targets": [
             "portable"
@@ -13987,7 +13556,7 @@
         "remediation": "Route native/freeform input through OC0; only the validator may construct validated Operator Configuration.",
         "secretSafe": true
       },
-      "notes": "Registered for Packet D resource-composition and driver-boundary correction; hook and test locations remain planned until prototype tracing."
+      "notes": "Registered for Packet D resource-composition and driver-boundary correction; hook and test locations remain planned until prototype tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "SVC-003",
@@ -14032,7 +13601,8 @@
           "case": "SVC-003",
           "status": "planned",
           "covers": [
-            "managed-service-definition-imports"
+            "managed-service-definition-imports",
+            "managed-service-definition-validation"
           ],
           "targets": [
             "portable"
@@ -14045,18 +13615,6 @@
           "status": "planned",
           "covers": [
             "managed-service-definition-imports"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/svc-003/wire-corruption",
-          "case": "SVC-003-corrupted",
-          "status": "planned",
-          "covers": [
-            "managed-service-definition-validation"
           ],
           "targets": [
             "portable"
@@ -14085,7 +13643,7 @@
         "remediation": "Pin every dependency, evaluate offline without ambient inputs, and submit the closed result to MS0.",
         "secretSafe": true
       },
-      "notes": "Registered for Packet D resource-composition and driver-boundary correction; hook and test locations remain planned until prototype tracing."
+      "notes": "Registered for Packet D resource-composition and driver-boundary correction; hook and test locations remain planned until prototype tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "SVC-004",
@@ -14130,7 +13688,8 @@
           "case": "SVC-004",
           "status": "planned",
           "covers": [
-            "managed-service-definition-precedence"
+            "managed-service-definition-precedence",
+            "managed-service-definition-validation"
           ],
           "targets": [
             "portable"
@@ -14143,18 +13702,6 @@
           "status": "planned",
           "covers": [
             "managed-service-definition-precedence"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/svc-004/wire-corruption",
-          "case": "SVC-004-corrupted",
-          "status": "planned",
-          "covers": [
-            "managed-service-definition-validation"
           ],
           "targets": [
             "portable"
@@ -14183,7 +13730,7 @@
         "remediation": "Declare every contributor and precedence decision, and reject undeclared force-class overrides at MS0.",
         "secretSafe": true
       },
-      "notes": "Registered for Packet D resource-composition and driver-boundary correction; hook and test locations remain planned until prototype tracing."
+      "notes": "Registered for Packet D resource-composition and driver-boundary correction; hook and test locations remain planned until prototype tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "SVC-005",
@@ -14228,7 +13775,8 @@
           "case": "SVC-005",
           "status": "planned",
           "covers": [
-            "managed-service-definition-native-escape"
+            "managed-service-definition-native-escape",
+            "managed-service-definition-validation"
           ],
           "targets": [
             "portable"
@@ -14241,18 +13789,6 @@
           "status": "planned",
           "covers": [
             "managed-service-definition-native-escape"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/svc-005/wire-corruption",
-          "case": "SVC-005-corrupted",
-          "status": "planned",
-          "covers": [
-            "managed-service-definition-validation"
           ],
           "targets": [
             "portable"
@@ -14284,7 +13820,7 @@
         "remediation": "Route native/freeform input through MS0 and the typed Core API; direct driver action is unsupported.",
         "secretSafe": true
       },
-      "notes": "Registered for Packet D resource-composition and driver-boundary correction; hook and test locations remain planned until prototype tracing."
+      "notes": "Registered for Packet D resource-composition and driver-boundary correction; hook and test locations remain planned until prototype tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "WIRE-007",
@@ -14428,7 +13964,8 @@
           "case": "DRV-002",
           "status": "planned",
           "covers": [
-            "serialized-resolved-reentry"
+            "serialized-resolved-reentry",
+            "resolved-reentry-stage"
           ],
           "targets": [
             "all-enabled-targets"
@@ -14441,18 +13978,6 @@
           "status": "planned",
           "covers": [
             "serialized-resolved-reentry"
-          ],
-          "targets": [
-            "all-enabled-targets"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/drv-002/wire-corruption",
-          "case": "DRV-002-corrupted",
-          "status": "planned",
-          "covers": [
-            "resolved-reentry-stage"
           ],
           "targets": [
             "all-enabled-targets"
@@ -14482,7 +14007,7 @@
         "remediation": "Strictly decode and fully replay the reentry candidate; mint a private stage only through the C0 product constructor.",
         "secretSafe": true
       },
-      "notes": "Registered for Packet D resource-composition and driver-boundary correction; hook and test locations remain planned until prototype tracing."
+      "notes": "Registered for Packet D resource-composition and driver-boundary correction; hook and test locations remain planned until prototype tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "DRV-003",
@@ -14531,7 +14056,8 @@
           "covers": [
             "resolved-driver-handoff",
             "serialized-resolved-reentry",
-            "generated-runtime-configuration"
+            "generated-runtime-configuration",
+            "prepared-launch-identity"
           ],
           "targets": [
             "all-enabled-targets"
@@ -14546,18 +14072,6 @@
             "resolved-driver-handoff",
             "serialized-resolved-reentry",
             "generated-runtime-configuration"
-          ],
-          "targets": [
-            "all-enabled-targets"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/drv-003/wire-corruption",
-          "case": "DRV-003-corrupted",
-          "status": "planned",
-          "covers": [
-            "prepared-launch-identity"
           ],
           "targets": [
             "all-enabled-targets"
@@ -14590,7 +14104,7 @@
         "remediation": "Rederive PreparedLaunch identity from every upstream product identity, registration, admission, and retained-object binding.",
         "secretSafe": true
       },
-      "notes": "Registered for Packet D resource-composition and driver-boundary correction; hook and test locations remain planned until prototype tracing."
+      "notes": "Registered for Packet D resource-composition and driver-boundary correction; hook and test locations remain planned until prototype tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "DRV-004",
@@ -14637,7 +14151,8 @@
           "status": "planned",
           "covers": [
             "direct-driver-invocation",
-            "raw-runtime-config-input"
+            "raw-runtime-config-input",
+            "driver-entry"
           ],
           "targets": [
             "all-enabled-targets"
@@ -14651,18 +14166,6 @@
           "covers": [
             "direct-driver-invocation",
             "raw-runtime-config-input"
-          ],
-          "targets": [
-            "all-enabled-targets"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/drv-004/wire-corruption",
-          "case": "DRV-004-corrupted",
-          "status": "planned",
-          "covers": [
-            "driver-entry"
           ],
           "targets": [
             "all-enabled-targets"
@@ -14693,7 +14196,7 @@
         "remediation": "Invoke drivers only with the product-owned private PreparedLaunch and reject direct, raw, copied, deserialized, or backend-default input before mutation.",
         "secretSafe": true
       },
-      "notes": "Registered for Packet D resource-composition and driver-boundary correction; hook and test locations remain planned until prototype tracing."
+      "notes": "Registered for Packet D resource-composition and driver-boundary correction; hook and test locations remain planned until prototype tracing. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "FEN-001",
@@ -14745,7 +14248,9 @@
             "resolved-driver-handoff",
             "serialized-resolved-reentry",
             "direct-driver-invocation",
-            "provider-native-operation"
+            "provider-native-operation",
+            "prepared-launch-identity",
+            "driver-preparation"
           ],
           "targets": [
             "portable"
@@ -14761,19 +14266,6 @@
             "serialized-resolved-reentry",
             "direct-driver-invocation",
             "provider-native-operation"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/fen-001/wire-corruption",
-          "case": "FEN-001-corrupted",
-          "status": "planned",
-          "covers": [
-            "prepared-launch-identity",
-            "driver-preparation"
           ],
           "targets": [
             "portable"
@@ -14803,7 +14295,7 @@
         "remediation": "Validate the full capability against the current authority epoch before every authoritative commit and reject stale holders.",
         "secretSafe": true
       },
-      "notes": "Packet E FEN family; discharges IDENTITY-04, IDENTITY-03. Traversal: driver effect-commit traversal, defensively revalidated at every later commit station."
+      "notes": "Packet E FEN family; discharges IDENTITY-04, IDENTITY-03. Traversal: driver effect-commit traversal, defensively revalidated at every later commit station. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "FEN-002",
@@ -14853,7 +14345,9 @@
           "covers": [
             "resolved-driver-handoff",
             "serialized-resolved-reentry",
-            "provider-native-operation"
+            "provider-native-operation",
+            "driver-preparation",
+            "prepared-launch-identity"
           ],
           "targets": [
             "all-enabled-targets"
@@ -14888,19 +14382,6 @@
           ]
         },
         {
-          "kind": "wire-corruption",
-          "path": "planned/fen-002/wire-corruption",
-          "case": "FEN-002-corrupted",
-          "status": "planned",
-          "covers": [
-            "driver-preparation",
-            "prepared-launch-identity"
-          ],
-          "targets": [
-            "all-enabled-targets"
-          ]
-        },
-        {
           "kind": "diagnostic",
           "path": "planned/fen-002/diagnostic",
           "case": "FEN-002",
@@ -14924,7 +14405,7 @@
         "remediation": "Prove atomic target fencing or a verifiable predecessor drain for the handoff, or quarantine and reconcile instead of granting authority.",
         "secretSafe": true
       },
-      "notes": "Packet E FEN family; discharges IDENTITY-21. Traversal: authority handoff preflight traversal preceding driver dispatch."
+      "notes": "Packet E FEN family; discharges IDENTITY-21. Traversal: authority handoff preflight traversal preceding driver dispatch. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "FEN-003",
@@ -14976,7 +14457,9 @@
             "resolved-driver-handoff",
             "operator-registration",
             "provider-native-operation",
-            "direct-driver-invocation"
+            "direct-driver-invocation",
+            "driver-preparation",
+            "driver-entry"
           ],
           "targets": [
             "all-enabled-targets"
@@ -14992,19 +14475,6 @@
             "operator-registration",
             "provider-native-operation",
             "direct-driver-invocation"
-          ],
-          "targets": [
-            "all-enabled-targets"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/fen-003/wire-corruption",
-          "case": "FEN-003-corrupted",
-          "status": "planned",
-          "covers": [
-            "driver-preparation",
-            "driver-entry"
           ],
           "targets": [
             "all-enabled-targets"
@@ -15034,7 +14504,7 @@
         "remediation": "Declare the fencing mechanism per effect boundary and refuse exclusive dispatch when neither atomic fencing nor a verifiable drain exists.",
         "secretSafe": true
       },
-      "notes": "Packet E FEN family; discharges IDENTITY-21, LIFECYCLE-42. Traversal: driver dispatch traversal."
+      "notes": "Packet E FEN family; discharges IDENTITY-21, LIFECYCLE-42. Traversal: driver dispatch traversal. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "FEN-004",
@@ -15206,7 +14676,9 @@
           "covers": [
             "resolved-driver-handoff",
             "provider-native-operation",
-            "direct-driver-invocation"
+            "direct-driver-invocation",
+            "driver-preparation",
+            "driver-entry"
           ],
           "targets": [
             "all-enabled-targets"
@@ -15241,19 +14713,6 @@
           ]
         },
         {
-          "kind": "wire-corruption",
-          "path": "planned/fen-005/wire-corruption",
-          "case": "FEN-005-corrupted",
-          "status": "planned",
-          "covers": [
-            "driver-preparation",
-            "driver-entry"
-          ],
-          "targets": [
-            "all-enabled-targets"
-          ]
-        },
-        {
           "kind": "diagnostic",
           "path": "planned/fen-005/diagnostic",
           "case": "FEN-005",
@@ -15277,7 +14736,7 @@
         "remediation": "Retry only with the provider's own idempotency token, adopt only under exact identity and fencing proof, and otherwise reconcile.",
         "secretSafe": true
       },
-      "notes": "Packet E FEN family; discharges RESULT-19, LIFECYCLE-43. Traversal: driver retry and adoption traversal."
+      "notes": "Packet E FEN family; discharges RESULT-19, LIFECYCLE-43. Traversal: driver retry and adoption traversal. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "FEN-006",
@@ -15329,7 +14788,9 @@
             "resolved-driver-handoff",
             "operator-registration",
             "provider-native-operation",
-            "direct-driver-invocation"
+            "direct-driver-invocation",
+            "driver-entry",
+            "driver-preparation"
           ],
           "targets": [
             "all-enabled-targets"
@@ -15345,19 +14806,6 @@
             "operator-registration",
             "provider-native-operation",
             "direct-driver-invocation"
-          ],
-          "targets": [
-            "all-enabled-targets"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/fen-006/wire-corruption",
-          "case": "FEN-006-corrupted",
-          "status": "planned",
-          "covers": [
-            "driver-entry",
-            "driver-preparation"
           ],
           "targets": [
             "all-enabled-targets"
@@ -15387,7 +14835,7 @@
         "remediation": "Declare required evidence per outcome variant and map status-only responses to the ambiguity variant instead.",
         "secretSafe": true
       },
-      "notes": "Packet E FEN family; discharges RESULT-43, RESULT-50. Traversal: driver evidence-decoding and outcome-selection traversal."
+      "notes": "Packet E FEN family; discharges RESULT-43, RESULT-50. Traversal: driver evidence-decoding and outcome-selection traversal. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "FEN-007",
@@ -15547,7 +14995,8 @@
             "cli-adapter",
             "managed-service",
             "create-native-extension",
-            "serialized-resolved-reentry"
+            "serialized-resolved-reentry",
+            "core-api-create"
           ],
           "targets": [
             "portable"
@@ -15565,18 +15014,6 @@
             "managed-service",
             "create-native-extension",
             "serialized-resolved-reentry"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/ide-001/wire-corruption",
-          "case": "IDE-001-corrupted",
-          "status": "planned",
-          "covers": [
-            "core-api-create"
           ],
           "targets": [
             "portable"
@@ -15606,7 +15043,7 @@
         "remediation": "Allocate a fresh never-issued Sandbox ID for every new Sandbox lifetime and never rebind a retired one.",
         "secretSafe": true
       },
-      "notes": "Packet E IDE family; discharges IDENTITY-01, TAXONOMY-38, LIFECYCLE-46. Traversal: CreateSandbox acceptance traversal, including restore-as-create and Fork child allocation."
+      "notes": "Packet E IDE family; discharges IDENTITY-01, TAXONOMY-38, LIFECYCLE-46. Traversal: CreateSandbox acceptance traversal, including restore-as-create and Fork child allocation. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "IDE-002",
@@ -15660,7 +15097,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "create-native-extension"
+            "create-native-extension",
+            "core-api-create",
+            "driver-preparation"
           ],
           "targets": [
             "portable"
@@ -15677,19 +15116,6 @@
             "cli-adapter",
             "managed-service",
             "create-native-extension"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/ide-002/wire-corruption",
-          "case": "IDE-002-corrupted",
-          "status": "planned",
-          "covers": [
-            "core-api-create",
-            "driver-preparation"
           ],
           "targets": [
             "portable"
@@ -15719,7 +15145,7 @@
         "remediation": "Record epoch one for a runtime-creating Create and an explicit no-runtime marker for a stopped Create.",
         "secretSafe": true
       },
-      "notes": "Packet E IDE family; discharges IDENTITY-01, IDENTITY-23, LIFECYCLE-46. Traversal: CreateSandbox acceptance traversal."
+      "notes": "Packet E IDE family; discharges IDENTITY-01, IDENTITY-23, LIFECYCLE-46. Traversal: CreateSandbox acceptance traversal. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "IDE-003",
@@ -15772,7 +15198,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "create-native-extension"
+            "create-native-extension",
+            "core-api-create"
           ],
           "targets": [
             "portable"
@@ -15789,18 +15216,6 @@
             "cli-adapter",
             "managed-service",
             "create-native-extension"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/ide-003/wire-corruption",
-          "case": "IDE-003-corrupted",
-          "status": "planned",
-          "covers": [
-            "core-api-create"
           ],
           "targets": [
             "portable"
@@ -15829,7 +15244,7 @@
         "remediation": "Choose a different alias, or delete the holding Sandbox and let its reservation release before reusing the name.",
         "secretSafe": true
       },
-      "notes": "Packet E IDE family; discharges IDENTITY-01, LIFECYCLE-17. Traversal: CreateSandbox acceptance traversal."
+      "notes": "Packet E IDE family; discharges IDENTITY-01, LIFECYCLE-17. Traversal: CreateSandbox acceptance traversal. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "IDE-004",
@@ -17118,7 +16533,9 @@
             "resolved-driver-handoff",
             "serialized-resolved-reentry",
             "provider-native-operation",
-            "direct-driver-invocation"
+            "direct-driver-invocation",
+            "driver-entry",
+            "driver-preparation"
           ],
           "targets": [
             "all-enabled-targets"
@@ -17134,19 +16551,6 @@
             "serialized-resolved-reentry",
             "provider-native-operation",
             "direct-driver-invocation"
-          ],
-          "targets": [
-            "all-enabled-targets"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/ide-016/wire-corruption",
-          "case": "IDE-016-corrupted",
-          "status": "planned",
-          "covers": [
-            "driver-entry",
-            "driver-preparation"
           ],
           "targets": [
             "all-enabled-targets"
@@ -17176,7 +16580,7 @@
         "remediation": "Keep native identifiers in scoped protected evidence and resolve public resources only through Core-allocated identities.",
         "secretSafe": true
       },
-      "notes": "Packet E IDE family; discharges IDENTITY-12. Traversal: driver decoding and effect-commit traversal."
+      "notes": "Packet E IDE family; discharges IDENTITY-12. Traversal: driver decoding and effect-commit traversal. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "IDE-017",
@@ -17231,7 +16635,8 @@
             "cli-adapter",
             "managed-service",
             "create-native-extension",
-            "serialized-resolved-reentry"
+            "serialized-resolved-reentry",
+            "core-api-create"
           ],
           "targets": [
             "portable"
@@ -17249,18 +16654,6 @@
             "managed-service",
             "create-native-extension",
             "serialized-resolved-reentry"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/ide-017/wire-corruption",
-          "case": "IDE-017-corrupted",
-          "status": "planned",
-          "covers": [
-            "core-api-create"
           ],
           "targets": [
             "portable"
@@ -17289,7 +16682,7 @@
         "remediation": "Read the allocated epoch from the Create result instead of attempting to supply one.",
         "secretSafe": true
       },
-      "notes": "Packet E IDE family; discharges IDENTITY-01. Traversal: CreateSandbox request traversal."
+      "notes": "Packet E IDE family; discharges IDENTITY-01. Traversal: CreateSandbox request traversal. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "IDE-018",
@@ -17646,7 +17039,9 @@
             "cli-adapter",
             "managed-service",
             "create-native-extension",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "driver-preparation",
+            "core-api-create"
           ],
           "targets": [
             "portable"
@@ -17664,19 +17059,6 @@
             "managed-service",
             "create-native-extension",
             "resolved-driver-handoff"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/opa-001/wire-corruption",
-          "case": "OPA-001-corrupted",
-          "status": "planned",
-          "covers": [
-            "driver-preparation",
-            "core-api-create"
           ],
           "targets": [
             "portable"
@@ -17706,7 +17088,7 @@
         "remediation": "Return a request rejection only before the acceptance commit and afterwards report every outcome inside the Operation.",
         "secretSafe": true
       },
-      "notes": "Packet E OPA family; discharges RESULT-01. Traversal: CreateSandbox acceptance traversal."
+      "notes": "Packet E OPA family; discharges RESULT-01. Traversal: CreateSandbox acceptance traversal. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "OPA-002",
@@ -17966,7 +17348,9 @@
             "managed-service",
             "create-native-extension",
             "resolved-driver-handoff",
-            "direct-driver-invocation"
+            "direct-driver-invocation",
+            "driver-preparation",
+            "core-api-create"
           ],
           "targets": [
             "portable"
@@ -17985,19 +17369,6 @@
             "create-native-extension",
             "resolved-driver-handoff",
             "direct-driver-invocation"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/opa-004/wire-corruption",
-          "case": "OPA-004-corrupted",
-          "status": "planned",
-          "covers": [
-            "driver-preparation",
-            "core-api-create"
           ],
           "targets": [
             "portable"
@@ -18028,7 +17399,7 @@
         "remediation": "Commit the full acceptance record, epoch allocation, and effect intent atomically before invoking any provider or driver effect.",
         "secretSafe": true
       },
-      "notes": "Packet E OPA family; discharges RESULT-02, IDENTITY-02. Traversal: CreateSandbox acceptance and launch-dispatch traversal."
+      "notes": "Packet E OPA family; discharges RESULT-02, IDENTITY-02. Traversal: CreateSandbox acceptance and launch-dispatch traversal. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "OPA-005",
@@ -18297,7 +17668,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "create-native-extension"
+            "create-native-extension",
+            "core-api-create",
+            "idempotency-store"
           ],
           "targets": [
             "portable"
@@ -18314,19 +17687,6 @@
             "cli-adapter",
             "managed-service",
             "create-native-extension"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/opa-007/wire-corruption",
-          "case": "OPA-007-corrupted",
-          "status": "planned",
-          "covers": [
-            "core-api-create",
-            "idempotency-store"
           ],
           "targets": [
             "portable"
@@ -18355,7 +17715,7 @@
         "remediation": "Resolve idempotency before evaluating mutable lifecycle, capacity, or quota preconditions.",
         "secretSafe": true
       },
-      "notes": "Packet E OPA family; discharges RESULT-12, RESULT-15. Traversal: CreateSandbox admission traversal."
+      "notes": "Packet E OPA family; discharges RESULT-12, RESULT-15. Traversal: CreateSandbox admission traversal. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "OPA-008",
@@ -18918,7 +18278,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "create-native-extension"
+            "create-native-extension",
+            "core-api-create",
+            "idempotency-store"
           ],
           "targets": [
             "portable"
@@ -18935,19 +18297,6 @@
             "cli-adapter",
             "managed-service",
             "create-native-extension"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/opa-013/wire-corruption",
-          "case": "OPA-013-corrupted",
-          "status": "planned",
-          "covers": [
-            "core-api-create",
-            "idempotency-store"
           ],
           "targets": [
             "portable"
@@ -18977,7 +18326,7 @@
         "remediation": "Return the expired-record recovery error with its prior-acceptance evidence and require operator or observation recovery.",
         "secretSafe": true
       },
-      "notes": "Packet E OPA family; discharges RESULT-15, RESULT-12. Traversal: CreateSandbox admission traversal."
+      "notes": "Packet E OPA family; discharges RESULT-15, RESULT-12. Traversal: CreateSandbox admission traversal. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "OPA-014",
@@ -19539,7 +18888,8 @@
             "operator-configuration-authoring",
             "operator-configuration-imports",
             "operator-configuration-precedence",
-            "operator-registration"
+            "operator-registration",
+            "operator-admission"
           ],
           "targets": [
             "portable"
@@ -19555,18 +18905,6 @@
             "operator-configuration-imports",
             "operator-configuration-precedence",
             "operator-registration"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/opa-019/wire-corruption",
-          "case": "OPA-019-corrupted",
-          "status": "planned",
-          "covers": [
-            "operator-admission"
           ],
           "targets": [
             "portable"
@@ -19595,7 +18933,7 @@
         "remediation": "Fail build, startup, or capability admission closed instead of advertising the atomic-update methods on non-transactional storage.",
         "secretSafe": true
       },
-      "notes": "Packet E OPA family; discharges RESULT-31. Traversal: operator configuration and capability-admission traversal."
+      "notes": "Packet E OPA family; discharges RESULT-31. Traversal: operator configuration and capability-admission traversal. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "OPA-020",
@@ -19647,7 +18985,9 @@
             "resolved-driver-handoff",
             "direct-driver-invocation",
             "provider-native-operation",
-            "serialized-resolved-reentry"
+            "serialized-resolved-reentry",
+            "driver-preparation",
+            "driver-entry"
           ],
           "targets": [
             "portable"
@@ -19663,19 +19003,6 @@
             "direct-driver-invocation",
             "provider-native-operation",
             "serialized-resolved-reentry"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/opa-020/wire-corruption",
-          "case": "OPA-020-corrupted",
-          "status": "planned",
-          "covers": [
-            "driver-preparation",
-            "driver-entry"
           ],
           "targets": [
             "portable"
@@ -19705,7 +19032,7 @@
         "remediation": "Persist the effect-attempt record with its recovery class before dispatch, and report ambiguity with quarantine when no class applies.",
         "secretSafe": true
       },
-      "notes": "Packet E OPA family; discharges LIFECYCLE-43, RESULT-19, RESULT-20. Traversal: external effect-attempt traversal preceding launch dispatch."
+      "notes": "Packet E OPA family; discharges LIFECYCLE-43, RESULT-19, RESULT-20. Traversal: external effect-attempt traversal preceding launch dispatch. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "OPA-021",
@@ -19969,7 +19296,9 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "create-native-extension"
+            "create-native-extension",
+            "core-api-create",
+            "idempotency-store"
           ],
           "targets": [
             "portable"
@@ -19986,19 +19315,6 @@
             "cli-adapter",
             "managed-service",
             "create-native-extension"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/opa-023/wire-corruption",
-          "case": "OPA-023-corrupted",
-          "status": "planned",
-          "covers": [
-            "core-api-create",
-            "idempotency-store"
           ],
           "targets": [
             "portable"
@@ -20028,7 +19344,7 @@
         "remediation": "Refuse a replay whose canonical digest differs from the one already bound to the coordinate, and use a fresh idempotency key for a different intent.",
         "secretSafe": true
       },
-      "notes": "Packet E OPA family; discharges IDENTITY-08, RESULT-13, RESULT-14. Traversal: CreateSandbox acceptance traversal, at idempotency binding."
+      "notes": "Packet E OPA family; discharges IDENTITY-08, RESULT-13, RESULT-14. Traversal: CreateSandbox acceptance traversal, at idempotency binding. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "PRF-001",
@@ -22846,7 +22162,8 @@
             "resolved-driver-handoff",
             "serialized-resolved-reentry",
             "generated-runtime-configuration",
-            "provider-native-operation"
+            "provider-native-operation",
+            "driver-entry"
           ],
           "targets": [
             "all-enabled-targets"
@@ -22862,18 +22179,6 @@
             "serialized-resolved-reentry",
             "generated-runtime-configuration",
             "provider-native-operation"
-          ],
-          "targets": [
-            "all-enabled-targets"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/adm-013/wire-corruption",
-          "case": "ADM-013-corrupted",
-          "status": "planned",
-          "covers": [
-            "driver-entry"
           ],
           "targets": [
             "all-enabled-targets"
@@ -22902,7 +22207,7 @@
         "remediation": "Return the typed capability-unsupported result before effect-producing work instead of substituting an approximate native mechanism.",
         "secretSafe": true
       },
-      "notes": "Packet E ADM family; discharges TAXONOMY-03. Traversal: one driver invocation with a validated PreparedLaunch stage."
+      "notes": "Packet E ADM family; discharges TAXONOMY-03. Traversal: one driver invocation with a validated PreparedLaunch stage. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "ADM-014",
@@ -22953,7 +22258,8 @@
             "resolved-driver-handoff",
             "serialized-resolved-reentry",
             "generated-runtime-configuration",
-            "provider-native-operation"
+            "provider-native-operation",
+            "driver-entry"
           ],
           "targets": [
             "all-enabled-targets"
@@ -22969,18 +22275,6 @@
             "serialized-resolved-reentry",
             "generated-runtime-configuration",
             "provider-native-operation"
-          ],
-          "targets": [
-            "all-enabled-targets"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/adm-014/wire-corruption",
-          "case": "ADM-014-corrupted",
-          "status": "planned",
-          "covers": [
-            "driver-entry"
           ],
           "targets": [
             "all-enabled-targets"
@@ -23010,7 +22304,7 @@
         "remediation": "Reject the operation as unsupported rather than lowering it to a native step whose postcondition differs from the requested one.",
         "secretSafe": true
       },
-      "notes": "Packet E ADM family; discharges TAXONOMY-42, TAXONOMY-02. Traversal: one driver invocation with a validated PreparedLaunch stage."
+      "notes": "Packet E ADM family; discharges TAXONOMY-42, TAXONOMY-02. Traversal: one driver invocation with a validated PreparedLaunch stage. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "ADM-015",
@@ -23059,7 +22353,8 @@
           "covers": [
             "driver-selection",
             "resolved-driver-handoff",
-            "provider-native-operation"
+            "provider-native-operation",
+            "driver-entry"
           ],
           "targets": [
             "all-enabled-targets"
@@ -23074,18 +22369,6 @@
             "driver-selection",
             "resolved-driver-handoff",
             "provider-native-operation"
-          ],
-          "targets": [
-            "all-enabled-targets"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/adm-015/wire-corruption",
-          "case": "ADM-015-corrupted",
-          "status": "planned",
-          "covers": [
-            "driver-entry"
           ],
           "targets": [
             "all-enabled-targets"
@@ -23114,7 +22397,7 @@
         "remediation": "Supply a Core-managed in-guest supervisor and durable spool, or do not advertise full Core Exec for this target.",
         "secretSafe": true
       },
-      "notes": "Packet E ADM family; discharges TAXONOMY-11, TAXONOMY-10. Traversal: one driver invocation with a validated PreparedLaunch stage, at capability admission."
+      "notes": "Packet E ADM family; discharges TAXONOMY-11, TAXONOMY-10. Traversal: one driver invocation with a validated PreparedLaunch stage, at capability admission. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "ADM-016",
@@ -23375,7 +22658,9 @@
           "covers": [
             "operator-registration",
             "resolved-driver-handoff",
-            "serialized-resolved-reentry"
+            "serialized-resolved-reentry",
+            "operator-admission",
+            "prepared-launch-identity"
           ],
           "targets": [
             "all-enabled-targets"
@@ -23390,19 +22675,6 @@
             "operator-registration",
             "resolved-driver-handoff",
             "serialized-resolved-reentry"
-          ],
-          "targets": [
-            "all-enabled-targets"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/adm-018/wire-corruption",
-          "case": "ADM-018-corrupted",
-          "status": "planned",
-          "covers": [
-            "operator-admission",
-            "prepared-launch-identity"
           ],
           "targets": [
             "all-enabled-targets"
@@ -23433,7 +22705,7 @@
         "remediation": "Re-admit the resolved placement, capacity, and tier at the operator admission plane for the current epoch before dispatching the launch.",
         "secretSafe": true
       },
-      "notes": "Packet E ADM family; discharges LIFECYCLE-04. Traversal: launch traversal, from operator re-admission through driver dispatch."
+      "notes": "Packet E ADM family; discharges LIFECYCLE-04. Traversal: launch traversal, from operator re-admission through driver dispatch. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "ADM-019",
@@ -23803,7 +23075,9 @@
             "framework-adapter",
             "managed-service",
             "create-native-extension",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "core-api-create",
+            "driver-preparation"
           ],
           "targets": [
             "all-enabled-targets"
@@ -23820,19 +23094,6 @@
             "managed-service",
             "create-native-extension",
             "resolved-driver-handoff"
-          ],
-          "targets": [
-            "all-enabled-targets"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/pol-001/wire-corruption",
-          "case": "POL-001-corrupted",
-          "status": "planned",
-          "covers": [
-            "core-api-create",
-            "driver-preparation"
           ],
           "targets": [
             "all-enabled-targets"
@@ -23862,7 +23123,7 @@
         "remediation": "Select a profile advertising the exact conformed capability, or drop the capability-gated requirement from the creation.",
         "secretSafe": true
       },
-      "notes": "Packet E POL family; discharges TAXONOMY-03. Traversal: CreateSandbox traversal, at creation resolution."
+      "notes": "Packet E POL family; discharges TAXONOMY-03. Traversal: CreateSandbox traversal, at creation resolution. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "POL-002",
@@ -24112,7 +23373,9 @@
             "direct-api",
             "framework-adapter",
             "managed-service",
-            "create-native-extension"
+            "create-native-extension",
+            "core-api-create",
+            "snapshot-store"
           ],
           "targets": [
             "all-enabled-targets"
@@ -24128,19 +23391,6 @@
             "framework-adapter",
             "managed-service",
             "create-native-extension"
-          ],
-          "targets": [
-            "all-enabled-targets"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/pol-004/wire-corruption",
-          "case": "POL-004-corrupted",
-          "status": "planned",
-          "covers": [
-            "core-api-create",
-            "snapshot-store"
           ],
           "targets": [
             "all-enabled-targets"
@@ -24170,7 +23420,7 @@
         "remediation": "Select or refine only permitted access within the pinned Artifact's hard policy, and never replace or widen an immutable policy dimension at creation.",
         "secretSafe": true
       },
-      "notes": "Packet E POL family; discharges TAXONOMY-38, RESULT-45. Traversal: restore-as-create CreateSandbox acceptance traversal, at policy resolution."
+      "notes": "Packet E POL family; discharges TAXONOMY-38, RESULT-45. Traversal: restore-as-create CreateSandbox acceptance traversal, at policy resolution. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "SBX-001",
@@ -24223,7 +23473,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "create-native-extension"
+            "create-native-extension",
+            "core-api-create"
           ],
           "targets": [
             "portable"
@@ -24240,18 +23491,6 @@
             "cli-adapter",
             "managed-service",
             "create-native-extension"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/sbx-001/wire-corruption",
-          "case": "SBX-001-corrupted",
-          "status": "planned",
-          "covers": [
-            "core-api-create"
           ],
           "targets": [
             "portable"
@@ -24281,7 +23520,7 @@
         "remediation": "Resolve `running` or `stopped` in the caller or profile layer and submit the exact value in the canonical request.",
         "secretSafe": true
       },
-      "notes": "Packet E SBX family; discharges TAXONOMY-04. Traversal: CreateSandbox launch traversal, at creation-request resolution."
+      "notes": "Packet E SBX family; discharges TAXONOMY-04. Traversal: CreateSandbox launch traversal, at creation-request resolution. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "SBX-002",
@@ -24335,7 +23574,9 @@
             "framework-adapter",
             "managed-service",
             "create-native-extension",
-            "resolved-driver-handoff"
+            "resolved-driver-handoff",
+            "core-api-create",
+            "driver-preparation"
           ],
           "targets": [
             "portable"
@@ -24352,19 +23593,6 @@
             "managed-service",
             "create-native-extension",
             "resolved-driver-handoff"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/sbx-002/wire-corruption",
-          "case": "SBX-002-corrupted",
-          "status": "planned",
-          "covers": [
-            "core-api-create",
-            "driver-preparation"
           ],
           "targets": [
             "portable"
@@ -24393,7 +23621,7 @@
         "remediation": "Commit the stopped Sandbox record without launch and require an explicit StartSandbox to establish a runtime.",
         "secretSafe": true
       },
-      "notes": "Packet E SBX family; discharges LIFECYCLE-05, TAXONOMY-04. Traversal: CreateSandbox traversal for `initialRuntime = stopped`, at creation commit."
+      "notes": "Packet E SBX family; discharges LIFECYCLE-05, TAXONOMY-04. Traversal: CreateSandbox traversal for `initialRuntime = stopped`, at creation commit. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "SBX-003",
@@ -31338,7 +30566,8 @@
           "covers": [
             "framework-adapter",
             "cli-adapter",
-            "adapter-native-extension"
+            "adapter-native-extension",
+            "framework-core-api"
           ],
           "targets": [
             "portable"
@@ -31353,18 +30582,6 @@
             "framework-adapter",
             "cli-adapter",
             "adapter-native-extension"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/adp-001/wire-corruption",
-          "case": "ADP-001-corrupted",
-          "status": "planned",
-          "covers": [
-            "framework-core-api"
           ],
           "targets": [
             "portable"
@@ -31393,7 +30610,7 @@
         "remediation": "Carry SandboxRuntimeRef, Process ID, Operation ID, etag, and idempotency key explicitly and keep Session identity adapter-local.",
         "secretSafe": true
       },
-      "notes": "Packet E ADP family; discharges IDENTITY-20, TAXONOMY-09. Traversal: Framework or CLI adapter action ingress."
+      "notes": "Packet E ADP family; discharges IDENTITY-20, TAXONOMY-09. Traversal: Framework or CLI adapter action ingress. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "ADP-002",
@@ -31535,7 +30752,8 @@
           "covers": [
             "framework-adapter",
             "cli-adapter",
-            "adapter-native-extension"
+            "adapter-native-extension",
+            "framework-core-api"
           ],
           "targets": [
             "portable"
@@ -31550,18 +30768,6 @@
             "framework-adapter",
             "cli-adapter",
             "adapter-native-extension"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/adp-003/wire-corruption",
-          "case": "ADP-003-corrupted",
-          "status": "planned",
-          "covers": [
-            "framework-core-api"
           ],
           "targets": [
             "portable"
@@ -31590,7 +30796,7 @@
         "remediation": "Project the Core status union verbatim and keep any adapter-specific phase clearly labelled as adapter-local presentation.",
         "secretSafe": true
       },
-      "notes": "Packet E ADP family; discharges LIFECYCLE-02, RESULT-46. Traversal: Framework or CLI adapter action ingress and result presentation."
+      "notes": "Packet E ADP family; discharges LIFECYCLE-02, RESULT-46. Traversal: Framework or CLI adapter action ingress and result presentation. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "ADP-004",
@@ -31639,7 +30845,8 @@
           "covers": [
             "framework-adapter",
             "cli-adapter",
-            "adapter-native-extension"
+            "adapter-native-extension",
+            "framework-core-api"
           ],
           "targets": [
             "portable"
@@ -31654,18 +30861,6 @@
             "framework-adapter",
             "cli-adapter",
             "adapter-native-extension"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/adp-004/wire-corruption",
-          "case": "ADP-004-corrupted",
-          "status": "planned",
-          "covers": [
-            "framework-core-api"
           ],
           "targets": [
             "portable"
@@ -31694,7 +30889,7 @@
         "remediation": "Reuse the caller's original idempotency key with the byte-identical canonical request when recovering, and derive a fresh key only for a genuinely new intent.",
         "secretSafe": true
       },
-      "notes": "Packet E ADP family; discharges IDENTITY-08, RESULT-13, RESULT-46. Traversal: Framework or CLI adapter action ingress."
+      "notes": "Packet E ADP family; discharges IDENTITY-08, RESULT-13, RESULT-46. Traversal: Framework or CLI adapter action ingress. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "ADP-005",
@@ -31743,7 +30938,8 @@
           "covers": [
             "framework-adapter",
             "cli-adapter",
-            "adapter-native-extension"
+            "adapter-native-extension",
+            "framework-core-api"
           ],
           "targets": [
             "portable"
@@ -31758,18 +30954,6 @@
             "framework-adapter",
             "cli-adapter",
             "adapter-native-extension"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/adp-005/wire-corruption",
-          "case": "ADP-005-corrupted",
-          "status": "planned",
-          "covers": [
-            "framework-core-api"
           ],
           "targets": [
             "portable"
@@ -31798,7 +30982,7 @@
         "remediation": "Document exactly the Core's compatibility and precondition contract and use etag and runtime-epoch preconditions instead of an adapter-local lock.",
         "secretSafe": true
       },
-      "notes": "Packet E ADP family; discharges RESULT-46, LIFECYCLE-20. Traversal: Framework or CLI adapter tool registration and action ingress."
+      "notes": "Packet E ADP family; discharges RESULT-46, LIFECYCLE-20. Traversal: Framework or CLI adapter tool registration and action ingress. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "ADP-006",
@@ -31847,7 +31031,8 @@
           "covers": [
             "framework-adapter",
             "cli-adapter",
-            "adapter-native-extension"
+            "adapter-native-extension",
+            "framework-core-api"
           ],
           "targets": [
             "portable"
@@ -31862,18 +31047,6 @@
             "framework-adapter",
             "cli-adapter",
             "adapter-native-extension"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/adp-006/wire-corruption",
-          "case": "ADP-006-corrupted",
-          "status": "planned",
-          "covers": [
-            "framework-core-api"
           ],
           "targets": [
             "portable"
@@ -31901,7 +31074,7 @@
         "remediation": "Generate the adapter failure type from the closed Core union and express adapter-specific context as non-semantic annotation.",
         "secretSafe": true
       },
-      "notes": "Packet E ADP family; discharges RESULT-46. Traversal: Framework or CLI adapter error projection."
+      "notes": "Packet E ADP family; discharges RESULT-46. Traversal: Framework or CLI adapter error projection. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "ADP-007",
@@ -31950,7 +31123,8 @@
           "covers": [
             "framework-adapter",
             "cli-adapter",
-            "adapter-native-extension"
+            "adapter-native-extension",
+            "framework-core-api"
           ],
           "targets": [
             "portable"
@@ -31965,18 +31139,6 @@
             "framework-adapter",
             "cli-adapter",
             "adapter-native-extension"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/adp-007/wire-corruption",
-          "case": "ADP-007-corrupted",
-          "status": "planned",
-          "covers": [
-            "framework-core-api"
           ],
           "targets": [
             "portable"
@@ -32005,7 +31167,7 @@
         "remediation": "Report the transport condition distinctly and resolve the Operation or Process state by retrieving it from the Core.",
         "secretSafe": true
       },
-      "notes": "Packet E ADP family; discharges RESULT-46, RESULT-23. Traversal: Framework or CLI adapter error projection."
+      "notes": "Packet E ADP family; discharges RESULT-46, RESULT-23. Traversal: Framework or CLI adapter error projection. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "ADP-008",
@@ -32054,7 +31216,8 @@
           "covers": [
             "framework-adapter",
             "cli-adapter",
-            "adapter-native-extension"
+            "adapter-native-extension",
+            "framework-core-api"
           ],
           "targets": [
             "portable"
@@ -32069,18 +31232,6 @@
             "framework-adapter",
             "cli-adapter",
             "adapter-native-extension"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/adp-008/wire-corruption",
-          "case": "ADP-008-corrupted",
-          "status": "planned",
-          "covers": [
-            "framework-core-api"
           ],
           "targets": [
             "portable"
@@ -32109,7 +31260,7 @@
         "remediation": "Surface the exact ProcessTermination arm and exit code as a normal Process result, reserving infrastructure errors for infrastructure conditions.",
         "secretSafe": true
       },
-      "notes": "Packet E ADP family; discharges RESULT-46, RESULT-26. Traversal: Framework or CLI adapter Process result projection."
+      "notes": "Packet E ADP family; discharges RESULT-46, RESULT-26. Traversal: Framework or CLI adapter Process result projection. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "ADP-009",
@@ -32158,7 +31309,8 @@
           "covers": [
             "framework-adapter",
             "cli-adapter",
-            "adapter-native-extension"
+            "adapter-native-extension",
+            "framework-core-api"
           ],
           "targets": [
             "portable"
@@ -32173,18 +31325,6 @@
             "framework-adapter",
             "cli-adapter",
             "adapter-native-extension"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/adp-009/wire-corruption",
-          "case": "ADP-009-corrupted",
-          "status": "planned",
-          "covers": [
-            "framework-core-api"
           ],
           "targets": [
             "portable"
@@ -32213,7 +31353,7 @@
         "remediation": "Surface the ambiguity arm, or recover the same coordinate through Core idempotency or Core observation, instead of issuing a replacement effect.",
         "secretSafe": true
       },
-      "notes": "Packet E ADP family; discharges RESULT-46, RESULT-29, IDENTITY-10. Traversal: Framework or CLI adapter recovery path after an ambiguous Core outcome."
+      "notes": "Packet E ADP family; discharges RESULT-46, RESULT-29, IDENTITY-10. Traversal: Framework or CLI adapter recovery path after an ambiguous Core outcome. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "ADP-010",
@@ -32262,7 +31402,8 @@
           "covers": [
             "framework-adapter",
             "cli-adapter",
-            "adapter-native-extension"
+            "adapter-native-extension",
+            "framework-core-api"
           ],
           "targets": [
             "portable"
@@ -32277,18 +31418,6 @@
             "framework-adapter",
             "cli-adapter",
             "adapter-native-extension"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/adp-010/wire-corruption",
-          "case": "ADP-010-corrupted",
-          "status": "planned",
-          "covers": [
-            "framework-core-api"
           ],
           "targets": [
             "portable"
@@ -32317,7 +31446,7 @@
         "remediation": "Report only the Core Operation's published proof and outcome, and mark any adapter observation explicitly as non-authoritative.",
         "secretSafe": true
       },
-      "notes": "Packet E ADP family; discharges RESULT-46, TAXONOMY-43. Traversal: Framework or CLI adapter result presentation."
+      "notes": "Packet E ADP family; discharges RESULT-46, TAXONOMY-43. Traversal: Framework or CLI adapter result presentation. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "ADP-011",
@@ -32366,7 +31495,8 @@
           "covers": [
             "framework-adapter",
             "cli-adapter",
-            "adapter-native-extension"
+            "adapter-native-extension",
+            "framework-core-api"
           ],
           "targets": [
             "portable"
@@ -32381,18 +31511,6 @@
             "framework-adapter",
             "cli-adapter",
             "adapter-native-extension"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/adp-011/wire-corruption",
-          "case": "ADP-011-corrupted",
-          "status": "planned",
-          "covers": [
-            "framework-core-api"
           ],
           "targets": [
             "portable"
@@ -32421,7 +31539,7 @@
         "remediation": "Issue and surface each named Core operation and its Operation handle separately, and label the composite as an adapter helper.",
         "secretSafe": true
       },
-      "notes": "Packet E ADP family; discharges RESULT-46, TAXONOMY-08. Traversal: Framework or CLI adapter composite action ingress."
+      "notes": "Packet E ADP family; discharges RESULT-46, TAXONOMY-08. Traversal: Framework or CLI adapter composite action ingress. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "ADP-012",
@@ -32566,7 +31684,8 @@
           "covers": [
             "managed-service",
             "managed-service-definition-authoring",
-            "service-native-extension"
+            "service-native-extension",
+            "managed-service-core-api"
           ],
           "targets": [
             "portable"
@@ -32581,18 +31700,6 @@
             "managed-service",
             "managed-service-definition-authoring",
             "service-native-extension"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/adp-013/wire-corruption",
-          "case": "ADP-013-corrupted",
-          "status": "planned",
-          "covers": [
-            "managed-service-core-api"
           ],
           "targets": [
             "portable"
@@ -32622,7 +31729,7 @@
         "remediation": "Keep the desired-state revision and the restart/recreate policy in the managed layer's own records and drive the Core only through named Core operations.",
         "secretSafe": true
       },
-      "notes": "Packet E ADP family; discharges TAXONOMY-45. Traversal: Managed-Sandbox Service request-shape traversal."
+      "notes": "Packet E ADP family; discharges TAXONOMY-45. Traversal: Managed-Sandbox Service request-shape traversal. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "ADP-014",
@@ -32768,7 +31875,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "create-native-extension"
+            "create-native-extension",
+            "core-api-create"
           ],
           "targets": [
             "portable"
@@ -32785,18 +31893,6 @@
             "cli-adapter",
             "managed-service",
             "create-native-extension"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/err-001/wire-corruption",
-          "case": "ERR-001-corrupted",
-          "status": "planned",
-          "covers": [
-            "core-api-create"
           ],
           "targets": [
             "portable"
@@ -32826,7 +31922,7 @@
         "remediation": "Add the condition to the sealed registry and regenerate the method subset, or map it onto an existing admitted variant.",
         "secretSafe": true
       },
-      "notes": "Packet E ERR family; discharges RESULT-07, RESULT-41, RESULT-47, RESULT-48. Traversal: CreateSandbox request ingress and rejection at C0."
+      "notes": "Packet E ERR family; discharges RESULT-07, RESULT-41, RESULT-47, RESULT-48. Traversal: CreateSandbox request ingress and rejection at C0. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "ERR-002",
@@ -33079,7 +32175,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "create-native-extension"
+            "create-native-extension",
+            "core-api-create"
           ],
           "targets": [
             "portable"
@@ -33096,18 +32193,6 @@
             "cli-adapter",
             "managed-service",
             "create-native-extension"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/err-004/wire-corruption",
-          "case": "ERR-004-corrupted",
-          "status": "planned",
-          "covers": [
-            "core-api-create"
           ],
           "targets": [
             "portable"
@@ -33138,7 +32223,7 @@
         "remediation": "Emit only the variant's declared payload fields and link protected context through a bounded opaque evidence identifier.",
         "secretSafe": true
       },
-      "notes": "Packet E ERR family; discharges RESULT-09. Traversal: CreateSandbox request ingress and rejection at C0."
+      "notes": "Packet E ERR family; discharges RESULT-09. Traversal: CreateSandbox request ingress and rejection at C0. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "ERR-005",
@@ -33393,7 +32478,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "create-native-extension"
+            "create-native-extension",
+            "core-api-create"
           ],
           "targets": [
             "portable"
@@ -33410,18 +32496,6 @@
             "cli-adapter",
             "managed-service",
             "create-native-extension"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/err-007/wire-corruption",
-          "case": "ERR-007-corrupted",
-          "status": "planned",
-          "covers": [
-            "core-api-create"
           ],
           "targets": [
             "portable"
@@ -33451,7 +32525,7 @@
         "remediation": "Authorize at a non-leaking scope first, then validate; return the same public response for unauthorized-existing and authorized-absent targets.",
         "secretSafe": true
       },
-      "notes": "Packet E ERR family; discharges RESULT-10, RESULT-11, RESULT-49. Traversal: CreateSandbox request ingress and rejection at C0."
+      "notes": "Packet E ERR family; discharges RESULT-10, RESULT-11, RESULT-49. Traversal: CreateSandbox request ingress and rejection at C0. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "ERR-008",
@@ -33705,7 +32779,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "create-native-extension"
+            "create-native-extension",
+            "core-api-create"
           ],
           "targets": [
             "portable"
@@ -33722,18 +32797,6 @@
             "cli-adapter",
             "managed-service",
             "create-native-extension"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/err-010/wire-corruption",
-          "case": "ERR-010-corrupted",
-          "status": "planned",
-          "covers": [
-            "core-api-create"
           ],
           "targets": [
             "portable"
@@ -33764,7 +32827,7 @@
         "remediation": "Emit the variant's registered `CallerRecovery`; treat `Retry-After` only as timing for an already-permitted action.",
         "secretSafe": true
       },
-      "notes": "Packet E ERR family; discharges RESULT-08, RESULT-17, RESULT-18. Traversal: CreateSandbox request ingress and rejection at C0."
+      "notes": "Packet E ERR family; discharges RESULT-08, RESULT-17, RESULT-18. Traversal: CreateSandbox request ingress and rejection at C0. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "ERR-011",
@@ -34019,7 +33082,8 @@
             "framework-adapter",
             "cli-adapter",
             "managed-service",
-            "create-native-extension"
+            "create-native-extension",
+            "core-api-create"
           ],
           "targets": [
             "portable"
@@ -34036,18 +33100,6 @@
             "cli-adapter",
             "managed-service",
             "create-native-extension"
-          ],
-          "targets": [
-            "portable"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/err-013/wire-corruption",
-          "case": "ERR-013-corrupted",
-          "status": "planned",
-          "covers": [
-            "core-api-create"
           ],
           "targets": [
             "portable"
@@ -34077,7 +33129,7 @@
         "remediation": "Derive the status from the product variant; return accepted work as its durable Operation with a successful transport status.",
         "secretSafe": true
       },
-      "notes": "Packet E ERR family; discharges RESULT-03, RESULT-04, RESULT-05, RESULT-06. Traversal: CreateSandbox request ingress and response emission at C0."
+      "notes": "Packet E ERR family; discharges RESULT-03, RESULT-04, RESULT-05, RESULT-06. Traversal: CreateSandbox request ingress and response emission at C0. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "ERR-014",
@@ -36009,7 +35061,9 @@
           "covers": [
             "resolved-driver-handoff",
             "generated-runtime-configuration",
-            "provider-native-operation"
+            "provider-native-operation",
+            "driver-preparation",
+            "driver-entry"
           ],
           "targets": [
             "all-enabled-targets"
@@ -36024,19 +35078,6 @@
             "resolved-driver-handoff",
             "generated-runtime-configuration",
             "provider-native-operation"
-          ],
-          "targets": [
-            "all-enabled-targets"
-          ]
-        },
-        {
-          "kind": "wire-corruption",
-          "path": "planned/ret-009/wire-corruption",
-          "case": "RET-009-corrupted",
-          "status": "planned",
-          "covers": [
-            "driver-preparation",
-            "driver-entry"
           ],
           "targets": [
             "all-enabled-targets"
@@ -36066,7 +35107,7 @@
         "remediation": "Emit explicit disabling values for every native expiry knob, or bind them to the Core expiry sequence and record the fence.",
         "secretSafe": true
       },
-      "notes": "Packet E RET family; discharges TAXONOMY-20. Traversal: launch traversal, at generated target-configuration derivation."
+      "notes": "Packet E RET family; discharges TAXONOMY-20. Traversal: launch traversal, at generated target-configuration derivation. wire-corruption evidence removed 2026-08-03 (Stage 0e): this invariant declares no boundary at which a serialized representation is decoded, so the test cannot be written. The rule change at 569bc08 already relieved the obligation; this removes the declaration so the planned-test count is honest."
     },
     {
       "id": "RET-010",
