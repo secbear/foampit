@@ -58,13 +58,13 @@ def has_member($list; $value):
 # Duplicated on purpose: check-inventory.sh carries the same values and aborts before any
 # validator runs, so the two copies must move together or the early abort guards a stale one.
 def expected_operation_registry_sha256:
-  "7612e8d346072e217b7a9107fea17d9ce79e60559d09db36f6de77ccad5a7ce5";
+  "612d3c211c13af4629ebd7b48272d04198aad29a270ba9dc4b9938a2ac8359de";
 
 def expected_case_contracts_sha256:
-  "e9dde541702c02370b37e6dc844a58fd79acca5edd4faa4966241e00885e0ba9";
+  "ca608d2a82b962d077602cb89f0e15b9d622d34a45363ad0405602e5a653c223";
 
 def expected_invariant_registry_sha256:
-  "a8d3f887a33e4ab6273a60b695ac05df1bdd94cc9ab4d1cb49dd3451d4844ef6";
+  "933697b9eb71411d37778660298789d9d077e5357ff1f2fb4651b7d89f921bdf";
 
 # --- recomputed vocabularies ---------------------------------------------------------
 def registry_doc: $registry[0];
@@ -82,6 +82,16 @@ def request_error_ids: [registry_doc.requestErrorVariants[].id];
 def terminal_outcome_ids: [registry_doc.terminalOutcomes[].id];
 def cell_kinds: [catalog_doc.cellKindContract | keys[]];
 def invariant_ids: [$invariants[0].invariants[].id];
+
+def admission_phases_for($operation):
+  # C0 creation admission, L0 live admission, E0 exec/process-control admission. An
+  # operation owned by core is admitted on whichever surface carries it, so all three are
+  # allowed; a live- or exec-owned operation is pinned to its own station.
+  if   $operation.owner == "live"   then ["L0", "C0"]
+  elif $operation.owner == "exec"   then ["E0", "L0", "C0"]
+  elif $operation.owner == "create" then ["C0"]
+  else ["C0", "L0", "E0"]
+  end;
 
 def operation_by($id): (registry_doc.operations[] | select(.id == $id));
 
@@ -338,6 +348,33 @@ def catalog_errors:
         length == 0
       ) |
       "\($entry.operationId) × \($cell.lifecycleStateId): rejects but cites no invariant whose disposition rejects"
+    ),
+
+    # FIFTH ANCHOR. The rule above asks only whether SOME cited invariant has a rejecting
+    # disposition. That is satisfiable by an invariant sound long after the request was
+    # refused -- a rule that rejects, but not here. This asks the stronger question: is the
+    # rejection decidable at an admission station? A J cell refuses before the operation
+    # runs, so at least one cited invariant must be sound at or before the admission phase
+    # for the operation's own surface.
+    #
+    # Designed 54d21cc; it found SignalProcess x stopped/closed, SignalProcess x
+    # unknown/closed, and TerminateProcess x unknown/closed citing only invariants sound at
+    # L1, D0, T0, H0, or E1, and could not ship until SIG-008 was registered (Stage 0g).
+    (
+      catalog_doc.entries[] as $entry |
+      (operation_by($entry.operationId)) as $operation |
+      (admission_phases_for($operation)) as $admission |
+      $entry.cells[] |
+      select(.cellKind == "J") |
+      . as $cell |
+      select(
+        [ $cell.invariants[] as $id |
+          ($invariants[0].invariants[] | select(.id == $id)) |
+          select(.disposition == "reject-at-boundary" or .disposition == "unrepresentable") |
+          select(has_member($admission; .firstSoundPhase)) ] |
+        length == 0
+      ) |
+      "\($entry.operationId) × \($cell.lifecycleStateId): rejects at admission but cites no rejecting invariant sound at an admission phase)"
     ),
 
     # An unsupported cell asserts a capability is not advertised, so the operation must

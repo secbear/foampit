@@ -310,9 +310,9 @@ as still unlocked).
 |---|---:|
 | Source obligations across the four locked records | 178 |
 | Registered invariants | 214 in 16 families |
-| Registry after merge | 354 |
-| Corpus invalid / valid cases | 354 / 256 |
-| Packet D cells / rule groups | 19,116 / 948 |
+| Registry after merge | 354 (355 after Stage 0g registered `SIG-008`) |
+| Corpus invalid / valid cases | 355 / 257 |
+| Packet D cells / rule groups | 19,170 / 948 |
 | Operations (methods + deferral markers) | 37 + 4 |
 | Operation-contract cells | 222 |
 | Operation-pair concurrency cells | 625 |
@@ -327,7 +327,7 @@ all 5 Packet B fields delegating `"E"`, and Packet D's four `E` concerns.
 ## Inventory-validator result
 
 `check-inventory.sh` exits 0. `check-enforcement-closure.sh` exits 5 and must:
-all 354 authoritative hooks and 1,206 tests remain `planned`. Gate 4B is not
+all 355 authoritative hooks and 1,209 tests remain `planned`. Gate 4B is not
 closed and Packet E does not close it.
 
 ## Reviewer findings and their disposition

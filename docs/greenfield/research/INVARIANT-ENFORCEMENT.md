@@ -224,9 +224,9 @@ coordinates; their executable semantic implementations remain planned Gate 4B
 hooks. The three provider contracts are validated separately because transport
 is not a target profile.
 
-Packet D's candidate expands exactly 54 composition paths across all 354
-current invariants, producing 19,116 unique cells in 948 identical
-complete-contract groups. The case catalog pins one total 354-code vector per
+Packet D's candidate expands exactly 54 composition paths across all 355
+current invariants, producing 19,170 unique cells in 948 identical
+complete-contract groups. The case catalog pins one total 355-code vector per
 path; 76 registry path aliases are invariant-facing names, not the
 classification oracle. Boundary inputs may begin strict validation before a
 fact is complete but preserve the cell's later terminal authority. Structural
@@ -452,8 +452,8 @@ checks that the generated Packet C realization document is current, proves its
 324-cell expansion has no gaps or overlaps, validates the complete runtime
 profile bundle records, validates all provider transport contracts, and checks
 their introduced invariant references against the registry. It also checks
-that Packet D's 54-path and 354-invariant universes, independent digest pins,
-classification vectors, 19,116-cell expansion, phase graph, terminal
+that Packet D's 54-path and 355-invariant universes, independent digest pins,
+classification vectors, 19,170-cell expansion, phase graph, terminal
 authorities, ownership exclusions, native-handle tuple, Packet C traceability
 set, evidence/test obligations, and later-packet delegations are exact.
 

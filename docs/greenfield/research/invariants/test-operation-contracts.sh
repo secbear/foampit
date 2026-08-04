@@ -327,6 +327,17 @@ expect_failure "recover-with-undeclared-error" catalog \
 expect_failure "reject-without-rejecting-ground" catalog \
   '(.entries[] | select(.operationId == "DeleteSandbox") | .cells[] | select(.cellKind == "J") | .invariants) = ["FEN-004"]' \
   'rejects but cites no invariant whose disposition rejects'
+expect_failure "reject-at-admission-without-admission-ground" catalog \
+  '(.entries[] | select(.operationId == "SignalProcess") | .cells[] | select(.lifecycleStateId == "stopped/closed") | .invariants) |= map(select(. != "SIG-008"))' \
+  'rejects at admission but cites no rejecting invariant sound at an admission phase'
+expect_failure "reject-at-admission-unknown-state" catalog \
+  '(.entries[] | select(.operationId == "TerminateProcess") | .cells[] | select(.lifecycleStateId == "unknown/closed") | .invariants) |= map(select(. != "SIG-008"))' \
+  'rejects at admission but cites no rejecting invariant sound at an admission phase'
+# The two cases above are the fifth anchor. It is strictly stronger than
+# reject-without-rejecting-ground: both mutations leave several reject-at-boundary
+# invariants cited, and the weaker rule stays silent on each. Only the admission-phase
+# question fails them.
+
 # NOTE: the shipped catalog contains no cell of kind U, so the unsupported-capability
 # anchor is currently VACUOUS -- it constrains nothing until a U cell exists. It is
 # implemented ahead of need and deliberately carries no mutation case, because a passing

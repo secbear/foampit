@@ -75,12 +75,12 @@ operation_case_contracts_sha256="$(
 # These pins detect drift and force explicit review. Semantic validation below,
 # not a coordinated digest rewrite, remains authoritative.
 expected_composition_paths_sha256="65322c7c30f4c75222a36793b8d1b877fa5813df4d1c83f236bb18884c364a65"
-expected_composition_case_contracts_sha256="52feb46769b058401fc14e73198635c71abfad6789e50b3fd7de260741c59401"
+expected_composition_case_contracts_sha256="2d8ad1adb6588171a0b1f892d56641495e311b5b167a47473dc85522ee3767e2"
 # Packet E pins. Second copies of the values inside validate-operation-contracts.jq, so a
 # drifted pin aborts here before any validator runs -- the same discipline as Packet D.
-expected_operation_registry_sha256="7612e8d346072e217b7a9107fea17d9ce79e60559d09db36f6de77ccad5a7ce5"
-expected_operation_case_contracts_sha256="e9dde541702c02370b37e6dc844a58fd79acca5edd4faa4966241e00885e0ba9"
-expected_invariant_registry_sha256="a8d3f887a33e4ab6273a60b695ac05df1bdd94cc9ab4d1cb49dd3451d4844ef6"
+expected_operation_registry_sha256="612d3c211c13af4629ebd7b48272d04198aad29a270ba9dc4b9938a2ac8359de"
+expected_operation_case_contracts_sha256="ca608d2a82b962d077602cb89f0e15b9d622d34a45363ad0405602e5a653c223"
+expected_invariant_registry_sha256="933697b9eb71411d37778660298789d9d077e5357ff1f2fb4651b7d89f921bdf"
 
 if [[ "${operation_registry_sha256}" != "${expected_operation_registry_sha256}" ||
       "${operation_case_contracts_sha256}" != "${expected_operation_case_contracts_sha256}" ]]; then
@@ -159,16 +159,16 @@ jq -e \
   --slurpfile paths "${composition_paths}" \
   --slurpfile contracts "${composition_case_contracts}" \
   '
-    ($registry[0].invariants | length) == 354 and
+    ($registry[0].invariants | length) == 355 and
     $paths[0].reviewedPathCount == 54 and
     ($paths[0].paths | length) == 54 and
-    ($contracts[0].reviewedInvariantIds | length) == 354 and
+    ($contracts[0].reviewedInvariantIds | length) == 355 and
     ($contracts[0].entries | length) == 54 and
     (.status == "candidate") and
     (.invariantIds == [$registry[0].invariants[].id]) and
     (.pathIds == [$paths[0].paths[].id]) and
-    .expectedCellCount == 19116 and
-    ([.rules[].selector.invariantIds[]] | length) == 19116 and
+    .expectedCellCount == 19170 and
+    ([.rules[].selector.invariantIds[]] | length) == 19170 and
     .delegatedConcernTaxonomy == $contracts[0].delegatedConcernTaxonomy and
     .resolvedReentryReplay ==
       $contracts[0].serializedResolvedReentryReplaySets and

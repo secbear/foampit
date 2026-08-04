@@ -30520,6 +30520,107 @@
       "notes": "Packet E SIG family; discharges LIFECYCLE-32. Traversal: one SignalProcess operation against an existing Sandbox, at Operation outcome commit. wire-corruption evidence removed 2026-08-03: this invariant declares no boundary at which a serialized representation is decoded, so the test could not be written. See prototypes/post-launch-enforcement/FINDINGS.md F1."
     },
     {
+      "id": "SIG-008",
+      "title": "Signal or termination admitted against a stopped or unprovable Sandbox",
+      "statement": "A SignalProcess or TerminateProcess request is admitted only against a Process whose Sandbox holds a proven running or suspended runtime state carrying a live runtime epoch; a stopped Sandbox and an unprovable runtime state are each rejected at admission, and neither is approximated as the other.",
+      "owner": "live",
+      "scope": "v1",
+      "status": "specified",
+      "firstSoundPhase": "L0",
+      "rejectionDeadline": "L0",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the decision reads the current Sandbox runtime state and whether a live runtime epoch exists; both are Core-held durable facts complete at the live request surface. Q2: admission of one operation against an existing Sandbox is the live request surface. Q3: the live surface is the last correct refusal point, because acceptance commits a dispatch intent into an epoch that either does not exist (stopped) or cannot be shown to exist (unprovable), and every downstream rule that would catch it is sound only after admission. Q4: same traversal as the signal or termination request. Reject-at-boundary under Ruling R2: runtime state is a Core durable record, not external state being probed. Registered 2026-08-03 to close the admission-anchor gap: SignalProcess x stopped/closed, SignalProcess x unknown/closed, and TerminateProcess x unknown/closed reject at admission while citing only invariants sound at L1, D0, T0, H0, or E1. SIG-001 covers arbitrary signals and SIG-002 the suspended case; neither is decidable about a stopped or unprovable Sandbox.",
+      "invalidWitnesses": [
+        "SIG-008"
+      ],
+      "validWitnesses": [
+        "VAL-257"
+      ],
+      "targets": [
+        "all-enabled-targets"
+      ],
+      "trustBoundaries": [
+        "live-operation-dispatch"
+      ],
+      "compositionPaths": [
+        "direct-api",
+        "framework-adapter",
+        "cli-adapter",
+        "managed-service",
+        "live-native-extension"
+      ],
+      "enforcementHooks": [
+        {
+          "phase": "L0",
+          "component": "live-operation-validator",
+          "path": "planned/sig-008/authority",
+          "symbol": "enforce_sig_008",
+          "role": "authoritative",
+          "status": "planned"
+        }
+      ],
+      "tests": [
+        {
+          "kind": "source-rejection",
+          "path": "planned/sig-008/source-rejection",
+          "case": "SIG-008",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "live-native-extension",
+            "live-operation-dispatch"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "positive-boundary",
+          "path": "planned/sig-008/positive-boundary",
+          "case": "VAL-257",
+          "status": "planned",
+          "covers": [
+            "direct-api",
+            "framework-adapter",
+            "cli-adapter",
+            "managed-service",
+            "live-native-extension"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        },
+        {
+          "kind": "diagnostic",
+          "path": "planned/sig-008/diagnostic",
+          "case": "SIG-008",
+          "status": "planned",
+          "covers": [
+            "diagnostic-contract"
+          ],
+          "targets": [
+            "all-enabled-targets"
+          ]
+        }
+      ],
+      "diagnostic": {
+        "identity": "SIG-008",
+        "primaryPaths": [
+          "live.signal",
+          "live.terminate",
+          "sandbox.status.runtime.state",
+          "sandbox.status.runtime.epoch"
+        ],
+        "relatedPaths": [],
+        "remediation": "A stopped Sandbox has no Process to signal or terminate; inspect the retained Operation record instead. An unprovable runtime state must be resolved -- never treated as stopped -- before a dispatch is admitted.",
+        "secretSafe": true
+      },
+      "notes": "Packet E SIG family; registered by Stage 0g to ship the fifth semantic anchor. Traversal: one SignalProcess or TerminateProcess request against an existing Sandbox whose runtime state is stopped or unprovable. Cited by the three J cells that previously had no admission-decidable ground."
+    },
+    {
       "id": "ADP-001",
       "title": "Framework Session used as a Core identity or authority coordinate",
       "statement": "Adapter Session identity stays outside the Core resource model and never appears in a Core request as a target, authority, precondition, or idempotency coordinate.",

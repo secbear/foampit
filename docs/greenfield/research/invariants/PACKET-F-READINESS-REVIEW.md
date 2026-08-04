@@ -5,8 +5,9 @@
 
 **Filed 2026-08-03** on `packet-e-inventory-walk`. The assessment was taken
 before Stage 0 began. Items **0a**, **0d**, **0e**, and **0f** have since been
-executed in this branch and their findings below are marked accordingly in §8;
-only **0g** remains open. The §1 verdict and the §2
+executed in this branch and their findings below are marked accordingly in §8.
+**Stage 0 is complete.** The §6 sequencing conclusion stands: the next unit of
+work is Stage 1, a Packet F design phase. The §1 verdict and the §2
 coverage map are unaffected — nothing in Stage 0 locks a decision.
 
 ---
@@ -264,7 +265,7 @@ Packet F will register 180–310 invariants into machinery that has three *known
 
 **(b) 87 residual `wire-corruption` declarations.** After `569bc08` made the obligation conditional on `decoding_trust_boundaries`, the current registry is: **required 107, declared 194, declared-but-not-required 87, required-but-not-declared 0.** The 87 split as 45 pre-existing (20 Packet A, 3 Packet C, 9 Packet D, 12 seeded corpus, 1 Packet C strengthening) and **42 Packet E** (ADP 11, OPA 7, ERR 5, FEN 5, IDE 5, ADM 4, POL 2, SBX 2, RET 1). `569bc08` deliberately left the 45 as a "Packets A-D question"; the 42 Packet E residuals are not accounted for anywhere. Every one is a planned test that the slice's own evidence says cannot be written. **Decide the disposition of all 87 before F adds its own.**
 
-**(c) The admission-anchor gap (`54d21cc`).** A fifth semantic anchor — *"a J cell must cite an invariant decidable at an admission station"* — was designed, found three genuine defects, and **could not ship**: `SignalProcess` against `stopped/closed` and `unknown/closed`, and `TerminateProcess` against `unknown/closed`, all reject at admission while citing only invariants at L1, D0, T0, H0, E1. `SIG-001` covers arbitrary signals, `SIG-002` the suspended case; **neither covers stopped or unknown.** The commit records the fix as *"registering the missing admission-time invariant, which is a full batch cycle and should be a deliberate decision rather than a side effect."* It is still open. Consequence for F: **the strongest available oracle over cell semantics is switched off**, and F's own reject-at-admission cells will be validated by a weaker rule than the one that exists in draft.
+**(c) The admission-anchor gap (`54d21cc`).** A fifth semantic anchor — *"a J cell must cite an invariant decidable at an admission station"* — was designed, found three genuine defects, and **could not ship**: `SignalProcess` against `stopped/closed` and `unknown/closed`, and `TerminateProcess` against `unknown/closed`, all reject at admission while citing only invariants at L1, D0, T0, H0, E1. `SIG-001` covers arbitrary signals, `SIG-002` the suspended case; **neither covers stopped or unknown.** The commit records the fix as *"registering the missing admission-time invariant, which is a full batch cycle and should be a deliberate decision rather than a side effect."* **Closed by Stage 0g** — see §8. Consequence for F had it stayed open: the strongest available oracle over cell semantics would have been switched off, and F's own reject-at-admission cells validated by a weaker rule than the one that existed in draft. The anchor is now live and carries two mutation cases.
 
 ### 6.2 Stale claims — cheap to repair, expensive to inherit
 
@@ -328,8 +329,9 @@ Stage 2  Exhaustive inventory walk: 150-260 obligations -> 180-310 invariants.
 | **0d** stale claims | **done** | Planned-test count corrected in four records; two `INVENTORY-REVIEW.md` open-work items closed; the `CONTRIBUTING.md` free-ride guidance corrected to the thirteen `decoding_trust_boundaries`; the retracted ~14-disposition estimate removed from `FINDINGS.md`. |
 | **0e** residual `wire-corruption` declarations | **done** | All 87 removed. Declared and required counts are now equal at 107. See the follow-on section of `FINDINGS.md`. |
 | **0f** `unrepresentable` / `source-rejection` contradiction | **done** | Ninth test kind `construction-exclusion` added. `unrepresentable` discharges with either kind; `reject-at-boundary` still requires `source-rejection`, because a boundary check presupposes something arrived to be checked. |
-| **0g** missing admission-time invariant | **open** | Needs a full batch cycle: corpus heading, `VAL-` witness, 54 Packet D classification characters, matrix regeneration, digest re-pin. |
+| **0g** missing admission-time invariant | **done** | `SIG-008` registered at `L0` (`live`/`reject-at-boundary`): a signal or termination request is admitted only against a Sandbox holding a proven running or suspended runtime state with a live epoch, and a stopped Sandbox and an unprovable state are each refused — neither approximated as the other. Full batch cycle executed: corpus `####` heading, witness `VAL-257`, a classification character appended to all 54 Packet D vectors (`B` on the four portable API paths, `F` elsewhere, matching `SIG-002`), matrix regenerated to 54 × 355 = 19,170, and every digest re-pinned. The three J cells now cite it. |
+| **fifth anchor** | **shipped** | *"A J cell must cite a rejecting invariant sound at an admission phase."* Strictly stronger than the existing `reject-without-rejecting-ground` rule, which is satisfied by an invariant sound long after the request was refused. Two permanent mutation cases added; the suite is 66 cases. |
 
-Gate state after 0a–0f: `check-inventory.sh` **EXIT=0**,
+Gate state after Stage 0: `check-inventory.sh` **EXIT=0**,
 `check-model-coherence.sh` **34 passed / 0 failed**,
 `check-enforcement-closure.sh` **exit 5** (correct — Gate 4B stays open).

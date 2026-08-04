@@ -588,6 +588,7 @@
     "SIG-005",
     "SIG-006",
     "SIG-007",
+    "SIG-008",
     "SOP-001",
     "SOP-002",
     "SOP-003",
@@ -2318,6 +2319,7 @@
         "SIG-004",
         "SIG-005",
         "SIG-007",
+        "SIG-008",
         "PRC-001",
         "PRC-003",
         "PRC-013",
@@ -2763,7 +2765,8 @@
         "FEN-006",
         "ADP-009",
         "FEN-001",
-        "PRC-006"
+        "PRC-006",
+        "SIG-008"
       ],
       "delegatedPackets": [],
       "rationale": "TerminateProcess is a durable Operation mutation over the sealed ProcessOperationTarget { processId, sandboxId, runtimeEpoch }, so resultCarrierKind is durable-operation and IDE-011/IDE-012 bind that target through every retry, adoption, and reconciliation. capabilityGate is core-exec-conformance but is DISCHARGED AT EXEC: ADM-015 makes provable Process termination a named component of Core Exec conformance, so a target that cannot terminate cannot have admitted the Exec that created the Process. That is why MethodUnavailable and CapabilityUnsupported are both proven inapplicable here rather than merely omitted -- a Process cannot exist on a surface that lacks the method, and the residual case is TargetNotFound. This is the deliberate contrast with SignalProcess, whose capability is independent of Exec and which therefore does admit both variants. InvalidState is admitted for the Sandbox-composite precondition (for example a suspended Sandbox whose target advertises no deterministic termination semantics), NOT for an already-terminated Process: TerminateProcess is the convergent Process-targeted Operation and a Process already holding an immutable terminal outcome it cannot act past already satisfies the SIG-006 success postcondition, so a repeat converges to succeeded rather than rejecting. ConcurrentOperation IS admitted because the locked concurrency table gives Stop ownership of force escalation, so a Terminate whose ordered pair with the lifecycle-lane holder is not a permitted row is refused with the typed conflict naming that active Operation (CNC-002). QuotaExceeded, CapacityUnavailable, NameConflict, StaleRevision, AdmissionClosed, ReferenceProtected, RetentionHold, ArtifactIncompatible, PolicyMismatch, OutputCursorExpired, and all four Process-control variants are inapplicable: termination consumes no new placement capacity or account quota, allocates no name, carries no representation revision or cursor, is not gated by execution admission (which gates new Exec only), and holds no writer lease or sequence. allowedRecoveryErrors is IdempotencyRecordExpired and never ProcessControlRecordExpired; OPA-014 makes an expired live-mutation coordinate return a recovery error with tagged prior-acceptance evidence and never a new accepted mutation, and PRF-010 forbids the terminalized-unknown case from authorizing a replacement kill. TerminationFailed is admitted here and deliberately WITHHELD from SignalProcess, because only Terminate promises the exit postcondition. EffectCompletionUnknown and CleanupAuthorityUnknown are distinguished: the former is admitted (the effect may be incomplete), the latter is withheld because Terminate discharges no cleanup obligation -- that belongs to Stop and Delete under PRF-011. REGISTRY GAP FLAGGED, not silently reconciled: OPA-002's acceptance-proof arm enumerates \"live Sandbox, Process-signal, Snapshot, or Fork mutation\" and does not name Process termination, so this record cites the live-mutation arms that do cover it (OPA-005, OPA-008, OPA-010, OPA-014, OPA-016, OPA-021) and PRF-002, which explicitly says \"Process-targeted mutation Operation\". OPA-002 is cited on SignalProcess, where its wording is exact. If Terminate is intended to be inside OPA-002, that statement needs a wording amendment before Packet E closes. owner is live because the Packet A operation surface naming this method, live.stop-terminate-delete-signal, is live-owned. delegatedPackets is empty: no Packet A-owned method family is involved. The id is not among the fifteen rejected names -- note that KillSandbox and Destroy are rejected, so no `kill` or `destroy` id may be minted as a synonym for this contract.",

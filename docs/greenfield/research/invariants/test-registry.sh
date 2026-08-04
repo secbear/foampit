@@ -408,8 +408,8 @@ assert_packet_d_correction_registration() {
         ][] | select($ids | index(.) == null) |
           "Packet E batch 4 invariant missing from the registry: \(.)"),
 
-        (if $count == 354 then empty
-         else "registry length is \($count); Packet E batch 2 expects 354 (297 + 57)"
+        (if $count == 355 then empty
+         else "registry length is \($count); Packet E batch 2 expects 355 (297 + 57 + SIG-008)"
          end)
       ] | .[]
     ' "${registry}"

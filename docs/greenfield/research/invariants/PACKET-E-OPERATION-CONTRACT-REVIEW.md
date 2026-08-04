@@ -14,8 +14,8 @@ and does not close.
 
 | Record | SHA-256 |
 |---|---|
-| [`PACKET-E-OPERATION-REGISTRY.json`](./PACKET-E-OPERATION-REGISTRY.json) | `7612e8d346072e217b7a9107fea17d9ce79e60559d09db36f6de77ccad5a7ce5` |
-| [`PACKET-E-CASE-CONTRACTS.json`](./PACKET-E-CASE-CONTRACTS.json) | `e9dde541702c02370b37e6dc844a58fd79acca5edd4faa4966241e00885e0ba9` |
+| [`PACKET-E-OPERATION-REGISTRY.json`](./PACKET-E-OPERATION-REGISTRY.json) | `612d3c211c13af4629ebd7b48272d04198aad29a270ba9dc4b9938a2ac8359de` |
+| [`PACKET-E-CASE-CONTRACTS.json`](./PACKET-E-CASE-CONTRACTS.json) | `ca608d2a82b962d077602cb89f0e15b9d622d34a45363ad0405602e5a653c223` |
 | [`PACKET-E-OPERATION-CONTRACTS.json`](./PACKET-E-OPERATION-CONTRACTS.json) | `f06954ab1d9b28aca8d2fa06ef4b18744faa5b090ba85374f62923470083933f` |
 | [`PACKET-E-CONCURRENCY-MATRIX.json`](./PACKET-E-CONCURRENCY-MATRIX.json) | `dc1a17677fe3a7105811fc6928852ef5b98ff0b4fd5ae33922e4b04a15cdffd9` |
 | [`PACKET-E-OBLIGATION-PARTITION.json`](./PACKET-E-OBLIGATION-PARTITION.json) | `b5946aacc93563461b59b60dc19a7601a36e28a96a56960e4afaee1dbd238f3f` |
@@ -80,7 +80,7 @@ coordinated catalog-plus-matrix rewrite does not satisfy them.
 
 ## What Packet E does not close
 
-**Gate 4B.** All 354 authoritative hooks and 1,206 tests remain `planned`.
+**Gate 4B.** All 355 authoritative hooks and 1,209 tests remain `planned`.
 `check-enforcement-closure.sh` exits 5 and must.
 
 **Gate 2A.** Packet F is unwalked, and the dynamic-state dimension row carries

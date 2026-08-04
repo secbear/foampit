@@ -22,11 +22,11 @@ Gate 2A classifies it, Packet E closes, or implementation consumes it.
 
 As of 2026-07-24:
 
-- 354 corpus invariant identifiers are present in the registry;
+- 355 corpus invariant identifiers are present in the registry;
 - the corpus and registry identifier sets match exactly;
-- 354 entries are `specified`;
-- 354 authoritative hooks are planned;
-- 1,206 tests are planned;
+- 355 entries are `specified`;
+- 355 authoritative hooks are planned;
+- 1,209 tests are planned;
 - no entry is marked `closed`;
 - Gate 2A structure passes;
 - Packet A has reviewed 117 public resource/operation surface groups;
@@ -36,12 +36,12 @@ As of 2026-07-24:
   field/profile cells, 85 structurally complete ordered value cases, and 3
   provider transport contracts, introducing 7 invariant cases;
 - Packet D has reviewed 17 composition/trust-boundary invariant cases and its
-  exact matrix covers 54 paths × 354 invariants = 19,116 unique cells in 948
+  exact matrix covers 54 paths × 355 invariants = 19,170 unique cells in 948
   complete-contract groups, with 92 focused validator checks;
 - Gate 2A review is open; and
 - Gate 4B correctly fails.
 
-Current owner distribution (354 across 9 owners):
+Current owner distribution (355 across 9 owners):
 
 | Owner | Registered invariants |
 |---|---:|
@@ -90,13 +90,13 @@ The status labels mean:
 | Single-resource semantics | reviewed for Artifact | Packet B covers profiles, defaults, environment, filesystem, network, resources, identity/security, secrets, lifecycle requirements, outputs, provenance, and targets | Preserve Packet B as Packets C-F refine realization, lifecycle, and disclosure |
 | Cross-resource semantics | reviewed through composition | Packet D owner/effect checks cover distinct Artifact, Operator Configuration, Managed-Service Definition, Create, and runtime branches | Packets E-F must preserve these ownership exclusions while completing lifecycle and disclosure |
 | Cross-target semantics | reviewed for initial targets | Packet C: 81 fields × Bubblewrap, Firecracker, Cloud Hypervisor, and OCI; provider transport remains separate | Packet D-F must preserve the matrix while adding bypass, lifecycle, and evidence detail; every later profile repeats Packet C |
-| Composition semantics | reviewed through Packet D | Packet D: 54 paths × 354 invariants = 19,116 cells; 948 complete-contract groups; 92 focused checks; three clean final verdicts. Widened by Packet E registration; the reviewed path and classification semantics stand, the new cells are Packet E's | Packet F additions reopen affected composition coordinates |
+| Composition semantics | reviewed through Packet D | Packet D: 54 paths × 355 invariants = 19,170 cells; 948 complete-contract groups; 92 focused checks; three clean final verdicts. Widened by Packet E registration; the reviewed path and classification semantics stand, the new cells are Packet E's | Packet F additions reopen affected composition coordinates |
 | Escape mechanisms | reviewed through Packet D | resource-qualified native escapes, typed/direct Nix values, unsafe opaque input, raw wire, and five driver trust states | Packet E/F additions reopen the affected path universe |
 | Trust boundaries | reviewed through Packet D | exact 89+30 serialized replay sets, private stage chain, total D0 output, direct/raw rejection, six separate-path handoffs | Packet E must still walk operation-specific API, guest, restore, teardown, and evidence decoding |
 | Lifecycle semantics | reviewed | Packet E: 214 registered invariants in 16 families; 37 operations × 6 lifecycle states = 222 contract cells; 625 operation-pair concurrency cells; all 20 Packet A surfaces and 5 Packet B fields delegating to E are claimed | Packet F adds disclosure and evidence obligations over the same operations |
 | Dynamic state | partial — ruled, deferred to F | Packet C profiles classify host prerequisites, object-handle retention, resources, networking, devices, and provider admission; Packet E discharges retry, cancellation, mutation, and teardown transitions through the operation ledger | **Acquisition, reservation, and rollback remain undischarged**, together with the dynamic reservation and time-of-check/time-of-use protocol all four locked Packet E records list as still unlocked. This row cannot close on Packet E alone |
 | Security and disclosure | partial | secret ownership/redaction, offline policy, host paths | Walk ambient environment, sockets, protected paths, logs, evidence, provenance, diagnostics, process inheritance, metadata services, and side-channel claims |
-| Valid expressiveness | reviewed through Packets D-E | `VAL-001` through `VAL-256`; Packet D adds pinned closed Operator Configuration, Managed-Service Definition, and revalidated resolved reentry controls | Packets E-F add complete lifecycle and disclosure witnesses |
+| Valid expressiveness | reviewed through Packets D-E | `VAL-001` through `VAL-257`; Packet D adds pinned closed Operator Configuration, Managed-Service Definition, and revalidated resolved reentry controls | Packets E-F add complete lifecycle and disclosure witnesses |
 
 No row may remain `partial` or `unwalked` when Gate 2A closes.
 
@@ -193,7 +193,7 @@ The digest-bound machine snapshot is reconstructable from (digests recomputed af
 [`PACKET-D-COMPOSITION-PATHS.json`](./PACKET-D-COMPOSITION-PATHS.json),
 [`PACKET-D-CASE-CONTRACTS.json`](./PACKET-D-CASE-CONTRACTS.json), and
 [`PACKET-D-COMPOSITION-COVERAGE.json`](./PACKET-D-COMPOSITION-COVERAGE.json):
-54 paths, 354 invariants, 19,116 cells, 948 complete-contract groups, exact
+54 paths, 355 invariants, 19,170 cells, 948 complete-contract groups, exact
 89 built-member/load and 30 resolved-stage replay arrays, six separate-path
 handoffs, and exact Packet E/F concern taxonomies.
 
@@ -228,13 +228,13 @@ neutralizing digest pins, and verified the real Nix/Rust prototype mechanisms
 and exact counters. The reviewed snapshot is bound to path
 `65322c7c30f4c75222a36793b8d1b877fa5813df4d1c83f236bb18884c364a65`,
 case-contract
-`52feb46769b058401fc14e73198635c71abfad6789e50b3fd7de260741c59401`,
+`2d8ad1adb6588171a0b1f892d56641495e311b5b167a47473dc85522ee3767e2`,
 invariant
 `7cd71ffdd40be3f61744704731b6de8acee30f91c060c51b9caa6f8f81c2b517`
 (reviewed as `d798c8fd…3284c2`; amended by the 2026-07-31 coherence repair
 without changing any classification, path, phase, owner, or effect),
 and coverage
-`bee8df000f15578079ef2723edb85a26edcb621b384a432b346449681da44248`
+`9872910cf7d25fa7846eb1bacf2896b762ad247e65c990cf0b0d0214f021d7c1`
 SHA-256 values.
 
 All 140 production hooks and 560 production tests remain planned. Gate 4B
@@ -325,7 +325,7 @@ rather than absorbed:
   so their agreement proves consistency and not correctness. Closing this needs
   a semantic anchor the ledger does not yet have.
 
-Packet E does not close Gate 4B. All 354 authoritative hooks and 1,206 tests
+Packet E does not close Gate 4B. All 355 authoritative hooks and 1,209 tests
 remain `planned`.
 
 ### Dynamic-state remainder: ruled 2026-08-03

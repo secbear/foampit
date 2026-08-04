@@ -3255,6 +3255,15 @@ boundary.
 - Minimum witness: A generic SignalProcess is admitted against a suspended Sandbox whose target advertises no deterministic suspended-delivery semantics.
 - Required diagnostic: identifies `SIG-002`, names `live.signal`, `sandbox.status.runtime.state`, `sandbox.capabilities.signals`, and states the remediation without disclosing secret values.
 
+#### `SIG-008` Signal or termination admitted against a stopped or unprovable Sandbox
+
+- Owner: `live`
+- First-sound phase: `L0`
+- Rejection deadline: `L0`
+- Invariant: A SignalProcess or TerminateProcess request is admitted only against a Process whose Sandbox holds a proven running or suspended runtime state carrying a live runtime epoch; a stopped Sandbox and an unprovable runtime state are each rejected at admission, and neither is approximated as the other.
+- Minimum witness: A TerminateProcess request is admitted against a Sandbox whose runtime state cannot be proven, and the unprovable state is treated as stopped.
+- Required diagnostic: identifies `SIG-008`, names `live.signal`, `live.terminate`, `sandbox.status.runtime.state`, `sandbox.status.runtime.epoch`, and states the remediation without disclosing secret values.
+
 #### `SIG-003` Driver reports signal dispatch without invoking the exact target-specific action
 
 - Owner: `runtime`
@@ -5501,6 +5510,12 @@ same canonical semantic value.
 - The named class identity resolves to a definition whose kind, captured component set, external-storage state, secret treatment, compatibility envelope, quiescence state, device state, portability, and Process handling all agree with what the request describes.
 - Capture admission recomputes the class identity from the resolved definition and finds it identical to the one submitted.
 - A second class in the same Artifact differs in kind and carries its own distinct content-addressed identity.
+
+### `VAL-257` Signal and terminate against a proven live epoch
+
+- A SignalProcess request names a Process whose Sandbox holds a proven running runtime state and a live runtime epoch, and is admitted.
+- The same request against a stopped Sandbox is refused at admission with `SIG-008`, and the caller is directed to the retained Operation record rather than told the Process is gone.
+- A Sandbox whose runtime state cannot be proven is refused with the same rule and a distinct remediation; it is never resolved to `stopped` in order to answer.
 
 ### `VAL-256` Per-component capture durability evidence
 

@@ -8028,6 +8028,7 @@
           "terminalOutcome": "none",
           "epochRule": "no-epoch",
           "invariants": [
+            "SIG-008",
             "SIG-007",
             "SIG-004",
             "SIG-003",
@@ -8076,6 +8077,7 @@
           "terminalOutcome": "none",
           "epochRule": "no-epoch",
           "invariants": [
+            "SIG-008",
             "SBX-012",
             "SIG-007",
             "SIG-005",
@@ -9234,6 +9236,7 @@
           "terminalOutcome": "none",
           "epochRule": "no-epoch",
           "invariants": [
+            "SIG-008",
             "SBX-012",
             "SIG-006",
             "PRC-009",
