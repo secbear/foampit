@@ -384,11 +384,29 @@ Walk:
 - metadata services, including the host-side carve-out where an endpoint is
   reachable by the supervisor but not by the guest.
 
+**Where each part of F's scope comes from (ruled 2026-08-03).** Three
+independent delegations feed Packet F, and they are not the same list:
+
+| Source | What it delegates | Scope of the delegation |
+|---|---|---|
+| `PACKET-D-CASE-CONTRACTS.json` `delegatedConcernTaxonomy` | `disclosure`, `redaction`, `evidence-visibility` | Per **composition path**, expanded mechanically onto all 54. |
+| `PACKET-A-RESOURCE-OPERATION-REVIEW.md:184-185` | authentication, tenancy | Per **public surface group**. |
+| The dimension row above | process inheritance, side channels, metadata services | Per **runtime boundary**. |
+
+Packet F's scope is their union. The Packet D taxonomy is **not** widened to
+match it, and that is deliberate: `delegatedConcerns` is a per-path expansion,
+so adding `authentication` would assert that `artifact-ordinary-authoring`
+delegates authentication to F. An authoring path has no process and no
+authentication. The taxonomy is correct as a statement about composition paths
+and false as a statement about F's scope; conflating the two would corrupt
+Packet D's model to fix a bookkeeping mismatch that is not a mismatch.
+
 **Scope reconciled 2026-08-03.** The dimension row above requires walking
 process inheritance, metadata services, and side-channel claims, and Packet A
 delegates authentication and tenancy here; the walk list named only metadata
 endpoints. The four omissions are added rather than left to be rediscovered
-during the walk.
+during the walk. The E/F disclosure seam is ruled separately in
+[`PACKET-E-F-DISCLOSURE-SEAM.md`](./PACKET-E-F-DISCLOSURE-SEAM.md).
 
 Each rule records the earliest phase that has the relevant information and the
 trust boundary that revalidates external input.

@@ -5,8 +5,8 @@
 
 **Filed 2026-08-03** on `packet-e-inventory-walk`. The assessment was taken
 before Stage 0 began. Items **0a**, **0d**, **0e**, and **0f** have since been
-executed in this branch and their findings below are marked accordingly at the
-end of §7; **0b**, **0c**, and **0g** remain open. The §1 verdict and the §2
+executed in this branch and their findings below are marked accordingly in §8;
+only **0g** remains open. The §1 verdict and the §2
 coverage map are unaffected — nothing in Stage 0 locks a decision.
 
 ---
@@ -323,13 +323,13 @@ Stage 2  Exhaustive inventory walk: 150-260 obligations -> 180-310 invariants.
 | Item | State | What changed |
 |---|---|---|
 | **0a** scope reconciliation | **done** | `INVENTORY-REVIEW.md` walk list now names process inheritance, side channels, authentication, tenancy, and the metadata-service host carve-out. The four omissions are recorded as omissions, not silently absorbed. |
-| **0b** Packet A/C/D ledger amendment | **open** | `PACKET-D-CASE-CONTRACTS.json:58-69` still freezes F's concerns at `["disclosure","redaction","evidence-visibility"]`. The widened scope in 0a is not yet reflected there. This is the one Stage 0 item that touches a pinned ledger and so costs a digest cycle. |
-| **0c** E/F disclosure-channel seam ruling | **open** | Planned at `plans/2026-07-31-packet-e-runtime-lifecycle-inventory-walk.md:200-213`, never written. Needed before Stage 1 lock 2. |
+| **0b** Packet A/C/D ledger amendment | **done — ruled, not amended** | `delegatedConcerns` is a per-path expansion; adding `authentication` would assert that `artifact-ordinary-authoring` delegates authentication to F, which is false. The taxonomy is correct about composition paths and was never a scope statement for F. Three independent delegations feed F — Packet D per composition path, Packet A per surface group, the dimension row per runtime boundary — and F's scope is their union. Recorded in `INVENTORY-REVIEW.md`. No ledger change, no digest cycle. |
+| **0c** E/F disclosure-channel seam ruling | **done** | [`PACKET-E-F-DISCLOSURE-SEAM.md`](./PACKET-E-F-DISCLOSURE-SEAM.md). The line is **audience**, not content: Packet E owns the response to the caller, Packet F owns every other channel. Nine Packet E invariants named on the E side, seven obligation classes on the F side, none on both. Records three known misreadings, including that `ERR-007` does not reach a log line. |
 | **0d** stale claims | **done** | Planned-test count corrected in four records; two `INVENTORY-REVIEW.md` open-work items closed; the `CONTRIBUTING.md` free-ride guidance corrected to the thirteen `decoding_trust_boundaries`; the retracted ~14-disposition estimate removed from `FINDINGS.md`. |
 | **0e** residual `wire-corruption` declarations | **done** | All 87 removed. Declared and required counts are now equal at 107. See the follow-on section of `FINDINGS.md`. |
 | **0f** `unrepresentable` / `source-rejection` contradiction | **done** | Ninth test kind `construction-exclusion` added. `unrepresentable` discharges with either kind; `reject-at-boundary` still requires `source-rejection`, because a boundary check presupposes something arrived to be checked. |
 | **0g** missing admission-time invariant | **open** | Needs a full batch cycle: corpus heading, `VAL-` witness, 54 Packet D classification characters, matrix regeneration, digest re-pin. |
 
-Gate state after 0a/0d/0e/0f: `check-inventory.sh` **EXIT=0**,
+Gate state after 0a–0f: `check-inventory.sh` **EXIT=0**,
 `check-model-coherence.sh` **34 passed / 0 failed**,
 `check-enforcement-closure.sh` **exit 5** (correct — Gate 4B stays open).
