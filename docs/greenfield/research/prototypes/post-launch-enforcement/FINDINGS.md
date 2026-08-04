@@ -74,8 +74,25 @@ So `unrepresentable` holds where the invalid state is a **closed vocabulary** (a
 does not exist), and fails where it is a **relation between a request and current state** —
 which is most of Packet E.
 
-Two of three are `reject-at-boundary` in any honest implementation. If that ratio holds, ~14
-of the 21 post-launch `unrepresentable` dispositions are misclassified.
+Two of three are `reject-at-boundary` in any honest implementation.
+
+**Correction, 2026-08-03.** The original text extrapolated that ratio to "~14 of 21
+misclassified". Reasoning through all 21 individually shows that estimate was wrong, and
+wrong in the direction that flattered the finding. Most genuinely ARE unrepresentable: a
+closed method vocabulary (`ADM-001`, `ADM-003`, `ADM-004`) admits no generic verb; an
+output-only epoch (`IDE-018`) and an immutable name (`IDE-019`) have no write field; a
+`runtimeLost` variant (`PRC-006`) has no exit-code slot; required fields with no default
+(`RET-003`, `SOP-002`, `PIO-008`) cannot be omitted. Each is a variant or field that does
+not exist, which is exactly what the disposition claims.
+
+Only three were reclassified, and only where the slice produced direct implementation
+evidence: `SBX-004` and `SBX-024` (the status type must carry the label for the legitimate
+derivation, so forbidding the stored case is a state comparison) and `PIO-004` (replay needs
+comparison against accepted state). Three further cases — `ADM-002`, `PRC-013`, `PIO-002` —
+are genuinely borderline and are left alone pending evidence.
+
+The lesson generalises past this finding: a two-of-three sample is not a ratio. The
+extrapolation was the least defensible sentence in this document, and it survived a commit.
 
 **Also**: for the one genuinely unrepresentable case, `source-rejection` is the wrong test
 mechanism. Proving `ERR-002` means proving code *does not compile*, which is a compile-fail

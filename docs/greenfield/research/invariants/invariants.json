@@ -24508,8 +24508,8 @@
       "status": "specified",
       "firstSoundPhase": "L1",
       "rejectionDeadline": "L1",
-      "disposition": "unrepresentable",
-      "rationale": "Q1: the facts are the durable Operation kind and the authoritative Core runtime status at the Operation and status commit station. Q2: the protected artefact is the Core durable status record and its serialization oracle, so the owner is `core`. Q3: L1 is the commit station at which a stored presentation label would first become durable. Q4: the offending act is the lifecycle mutation's own commit. Merged from indices 101 and 128 (L0.D7, L1.D19, L2.D11). This entry carries only the storage/oracle clause of LIFECYCLE-03; the request-input clause is at the M2 survivor at L0, its own station.",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the facts are the durable Operation kind and the authoritative Core runtime status at the Operation and status commit station. Q2: the protected artefact is the Core durable status record and its serialization oracle, so the owner is `core`. Q3: L1 is the commit station at which a stored presentation label would first become durable. Q4: the offending act is the lifecycle mutation's own commit. Merged from indices 101 and 128 (L0.D7, L1.D19, L2.D11). This entry carries only the storage/oracle clause of LIFECYCLE-03; the request-input clause is at the M2 survivor at L0, its own station. Reclassified 2026-08-03 from `unrepresentable`: the status type must carry a presentation label for the legitimate derivation, so forbidding the STORED case is a comparison against current state, not a variant that fails to exist. Evidence: prototypes/post-launch-enforcement, which implemented this hook and could not make the invalid value unconstructable. See FINDINGS.md F2.",
       "invalidWitnesses": [
         "SBX-004"
       ],
@@ -24596,7 +24596,7 @@
         "remediation": "Derive presentation words at read time from the Operation kind and the authoritative status, and store neither.",
         "secretSafe": true
       },
-      "notes": "Packet E SBX family; discharges LIFECYCLE-03. Traversal: any live lifecycle-mutation traversal, at Operation and status commit. wire-corruption evidence removed 2026-08-03: this invariant declares no boundary at which a serialized representation is decoded, so the test could not be written. See prototypes/post-launch-enforcement/FINDINGS.md F1."
+      "notes": "Packet E SBX family; discharges LIFECYCLE-03. Traversal: any live lifecycle-mutation traversal, at Operation and status commit. wire-corruption evidence removed 2026-08-03: this invariant declares no boundary at which a serialized representation is decoded, so the test could not be written. See prototypes/post-launch-enforcement/FINDINGS.md F1. Disposition corrected 2026-08-03 on implementation evidence."
     },
     {
       "id": "SBX-005",
@@ -26732,8 +26732,8 @@
       "status": "specified",
       "firstSoundPhase": "R1",
       "rejectionDeadline": "R1",
-      "disposition": "unrepresentable",
-      "rationale": "Q1: the facts are the durable Operation kind and the authoritative Core runtime status at the launch Operation and status commit station. Q2: the protected artefact is the Core durable status record and its serialization oracle, so under Criterion O the owner is `core`. Q3: R1 is the launch traversal's commit station, at which a stored launch presentation label would first become durable. Q4: the offending act is the launch traversal's own commit; the live half is `86`, whose traversal is narrowed to live lifecycle mutations, and the request-input clause of LIFECYCLE-03 stays at L0. Unrepresentable because the generated status type has no field in which a presentation label can be stored. Added because a launch traversal never reaches L1, so `86` could not bind launch-branch status commits.",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the facts are the durable Operation kind and the authoritative Core runtime status at the launch Operation and status commit station. Q2: the protected artefact is the Core durable status record and its serialization oracle, so under Criterion O the owner is `core`. Q3: R1 is the launch traversal's commit station, at which a stored launch presentation label would first become durable. Q4: the offending act is the launch traversal's own commit; the live half is `86`, whose traversal is narrowed to live lifecycle mutations, and the request-input clause of LIFECYCLE-03 stays at L0. Unrepresentable because the generated status type has no field in which a presentation label can be stored. Added because a launch traversal never reaches L1, so `86` could not bind launch-branch status commits. Reclassified 2026-08-03 from `unrepresentable`: identical rule to SBX-004 on the launch traversal; same evidence. Evidence: prototypes/post-launch-enforcement, which implemented this hook and could not make the invalid value unconstructable. See FINDINGS.md F2.",
       "invalidWitnesses": [
         "SBX-024"
       ],
@@ -26821,7 +26821,7 @@
         "remediation": "Derive launch presentation words at read time from the Operation kind and the authoritative status, and store neither.",
         "secretSafe": true
       },
-      "notes": "Packet E SBX family; discharges LIFECYCLE-03. Traversal: one launch (Create running, Start, or same-Sandbox Restore) traversal, at Operation and status commit. wire-corruption evidence removed 2026-08-03: this invariant declares no boundary at which a serialized representation is decoded, so the test could not be written. See prototypes/post-launch-enforcement/FINDINGS.md F1."
+      "notes": "Packet E SBX family; discharges LIFECYCLE-03. Traversal: one launch (Create running, Start, or same-Sandbox Restore) traversal, at Operation and status commit. wire-corruption evidence removed 2026-08-03: this invariant declares no boundary at which a serialized representation is decoded, so the test could not be written. See prototypes/post-launch-enforcement/FINDINGS.md F1. Disposition corrected 2026-08-03 on implementation evidence."
     },
     {
       "id": "SBX-025",
@@ -27248,8 +27248,8 @@
       "status": "specified",
       "firstSoundPhase": "E0",
       "rejectionDeadline": "E0",
-      "disposition": "unrepresentable",
-      "rationale": "Q1: the decision reads the accepted, sequenced Process input frame's durable record and the operation proposed against it; both are complete at the Process-control request station where the resubmission would arrive. Q2: one Process-control request inside an existing Sandbox is the exec request surface; the accepted input-frame record is the consulted fact. Q3: the request station is the last correct refusal point, because a re-submitted input frame is already ordered for a second delivery once accepted. Q4: the separate rule bounding live stdin writer leases to one per Process has its own fact set and is filed at `198`. Unrepresentable because the generated input path offers no replay operation over an accepted, sequenced input frame.",
+      "disposition": "reject-at-boundary",
+      "rationale": "Q1: the decision reads the accepted, sequenced Process input frame's durable record and the operation proposed against it; both are complete at the Process-control request station where the resubmission would arrive. Q2: one Process-control request inside an existing Sandbox is the exec request surface; the accepted input-frame record is the consulted fact. Q3: the request station is the last correct refusal point, because a re-submitted input frame is already ordered for a second delivery once accepted. Q4: the separate rule bounding live stdin writer leases to one per Process has its own fact set and is filed at `198`. Unrepresentable because the generated input path offers no replay operation over an accepted, sequenced input frame. Reclassified 2026-08-03 from `unrepresentable`: replay is detected by comparing a submitted sequence against already-accepted state, which no type can exclude. Evidence: prototypes/post-launch-enforcement, which implemented this hook and could not make the invalid value unconstructable. See FINDINGS.md F2.",
       "invalidWitnesses": [
         "PIO-004"
       ],
@@ -27338,7 +27338,7 @@
         "remediation": "Recover a lost response by the retained coordinate for the accepted input frame rather than by replaying the input.",
         "secretSafe": true
       },
-      "notes": "Packet E PIO family; discharges LIFECYCLE-39. Traversal: one sequenced Process-control command inside an existing Sandbox. wire-corruption evidence removed 2026-08-03: this invariant declares no boundary at which a serialized representation is decoded, so the test could not be written. See prototypes/post-launch-enforcement/FINDINGS.md F1."
+      "notes": "Packet E PIO family; discharges LIFECYCLE-39. Traversal: one sequenced Process-control command inside an existing Sandbox. wire-corruption evidence removed 2026-08-03: this invariant declares no boundary at which a serialized representation is decoded, so the test could not be written. See prototypes/post-launch-enforcement/FINDINGS.md F1. Disposition corrected 2026-08-03 on implementation evidence."
     },
     {
       "id": "PIO-005",
