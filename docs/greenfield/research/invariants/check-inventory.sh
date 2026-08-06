@@ -13,6 +13,10 @@ provider_contracts="${script_dir}/PACKET-C-PROVIDER-CONTRACTS.json"
 composition_paths="${script_dir}/PACKET-D-COMPOSITION-PATHS.json"
 composition_coverage="${script_dir}/PACKET-D-COMPOSITION-COVERAGE.json"
 composition_case_contracts="${script_dir}/PACKET-D-CASE-CONTRACTS.json"
+operation_registry="${script_dir}/PACKET-E-OPERATION-REGISTRY.json"
+operation_case_contracts="${script_dir}/PACKET-E-CASE-CONTRACTS.json"
+operation_contracts="${script_dir}/PACKET-E-OPERATION-CONTRACTS.json"
+concurrency_matrix="${script_dir}/PACKET-E-CONCURRENCY-MATRIX.json"
 
 for required_packet_d_file in \
   "${composition_paths}" \
@@ -20,7 +24,14 @@ for required_packet_d_file in \
   "${composition_coverage}" \
   "${script_dir}/generate-composition-coverage.mjs" \
   "${script_dir}/validate-composition-coverage.jq" \
-  "${script_dir}/test-composition-coverage.sh"; do
+  "${script_dir}/test-composition-coverage.sh" \
+  "${operation_registry}" \
+  "${operation_case_contracts}" \
+  "${operation_contracts}" \
+  "${concurrency_matrix}" \
+  "${script_dir}/generate-operation-contracts.mjs" \
+  "${script_dir}/validate-operation-contracts.jq" \
+  "${script_dir}/test-operation-contracts.sh"; do
   if [[ ! -f "${required_packet_d_file}" ]]; then
     echo "Missing required Packet D inventory file: ${required_packet_d_file}" >&2
     exit 1
@@ -54,12 +65,28 @@ composition_case_contracts_sha256="$(
 invariant_registry_sha256="$(
   sha256_file "${registry}"
 )"
+operation_registry_sha256="$(
+  sha256_file "${operation_registry}"
+)"
+operation_case_contracts_sha256="$(
+  sha256_file "${operation_case_contracts}"
+)"
 
 # These pins detect drift and force explicit review. Semantic validation below,
 # not a coordinated digest rewrite, remains authoritative.
-expected_composition_paths_sha256="488bf76167461b52766dd9fa8a9b1756d084f1ebc08c795315fd2baf2fbab6e0"
-expected_composition_case_contracts_sha256="955c3dd8c03927be6876c58b2c3c67210f1fc0710ecf5f5ea2a4a2c59bc3f5b0"
-expected_invariant_registry_sha256="d798c8fd82ddfe590cc252ce01829a1e4440489b2bd3ca3542c655fcee3284c2"
+expected_composition_paths_sha256="65322c7c30f4c75222a36793b8d1b877fa5813df4d1c83f236bb18884c364a65"
+expected_composition_case_contracts_sha256="2d8ad1adb6588171a0b1f892d56641495e311b5b167a47473dc85522ee3767e2"
+# Packet E pins. Second copies of the values inside validate-operation-contracts.jq, so a
+# drifted pin aborts here before any validator runs -- the same discipline as Packet D.
+expected_operation_registry_sha256="612d3c211c13af4629ebd7b48272d04198aad29a270ba9dc4b9938a2ac8359de"
+expected_operation_case_contracts_sha256="ca608d2a82b962d077602cb89f0e15b9d622d34a45363ad0405602e5a653c223"
+expected_invariant_registry_sha256="933697b9eb71411d37778660298789d9d077e5357ff1f2fb4651b7d89f921bdf"
+
+if [[ "${operation_registry_sha256}" != "${expected_operation_registry_sha256}" ||
+      "${operation_case_contracts_sha256}" != "${expected_operation_case_contracts_sha256}" ]]; then
+  echo "Packet E digest pin mismatch; pins provide drift detection, not semantic authority" >&2
+  exit 1
+fi
 
 if [[ "${composition_paths_sha256}" != "${expected_composition_paths_sha256}" ||
       "${composition_case_contracts_sha256}" != "${expected_composition_case_contracts_sha256}" ||
@@ -67,6 +94,10 @@ if [[ "${composition_paths_sha256}" != "${expected_composition_paths_sha256}" ||
   echo "Packet D digest pin mismatch; pins provide drift detection, not semantic authority" >&2
   exit 1
 fi
+
+# Runs first: several definitions are duplicated across independent oracles on
+# purpose, and a drifted copy makes every downstream result untrustworthy.
+"${script_dir}/check-model-coherence.sh"
 
 "${script_dir}/test-registry.sh" inventory
 "${script_dir}/validate-registry.sh" inventory "${registry}" "${corpus}"
@@ -128,16 +159,16 @@ jq -e \
   --slurpfile paths "${composition_paths}" \
   --slurpfile contracts "${composition_case_contracts}" \
   '
-    ($registry[0].invariants | length) == 140 and
+    ($registry[0].invariants | length) == 355 and
     $paths[0].reviewedPathCount == 54 and
     ($paths[0].paths | length) == 54 and
-    ($contracts[0].reviewedInvariantIds | length) == 140 and
+    ($contracts[0].reviewedInvariantIds | length) == 355 and
     ($contracts[0].entries | length) == 54 and
     (.status == "candidate") and
     (.invariantIds == [$registry[0].invariants[].id]) and
     (.pathIds == [$paths[0].paths[].id]) and
-    .expectedCellCount == 7560 and
-    ([.rules[].selector.invariantIds[]] | length) == 7560 and
+    .expectedCellCount == 19170 and
+    ([.rules[].selector.invariantIds[]] | length) == 19170 and
     .delegatedConcernTaxonomy == $contracts[0].delegatedConcernTaxonomy and
     .resolvedReentryReplay ==
       $contracts[0].serializedResolvedReentryReplaySets and
@@ -146,6 +177,20 @@ jq -e \
       $contracts[0].targetApplicabilityProjection
   ' \
   "${composition_coverage}" >/dev/null
+
+"${script_dir}/test-operation-contracts.sh"
+node "${script_dir}/generate-operation-contracts.mjs" --check
+jq -e \
+  --arg validationScope full \
+  --arg operationRegistrySha256 "${operation_registry_sha256}" \
+  --arg caseContractsSha256 "${operation_case_contracts_sha256}" \
+  --arg invariantRegistrySha256 "${invariant_registry_sha256}" \
+  --slurpfile registry "${operation_registry}" \
+  --slurpfile catalog "${operation_case_contracts}" \
+  --slurpfile invariants "${registry}" \
+  --slurpfile concurrency "${concurrency_matrix}" \
+  -f "${script_dir}/validate-operation-contracts.jq" \
+  "${operation_contracts}" >/dev/null
 
 invariant_count="$(jq '.invariants | length' "${registry}")"
 surface_count="$(jq '.surfaces | length' "${surface_coverage}")"
@@ -232,4 +277,42 @@ echo "Gate 2A Packet D: ${composition_path_count} paths × ${invariant_count} in
 echo "Gate 2A Packet D effects: ${composition_effect_counts}"
 echo "Gate 2A Packet D mappings/surfaces: ${composition_frontend_mapping_count} frontend/path mappings; ${composition_native_path_count} native paths"
 echo "Gate 2A Packet D invariants: ${packet_d_invariant_count} introduced"
+operation_method_count="$(
+  jq '[.operations[] | select(.id | startswith("deferred.") | not)] | length' "${operation_registry}"
+)"
+operation_deferral_count="$(
+  jq '[.operations[] | select(.id | startswith("deferred."))] | length' "${operation_registry}"
+)"
+operation_state_count="$(jq '.lifecycleStates | length' "${operation_registry}")"
+operation_cell_count="$(jq '.expectedCellCount' "${operation_contracts}")"
+operation_rule_count="$(jq '.rules | length' "${operation_contracts}")"
+operation_kind_counts="$(
+  jq -r '
+    [.rules[].valueCases[].cellKind] |
+    group_by(.) |
+    map("\(.[0])=\(length)") |
+    join(", ")
+  ' "${operation_contracts}"
+)"
+concurrency_cell_count="$(jq '.expectedCellCount' "${concurrency_matrix}")"
+packet_e_operation_invariants="$(
+  jq '[.operations[] | select(.coverageStatus == "generated") | .invariants[]] | unique | length' "${operation_registry}"
+)"
+packet_e_stated_absence_invariants="$(
+  jq '
+    ([.operations[] | select(.coverageStatus == "generated") | .invariants[]] | unique) as $generated |
+    [.operations[] | select(.coverageStatus != "generated") | .invariants[]] |
+    unique |
+    map(select(. as $id | $generated | index($id) | not)) |
+    length
+  ' "${operation_registry}"
+)"
+packet_e_non_operation_invariants="$(
+  jq '[.nonOperationCoverage.assignments[].invariants[]] | length' "${operation_registry}"
+)"
+
+echo "Gate 2A Packet E: ${operation_method_count} operations (+${operation_deferral_count} deferral markers) × ${operation_state_count} lifecycle states = ${operation_cell_count} cells; ${operation_rule_count} contract rules"
+echo "Gate 2A Packet E cell kinds: ${operation_kind_counts}"
+echo "Gate 2A Packet E concurrency: ${concurrency_cell_count} operation-pair cells"
+echo "Gate 2A Packet E invariants: ${packet_e_operation_invariants} governed by a generated operation contract; ${packet_e_stated_absence_invariants} covered only by a stated absence; ${packet_e_non_operation_invariants} assigned to other ledgers"
 echo "Gate 2A remains open for Packets E-F"

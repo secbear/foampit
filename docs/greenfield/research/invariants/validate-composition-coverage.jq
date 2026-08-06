@@ -57,7 +57,7 @@ def locked_path_ids:
   ];
 
 def owners:
-  ["artifact", "create", "operator", "service", "live", "exec", "framework", "runtime"];
+  ["artifact", "create", "operator", "service", "live", "exec", "framework", "runtime", "core"];
 
 def effects:
   ["may-contribute", "may-narrow", "may-select", "no-authority", "boundary-input"];
@@ -287,13 +287,16 @@ def complete_path_projection($path; $entry):
 def exact_registry_path_aliases:
   {
     "adapter-native-extension": "adapter-native-extension",
+    "artifact-semantic-refinement": "artifact-semantic-refinement",
     "binding-resolution": "direct-api",
     "built-artifact-load": "built-artifact-load",
     "canonical-wire-corruption": "raw-wire-input",
     "cli-adapter": "cli-adapter",
     "core-api": "direct-api",
     "corrupted-manifest": "corrupted-manifest",
+    "corrupted-provider-build-result": "corrupted-provider-build-result",
     "corrupted-resolved-input": "serialized-resolved-reentry",
+    "create-native-extension": "create-native-extension",
     "direct-api": "direct-api",
     "direct-driver-invocation": "direct-driver-invocation",
     "direct-native-nix-value": "direct-native-nix-value",
@@ -304,6 +307,7 @@ def exact_registry_path_aliases:
     "framework-adapter": "framework-adapter",
     "frontend-adaptation": "frontend-adaptation",
     "frontend-output": "frontend-output",
+    "generated-runtime-configuration": "generated-runtime-configuration",
     "generated-unit-inspection": "managed-service",
     "host-path-resolution": "resolved-driver-handoff",
     "host-preflight": "provider-native-operation",
@@ -314,19 +318,23 @@ def exact_registry_path_aliases:
     "live-native-extension": "live-native-extension",
     "live-operation": "live-native-extension",
     "managed-service": "managed-service",
+    "managed-service-definition-authoring": "managed-service-definition-authoring",
     "managed-service-definition-imports": "managed-service-definition-imports",
     "managed-service-definition-native-escape": "managed-service-definition-native-escape",
     "managed-service-definition-precedence": "managed-service-definition-precedence",
+    "managed-service-definition-refinement": "managed-service-definition-refinement",
     "managed-service-reconciliation": "managed-service",
     "member-deduplication": "built-artifact-load",
     "namespaced-extension": "namespaced-extension",
     "native-guest-module": "native-guest-module",
     "native-language-escape": "artifact-native-language-escape",
     "oci-descriptor-transfer": "oci-descriptor-transfer",
-    "operator-policy": "operator-native-extension",
+    "operator-configuration-authoring": "operator-configuration-authoring",
     "operator-configuration-imports": "operator-configuration-imports",
     "operator-configuration-native-escape": "operator-configuration-native-escape",
     "operator-configuration-precedence": "operator-configuration-precedence",
+    "operator-configuration-refinement": "operator-configuration-refinement",
+    "operator-policy": "operator-native-extension",
     "operator-registration": "operator-native-extension",
     "ordinary-authoring": "artifact-ordinary-authoring",
     "placement": "direct-api",
@@ -343,10 +351,10 @@ def exact_registry_path_aliases:
     "resolved-driver-handoff": "resolved-driver-handoff",
     "schema-migration": "schema-migration",
     "secret-delivery": "direct-api",
+    "serialized-resolved-reentry": "serialized-resolved-reentry",
     "service-native-extension": "service-native-extension",
     "snapshot-capture": "live-native-extension",
     "snapshot-restore": "direct-api",
-    "serialized-resolved-reentry": "serialized-resolved-reentry",
     "strongest-override": "artifact-strongest-override",
     "target-lowering": "target-lowering",
     "target-native-extension": "target-native-extension",
@@ -1013,15 +1021,15 @@ def complete_template_projection($template):
   };
 
 def expected_paths_registry_sha256:
-  "488bf76167461b52766dd9fa8a9b1756d084f1ebc08c795315fd2baf2fbab6e0";
+  "65322c7c30f4c75222a36793b8d1b877fa5813df4d1c83f236bb18884c364a65";
 
 def expected_case_contracts_sha256:
-  "955c3dd8c03927be6876c58b2c3c67210f1fc0710ecf5f5ea2a4a2c59bc3f5b0";
+  "2d8ad1adb6588171a0b1f892d56641495e311b5b167a47473dc85522ee3767e2";
 
 # Digest pins detect accidental drift and impose review friction. They do not
 # authorize inputs that fail the semantic relationship checks below.
 def expected_invariant_registry_sha256:
-  "d798c8fd82ddfe590cc252ce01829a1e4440489b2bd3ca3542c655fcee3284c2";
+  "933697b9eb71411d37778660298789d9d077e5357ff1f2fb4651b7d89f921bdf";
 
 def nonempty_string:
   type == "string" and (gsub("^\\s+|\\s+$"; "") | length > 0);
@@ -1176,12 +1184,31 @@ def phase_ids:
     phase_edges[][]
   ] | unique;
 
+# Visited-set-guarded transitive closure. The guard is load-bearing, not an
+# optimization. This was previously unguarded recursion, which meant the
+# acyclicity assertion below could never fire as a diagnostic: because jq's
+# `and` short-circuits, a single-copy edit to phase_edges was caught by the
+# literal comparison, while a coordinated two-copy edit passed that comparison
+# and then exhausted memory inside the acyclicity check itself (verified under
+# jq 1.8.1: a graph containing L1 -> D0 aborts with "cannot allocate memory").
+# It was a true statement structurally incapable of diagnosing its own subject.
+# $seen grows monotonically and is bounded by the node count, so the traversal
+# is total on any graph, and a node reachable from itself now appears in its own
+# descendant set — which is exactly what the acyclicity assertion tests for.
+def phase_closure($frontier; $seen):
+  if ($frontier | length) == 0
+  then $seen
+  else
+    ($frontier[0]) as $node |
+    ($frontier[1:]) as $rest |
+    if ($seen | index($node)) != null
+    then phase_closure($rest; $seen)
+    else phase_closure(($rest + (phase_edges[$node] // [])); ($seen + [$node]))
+    end
+  end;
+
 def descendants($phase):
-  [
-    phase_edges[$phase][]? as $next |
-    $next,
-    descendants($next)[]
-  ] | unique;
+  phase_closure((phase_edges[$phase] // []); []) | unique;
 
 def reachable($from; $to):
   (phase_ids | index($from)) != null and
@@ -1420,8 +1447,35 @@ def expected_driver_contract($id):
     "delegatedPackets": ["E", "F"]
   };
 
+# Byte-identical to the definition carried by every other ledger validator
+# (validate-registry.jq, validate-surface-coverage.jq,
+# validate-artifact-field-review.jq, validate-target-realization.jq,
+# validate-provider-contracts.jq). This validator was the only one without it,
+# which no comparison of the copies that existed could detect.
+#
+# Note for Packet E authors: this matches ^UNKNOWN$ case-insensitively, so the
+# bare token "unknown" is rejected as placeholder content. Packet E's locked
+# vocabulary namespaces it (state-unknown, outcome-unknown) rather than
+# weakening this rule in one validator.
+def placeholder_strings:
+  [
+    .. |
+    strings |
+    select(test("^(TBD|TODO|FIXME)(:|\\b|$)|^UNKNOWN$"; "i"))
+  ];
+
 def path_errors:
   [
+    if ($paths[0] | placeholder_strings | length) == 0
+    then empty
+    else "composition path registry contains placeholder content"
+    end,
+
+    if ($caseContracts[0] | placeholder_strings | length) == 0
+    then empty
+    else "composition case contracts contain placeholder content"
+    end,
+
     if $pathsRegistrySha256 == expected_paths_registry_sha256
     then empty
     else "path registry SHA-256 must equal the independently reviewed validator pin"
@@ -1551,10 +1605,10 @@ def path_errors:
       else "registryPathAliases has unknown generic path target: \($alias.key) -> \($alias.value)"
       end
     ),
-    if (exact_registry_path_aliases | length) == 68 and
+    if (exact_registry_path_aliases | length) == 76 and
        $paths[0].registryPathAliases == exact_registry_path_aliases
     then empty
-    else "registryPathAliases must equal the exact validator-owned 68-alias mapping"
+    else "registryPathAliases must equal the exact validator-owned 76-alias mapping"
     end,
     (
       $paths[0].paths[] as $path |
@@ -1985,7 +2039,7 @@ def case_contract_errors:
          ][];
            (. as $path |
             $caseContracts[0].classificationVectorsByPath[$path] |
-            test("^[FLIH]{140}$"))
+            test("^[FLIH]{355}$"))
          )
       then empty
       else "resource source classifications must apply ownership before exact mechanism refinement and native escapes must have no authority"
@@ -1994,10 +2048,10 @@ def case_contract_errors:
     if all(forbidden_driver_path_ids[];
          (. as $path |
           $caseContracts[0].classificationVectorsByPath[$path] |
-          test("^[FLIH]{140}$"))
+          test("^[FLIH]{355}$"))
        )
     then empty
-    else "forbidden direct/raw driver paths must classify all 140 invariants no-authority"
+    else "forbidden direct/raw driver paths must classify all 355 invariants no-authority"
     end,
     (
       ($caseContracts[0].portableArtifactInvariantIds + ["NAT-002","NAT-003"] | unique) as $expected |
@@ -2356,9 +2410,9 @@ def coverage_schema_errors:
     else "composition coverage textAuthority must be non-empty"
     end,
     if .invariantIds == registry_ids and
-       (.invariantIds | length) == 140
+       (.invariantIds | length) == 355
     then empty
-    else "coverage invariant IDs must equal the exact 140-ID registry order"
+    else "coverage invariant IDs must equal the exact 355-ID registry order"
     end,
     if .pathIds == locked_path_ids
     then empty

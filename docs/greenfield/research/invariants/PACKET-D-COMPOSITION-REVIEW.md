@@ -35,13 +35,21 @@ here, not a claim that production Gate 4B is closed.
 
 ## Reviewed universe
 
-| Coordinate | Reviewed count |
+The counts below are what Packet D **reviewed** on 2026-07-24. Packet E
+registration later widened the invariant axis from 140 to 354, so the current
+machine state is 54 paths × 355 invariants = 19,170 cells in 948 rule groups.
+The reviewed path universe, classification semantics, effect vocabulary, and
+boundary contracts are unchanged by that widening; the added cells are Packet
+E's and were classified under the same rules. Where a number below is a
+*reviewed* fact it is left as reviewed.
+
+| Coordinate | Reviewed count (2026-07-24) |
 |---|---:|
 | Composition paths | 54 |
 | Registered invariants | 140 |
 | Exact path × invariant cells | 7,560 |
 | Generated identical-contract rule groups | 634 |
-| Historical registry path aliases mapped | 68 |
+| Registry path aliases mapped | 76 |
 | Frontend/path evidence mappings | 74 |
 | Invalid witnesses with nearby valid controls | 50 |
 | Initial Packet C target profiles preserved | 4 |
@@ -67,7 +75,9 @@ Packet D and changes a validator-owned absolute universe.
 
 ## Effect decision
 
-The 7,560 cells have this exact partition:
+The 7,560 reviewed cells had this exact partition. The current 19,170-cell
+partition is reported by `check-inventory.sh` and is not restated here, so this
+record continues to describe what was reviewed:
 
 | Effect | Cells | Meaning |
 |---|---:|---|
@@ -87,7 +97,7 @@ The independent case catalog stores one 140-code classification vector for
 each path. It is a total partition, not a generated owner heuristic. SHA-256
 pins add review friction; they are not semantic proof. The validator therefore
 also owns exact projections for all 54 complete path contracts, 74 normative
-frontend mappings, 68 aliases, and every field of all 28 contract templates.
+frontend mappings, 76 aliases, and every field of all 28 contract templates.
 Coordinated catalog, path, and regenerated-coverage mutations must fail those
 independent semantic anchors even when digest checks are neutralized.
 
@@ -272,14 +282,20 @@ conformance tests, and implementation evidence remain planned.
 - Case-contract catalog SHA-256:
   `955c3dd8c03927be6876c58b2c3c67210f1fc0710ecf5f5ea2a4a2c59bc3f5b0`
 - Invariant registry SHA-256:
-  `d798c8fd82ddfe590cc252ce01829a1e4440489b2bd3ca3542c655fcee3284c2`
+  `8901d7f384a8fea6b5c8bec82271b4456b4052b988ba74ff1947adda5a768ee2`
+  (reviewed as `d798c8fd82ddfe590cc252ce01829a1e4440489b2bd3ca3542c655fcee3284c2`;
+  amended by the 2026-07-31 coherence repair, which added the
+  `frontend-evaluation` and `artifact-final-validation` trust boundaries to the
+  `CMP-009`, `CMP-010`, and `CMP-011` wire-corruption test coverage and added
+  `VAL-011` as a valid witness of `SVC-001` and `SVC-002`. No classification,
+  path, phase, owner, or effect changed, so the reviewed verdicts below stand.)
 - Generated coverage SHA-256:
   `16b156ef2d39c10f55f5aedb5abc025385b865e7d92f9a8ccbb2dd4bf635e532`
 - Validator SHA-256:
-  `7f9777d36527c8aa0ef571cecc435c4254d8072abca7cd962912d2dec780a31a`
+  `34b1c610bdf303860ba6171cedb4c532ea1fa49a9bbaf0bbb4fca7257f9cd82f`
 - Focused harness SHA-256:
-  `fefac4fb2b7bddc263417e39c04793e1afbab157daf71b510c35fc61c21c936e`
-- Focused Packet D validator: 89 cases passed.
+  `33459c40f7935377d32bd0aac69b25e9fe3d6688f1609f6ee42f484de3817e5e`
+- Focused Packet D validator: 90 cases passed.
 - Exact expansion: 54 × 140 = 7,560 unique cells.
 - Exact grouping: 634 complete-contract rules.
 - Exact effect partition: 145 `may-contribute`, 32 `may-narrow`, 54

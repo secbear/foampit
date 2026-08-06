@@ -1,0 +1,9 @@
+[package]
+name = "post-launch-enforcement"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+# No dependencies on purpose. This slice tests whether the invariant model is
+# implementable, not whether serde works.
+[dependencies]

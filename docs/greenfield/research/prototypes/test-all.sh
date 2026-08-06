@@ -34,6 +34,8 @@ bash "$prototype_root/resolved-reentry/test.sh"
 
 bash "$prototype_root/downstream-boundaries/test.sh"
 
+bash "$prototype_root/classification-lattice/test.sh"
+
 nix shell \
   "$nixpkgs_ref#cue" \
   "$nixpkgs_ref#nickel" \

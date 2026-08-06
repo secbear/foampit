@@ -217,7 +217,22 @@ expect_coordinated_regeneration_failure \
   "coordinated-alias-reassignment" \
   '.registryPathAliases["binding-resolution"] = "framework-adapter"' \
   '.' \
-  'registryPathAliases must equal the exact validator-owned 68-alias mapping'
+  'registryPathAliases must equal the exact validator-owned 76-alias mapping'
+
+# The eight identity tokens minted in 2026-07-31 name paths that previously no
+# invariant could reach. A wrong target for a NEW token would still satisfy the
+# 76-entry count, so pin two of them against re-pointing specifically.
+expect_coordinated_regeneration_failure \
+  "coordinated-new-token-reassignment-create-native-extension" \
+  '.registryPathAliases["create-native-extension"] = "direct-api"' \
+  '.' \
+  'registryPathAliases must equal the exact validator-owned 76-alias mapping'
+
+expect_coordinated_regeneration_failure \
+  "coordinated-new-token-reassignment-artifact-semantic-refinement" \
+  '.registryPathAliases["artifact-semantic-refinement"] = "artifact-explicit-override"' \
+  '.' \
+  'registryPathAliases must equal the exact validator-owned 76-alias mapping'
 
 expect_coordinated_regeneration_failure \
   "coordinated-frontend-candidate-reassignment" \
@@ -296,9 +311,17 @@ expect_catalog_failure \
   '.reviewedInvariantIds[0:2] |= reverse' \
   'reviewedInvariantIds must equal the exact current registry in order'
 
+# This validator was the only ledger validator carrying no placeholder rule.
+# Its five siblings all reject TBD/TODO/FIXME/UNKNOWN content, so the gap was
+# invisible to any check comparing the copies that existed.
 expect_catalog_failure \
-  "vector-width-139" \
-  '.classificationVectorsByPath["artifact-imports"] |= .[0:139]' \
+  "catalog-placeholder-content" \
+  '. + {"probeNote": "TODO: unfinished"}' \
+  'composition case contracts contain placeholder content'
+
+expect_catalog_failure \
+  "vector-width-353" \
+  '.classificationVectorsByPath["artifact-imports"] |= .[0:353]' \
   'classification vector must classify every reviewed invariant exactly once'
 
 expect_catalog_failure \
@@ -674,16 +697,16 @@ coverage_invariants="$(jq '.invariantIds | length' "${coverage_fixture}")"
 coverage_paths="$(jq '.pathIds | length' "${coverage_fixture}")"
 coverage_cells="$(jq '.expectedCellCount' "${coverage_fixture}")"
 
-if [[ "${coverage_invariants}" != "140" ||
+if [[ "${coverage_invariants}" != "355" ||
       "${coverage_paths}" != "54" ||
-      "${coverage_cells}" != "7560" ]]; then
+      "${coverage_cells}" != "19170" ]]; then
   echo "focused composition catalog validator: ${pass_count} cases passed" >&2
-  echo "FAIL task-4-generated-matrix-boundary: PACKET-D-COMPOSITION-COVERAGE.json remains ${coverage_paths} paths × ${coverage_invariants} invariants = ${coverage_cells} cells; expected 54 × 140 = 7560" >&2
+  echo "FAIL task-4-generated-matrix-boundary: PACKET-D-COMPOSITION-COVERAGE.json remains ${coverage_paths} paths × ${coverage_invariants} invariants = ${coverage_cells} cells; expected 54 × 355 = 19170" >&2
   exit 1
 fi
 
 if ! run_validator "${coverage_fixture}"; then
-  echo "FAIL generated-composition-coverage: current 54 × 140 matrix failed full validation" >&2
+  echo "FAIL generated-composition-coverage: current 54 × 355 matrix failed full validation" >&2
   exit 1
 fi
 pass_count=$((pass_count + 1))
@@ -696,7 +719,7 @@ expect_coverage_failure \
 expect_coverage_failure \
   "coverage-registry-order-diverges" \
   '.invariantIds[0:2] |= reverse' \
-  'coverage invariant IDs must equal the exact 140-ID registry order'
+  'coverage invariant IDs must equal the exact 355-ID registry order'
 
 expect_coverage_failure \
   "coverage-delegated-taxonomy-diverges" \

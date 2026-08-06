@@ -224,10 +224,10 @@ coordinates; their executable semantic implementations remain planned Gate 4B
 hooks. The three provider contracts are validated separately because transport
 is not a target profile.
 
-Packet D's candidate expands exactly 54 composition paths across all 140
-current invariants, producing 7,560 unique cells in 634 identical
-complete-contract groups. The case catalog pins one total 140-code vector per
-path; 68 historical aliases are compatibility mappings, not the
+Packet D's candidate expands exactly 54 composition paths across all 355
+current invariants, producing 19,170 unique cells in 948 identical
+complete-contract groups. The case catalog pins one total 355-code vector per
+path; 76 registry path aliases are invariant-facing names, not the
 classification oracle. Boundary inputs may begin strict validation before a
 fact is complete but preserve the cell's later terminal authority. Structural
 no-authority cells use the exact boundary they name, while hard-contract
@@ -298,13 +298,13 @@ flowchart LR
     C0 --> O0["O0 Operator admission"]
     O0 --> H0["H0 Host/provider preflight"]
     H0 --> D0["D0 Driver preparation"]
-    D0 --> R0["R0 Sandbox launch"]
+    D0 --> R0["R0 Runtime launch"]
     R0 --> R1["R1 Post-create conformance"]
     R1 --> L0["L0 Live-operation validation"]
     L0 --> L1["L1 Live-operation mutation"]
     R1 --> E0["E0 Exec validation"]
     E0 --> E1["E1 Process launch"]
-    R1 --> T0["T0 Teardown/final evidence"]
+    R1 --> T0["T0 Teardown and final evidence"]
     L1 --> T0
     E1 --> T0
     F0 --> L0
@@ -336,6 +336,55 @@ A structural source representation may reject before the product's first-sound
 semantic phase only when its `unrepresentable` disposition explains the
 exclusion and a downstream corruption test proves defensive enforcement.
 
+### What the phase graph models
+
+The product-phase graph is a validation-order model over a **single traversal**,
+not a runtime-history model. Each node names an **information set** — the facts
+completely available at that station — and each edge names the succession by
+which one information set becomes another within one end-to-end realization of
+one product-owned request or value.
+
+Reachability is therefore a soundness relation over **decidability**, not a
+claim about what may happen next in wall-clock time. Two phases may both occur
+after launch and remain mutually unreachable (`L0 -> E0`), and one operation may
+consult two unconnected information sets in sequence without that sequence being
+an edge. A `firstSoundPhase` names the earliest phase whose information set
+suffices to decide the invariant without guessing future inputs. A
+`rejectionDeadline` names the latest phase at which refusing **the same
+traversal** is still a correct product implementation.
+
+Repetition, re-entry, and succession *between* operations are deliberately
+unrepresentable here. An operation that ends and thereby authorizes, triggers,
+or constrains another — a `StartSandbox` that launches a runtime, a system
+reconciliation that resolves an `unknown`, a later `CreateSandbox` that reuses a
+released name — **begins a new traversal with its own first-sound phase**. The
+dependency between them is recorded as a handoff record, never as a phase edge.
+Runtime history is modeled separately and on a different substrate: the
+monotonically increasing, never-reused runtime epoch over immutable Operation,
+Process, event, and tombstone records.
+
+A phase may therefore be added only when a genuinely new **information set**
+enters the product — typically a new trust boundary decoding a value no existing
+phase can describe — and never to express that an existing information set was
+reached **again**, reached **from a different caller**, or reached **later in
+time**.
+
+**`firstSoundPhase` may never name an ingress or resolution phase that the
+operation being described does not itself traverse.** This is normative, not
+stylistic. The phase pair is the filter input that mechanically selects which
+components the generated coverage asserts defensively revalidate the rule across
+every composition path. Borrowing a phase the operation does not traverse
+therefore emits a false coverage claim — silently, into the artifact the gates
+treat as reviewed coverage.
+
+The reachability relation is defined by one succession graph, duplicated
+verbatim across the registry validator, the composition-coverage validator, and
+the coverage generator so that no validator depends on another's definition.
+`check-model-coherence.sh` compares the copies. Its transitive closure is
+visited-set guarded: unguarded recursion over a cyclic graph exhausts memory
+instead of reporting, which would make cycle detection structurally incapable of
+diagnosing its own subject.
+
 ## Enforcement-Hook Rules
 
 An enforcement hook records:
@@ -362,6 +411,7 @@ Tests use the smallest set of kinds that proves the disposition:
 | Test kind | Required purpose |
 |---|---|
 | `source-rejection` | The ordinary authoring path rejects the invalid witness |
+| `construction-exclusion` | The supported API cannot name the invalid witness at all — compile- or schema-level |
 | `positive-boundary` | A nearby valid witness remains expressible and preserves semantics |
 | `composition-bypass` | Import order, override, profile, or escape mechanisms cannot bypass the rule |
 | `wire-corruption` | A malformed/corrupted frontend result is rejected by the next trust boundary |
@@ -369,6 +419,12 @@ Tests use the smallest set of kinds that proves the disposition:
 | `dynamic-preflight` | Current-state failure occurs before external mutation or launch |
 | `runtime-probe` | Declared and lowered behavior is compared with observed runtime behavior |
 | `diagnostic` | Owner, paths, related definitions, remediation, and redaction are asserted |
+
+`unrepresentable` discharges with either `source-rejection` or
+`construction-exclusion`, and which one is a real claim about the design: the
+first says the value can be written and is refused, the second says it cannot be
+written. `reject-at-boundary` requires `source-rejection` specifically, because
+a boundary check presupposes something arrived to be checked.
 
 Every entry needs at least one invalid and one valid witness. Entries with
 multiple construction paths need a test for every supported path. Test
@@ -396,8 +452,8 @@ checks that the generated Packet C realization document is current, proves its
 324-cell expansion has no gaps or overlaps, validates the complete runtime
 profile bundle records, validates all provider transport contracts, and checks
 their introduced invariant references against the registry. It also checks
-that Packet D's 54-path and 140-invariant universes, independent digest pins,
-classification vectors, 7,560-cell expansion, phase graph, terminal
+that Packet D's 54-path and 355-invariant universes, independent digest pins,
+classification vectors, 19,170-cell expansion, phase graph, terminal
 authorities, ownership exclusions, native-handle tuple, Packet C traceability
 set, evidence/test obligations, and later-packet delegations are exact.
 

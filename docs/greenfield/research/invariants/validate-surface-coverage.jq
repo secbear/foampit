@@ -1,7 +1,8 @@
 def owners:
   [
     "artifact", "create", "operator", "service",
-    "live", "exec", "framework", "runtime"
+    "live", "exec", "framework", "runtime",
+    "core"
   ];
 
 def resources:

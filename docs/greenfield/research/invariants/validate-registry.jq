@@ -5,45 +5,42 @@ def phase_order:
     "L0", "L1", "E0", "E1", "T0"
   ];
 
-def artifact_phases:
-  ["P0", "P1", "A0", "A1", "W0", "N0", "N1"];
-
-def launch_phases:
-  ["C0", "O0", "H0", "D0", "R0", "R1"];
-
-def live_phases:
-  ["L0", "L1", "T0"];
-
-def exec_phases:
-  ["E0", "E1", "T0"];
-
-def phase_paths:
-  [
-    (artifact_phases + launch_phases + live_phases),
-    (artifact_phases + launch_phases + exec_phases),
-    (artifact_phases + launch_phases + ["T0"]),
-    (["F0"] + launch_phases + live_phases),
-    (["F0"] + launch_phases + exec_phases),
-    (["F0"] + launch_phases + ["T0"]),
-    (["F0"] + live_phases),
-    (["F0"] + exec_phases),
-    (["F0", "T0"]),
-    (["P1", "OC0"] + launch_phases + live_phases),
-    (["P1", "OC0"] + launch_phases + exec_phases),
-    (["P1", "OC0"] + launch_phases + ["T0"]),
-    (["P1", "MS0", "S0"] + launch_phases + live_phases),
-    (["P1", "MS0", "S0"] + launch_phases + exec_phases),
-    (["P1", "MS0", "S0"] + launch_phases + ["T0"]),
-    (["RW0"] + launch_phases + live_phases),
-    (["RW0"] + launch_phases + exec_phases),
-    (["RW0"] + launch_phases + ["T0"]),
-    (["S0"] + launch_phases + live_phases),
-    (["S0"] + launch_phases + exec_phases),
-    (["S0"] + launch_phases + ["T0"]),
-    (["S0"] + live_phases),
-    (["S0"] + exec_phases),
-    (["S0", "T0"])
-  ];
+# The product-phase succession graph. This is the single authority for phase
+# reachability and is duplicated verbatim in validate-composition-coverage.jq
+# and generate-composition-coverage.mjs so that no validator depends on
+# another's definition. check-model-coherence.sh compares all three copies.
+#
+# This replaced a hand-enumerated list of 24 linear phase paths, which admitted
+# 231 ordered pairs against this graph's 233 and disagreed on four:
+# P0 -> OC0, P0 -> MS0, and P0 -> S0 were wrongly rejected, and OC0 -> C0 was
+# wrongly accepted. OC0 -> C0 contradicted the locked Operator Configuration
+# branch P1 -> OC0/O0 (DESIGN.md:117): the enumeration routed ["P1","OC0"] into
+# the launch phases, which begin at C0. No registry entry used any of the four.
+def phase_edges:
+  {
+    "P0": ["P1"],
+    "P1": ["A0", "OC0", "MS0"],
+    "A0": ["A1"],
+    "A1": ["W0"],
+    "W0": ["N0"],
+    "N0": ["N1"],
+    "N1": ["C0"],
+    "F0": ["C0", "L0", "E0", "T0"],
+    "OC0": ["O0"],
+    "MS0": ["S0"],
+    "S0": ["C0", "L0", "E0", "T0"],
+    "RW0": ["C0"],
+    "C0": ["O0"],
+    "O0": ["H0"],
+    "H0": ["D0"],
+    "D0": ["R0"],
+    "R0": ["R1"],
+    "R1": ["L0", "E0", "T0"],
+    "L0": ["L1"],
+    "L1": ["T0"],
+    "E0": ["E1"],
+    "E1": ["T0"]
+  };
 
 def owners:
   [
@@ -54,7 +51,8 @@ def owners:
     "live",
     "exec",
     "framework",
-    "runtime"
+    "runtime",
+    "core"
   ];
 
 def scopes:
@@ -80,6 +78,7 @@ def hook_statuses:
 def test_kinds:
   [
     "source-rejection",
+    "construction-exclusion",
     "positive-boundary",
     "composition-bypass",
     "wire-corruption",
@@ -101,6 +100,33 @@ def string_array:
 def nonempty_string_array:
   string_array and length > 0;
 
+# A boundary at which a serialized, product-owned representation is decoded and
+# revalidated. `wire-corruption` is defined as "a malformed/corrupted FRONTEND RESULT is
+# rejected by the next trust boundary", so the obligation belongs to these boundaries and
+# not to in-process Core boundaries such as core-api, live-operation-dispatch,
+# process-launch, idempotency-store, or driver-preparation, which receive a private
+# product-owned stage rather than a decoded representation.
+def decoding_trust_boundaries:
+  [
+    "canonical-wire",
+    "frontend-adaptation",
+    "frontend-evaluation",
+    "schema-migration",
+    "raw-wire-input",
+    "resolved-reentry-wire",
+    "built-manifest",
+    "artifact-manifest-load",
+    "provider-build-result",
+    "provider-transport",
+    "provider-cache",
+    "nix-construction",
+    "generated-service-unit"
+  ];
+
+def decodes_a_representation($invariant):
+  any($invariant.trustBoundaries[]?;
+      . as $b | decoding_trust_boundaries | index($b) != null);
+
 def placeholder_strings:
   [
     .. |
@@ -111,15 +137,32 @@ def placeholder_strings:
 def phase_index($phase):
   phase_order | index($phase);
 
+# Visited-set-guarded transitive closure. The guard is not an optimization:
+# unguarded recursion over a graph containing any cycle exhausts memory instead
+# of reporting, which is how a cycle-detection check can become structurally
+# incapable of diagnosing the failure it names. $seen grows monotonically and is
+# bounded by the node count, so this is total on any graph, cyclic or not.
+def phase_closure($frontier; $seen):
+  if ($frontier | length) == 0
+  then $seen
+  else
+    ($frontier[0]) as $node |
+    ($frontier[1:]) as $rest |
+    if ($seen | index($node)) != null
+    then phase_closure($rest; $seen)
+    else phase_closure(($rest + (phase_edges[$node] // [])); ($seen + [$node]))
+    end
+  end;
+
+def phase_descendants($phase):
+  phase_closure((phase_edges[$phase] // []); []) | unique;
+
 def phase_reachable($from; $to):
-  any(
-    phase_paths[];
-    . as $path |
-    ($path | index($from)) as $from_index |
-    ($path | index($to)) as $to_index |
-    $from_index != null and
-    $to_index != null and
-    $from_index <= $to_index
+  (phase_order | index($from)) != null and
+  (phase_order | index($to)) != null and
+  (
+    $from == $to or
+    (phase_descendants($from) | index($to)) != null
   );
 
 def inv_error($invariant; $message):
@@ -249,10 +292,19 @@ def common_invariant_errors($invariant):
     else inv_error($invariant; "inventory requires planned diagnostic evidence")
     end,
 
-    if ($invariant.disposition == "unrepresentable" or
-        $invariant.disposition == "reject-at-boundary") and
+    if ($invariant.disposition == "reject-at-boundary") and
        (has_test($invariant; "source-rejection") | not)
     then inv_error($invariant; "inventory requires planned source-rejection evidence")
+    else empty
+    end,
+
+    # `unrepresentable` accepts either kind. A value the schema cannot express has no
+    # source text to reject, so `construction-exclusion` -- a compile- or schema-level
+    # test that the supported API cannot name the value -- is the honest evidence.
+    if ($invariant.disposition == "unrepresentable") and
+       (has_test($invariant; "source-rejection") | not) and
+       (has_test($invariant; "construction-exclusion") | not)
+    then inv_error($invariant; "inventory requires planned source-rejection or construction-exclusion evidence")
     else empty
     end,
 
@@ -268,7 +320,7 @@ def common_invariant_errors($invariant):
     else empty
     end,
 
-    if ($invariant.trustBoundaries | length > 0) and
+    if decodes_a_representation($invariant) and
        (has_test($invariant; "wire-corruption") | not)
     then inv_error($invariant; "inventory requires planned wire-corruption evidence")
     else empty
@@ -439,10 +491,16 @@ def closure_errors($invariant):
     else inv_error($invariant; "closure requires diagnostic evidence")
     end,
 
-    if ($invariant.disposition == "unrepresentable" or
-        $invariant.disposition == "reject-at-boundary") and
+    if ($invariant.disposition == "reject-at-boundary") and
        (has_passing_test($invariant; "source-rejection") | not)
     then inv_error($invariant; "closure requires source-rejection evidence")
+    else empty
+    end,
+
+    if ($invariant.disposition == "unrepresentable") and
+       (has_passing_test($invariant; "source-rejection") | not) and
+       (has_passing_test($invariant; "construction-exclusion") | not)
+    then inv_error($invariant; "closure requires source-rejection or construction-exclusion evidence")
     else empty
     end,
 
@@ -458,7 +516,7 @@ def closure_errors($invariant):
     else empty
     end,
 
-    if ($invariant.trustBoundaries | length > 0) and
+    if decodes_a_representation($invariant) and
        (has_passing_test($invariant; "wire-corruption") | not)
     then inv_error($invariant; "closure requires wire-corruption evidence")
     else empty

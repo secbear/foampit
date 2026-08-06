@@ -141,7 +141,7 @@ bypass configuration as a closed review coordinate. The normative registry is
 [`PACKET-D-COMPOSITION-PATHS.json`](./research/invariants/PACKET-D-COMPOSITION-PATHS.json);
 the complete invariant cross-product is
 [`PACKET-D-COMPOSITION-COVERAGE.json`](./research/invariants/PACKET-D-COMPOSITION-COVERAGE.json).
-The current candidate is exactly 54 paths × 140 invariants = 7,560 unique
+The current candidate is exactly 54 paths × 354 invariants = 19,116 unique
 cells. The machine records, rather than this prose, own those dimensions.
 
 The boundaries are deliberately split:

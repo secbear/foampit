@@ -385,16 +385,40 @@ run_inventory_cases() {
 
 assert_packet_d_correction_registration() {
   local registry="${script_dir}/invariants.json"
+  local failures
 
-  jq -e '
-    [.invariants[].id] as $ids |
-    all([
-      "OPS-003","OPS-004","OPS-005",
-      "SVC-003","SVC-004","SVC-005",
-      "WIRE-007","DRV-002","DRV-003","DRV-004"
-    ][]; $ids | index(.) != null) and
-    (.invariants | length == 140)
-  ' "${registry}" >/dev/null
+  # Reports which assertion failed. This was previously a bare
+  # `jq -e ... >/dev/null`, so a count mismatch aborted check-inventory.sh with
+  # completely empty output and read as a harness crash rather than a failed
+  # assertion.
+  failures="$(
+    jq -r '
+      [.invariants[].id] as $ids |
+      (.invariants | length) as $count |
+      [
+        ([
+          "OPS-003","OPS-004","OPS-005",
+          "SVC-003","SVC-004","SVC-005",
+          "WIRE-007","DRV-002","DRV-003","DRV-004"
+        ][] | select($ids | index(.) == null) |
+          "Packet D correction invariant missing from the registry: \(.)"),
+
+        ([
+          "ADP-001","ERR-001","FRK-001","RET-001","SOP-001"
+        ][] | select($ids | index(.) == null) |
+          "Packet E batch 4 invariant missing from the registry: \(.)"),
+
+        (if $count == 355 then empty
+         else "registry length is \($count); Packet E batch 2 expects 355 (297 + 57 + SIG-008)"
+         end)
+      ] | .[]
+    ' "${registry}"
+  )"
+
+  if [[ -n "${failures}" ]]; then
+    printf '%s\n' "${failures}" >&2
+    return 1
+  fi
 }
 
 run_closure_cases() {
